@@ -12,4 +12,9 @@ class ListTest {
     assertEquals("empty", nil[Int].uncons("empty", l => s"size: ${l.size}"))
     assertEquals("size: 3", List(1, 2, 3).uncons("empty", l => s"size: ${l.size}"))
   }
+
+  @Test def emptyTo {
+    assertEquals(List(1), nil[Int].emptyTo(List(1)))
+    assertEquals(List(1, 2, 3), List(1, 2, 3).emptyTo(List(1)))
+  }
 }

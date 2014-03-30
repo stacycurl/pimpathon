@@ -15,7 +15,12 @@ class MapTest {
     }.getMessage)
   }
 
-  def intercept[E <: AnyRef](f: => Any)(implicit expected: ClassTag[E]): E = {
+  @Test def uncons {
+    assertEquals("empty", Map.empty[Int, Int].uncons("empty", _ => "nonEmpty"))
+    assertEquals("nonEmpty", Map(1 -> 2).uncons("empty", _ => "nonEmpty"))
+  }
+
+  private def intercept[E <: AnyRef](f: => Any)(implicit expected: ClassTag[E]): E = {
     val clazz = expected.runtimeClass
 
     val caught = try { f; None } catch {

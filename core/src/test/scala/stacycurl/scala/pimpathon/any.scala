@@ -15,4 +15,9 @@ class AnyTest {
 
     assertEquals(List(1), tapped.toList)
   }
+
+  @Test def partialMatch {
+    assertEquals(Some("Matched"), 1 partialMatch { case 1 => "Matched" })
+    assertEquals(None,            0 partialMatch { case 1 => "Matched" })
+  }
 }

@@ -1,0 +1,3 @@
+Todo:
+ - Generalise uncons to Foldable
+ - Generalise emptyTo to Foldable

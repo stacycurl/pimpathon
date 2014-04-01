@@ -27,4 +27,9 @@ class ListTest {
     assertEquals(Map(), List.empty[Int].toMapWithKeys(_ * 2))
     assertEquals(Map(2 -> 1), List(1).toMapWithKeys(_ * 2))
   }
+
+  @Test def toMapWithValues {
+    assertEquals(Map(), List.empty[Int].toMapWithValues(_ * 2))
+    assertEquals(Map(1 -> 2), List(1).toMapWithValues(_ * 2))
+  }
 }

@@ -22,4 +22,9 @@ class ListTest {
     assertEquals(Map(), List.empty[(Int, Int)].toMultiMap)
     assertEquals(Map(1 -> List(10, 11), 2 -> List(20, 21)), List((1, 10), (1, 11), (2, 20), (2, 21)).toMultiMap)
   }
+
+  @Test def toMapWithKeys {
+    assertEquals(Map(), List.empty[Int].toMapWithKeys(_ * 2))
+    assertEquals(Map(2 -> 1), List(1).toMapWithKeys(_ * 2))
+  }
 }

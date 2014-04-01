@@ -9,6 +9,8 @@ object list {
     def emptyTo(alternative: => List[A]): List[A] = uncons(alternative, _ => list)
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
+
+    def toMapWithKeys[K](f: A => K): Map[K, A] = list.map(a => (f(a), a))(collection.breakOut)
   }
 
   implicit class ListTuple2Ops[K, V](list: List[(K, V)]) {

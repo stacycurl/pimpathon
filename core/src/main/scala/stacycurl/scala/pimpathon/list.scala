@@ -14,6 +14,9 @@ object list {
 
     def toMapWithValues[V](f: A => V): Map[A, V] = list.map(a => (a, f(a)))(collection.breakOut)
 
+    def toMapWithSomeKeys[K](f: A => Option[K]): Map[K, A] =
+      list.flatMap(a => f(a).map(fa => (fa, a)))(collection.breakOut)
+
     def toMultiMapWithKeys[K](f: A => K): MultiMap[K, A] = list.map(a => (f(a), a))(MultiMap.build)
   }
 

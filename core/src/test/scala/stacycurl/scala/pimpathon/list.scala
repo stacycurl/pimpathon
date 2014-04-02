@@ -4,6 +4,7 @@ import org.junit.Test
 import scalaz.std.list._
 
 import org.junit.Assert._
+import scalaz.syntax.std.boolean._
 import stacycurl.scala.pimpathon.list._
 
 
@@ -36,5 +37,10 @@ class ListTest {
   @Test def toMapWithValues {
     assertEquals(Map(), List.empty[Int].toMapWithValues(_ * 2))
     assertEquals(Map(1 -> 2), List(1).toMapWithValues(_ * 2))
+  }
+
+  @Test def toMapWithSomeKeys {
+    assertEquals(Map(), List.empty[Int].toMapWithSomeKeys(i => Some(i * 2)))
+    assertEquals(Map(2 -> 1), List(1, 2).toMapWithSomeKeys(i => (i % 2 == 1).option(i * 2)))
   }
 }

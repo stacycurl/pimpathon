@@ -11,15 +11,31 @@ object list {
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
 
-    def toMapWithKeys[K](f: A => K): Map[K, A] = list.map(a => (f(a), a))(breakOut)
+    def toMapWithKeys[K](f: A => K): Map[K, A] = withKeys(f)(breakOut)
 
-    def toMapWithValues[V](f: A => V): Map[A, V] = list.map(a => (a, f(a)))(breakOut)
+    def toMapWithValues[V](f: A => V): Map[A, V] = withValues(f)(breakOut)
 
-    def toMapWithSomeKeys[K](f: A => Option[K]): Map[K, A] = list.flatMap(a => f(a).map(_ -> a))(breakOut)
+    def toMapWithSomeKeys[K](f: A => Option[K]): Map[K, A] = withSomeKeys(f)(breakOut)
 
-    def toMapWithSomeValues[V](f: A => Option[V]): Map[A, V] = list.flatMap(a => f(a).map(a -> _))(breakOut)
+    def toMapWithSomeValues[V](f: A => Option[V]): Map[A, V] = withSomeValues(f)(breakOut)
 
-    def toMultiMapWithKeys[K](f: A => K): MultiMap[K, A] = list.map(a => (f(a), a))(MultiMap.build)
+
+    def toMultiMapWithKeys[K](f: A => K): MultiMap[K, A] = withKeys(f)(MultiMap.build)
+
+    def toMultiMapWithSomeKeys[K](f: A => Option[K]): MultiMap[K, A] = withSomeKeys(f)(MultiMap.build)
+
+
+    def withKeys[K, That](f: A => K)(implicit cbf: CanBuildFrom[List[A], (K, A), That]): That =
+      list.map(a => (f(a), a))(cbf)
+
+    def withValues[V, That](f: A => V)(implicit cbf: CanBuildFrom[List[A], (A, V), That]): That =
+      list.map(a => (a, f(a)))(cbf)
+
+    def withSomeKeys[K, That](f: A => Option[K])(implicit cbf: CanBuildFrom[List[A], (K, A), That]): That =
+      list.flatMap(a => f(a).map(_ -> a))(cbf)
+
+    def withSomeValues[V, That](f: A => Option[V])(implicit cbf: CanBuildFrom[List[A], (A, V), That]): That =
+      list.flatMap(a => f(a).map(a -> _))(cbf)
   }
 
   implicit class ListTuple2Ops[K, V](list: List[(K, V)]) {

@@ -29,6 +29,11 @@ class ListTest {
     assertEquals(Map(0 -> List(0, 2), 1 -> List(1, 3)), List(0, 1, 2, 3).toMultiMapWithKeys(_ % 2))
   }
 
+  @Test def toMultiMapWithSomeKeys {
+    assertEquals(Map(), List.empty[Int].toMultiMapWithSomeKeys(i => (i % 2 == 1).option(i % 2)))
+    assertEquals(Map(1 -> List(1, 3)), List(0, 1, 2, 3).toMultiMapWithSomeKeys(i => (i % 2 == 1).option(i % 2)))
+  }
+
   @Test def toMapWithKeys {
     assertEquals(Map(), List.empty[Int].toMapWithKeys(_ * 2))
     assertEquals(Map(2 -> 1), List(1).toMapWithKeys(_ * 2))

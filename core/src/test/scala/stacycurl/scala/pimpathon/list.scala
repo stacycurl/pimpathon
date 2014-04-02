@@ -43,4 +43,9 @@ class ListTest {
     assertEquals(Map(), List.empty[Int].toMapWithSomeKeys(i => Some(i * 2)))
     assertEquals(Map(2 -> 1), List(1, 2).toMapWithSomeKeys(i => (i % 2 == 1).option(i * 2)))
   }
+
+  @Test def toMapWithSomeValues {
+    assertEquals(Map(), List.empty[Int].toMapWithSomeValues(i => Some(i * 2)))
+    assertEquals(Map(1 -> 2), List(1, 2).toMapWithSomeValues(i => (i % 2 == 1).option(i * 2)))
+  }
 }

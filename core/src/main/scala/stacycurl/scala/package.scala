@@ -1,6 +1,8 @@
 package stacycurl.scala
 
 import scala.collection.generic.CanBuildFrom
+import scalaz._
+
 
 
 package object pimpathon {

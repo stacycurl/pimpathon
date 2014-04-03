@@ -12,19 +12,10 @@ object list {
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
 
-    def asMap      = new ListCapturer[A, Map](list)
-    def asMultiMap = new ListCapturer[A, MultiMap](list)
+    def asMap      = as[Map]
+    def asMultiMap = as[MultiMap]
 
-    def toMapWithKeys[K]      (f: A => K):         Map[K, A] = asMap.withKeys(f)(breakOut)
-    def toMapWithValues[V]    (f: A => V):         Map[A, V] = asMap.withValues(f)(breakOut)
-    def toMapWithSomeKeys[K]  (f: A => Option[K]): Map[K, A] = asMap.withSomeKeys(f)(breakOut)
-    def toMapWithSomeValues[V](f: A => Option[V]): Map[A, V] = asMap.withSomeValues(f)(breakOut)
-
-    def toMultiMapWithKeys[K]      (f: A => K): MultiMap[K, A] = asMultiMap.withKeys(f)(MultiMap.build)
-    def toMultiMapWithValues[V]    (f: A => V): MultiMap[A, V] = asMultiMap.withValues(f)(MultiMap.build)
-    def toMultiMapWithSomeKeys[K]  (f: A => Option[K]): MultiMap[K, A] = asMultiMap.withSomeKeys(f)(MultiMap.build)
-    def toMultiMapWithSomeValues[V](f: A => Option[V]): MultiMap[A, V] = asMultiMap.withSomeValues(f)(MultiMap.build)
-
+    def as[F[_, _]] = new ListCapturer[A, F](list)
   }
 
   implicit class ListTuple2Ops[K, V](list: List[(K, V)]) {
@@ -33,17 +24,17 @@ object list {
 }
 
 class ListCapturer[A, F[_, _]](list: List[A]) {
-  def withKeys[K](f: A => K)(implicit cbf: CanBuildFrom[List[A], (K, A), F[K, A]]): F[K, A] =
-    list.map(a => (f(a), a))(cbf)
+  def withKeys[K](f: A => K)(implicit cbf: CanBuildFrom[Nothing, (K, A), F[K, A]]): F[K, A] =
+    list.map(a => (f(a), a))(breakOut)
 
-  def withValues[V](f: A => V)(implicit cbf: CanBuildFrom[List[A], (A, V), F[A, V]]): F[A, V] =
-    list.map(a => (a, f(a)))(cbf)
+  def withValues[V](f: A => V)(implicit cbf: CanBuildFrom[Nothing, (A, V), F[A, V]]): F[A, V] =
+    list.map(a => (a, f(a)))(breakOut)
 
-  def withSomeKeys[K](f: A => Option[K])(implicit cbf: CanBuildFrom[List[A], (K, A), F[K, A]]): F[K, A] =
-    list.flatMap(a => f(a).map(_ -> a))(cbf)
+  def withSomeKeys[K](f: A => Option[K])(implicit cbf: CanBuildFrom[Nothing, (K, A), F[K, A]]): F[K, A] =
+    list.flatMap(a => f(a).map(_ -> a))(breakOut)
 
-  def withSomeValues[V](f: A => Option[V])(implicit cbf: CanBuildFrom[List[A], (A, V), F[A, V]]): F[A, V] =
-    list.flatMap(a => f(a).map(a -> _))(cbf)
+  def withSomeValues[V](f: A => Option[V])(implicit cbf: CanBuildFrom[Nothing, (A, V), F[A, V]]): F[A, V] =
+    list.flatMap(a => f(a).map(a -> _))(breakOut)
 }
 
 class MultiMapCanBuildFrom[From, K, V] extends CanBuildFrom[From, (K, V), MultiMap[K, V]] {

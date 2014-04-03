@@ -1,6 +1,7 @@
 package stacycurl.scala.pimpathon
 
 import org.junit.Test
+import scala.collection.immutable.SortedMap
 import scalaz.std.list._
 
 import org.junit.Assert._
@@ -25,44 +26,49 @@ class ListTest {
     assertEquals(Map(1 -> List(10, 11), 2 -> List(20, 21)), List((1, 10), (1, 11), (2, 20), (2, 21)).toMultiMap)
   }
 
-  @Test def toMultiMapWithKeys {
-    assertEquals(Map(), List.empty[Int].toMultiMapWithKeys(_ % 2))
-    assertEquals(Map(0 -> List(0, 2), 1 -> List(1, 3)), List(0, 1, 2, 3).toMultiMapWithKeys(_ % 2))
+  @Test def asMultiMap_withKeys {
+    assertEquals(Map(), List.empty[Int].asMultiMap.withKeys(_ % 2))
+    assertEquals(Map(0 -> List(0, 2), 1 -> List(1, 3)), List(0, 1, 2, 3).asMultiMap.withKeys(_ % 2))
   }
 
-  @Test def toMultiMapWithValues {
-    assertEquals(Map(), List.empty[Int].toMultiMapWithValues(_ % 2))
-    assertEquals(Map(0 -> List(0), 1 -> List(1), 2 -> List(0), 3 -> List(1)), List(0, 1, 2, 3).toMultiMapWithValues(_ % 2))
+  @Test def asMultiMap_withValues {
+    assertEquals(Map(), List.empty[Int].asMultiMap.withValues(_ % 2))
+    assertEquals(Map(0 -> List(0), 1 -> List(1), 2 -> List(0), 3 -> List(1)), List(0, 1, 2, 3).asMultiMap.withValues(_ % 2))
   }
 
-  @Test def toMultiMapWithSomeKeys {
-    assertEquals(Map(), List.empty[Int].toMultiMapWithSomeKeys(i => (i % 2 == 1).option(i % 2)))
-    assertEquals(Map(1 -> List(1, 3)), List(0, 1, 2, 3).toMultiMapWithSomeKeys(i => (i % 2 == 1).option(i % 2)))
+  @Test def asMultiMap_withSomeKeys {
+    assertEquals(Map(), List.empty[Int].asMultiMap.withSomeKeys(i => (i % 2 == 1).option(i % 2)))
+    assertEquals(Map(1 -> List(1, 3)), List(0, 1, 2, 3).asMultiMap.withSomeKeys(i => (i % 2 == 1).option(i % 2)))
   }
 
-  @Test def toMultiMapWithSomeValues {
-    assertEquals(Map(), List.empty[Int].toMultiMapWithSomeValues(i => (i % 2 == 1).option(i % 2)))
-    assertEquals(Map(1 -> List(1), 3 -> List(1)), List(0, 1, 2, 3).toMultiMapWithSomeValues(i => (i % 2 == 1).option(i % 2)))
+  @Test def asMultiMap_withSomeValues {
+    assertEquals(Map(), List.empty[Int].asMultiMap.withSomeValues(i => (i % 2 == 1).option(i % 2)))
+    assertEquals(Map(1 -> List(1), 3 -> List(1)), List(0, 1, 2, 3).asMultiMap.withSomeValues(i => (i % 2 == 1).option(i % 2)))
   }
 
 
-  @Test def toMapWithKeys {
-    assertEquals(Map(), List.empty[Int].toMapWithKeys(_ * 2))
-    assertEquals(Map(2 -> 1), List(1).toMapWithKeys(_ * 2))
+  @Test def asMap_withKeys {
+    assertEquals(Map(), List.empty[Int].asMap.withKeys(_ * 2))
+    assertEquals(Map(2 -> 1), List(1).asMap.withKeys(_ * 2))
   }
 
-  @Test def toMapWithValues {
-    assertEquals(Map(), List.empty[Int].toMapWithValues(_ * 2))
-    assertEquals(Map(1 -> 2), List(1).toMapWithValues(_ * 2))
+  @Test def asMap_withValues {
+    assertEquals(Map(), List.empty[Int].asMap.withValues(_ * 2))
+    assertEquals(Map(1 -> 2), List(1).asMap.withValues(_ * 2))
   }
 
-  @Test def toMapWithSomeKeys {
-    assertEquals(Map(), List.empty[Int].toMapWithSomeKeys(i => Some(i * 2)))
-    assertEquals(Map(2 -> 1), List(1, 2).toMapWithSomeKeys(i => (i % 2 == 1).option(i * 2)))
+  @Test def asMap_withSomeKeys {
+    assertEquals(Map(), List.empty[Int].asMap.withSomeKeys(i => Some(i * 2)))
+    assertEquals(Map(2 -> 1), List(1, 2).asMap.withSomeKeys(i => (i % 2 == 1).option(i * 2)))
   }
 
-  @Test def toMapWithSomeValues {
-    assertEquals(Map(), List.empty[Int].toMapWithSomeValues(i => Some(i * 2)))
-    assertEquals(Map(1 -> 2), List(1, 2).toMapWithSomeValues(i => (i % 2 == 1).option(i * 2)))
+  @Test def asMap_withSomeValues {
+    assertEquals(Map(), List.empty[Int].asMap.withSomeValues(i => Some(i * 2)))
+    assertEquals(Map(1 -> 2), List(1, 2).asMap.withSomeValues(i => (i % 2 == 1).option(i * 2)))
+  }
+
+  @Test def as_SortedMap_withValues {
+    assertEquals(Map(), List.empty[Int].as[SortedMap].withValues(_ * 2))
+    assertEquals(Map(1 -> 2), List(1).as[SortedMap].withValues(_ * 2))
   }
 }

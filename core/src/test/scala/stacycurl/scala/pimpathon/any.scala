@@ -20,4 +20,13 @@ class AnyTest {
     assertEquals(Some("Matched"), 1 partialMatch { case 1 => "Matched" })
     assertEquals(None,            0 partialMatch { case 1 => "Matched" })
   }
+
+  @Test def lpair {
+    assertEquals((10, 1), 1.lpair(_ * 10))
+  }
+
+  @Test def rpair {
+    assertEquals((1, 10), 1.rpair(_ * 10))
+  }
 }
+

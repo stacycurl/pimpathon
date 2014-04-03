@@ -24,16 +24,15 @@ object list {
 }
 
 class ListCapturer[A, F[_, _]](list: List[A]) {
-  def withKeys[K](f: A => K)(implicit cbf: CanBuildFrom[Nothing, (K, A), F[K, A]]): F[K, A] =
-    list.map(a => (f(a), a))(breakOut)
+  type CBF[K, V] = CanBuildFrom[Nothing, (K, V), F[K, V]]
 
-  def withValues[V](f: A => V)(implicit cbf: CanBuildFrom[Nothing, (A, V), F[A, V]]): F[A, V] =
-    list.map(a => (a, f(a)))(breakOut)
+  def withKeys[K](f: A => K)(implicit cbf: CBF[K, A]): F[K, A] = list.map(a => (f(a), a))(breakOut)
+  def withValues[V](f: A => V)(implicit cbf: CBF[A, V]): F[A, V] = list.map(a => (a, f(a)))(breakOut)
 
-  def withSomeKeys[K](f: A => Option[K])(implicit cbf: CanBuildFrom[Nothing, (K, A), F[K, A]]): F[K, A] =
+  def withSomeKeys[K](f: A => Option[K])(implicit cbf: CBF[K, A]): F[K, A] =
     list.flatMap(a => f(a).map(_ -> a))(breakOut)
 
-  def withSomeValues[V](f: A => Option[V])(implicit cbf: CanBuildFrom[Nothing, (A, V), F[A, V]]): F[A, V] =
+  def withSomeValues[V](f: A => Option[V])(implicit cbf: CBF[A, V]): F[A, V] =
     list.flatMap(a => f(a).map(a -> _))(breakOut)
 }
 

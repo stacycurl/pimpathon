@@ -19,7 +19,7 @@ object list {
   }
 
   implicit class ListTuple2Ops[K, V](list: List[(K, V)]) {
-    def toMultiMap: MultiMap[K, V] = list.map(kv => kv)(MultiMap.build)
+    def toMultiMap: MultiMap[K, V] = list.map(kv => kv)(breakOut)
   }
 }
 
@@ -34,10 +34,13 @@ class ListCapturer[A, F[_, _]](list: List[A]) {
 
   def withSomeValues[V](f: A => Option[V])(implicit cbf: CBF[A, V]): F[A, V] =
     list.flatMap(a => f(a).map(a -> _))(breakOut)
+
+  def withManyKeys[K](f: A => List[K])(implicit cbf: CBF[K, A]): F[K, A] =
+    list.flatMap(a => f(a).map(_ -> a))(breakOut)
 }
 
-class MultiMapCanBuildFrom[From, K, V] extends CanBuildFrom[From, (K, V), MultiMap[K, V]] {
-  def apply(from: From): Builder[(K, V), MultiMap[K, V]] = apply()
+class MultiMapCanBuildFrom[K, V] extends CanBuildFrom[Nothing, (K, V), MultiMap[K, V]] {
+  def apply(from: Nothing): Builder[(K, V), MultiMap[K, V]] = apply()
   def apply(): Builder[(K, V), MultiMap[K, V]] = new MultiMapBuilder[K, V]
 }
 

@@ -46,6 +46,13 @@ class ListTest {
     assertEquals(Map(1 -> List(1), 3 -> List(1)), List(0, 1, 2, 3).asMultiMap.withSomeValues(i => (i % 2 == 1).option(i % 2)))
   }
 
+  @Test def asMultiMap_withManyKeys {
+    assertEquals(Map(), List.empty[Int].asMultiMap.withManyKeys(i => List(-i, i)))
+
+    assertEquals(Map(1 -> List(1), 2 -> List(1, 2), 3 -> List(2)),
+      List(1, 2).asMultiMap.withManyKeys(i => List(i, i + 1)))
+  }
+
 
   @Test def asMap_withKeys {
     assertEquals(Map(), List.empty[Int].asMap.withKeys(_ * 2))
@@ -70,5 +77,10 @@ class ListTest {
   @Test def as_SortedMap_withValues {
     assertEquals(Map(), List.empty[Int].as[SortedMap].withValues(_ * 2))
     assertEquals(Map(1 -> 2), List(1).as[SortedMap].withValues(_ * 2))
+  }
+
+  @Test def asMap_withManyKeys {
+    assertEquals(Map(), List.empty[Int].asMap.withManyKeys(i => List(-i, i)))
+    assertEquals(Map(-2 -> 2, -1 -> 1, 1 -> 1, 2 -> 2), List(1, 2).asMap.withManyKeys(i => List(-i, i)))
   }
 }

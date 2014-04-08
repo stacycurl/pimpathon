@@ -7,7 +7,7 @@ import scala.collection.{mutable => M}
 
 
 object list {
-  implicit class ListOps[A](list: List[A]) {
+  implicit class ListOps[A](val list: List[A]) extends AnyVal {
     def emptyTo(alternative: => List[A]): List[A] = uncons(alternative, _ => list)
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)

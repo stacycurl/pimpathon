@@ -3,7 +3,7 @@ package stacycurl.scala.pimpathon
 import scala.collection.breakOut
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable._
-import scala.collection.mutable.{Builder, ListBuffer, Map => MMap}
+import scala.collection.{mutable => M}
 
 
 object list {
@@ -40,19 +40,19 @@ class ListCapturer[A, F[_, _]](list: List[A]) {
 }
 
 class MultiMapCanBuildFrom[K, V] extends CanBuildFrom[Nothing, (K, V), MultiMap[K, V]] {
-  def apply(from: Nothing): Builder[(K, V), MultiMap[K, V]] = apply()
-  def apply(): Builder[(K, V), MultiMap[K, V]] = new MultiMapBuilder[K, V]
+  def apply(from: Nothing): M.Builder[(K, V), MultiMap[K, V]] = apply()
+  def apply(): M.Builder[(K, V), MultiMap[K, V]] = new MultiMapBuilder[K, V]
 }
 
-class MultiMapBuilder[K, V](map: MMap[K, ListBuffer[V]] = MMap.empty[K, ListBuffer[V]])
-  extends Builder[(K, V), MultiMap[K, V]] {
+class MultiMapBuilder[K, V](map: M.Map[K, M.ListBuffer[V]] = M.Map.empty[K, M.ListBuffer[V]])
+  extends M.Builder[(K, V), MultiMap[K, V]] {
 
   def +=(elem: (K, V)): this.type = add(elem._1, elem._2)
   def clear(): Unit = map.clear()
   def result(): Map[K, List[V]] = map.map(kv => (kv._1, kv._2.toList))(breakOut)
 
   def add(k: K, v: V): this.type = {
-    map.update(k, map.get(k).fold(ListBuffer(v))(values => { values += v; values }))
+    map.update(k, map.get(k).fold(M.ListBuffer(v))(values => { values += v; values }))
 
     this
   }

@@ -1,3 +1,6 @@
 Todo:
  - Generalise uncons to Foldable
  - Generalise emptyTo to Foldable
+ - as[Z: MapBuilder]
+ - determine how to add non-transitive dependencies,
+     so I can pimp all the things without forcing everyone to include all dependencies

@@ -12,5 +12,10 @@ class FunctionTest {
       List(Nil, List(2), List(3), List(2, 4), List(2, 4, 3)).filter(isEven.forall))
   }
 
+  @Test def exists {
+    assertEquals(List(List(2), List(2, 4), List(2, 4, 3)),
+      List(Nil, List(2), List(3), List(2, 4), List(2, 4, 3)).filter(isEven.exists))
+  }
+
   private val isEven: (Int => Boolean) = (_ % 2 == 0)
 }

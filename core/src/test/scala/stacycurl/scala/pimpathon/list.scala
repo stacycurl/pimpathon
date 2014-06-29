@@ -87,4 +87,11 @@ class ListTest {
   @Test def attributeCounts {
     assertEquals(Map(3 -> 2, 4 -> 1), List("foo", "food", "bar").attributeCounts(_.size))
   }
+
+  @Test def optAttributeCounts {
+    import stacycurl.scala.pimpathon.any._
+
+    assertEquals(Map(3 -> 2, 4 -> 1),
+      List("foo", "food", "bar", "oo").optAttributeCounts(_.size.filterSelf(_ > 2)))
+  }
 }

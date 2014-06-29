@@ -16,6 +16,8 @@ object list {
     def asMultiMap = as[MultiMap]
 
     def as[F[_, _]] = new ListCapturer[A, F](list)
+
+    def attributeCounts[B](f: A => B): Map[B, Int] = asMultiMap.withKeys(f).mapValues(_.size)
   }
 
   implicit class ListTuple2Ops[K, V](list: List[(K, V)]) {

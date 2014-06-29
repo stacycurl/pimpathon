@@ -83,4 +83,8 @@ class ListTest {
     assertEquals(Map(), List.empty[Int].asMap.withManyKeys(i => List(-i, i)))
     assertEquals(Map(-2 -> 2, -1 -> 1, 1 -> 1, 2 -> 2), List(1, 2).asMap.withManyKeys(i => List(-i, i)))
   }
+
+  @Test def attributeCounts {
+    assertEquals(Map(3 -> 2, 4 -> 1), List("foo", "food", "bar").attributeCounts(_.size))
+  }
 }

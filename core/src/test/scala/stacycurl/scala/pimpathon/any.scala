@@ -28,5 +28,10 @@ class AnyTest {
   @Test def rpair {
     assertEquals((1, 10), 1.rpair(_ * 10))
   }
+
+  @Test def filterSelf {
+    assertEquals(List(None, Some(2), None, Some(4)),
+      List(1, 2, 3, 4).map(_.filterSelf(_ % 2 == 0)))
+  }
 }
 

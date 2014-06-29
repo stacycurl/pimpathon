@@ -1,5 +1,8 @@
 package stacycurl.scala.pimpathon
 
+import scalaz.syntax.std.boolean._
+
+
 object any {
   implicit class AnyOps[A](val a: A) extends AnyVal {
     def tap(action: A => Unit): A = { action(a); a }
@@ -8,5 +11,7 @@ object any {
 
     def lpair[B](f: A => B): (B, A) = (f(a), a)
     def rpair[B](f: A => B): (A, B) = (a, f(a))
+
+    def filterSelf(p: A => Boolean): Option[A] = p(a).option(a)
   }
 }

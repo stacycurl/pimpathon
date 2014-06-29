@@ -17,7 +17,11 @@ object list {
 
     def as[F[_, _]] = new ListCapturer[A, F](list)
 
-    def attributeCounts[B](f: A => B): Map[B, Int] = asMultiMap.withKeys(f).mapValues(_.size)
+    def attributeCounts[B](f: A => B): Map[B, Int] =
+      asMultiMap.withKeys(f).mapValues(_.size)
+
+    def collectAttributeCounts[B](pf: PartialFunction[A, B]): Map[B, Int] =
+      optAttributeCounts(pf.lift)
 
     def optAttributeCounts[B](f: A => Option[B]): Map[B, Int] =
       asMultiMap.withSomeKeys(f).mapValues(_.size)

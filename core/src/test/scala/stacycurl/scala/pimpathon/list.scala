@@ -94,4 +94,12 @@ class ListTest {
     assertEquals(Map(3 -> 2, 4 -> 1),
       List("foo", "food", "bar", "oo").optAttributeCounts(_.size.filterSelf(_ > 2)))
   }
+
+  @Test def collectAttributeCounts {
+    assertEquals(Map(3 -> 2, 4 -> 1),
+      List("foo", "food", "bar", "oo").collectAttributeCounts {
+        case word if word.size > 2 => word.size
+      }
+    )
+  }
 }

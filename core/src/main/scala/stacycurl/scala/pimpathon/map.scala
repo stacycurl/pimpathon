@@ -13,13 +13,15 @@ object map {
 
     def uncons[A](empty: => A, nonEmpty: Map[K, V] => A): A = if (map.isEmpty) empty else nonEmpty(map)
 
-    def keyForMaxValue(implicit O: Ordering[V]): Option[K] =
-      map.maximum(Order.fromScalaOrdering(O).contramap[(K, V)](_._2)).map(_._1)
+    def keyForMaxValue(implicit O: Ordering[V]): Option[K] = map.maximum(value).map(_._1)
+    def keyForMinValue(implicit O: Ordering[V]): Option[K] = map.minimum(value).map(_._1)
+    def valueForMaxKey(implicit O: Ordering[K]): Option[V] = map.maximum(key).map(_._2)
+    def valueForMinKey(implicit O: Ordering[K]): Option[V] = map.minimum(key).map(_._2)
 
-    def valueForMaxKey(implicit O: Ordering[K]): Option[V] =
-      map.maximum(Order.fromScalaOrdering(O).contramap[(K, V)](_._1)).map(_._2)
+    private def key(implicit O: Ordering[K]): Order[(K, V)] =
+      Order.fromScalaOrdering(O).contramap[(K, V)](_._1)
 
-    def valueForMinKey(implicit O: Ordering[K]): Option[V] =
-      map.minimum(Order.fromScalaOrdering(O).contramap[(K, V)](_._1)).map(_._2)
+    private def value(implicit O: Ordering[V]): Order[(K, V)] =
+      Order.fromScalaOrdering(O).contramap[(K, V)](_._2)
   }
 }

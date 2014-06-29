@@ -15,5 +15,8 @@ object map {
 
     def valueForMaxKey(implicit O: Ordering[K]): Option[V] =
       map.maximum(Order.fromScalaOrdering(O).contramap[(K, V)](_._1)).map(_._2)
+
+    def valueForMinKey(implicit O: Ordering[K]): Option[V] =
+      map.minimum(Order.fromScalaOrdering(O).contramap[(K, V)](_._1)).map(_._2)
   }
 }

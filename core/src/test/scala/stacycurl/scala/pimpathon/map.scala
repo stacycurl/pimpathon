@@ -30,6 +30,11 @@ class MapTest {
     assertEquals(Some("max"), Map(1 -> "min", 2 -> "max").valueForMaxKey)
   }
 
+  @Test def valueForMinKey {
+    assertEquals(None, Map.empty[Int, String].valueForMinKey)
+    assertEquals(Some("min"), Map(1 -> "min", 2 -> "max").valueForMinKey)
+  }
+
   private def intercept[E <: AnyRef](f: => Any)(implicit expected: ClassTag[E]): E = {
     val clazz = expected.runtimeClass
 

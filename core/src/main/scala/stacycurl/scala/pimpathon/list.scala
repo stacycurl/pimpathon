@@ -44,6 +44,12 @@ class ListCapturer[A, F[_, _]](list: List[A]) {
   def withSomeValues[V](f: A => Option[V])(implicit cbf: CBF[A, V]): F[A, V] =
     list.flatMap(a => f(a).map(a -> _))(breakOut)
 
+  def withPFKeys[K](pf: PartialFunction[A, K])(implicit cbf: CBF[K, A]): F[K, A] =
+    list.collect { case a if pf.isDefinedAt(a) => (pf(a), a) }(breakOut)
+
+  def withPFValues[V](pf: PartialFunction[A, V])(implicit cbf: CBF[A, V]): F[A, V] =
+    list.collect { case a if pf.isDefinedAt(a) => (a, pf(a)) }(breakOut)
+
   def withManyKeys[K](f: A => List[K])(implicit cbf: CBF[K, A]): F[K, A] =
     list.flatMap(a => f(a).map(_ -> a))(breakOut)
 }

@@ -46,6 +46,16 @@ class ListTest {
     assertEquals(Map(1 -> List(1), 3 -> List(1)), List(0, 1, 2, 3).asMultiMap.withSomeValues(i => (i % 2 == 1).option(i % 2)))
   }
 
+  @Test def asMultiMap_withPFKeys {
+    assertEquals(Map(), List.empty[Int].asMultiMap.withPFKeys { case i if i % 2 == 1 => i % 2 })
+    assertEquals(Map(1 -> List(1, 3)), List(0, 1, 2, 3).asMultiMap.withPFKeys { case i if i % 2 == 1 => i % 2 })
+  }
+
+  @Test def asMultiMap_withPFValues {
+    assertEquals(Map(), List.empty[Int].asMultiMap.withPFValues { case i if i % 2 == 1 => i % 2 })
+    assertEquals(Map(1 -> List(1), 3 -> List(1)), List(0, 1, 2, 3).asMultiMap.withPFValues { case i if i % 2 == 1 => i % 2 })
+  }
+
   @Test def asMultiMap_withManyKeys {
     assertEquals(Map(), List.empty[Int].asMultiMap.withManyKeys(i => List(-i, i)))
 
@@ -72,6 +82,16 @@ class ListTest {
   @Test def asMap_withSomeValues {
     assertEquals(Map(), List.empty[Int].asMap.withSomeValues(i => Some(i * 2)))
     assertEquals(Map(1 -> 2), List(1, 2).asMap.withSomeValues(i => (i % 2 == 1).option(i * 2)))
+  }
+
+  @Test def asMap_withPFKeys {
+    assertEquals(Map(), List.empty[Int].asMap.withPFKeys { case i => i * 2 })
+    assertEquals(Map(2 -> 1), List(1, 2).asMap.withPFKeys { case i if i % 2 == 1 => i * 2 })
+  }
+
+  @Test def asMap_withPFValues {
+    assertEquals(Map(), List.empty[Int].asMap.withPFValues { case i => i * 2 })
+    assertEquals(Map(1 -> 2), List(1, 2).asMap.withPFValues { case i if i % 2 == 1 => i * 2 })
   }
 
   @Test def as_SortedMap_withValues {

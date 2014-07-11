@@ -18,6 +18,8 @@ object map {
     def valueForMaxKey(implicit O: Ordering[K]): Option[V] = map.maximum(key).map(_._2)
     def valueForMinKey(implicit O: Ordering[K]): Option[V] = map.minimum(key).map(_._2)
 
+    def mapValuesEagerly[W](f: V => W): Map[K, W] = map.map { case (k, v) => (k, f(v)) }(collection.breakOut)
+
     private def key(implicit O: Ordering[K]): Order[(K, V)] =
       Order.fromScalaOrdering(O).contramap[(K, V)](_._1)
 

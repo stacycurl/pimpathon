@@ -1,6 +1,7 @@
 package stacycurl.scala.pimpathon
 
 import org.junit.Test
+import scala.collection.{mutable => M}
 import scala.reflect.ClassTag
 import scala.util.control._
 
@@ -43,6 +44,17 @@ class MapTest {
   @Test def keyForMinValue {
     assertEquals(None, Map.empty[Int, String].keyForMinValue)
     assertEquals(Some(2), Map(2 -> "abc", 2 -> "def").keyForMinValue)
+  }
+
+  @Test def mapValuesEagerly {
+    val originalValuesSeen = new M.ListBuffer[Int]
+    def update(v: Int) = { originalValuesSeen += v; v * 10 }
+
+    val result = Map(1 -> 1, 2 -> 2).mapValuesEagerly(update)
+    assertEquals("Should have iterated over the original map already", List(1, 2), originalValuesSeen.toList)
+    assertEquals(Map(1 -> 10, 2 -> 20), result)
+    assertEquals(Map(1 -> 10, 2 -> 20), result)
+    assertEquals("Shouldn't have iterated over the original map twice", List(1, 2), originalValuesSeen.toList)
   }
 
   private def intercept[E <: AnyRef](f: => Any)(implicit expected: ClassTag[E]): E = {

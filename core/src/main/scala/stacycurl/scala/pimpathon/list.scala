@@ -12,8 +12,8 @@ object list {
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
 
-    def asMap      = as[Map]
-    def asMultiMap = as[MultiMap]
+    def asMap            = as[Map]
+    def asMultiMap[F[_]] = as[({ type MM[K, V] = MultiMap[F, K, V] })#MM]
 
     def as[F[_, _]] = new ListCapturer[A, F](list)
 
@@ -28,7 +28,8 @@ object list {
   }
 
   implicit class ListTuple2Ops[K, V](list: List[(K, V)]) {
-    def toMultiMap: MultiMap[K, V] = list.map(kv => kv)(breakOut)
+    def toMultiMap[F[_]](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
+      : MultiMap[F, K, V] = list.map(kv => kv)(breakOut)
   }
 }
 
@@ -54,20 +55,26 @@ class ListCapturer[A, F[_, _]](list: List[A]) {
     list.flatMap(a => f(a).map(_ -> a))(breakOut)
 }
 
-class MultiMapCanBuildFrom[K, V] extends CanBuildFrom[Nothing, (K, V), MultiMap[K, V]] {
-  def apply(from: Nothing): M.Builder[(K, V), MultiMap[K, V]] = apply()
-  def apply(): M.Builder[(K, V), MultiMap[K, V]] = new MultiMapBuilder[K, V]
+class MultiMapCanBuildFrom[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
+  extends CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]] {
+
+  def apply(from: Nothing): M.Builder[(K, V), MultiMap[F, K, V]] = apply()
+  def apply(): M.Builder[(K, V), MultiMap[F, K, V]] = new MultiMapBuilder[F, K, V]
 }
 
-class MultiMapBuilder[K, V](map: M.Map[K, M.ListBuffer[V]] = M.Map.empty[K, M.ListBuffer[V]])
-  extends M.Builder[(K, V), MultiMap[K, V]] {
+class MultiMapBuilder[F[_], K, V](
+  map: M.Map[K, M.Builder[V, F[V]]] = M.Map.empty[K, M.Builder[V, F[V]]]
+)(
+  implicit fcbf: CanBuildFrom[Nothing, V, F[V]]
+)
+  extends M.Builder[(K, V), MultiMap[F, K, V]] {
 
   def +=(elem: (K, V)): this.type = add(elem._1, elem._2)
   def clear(): Unit = map.clear()
-  def result(): Map[K, List[V]] = map.map(kv => (kv._1, kv._2.toList))(breakOut)
+  def result(): Map[K, F[V]] = map.map(kv => (kv._1, kv._2.result()))(breakOut)
 
   def add(k: K, v: V): this.type = {
-    map.update(k, map.get(k).fold(M.ListBuffer(v))(values => { values += v; values }))
+    map.put(k, map.getOrElse(k, fcbf.apply()) += v)
 
     this
   }

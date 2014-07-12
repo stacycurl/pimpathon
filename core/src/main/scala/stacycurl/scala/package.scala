@@ -6,11 +6,13 @@ import scalaz._
 
 
 package object pimpathon {
-  type MultiMap[K, V] = Map[K, List[V]]
+  type MultiMap[F[_], K, V] = Map[K, F[V]]
 
-  implicit def build[K, V]: CanBuildFrom[Nothing, (K, V), MultiMap[K, V]] = MultiMap.build
+  implicit def build[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
+    : CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]] = MultiMap.build
 
   object MultiMap {
-    def build[K, V]: CanBuildFrom[Nothing, (K, V), MultiMap[K, V]] = new MultiMapCanBuildFrom[K, V]
+    def build[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
+      : CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]] = new MultiMapCanBuildFrom[F, K, V]
   }
 }

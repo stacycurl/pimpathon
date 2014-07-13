@@ -25,6 +25,10 @@ object list {
 
     def optAttributeCounts[B](f: A => Option[B]): Map[B, Int] =
       asMultiMap.withSomeKeys(f).mapValues(_.size)
+
+    def distinctBy[B](f: A => B): List[A] = list.map(equalBy(f)).distinct.map(_.a)
+
+    private def equalBy[B](f: A => B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
   }
 
   implicit class ListTuple2Ops[K, V](list: List[(K, V)]) {
@@ -79,3 +83,5 @@ class MultiMapBuilder[F[_], K, V](
     this
   }
 }
+
+case class EqualBy[A, B](b: B)(val a: A)

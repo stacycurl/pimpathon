@@ -2,9 +2,9 @@ package stacycurl.scala.pimpathon
 
 import org.junit.Test
 import scala.collection.immutable.SortedMap
-import scalaz.std.list._
 
 import org.junit.Assert._
+import scalaz.std.list._
 import scalaz.syntax.std.boolean._
 import stacycurl.scala.pimpathon.list._
 
@@ -142,5 +142,10 @@ class ListTest {
         case word if word.size > 2 => word.size
       }
     )
+  }
+
+  @Test def distinctBy {
+    assertEquals(List("foo", "bard", "foody"),
+      List("foo", "bar", "bard", "food", "foody", "bardo").distinctBy(_.length))
   }
 }

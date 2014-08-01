@@ -12,7 +12,7 @@ import sbtrelease.ReleasePlugin.ReleaseKeys._
 import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
 
-object pimpathonBuild extends Build {
+object PimpathonBuild extends Build {
 
   lazy val pimpathon = Project(
     id = "pimpathon",
@@ -33,7 +33,7 @@ object pimpathonBuild extends Build {
     Project(
       id = "pimpathon-core",
       base = file("core"),
-      settings = commonSettings ++ buildInfoSettings ++ releaseSettings ++ Seq(
+      settings = commonSettings ++ Publishing.settings ++ buildInfoSettings ++ releaseSettings ++ Seq(
         moduleName := "pimpathon",
 
         managedSourceDirectories in Test := Nil,
@@ -109,7 +109,7 @@ object pimpathonBuild extends Build {
 
   def commonSettings = Defaults.defaultSettings ++
     Seq(
-      organization        := "stacycurl.scala",
+      organization        := "com.github.stacycurl",
       scalaVersion        := "2.10.3",
       scalaBinaryVersion  := "2.10.3",
 

@@ -5,7 +5,10 @@ import scalaz.syntax.std.boolean._
 
 object any {
   implicit class AnyOps[A](val a: A) extends AnyVal {
-    def tap(action: A => Unit): A = { action(a); a }
+    // These methods are aliased to suit individual preferences
+    def tap(action: A => Unit): A            = { action(a); a }
+    def update(action: A => Unit): A         = { action(a); a }
+    def withSideEffect(action: A => Unit): A = { action(a); a }
 
     def partialMatch[B](pf: PartialFunction[A, B]): Option[B] = PartialFunction.condOpt(a)(pf)
 

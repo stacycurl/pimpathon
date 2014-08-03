@@ -8,12 +8,17 @@ import pimpathon.any._
 
 
 class AnyTest {
-  @Test def tap {
-    val tapped = new ListBuffer[Int]
+  @Test def tap_update_withSideEffect {
+    val ints = new ListBuffer[Int]
 
-    1.tap(tapped += _)
+    1.tap(ints += _)
+    assertEquals(List(1), ints.toList)
 
-    assertEquals(List(1), tapped.toList)
+    2.update(ints += _)
+    assertEquals(List(1, 2), ints.toList)
+
+    3.withSideEffect(ints += _)
+    assertEquals(List(1, 2, 3), ints.toList)
   }
 
   @Test def partialMatch {

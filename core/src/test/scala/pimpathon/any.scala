@@ -1,10 +1,10 @@
-package stacycurl.scala.pimpathon
+package pimpathon
 
 import org.junit.Test
 import scala.collection.mutable.ListBuffer
 
 import org.junit.Assert._
-import stacycurl.scala.pimpathon.any._
+import pimpathon.any._
 
 
 class AnyTest {

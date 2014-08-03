@@ -1,4 +1,4 @@
-package stacycurl.scala.pimpathon
+package pimpathon
 
 import scalaz.Order
 import scalaz.std.iterable._

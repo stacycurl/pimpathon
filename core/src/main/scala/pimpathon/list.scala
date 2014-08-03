@@ -1,4 +1,4 @@
-package stacycurl.scala.pimpathon
+package pimpathon
 
 import scala.collection.breakOut
 import scala.collection.generic.CanBuildFrom

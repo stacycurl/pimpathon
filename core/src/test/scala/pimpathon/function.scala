@@ -1,9 +1,9 @@
-package stacycurl.scala.pimpathon
+package pimpathon
 
 import org.junit.Test
 
 import org.junit.Assert._
-import stacycurl.scala.pimpathon.function._
+import pimpathon.function._
 
 
 class FunctionTest {

@@ -1,4 +1,4 @@
-package stacycurl.scala.pimpathon
+package pimpathon
 
 object function {
   implicit class PredicateOps[A](val p: A => Boolean) extends AnyVal {

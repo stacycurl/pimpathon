@@ -1,4 +1,4 @@
-package stacycurl.scala.pimpathon
+package pimpathon
 
 import scalaz.syntax.std.boolean._
 

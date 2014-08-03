@@ -1,4 +1,4 @@
-package stacycurl.scala.pimpathon
+package pimpathon
 
 import org.junit.Test
 import scala.collection.{mutable => M}
@@ -6,7 +6,7 @@ import scala.reflect.ClassTag
 import scala.util.control._
 
 import org.junit.Assert._
-import stacycurl.scala.pimpathon.map._
+import pimpathon.map._
 
 
 class MapTest {

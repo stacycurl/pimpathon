@@ -1,4 +1,4 @@
-package stacycurl.scala.pimpathon
+package pimpathon
 
 import org.junit.Test
 import scala.collection.immutable.SortedMap
@@ -6,7 +6,7 @@ import scala.collection.immutable.SortedMap
 import org.junit.Assert._
 import scalaz.std.list._
 import scalaz.syntax.std.boolean._
-import stacycurl.scala.pimpathon.list._
+import pimpathon.list._
 
 
 class ListTest {
@@ -130,7 +130,7 @@ class ListTest {
   }
 
   @Test def optAttributeCounts {
-    import stacycurl.scala.pimpathon.any._
+    import pimpathon.any._
 
     assertEquals(Map(3 -> 2, 4 -> 1),
       List("foo", "food", "bar", "oo").optAttributeCounts(_.size.filterSelf(_ > 2)))

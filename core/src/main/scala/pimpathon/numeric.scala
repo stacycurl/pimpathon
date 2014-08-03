@@ -1,4 +1,4 @@
-package stacycurl.scala.pimpathon
+package pimpathon
 
 object numeric {
   implicit class NumericOps[A](val na: Numeric[A]) extends AnyVal {

@@ -1,11 +1,11 @@
-package stacycurl.scala.pimpathon
+package pimpathon
 
 import org.junit.Test
 import scalaz.std.list._
 
 import org.junit.Assert._
 import scala.math.Numeric._
-import stacycurl.scala.pimpathon.numeric._
+import pimpathon.numeric._
 
 
 class NumericTest {

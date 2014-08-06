@@ -7,7 +7,11 @@ import scalaz.syntax.foldable._
 
 object map {
   implicit class MapOps[K, V](val map: Map[K, V]) extends AnyVal {
-    def getOrThrow(k: K, message: => String): V = map.getOrElse(k, throw new RuntimeException(message))
+    def getOrThrow(k: K, message: String): V =
+      getOrThrow(k, new IllegalArgumentException(message))
+
+    def getOrThrow(k: K, exception: Exception): V =
+      map.getOrElse(k, throw exception)
 
     def emptyTo(empty: => Map[K, V]): Map[K, V] = uncons(empty, _ => map)
 

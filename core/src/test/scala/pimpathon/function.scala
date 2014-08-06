@@ -25,5 +25,9 @@ class FunctionTest {
     assertEquals(List(2, 4, 3), List(2, 1, 4, 3, 5).filter(isEven or (_ == 3)))
   }
 
+  @Test def not {
+    assertEquals(List(1, 3, 5), List(2, 1, 4, 3, 5).filter(isEven.not))
+  }
+
   private val isEven: (Int => Boolean) = (_ % 2 == 0)
 }

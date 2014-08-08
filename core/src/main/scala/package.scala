@@ -2,7 +2,6 @@ import scala.collection.generic.CanBuildFrom
 import scalaz._
 
 
-
 package object pimpathon {
   type MultiMap[F[_], K, V] = Map[K, F[V]]
 

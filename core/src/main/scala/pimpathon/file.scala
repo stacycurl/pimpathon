@@ -3,17 +3,20 @@ package pimpathon
 import java.io.File
 
 
-object file extends FileUtils
+object file {
+  def withTempFile[A](f: File => A): A = withTempFile(".tmp", "temp")(f)
 
-case class FileUtils(tempPrefix: String = "temp", tempSuffix: String = ".tmp") {
-  def withTemp[A](f: File => A): A = {
-    val file = File.createTempFile(tempPrefix, tempSuffix)
+  def withTempFile[A](suffix: String, prefix: String = "temp")(f: File => A): A = {
+    val file = File.createTempFile(prefix, suffix)
 
     try f(file) finally file.delete
   }
 
-  def withTempDirectory[A](f: File => A): A = {
-    withTemp[A](file => {
+
+  def withTempDirectory[A](f: File => A): A = withTempDirectory(".tmp", "temp")(f)
+
+  def withTempDirectory[A](suffix: String, prefix: String = "temp")(f: File => A): A = {
+    file.withTempFile[A](suffix, prefix)((file: File) => {
       file.delete()
       file.mkdir()
 

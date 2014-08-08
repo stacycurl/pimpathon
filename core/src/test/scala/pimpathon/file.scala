@@ -8,29 +8,58 @@ import pimpathon.file._
 
 
 class FileTest {
-  @Test def withTemp {
-    val temp = file.withTemp(tmp => {
-      assertTrue("Temp file should exist during 'withTemp'", tmp.exists)
-      assertTrue(tmp.getName.startsWith(file.tempPrefix))
-      assertTrue(tmp.getName.endsWith(file.tempSuffix))
-      assertTrue(tmp.isFile)
+  @Test def withTempFile {
+    assertFalse("Temp file should not exist after 'withTempFile'",
+      file.withTempFile(tmp => {
+        assertIsTemp(".tmp", "temp", expectedIsFile = true, tmp); tmp
+      }).exists
+    )
 
-      tmp
-    })
+    assertFalse("Temp file should not exist after 'withTempFile'",
+      file.withTempFile("suffix")(tmp => {
+        assertIsTemp("suffix", "temp", expectedIsFile = true, tmp); tmp
+      }).exists
+    )
 
-    assertFalse("Temp file should not exist after 'withTemp'", temp.exists)
+    assertFalse("Temp file should not exist after 'withTempFile'",
+      file.withTempFile("suffix", "prefix")(tmp => {
+        assertIsTemp("suffix", "prefix", expectedIsFile = true, tmp); tmp
+      }).exists
+    )
   }
 
   @Test def withTempDirectory {
-    val temp = file.withTempDirectory(tmp => {
-      assertTrue("Temp directory should exist during 'withTemp'", tmp.exists)
-      assertTrue(tmp.getName.startsWith(file.tempPrefix))
-      assertTrue(tmp.getName.endsWith(file.tempSuffix))
-      assertTrue(tmp.isDirectory)
+    assertFalse("Temp directory should not exist after 'withTempDirectory'",
+      file.withTempDirectory(tmp => {
+        assertIsTemp(".tmp", "temp", expectedIsFile = false, tmp); tmp
+      }).exists
+    )
 
-      tmp
-    })
+    assertFalse("Temp directory should not exist after 'withTempDirectory'",
+      file.withTempDirectory("suffix")(tmp => {
+        assertIsTemp("suffix", "temp", expectedIsFile = false, tmp); tmp
+      }).exists
+    )
 
-    assertFalse("Temp directory should not exist after 'withTemp'", temp.exists)
+    assertFalse("Temp directory should not exist after 'withTempDirectory'",
+      file.withTempDirectory("suffix", "prefix")(tmp => {
+        assertIsTemp("suffix", "prefix", expectedIsFile = false, tmp); tmp
+      }).exists
+    )
+  }
+
+  private def assertIsTemp(expectedSuffix: String, expectedPrefix: String, expectedIsFile: Boolean,
+    tmp: File) {
+
+    assertTrue(s"Expected ${tmp.getName} to exist !", tmp.exists)
+
+    assertTrue(s"Expected ${tmp.getName}, to begin with $expectedPrefix",
+      tmp.getName.startsWith(expectedPrefix))
+
+    assertTrue(s"Expected ${tmp.getName}, to end with $expectedSuffix",
+      tmp.getName.endsWith(expectedSuffix))
+
+    assertEquals(s"Expected ${tmp.getName} to be a " + (if (expectedIsFile) "file" else "directory"),
+      expectedIsFile, tmp.isFile)
   }
 }

@@ -11,4 +11,13 @@ case class FileUtils(tempPrefix: String = "temp", tempSuffix: String = ".tmp") {
 
     try f(file) finally file.delete
   }
+
+  def withTempDirectory[A](f: File => A): A = {
+    withTemp[A](file => {
+      file.delete()
+      file.mkdir()
+
+      f(file)
+    })
+  }
 }

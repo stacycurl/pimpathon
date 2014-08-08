@@ -21,6 +21,6 @@ after_success:
 env:
   global:
   # travis encrypt -r stacycurl/pimpathon SONATYPE_USERNAME=<USERNAME>
-  - secure: bg+z118J0EpWSmAdw+/SMWBCKjDF5ZNN3uwhL3TDPC6cCqsS0hj8ctN3WEvqY+D/kFTNu7y2bERuV1cpg3oyZIZ67ZaBQ9n1YvvSMrXwP7VVwATqErcOF8LiRXm9E7n/pzg5BXC+U8sF6TbyP+KyK+ugkywcr/6giEuTy9XVnyg=
+  - secure: "GtMoVDw4EdbHc1TKyinx4BbtvtiyZWp0DS5fi6tUNzrqajihpj0d6sxPLMupYyKJnQtBZBpLmxtrfRmyeIyuS3Oz1OkapHy06grLJl4Eb1fHmi5OwcDY/Q96E2mFdR2a4NH0WZ596gxUvmT26DXVsDyvbJFhgCGqhYDV8BKD9l8="
   # travis encrypt -r stacycurl/pimpathon SONATYPE_PASSWORD=<PASSWORD>
-  - secure: Ge16/zmTPUZWx6k2aKDtIgPRnopRnsBxzCI1m4yQ9ihaaDLQg76Y/+VLBFKhc6QStsmlUm9NDshISeb6c2YCYFeXlJY8sJxQUaO6dFpFC/y3cGT/CwJy/RDlM4rfGqvmH63UWdPb+j8c+yBQbnMHmPiTdorsOSF32pHnp3l8tlU=
+  - secure: "OaekiCfTPKOCzTvxj9dbKDelmwIScYmuATNZ+2qJ/ilJTkBvsPdJJFoeMpDDC6/Z+43UZfVreU23Gkh8NidLaGO9KbqmD8si64nPrO8UVyUv9vn36tviseDAN8HAzxM8Mt9YC+sx5Z5v1ZhYLmXg6c1PoQgWrURG2uNsZe+BGJw="

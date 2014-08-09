@@ -9,6 +9,8 @@ object file {
   implicit class RichFile(file: File) {
     def named(name: String = file.getName): File = new NamedFile(file, name)
 
+    def children: Stream[File] = if (file.isFile) Stream.empty[File] else file.listFiles.toStream
+
     def changeToDirectory(): File = file.tapIf(_.isFile)(_.delete(), _.mkdir())
     def create(): File            = file.tap(_.createNewFile())
   }

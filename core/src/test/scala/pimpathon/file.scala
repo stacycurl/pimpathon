@@ -30,6 +30,17 @@ class FileTest {
     })
   }
 
+  @Test def chilren {
+    file.withTempDirectory(dir => {
+      assertEquals(Set.empty[File], dir.children.toSet)
+
+      val child   = createFile(dir, "child")
+      val toddler = createFile(dir, "toddler")
+
+      assertEquals(Set(child, toddler), dir.children.map(_.named()).toSet)
+    })
+  }
+
   @Test def withTempFile {
     assertFalse("Temp file should not exist after 'withTempFile'",
       file.withTempFile(tmp => {
@@ -84,4 +95,7 @@ class FileTest {
     assertEquals(s"Expected ${tmp.getName} to be a " + (if (expectedIsFile) "file" else "directory"),
       expectedIsFile, tmp.isFile)
   }
+
+  private def createFile(parent: File, name: String): File =
+    new File(parent, name).named().create()
 }

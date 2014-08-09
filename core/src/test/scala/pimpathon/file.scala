@@ -18,6 +18,12 @@ class FileTest {
     tmpFile.delete()
   }
 
+  @Test def named {
+    file.withTempFile(tmp => {
+      assertEquals("name", tmp.named("name").toString)
+    })
+  }
+
   @Test def withTempFile {
     assertFalse("Temp file should not exist after 'withTempFile'",
       file.withTempFile(tmp => {

@@ -7,6 +7,8 @@ import pimpathon.any._
 
 object file {
   implicit class RichFile(file: File) {
+    def named(name: String = file.getName): File = new NamedFile(file, name)
+
     def create(): File = file.tap(_.createNewFile)
   }
 
@@ -28,5 +30,9 @@ object file {
 
       f(file)
     })
+  }
+
+  class NamedFile(file: File, name: String) extends File(file.getPath) {
+    override def toString = name
   }
 }

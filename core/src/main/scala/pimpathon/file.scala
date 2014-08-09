@@ -9,7 +9,8 @@ object file {
   implicit class RichFile(file: File) {
     def named(name: String = file.getName): File = new NamedFile(file, name)
 
-    def create(): File = file.tap(_.createNewFile)
+    def changeToDirectory(): File = file.tapIf(_.isFile)(_.delete(), _.mkdir())
+    def create(): File            = file.tap(_.createNewFile())
   }
 
   def withTempFile[A](f: File => A): A = withTempFile(".tmp", "temp")(f)

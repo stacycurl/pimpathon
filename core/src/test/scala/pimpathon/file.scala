@@ -24,6 +24,12 @@ class FileTest {
     })
   }
 
+  @Test def changeToDirectory {
+    file.withTempFile(file => {
+      assertTrue(file.changeToDirectory().isDirectory)
+    })
+  }
+
   @Test def withTempFile {
     assertFalse("Temp file should not exist after 'withTempFile'",
       file.withTempFile(tmp => {

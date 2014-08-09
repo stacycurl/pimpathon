@@ -8,6 +8,16 @@ import pimpathon.file._
 
 
 class FileTest {
+  @Test def create {
+    val tmpFile = file.withTempFile(f => f)
+    assertFalse(tmpFile.exists)
+
+    tmpFile.create()
+    assertTrue(tmpFile.exists)
+
+    tmpFile.delete()
+  }
+
   @Test def withTempFile {
     assertFalse("Temp file should not exist after 'withTempFile'",
       file.withTempFile(tmp => {

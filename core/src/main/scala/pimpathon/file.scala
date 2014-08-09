@@ -2,8 +2,14 @@ package pimpathon
 
 import java.io.File
 
+import pimpathon.any._
+
 
 object file {
+  implicit class RichFile(file: File) {
+    def create(): File = file.tap(_.createNewFile)
+  }
+
   def withTempFile[A](f: File => A): A = withTempFile(".tmp", "temp")(f)
 
   def withTempFile[A](suffix: String, prefix: String = "temp")(f: File => A): A = {

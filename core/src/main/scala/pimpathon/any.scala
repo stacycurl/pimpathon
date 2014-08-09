@@ -6,7 +6,7 @@ import scalaz.syntax.std.boolean._
 object any {
   implicit class AnyOps[A](val a: A) extends AnyVal {
     // These methods are aliased to suit individual preferences
-    def tap(action: A => Unit): A            = { action(a); a }
+    def tap(actions: (A => Unit)*): A        = { actions.foreach(action => action(a)); a }
     def update(action: A => Unit): A         = { action(a); a }
     def withSideEffect(action: A => Unit): A = { action(a); a }
 

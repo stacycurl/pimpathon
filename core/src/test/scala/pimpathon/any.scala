@@ -11,14 +11,14 @@ class AnyTest {
   @Test def tap_update_withSideEffect {
     val ints = new ListBuffer[Int]
 
-    1.tap(ints += _)
-    assertEquals(List(1), ints.toList)
+    1.tap(ints += _, ints += _)
+    assertEquals(List(1, 1), ints.toList)
 
     2.update(ints += _)
-    assertEquals(List(1, 2), ints.toList)
+    assertEquals(List(1, 1, 2), ints.toList)
 
     3.withSideEffect(ints += _)
-    assertEquals(List(1, 2, 3), ints.toList)
+    assertEquals(List(1, 1, 2, 3), ints.toList)
   }
 
   @Test def partialMatch {

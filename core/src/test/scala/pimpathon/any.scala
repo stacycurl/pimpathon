@@ -21,6 +21,13 @@ class AnyTest {
     assertEquals(List(1, 1, 2, 3), ints.toList)
   }
 
+  @Test def tapIf {
+    val ints = new ListBuffer[Int]
+
+    List(1, 2, 3).foreach(i => i.tapIf(_ % 2 != 0)(ints += _))
+    assertEquals(List(1, 3), ints.toList)
+  }
+
   @Test def partialMatch {
     assertEquals(Some("Matched"), 1 partialMatch { case 1 => "Matched" })
     assertEquals(None,            0 partialMatch { case 1 => "Matched" })

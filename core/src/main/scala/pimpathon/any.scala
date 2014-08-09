@@ -10,6 +10,8 @@ object any {
     def update(action: A => Unit): A         = { action(a); a }
     def withSideEffect(action: A => Unit): A = { action(a); a }
 
+    def tapIf(p: A => Boolean)(actions: (A => Unit)*): A = if (!p(a)) a else tap(actions: _*)
+
     def partialMatch[B](pf: PartialFunction[A, B]): Option[B] = PartialFunction.condOpt(a)(pf)
 
     def lpair[B](f: A => B): (B, A) = (f(a), a)

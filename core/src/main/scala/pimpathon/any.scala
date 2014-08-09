@@ -18,5 +18,7 @@ object any {
     def rpair[B](f: A => B): (A, B) = (a, f(a))
 
     def filterSelf(p: A => Boolean): Option[A] = p(a).option(a)
+
+    def withFinally[B](f: A => Unit)(t: A => B): B = try t(a) finally f(a)
   }
 }

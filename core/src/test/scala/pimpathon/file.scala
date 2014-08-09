@@ -98,8 +98,8 @@ class FileTest {
     )
   }
 
-  private def assertIsTemp(expectedSuffix: String, expectedPrefix: String, expectedIsFile: Boolean,
-    tmp: File) {
+  private def assertIsTemp(
+    expectedSuffix: String, expectedPrefix: String, expectedIsFile: Boolean, tmp: File) {
 
     assertTrue(s"Expected ${tmp.getName} to exist !", tmp.exists)
 

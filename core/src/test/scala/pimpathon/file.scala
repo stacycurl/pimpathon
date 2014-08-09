@@ -41,6 +41,23 @@ class FileTest {
     })
   }
 
+  @Test def tree {
+    assertEquals(Nil, new File("non-existent").tree)
+
+    file.withTempFile(tmp =>      assertEquals(List(tmp), tmp.tree))
+    file.withTempDirectory(tmp => assertEquals(List(tmp), tmp.tree))
+
+    file.withTempDirectory(tmp => {
+      val temp          = tmp.named()
+      val child         = createFile(tmp, "child")
+      val toddler       = createFile(tmp, "toddler")
+      val teenageParent = createDirectory(tmp, "teenageParent")
+      val brat          = createFile(teenageParent, "brat")
+
+      assertEquals(Set(temp, child, toddler, teenageParent, brat), temp.tree.map(_.named()).toSet)
+    })
+  }
+
   @Test def withTempFile {
     assertFalse("Temp file should not exist after 'withTempFile'",
       file.withTempFile(tmp => {
@@ -95,6 +112,9 @@ class FileTest {
     assertEquals(s"Expected ${tmp.getName} to be a " + (if (expectedIsFile) "file" else "directory"),
       expectedIsFile, tmp.isFile)
   }
+
+  private def createDirectory(parent: File, name: String): File =
+    createFile(parent, name).changeToDirectory
 
   private def createFile(parent: File, name: String): File =
     new File(parent, name).named().create()

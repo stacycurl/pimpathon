@@ -1,6 +1,6 @@
 package pimpathon
 
-import java.io.File
+import _root_.java.io.File
 
 import pimpathon.any._
 
@@ -8,7 +8,7 @@ import pimpathon.any._
 object file extends FileUtils(".tmp", "temp")
 
 case class FileUtils(suffix: String, prefix: String) {
-  implicit class RichFile(file: File) {
+  implicit class FileOps(file: File) {
     def named(name: String = file.getName): File = new NamedFile(file, name)
 
     def tree: Stream[File]     = if (!file.exists) Stream.empty[File] else file #:: children.flatMap(_.tree)

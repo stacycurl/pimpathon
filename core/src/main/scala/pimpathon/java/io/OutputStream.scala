@@ -7,7 +7,7 @@ import pimpathon.java.io.inputStream._
 
 
 object outputStream {
-  implicit class RichOutputStream(val os: OutputStream) extends AnyVal {
+  implicit class OutputStreamOps(val os: OutputStream) extends AnyVal {
     def write(is: InputStream): OutputStream = { is.read(os); os }
   }
 }

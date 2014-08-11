@@ -1,6 +1,6 @@
 package pimpathon
 
-import java.io.File
+import _root_.java.io.File
 import org.junit.Test
 
 import org.junit.Assert._

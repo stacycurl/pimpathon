@@ -148,4 +148,10 @@ class ListTest {
     assertEquals(List("foo", "bard", "foody"),
       List("foo", "bar", "bard", "food", "foody", "bardo").distinctBy(_.length))
   }
+
+  @Test def tailOption {
+    assertEquals(None,          Nil.tailOption)
+    assertEquals(Some(Nil),     List(0).tailOption)
+    assertEquals(Some(List(1)), List(0, 1).tailOption)
+  }
 }

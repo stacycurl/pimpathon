@@ -5,6 +5,8 @@ import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable._
 import scala.collection.{mutable => M}
 
+import pimpathon.any._
+
 
 object list {
   implicit class ListOps[A](val list: List[A]) extends AnyVal {
@@ -27,6 +29,8 @@ object list {
       asMultiMap.withSomeKeys(f).mapValues(_.size)
 
     def distinctBy[B](f: A => B): List[A] = list.map(equalBy(f)).distinct.map(_.a)
+
+    def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 
     private def equalBy[B](f: A => B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
   }

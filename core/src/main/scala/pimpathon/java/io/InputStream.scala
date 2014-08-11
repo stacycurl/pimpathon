@@ -6,17 +6,19 @@ import scala.annotation.tailrec
 
 object inputStream {
   implicit class RichInputStream(val is: InputStream) extends AnyVal {
-    def read(os: OutputStream): Unit = {
-      @tailrec def recurse(buf: Array[Byte]): Unit = {
-        val len = is.read(buf)
+    def read(os: OutputStream): InputStream = { copy(is, os); is }
+  }
 
-        if (len > 0) {
-          os.write(buf, 0, len)
-          recurse(buf)
-        }
+  def copy(is: InputStream, os: OutputStream, buf: Array[Byte] = new Array[Byte](8192)): Unit = {
+    @tailrec def recurse(): Unit = {
+      val len = is.read(buf)
+
+      if (len > 0) {
+        os.write(buf, 0, len)
+        recurse()
       }
-
-      recurse(new Array[Byte](8192))
     }
+
+    recurse()
   }
 }

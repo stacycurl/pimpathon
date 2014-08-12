@@ -1,10 +1,14 @@
 language: scala
 
 scala:
-- 2.11.1
+- 2.11.2
+- 2.10.4
 
 jdk:
-- oraclejdk7
+- openjdk6
+#- openjdk7
+#- oraclejdk7
+#- oraclejdk8
 
 branches:
   only:
@@ -14,9 +18,11 @@ branches:
 
 script:
 - sbt ++$TRAVIS_SCALA_VERSION clean test
+- sbt ++$TRAVIS_SCALA_VERSION clean scoverage:test
 
 after_success:
-- sbt ++$TRAVIS_SCALA_VERSION clean publish
+- sbt ++$TRAVIS_SCALA_VERSION clean $(if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$JAVA_HOME" == "$(jdk_switcher home openjdk6)" ]]; then echo "publish"; fi)
+#- sbt ++$TRAVIS_SCALA_VERSION scalastyleGenerateConfig scalastyle
 
 env:
   global:

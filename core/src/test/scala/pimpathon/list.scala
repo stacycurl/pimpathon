@@ -159,4 +159,11 @@ class ListTest {
     assertEquals(nil[Int], nil[String].const(1))
     assertEquals(List(1, 1, 1), List('a', 'b', 'c').const(1))
   }
+
+  @Test def sharedPrefix {
+    assertEquals((Nil, Nil, Nil), nil[Int].sharedPrefix(Nil))
+    assertEquals((List(1), Nil, Nil), List(1).sharedPrefix(List(1)))
+
+    assertEquals((List(1, 2), List(3, 4), List(4, 3)), List(1, 2, 3, 4).sharedPrefix(List(1, 2, 4, 3)))
+  }
 }

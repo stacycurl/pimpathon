@@ -1,9 +1,11 @@
 package pimpathon
 
+import scala.annotation.tailrec
 import scala.collection.breakOut
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable._
 import scala.collection.{mutable => M}
+import scalaz.Equal
 
 import pimpathon.any._
 
@@ -33,6 +35,17 @@ object list {
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 
     def const[B](elem: B): List[B] = list.map(_ => elem)
+
+    def sharedPrefix(other: List[A])(implicit e: Equal[A] = Equal.equalA[A]): (List[A], List[A], List[A]) = {
+      @tailrec def recurse(lefts: List[A], rights: List[A], acc: List[A]): (List[A], List[A], List[A]) = {
+        (lefts, rights) match {
+          case (left :: lhs, right :: rhs) if e.equal(left, right) => recurse(lhs, rhs, left :: acc)
+          case _                                                   => (acc.reverse, lefts, rights)
+        }
+      }
+
+      recurse(list, other, Nil)
+    }
 
     private def equalBy[B](f: A => B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
   }

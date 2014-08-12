@@ -21,10 +21,16 @@ case class FileUtils(suffix: String, prefix: String) {
   def file(name: String): File = new File(name)
   def file(parent: File, name: String): File = new File(parent, name)
 
+  def tempFile(suffix: String = suffix, prefix: String = prefix): File =
+    File.createTempFile(prefix, suffix).tap(_.deleteOnExit())
+
+  def tempDir(suffix: String = suffix, prefix: String = prefix): File =
+    tempFile(suffix, prefix).changeToDirectory().tap(_.deleteOnExit())
+
   def withTempFile[A](f: File => A): A = withTempFile(suffix)(f)
 
   def withTempFile[A](suffix: String, prefix: String = prefix)(f: File => A): A = {
-    val file = File.createTempFile(prefix, suffix)
+    val file = tempFile(suffix, prefix)
 
     try f(file) finally file.delete
   }

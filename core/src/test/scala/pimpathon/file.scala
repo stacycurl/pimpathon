@@ -39,6 +39,8 @@ class FileTest {
 
       assertEquals(Set(child, toddler), dir.children.map(_.named()).toSet)
     })
+
+    assertEquals(Stream.empty[File], (null: File).children)
   }
 
   @Test def relativeTo {

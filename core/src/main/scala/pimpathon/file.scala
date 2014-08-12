@@ -19,7 +19,7 @@ case class FileUtils(suffix: String, prefix: String) {
     }
 
     def tree: Stream[File]     = if (!file.exists) Stream.empty[File] else file #:: children.flatMap(_.tree)
-    def children: Stream[File] = if (file.isFile) Stream.empty[File] else file.listFiles.toStream
+    def children: Stream[File] = if (file == null || file.isFile) Stream.empty[File] else file.listFiles.toStream
     def path: List[String]     = file.getAbsolutePath.split(separator).toList.filterNot(Set("", "."))
 
     def changeToDirectory(): File = file.tapIf(_.isFile)(_.delete(), _.mkdir())

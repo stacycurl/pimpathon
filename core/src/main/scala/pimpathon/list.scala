@@ -32,6 +32,8 @@ object list {
 
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 
+    def const[B](elem: B): List[B] = list.map(_ => elem)
+
     private def equalBy[B](f: A => B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
   }
 

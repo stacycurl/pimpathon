@@ -154,4 +154,9 @@ class ListTest {
     assertEquals(Some(Nil),     List(0).tailOption)
     assertEquals(Some(List(1)), List(0, 1).tailOption)
   }
+
+  @Test def const {
+    assertEquals(nil[Int], nil[String].const(1))
+    assertEquals(List(1, 1, 1), List('a', 'b', 'c').const(1))
+  }
 }

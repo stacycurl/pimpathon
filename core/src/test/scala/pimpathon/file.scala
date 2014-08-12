@@ -30,7 +30,7 @@ class FileTest {
     })
   }
 
-  @Test def chilren {
+  @Test def children {
     file.withTempDirectory(dir => {
       assertEquals(Set.empty[File], dir.children.toSet)
 
@@ -96,6 +96,15 @@ class FileTest {
         assertIsTemp("suffix", "prefix", expectedIsFile = false, tmp); tmp
       }).exists
     )
+  }
+
+  @Test def newFile {
+    import file._
+    val dir = file("this directory does not exist")
+    val f = file(dir, "and this file does not exist")
+    assert(!dir.exists)
+    assert(!f.exists)
+    assert(f.getParentFile == dir)
   }
 
   private def assertIsTemp(

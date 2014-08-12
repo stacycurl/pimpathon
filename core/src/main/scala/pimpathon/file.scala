@@ -18,6 +18,8 @@ case class FileUtils(suffix: String, prefix: String) {
     def create(): File            = file.tap(_.createNewFile())
   }
 
+  def file(name: String): File = new File(name)
+  def file(parent: File, name: String): File = new File(parent, name)
 
   def withTempFile[A](f: File => A): A = withTempFile(suffix)(f)
 

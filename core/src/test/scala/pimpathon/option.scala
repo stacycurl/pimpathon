@@ -8,7 +8,7 @@ import pimpathon.option._
 
 class OptionTest {
   @Test def getOrThrow {
-    assertEquals("missing", util.intercept[IllegalArgumentException] {
+    assertEquals("missing", util.intercept[NoSuchElementException] {
       None.getOrThrow("missing")
     }.getMessage)
 

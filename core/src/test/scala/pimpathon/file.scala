@@ -30,7 +30,7 @@ class FileTest {
     })
   }
 
-  @Test def chilren {
+  @Test def children {
     file.withTempDirectory(dir => {
       assertEquals(Set.empty[File], dir.children.toSet)
 
@@ -112,6 +112,59 @@ class FileTest {
         assertIsTemp("suffix", "prefix", expectedIsFile = false, tmp); tmp
       }).exists
     )
+  }
+
+  @Test def tempFile {
+    val f = file.tempFile()
+    assert(f.isFile())
+    assert(f.exists())
+
+    val suffix = ".sufferin"
+    val prefix = "sucotash-"
+
+    val f1 = file.tempFile(suffix)
+    assert(f1.isFile())
+    assert(f1.getName.endsWith(suffix))
+
+    val f2 = file.tempFile(prefix = prefix)
+    assert(f2.isFile())
+    assert(f2.getName.startsWith(prefix))
+
+    val f3 = file.tempFile(suffix, prefix)
+    assert(f3.isFile())
+    assert(f3.getName.startsWith(prefix))
+    assert(f3.getName.endsWith(suffix))
+  }
+
+  @Test def tempDir {
+    val f = file.tempDir()
+    assert(f.isDirectory())
+    assert(f.exists())
+
+    val suffix = ".gosh"
+    val prefix = "darnit-"
+
+    val f1 = file.tempDir(suffix)
+    assert(f1.isDirectory())
+    assert(f1.getName.endsWith(suffix))
+
+    val f2 = file.tempDir(prefix = prefix)
+    assert(f2.isDirectory())
+    assert(f2.getName.startsWith(prefix))
+
+    val f3 = file.tempDir(suffix, prefix)
+    assert(f3.isDirectory())
+    assert(f3.getName.startsWith(prefix))
+    assert(f3.getName.endsWith(suffix))
+  }
+
+  @Test def newFile {
+    import file._
+    val dir = file("this directory does not exist")
+    val f = file(dir, "and this file does not exist")
+    assert(!dir.exists)
+    assert(!f.exists)
+    assert(f.getParentFile == dir)
   }
 
   private def assertIsTemp(

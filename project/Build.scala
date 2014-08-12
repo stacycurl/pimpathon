@@ -122,11 +122,6 @@ object PimpathonBuild extends Build {
         "-language:implicitConversions",
         "-Xfatal-warnings",
         "-deprecation",
-        "-unchecked"),
-
-      resolvers           ++= Seq(
-        Classpaths.typesafeSnapshots,
-        "snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
-      )
+        "-unchecked")
     )
 }

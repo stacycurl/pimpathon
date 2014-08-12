@@ -41,6 +41,22 @@ class FileTest {
     })
   }
 
+  @Test def relativeTo {
+    file.withTempDirectory(dir => {
+      assertEquals("child", createFile(dir, "child").relativeTo(dir).getPath)
+
+      assertEquals(dir.getName + "/kid",
+        createFile(dir, "kid").relativeTo(dir.getParentFile).getPath)
+
+      val parent = createDirectory(dir, "parent")
+
+      assertEquals("parent", parent.relativeTo(dir).getPath)
+      assertEquals("..", dir.relativeTo(parent).getPath)
+
+      assertEquals("parent/child", createFile(parent, "child").relativeTo(dir).getPath)
+    })
+  }
+
   @Test def tree {
     assertEquals(Nil, new File("non-existent").tree)
 

@@ -23,8 +23,8 @@ object numeric {
 
     def negate(b: B): B = aToB(na.negate(bToA(b)))
 
-    def minus(l: B, r: B): B = aToB(na.plus(bToA(l), bToA(r)))
-    def plus(l: B, r: B): B = aToB(na.plus(bToA(l), bToA(r)))
-    def times(l: B, r: B): B = aToB(na.plus(bToA(l), bToA(r)))
+    def minus(l: B, r: B): B = aToB(na.minus(bToA(l), bToA(r)))
+    def plus(l: B, r: B): B  = aToB(na.plus(bToA(l),  bToA(r)))
+    def times(l: B, r: B): B = aToB(na.times(bToA(l), bToA(r)))
   }
 }

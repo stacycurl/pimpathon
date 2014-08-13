@@ -1,12 +1,16 @@
 package pimpathon
 
 object function {
-  implicit class PredicateOps[A](val p: A => Boolean) extends AnyVal {
-    def and(q: A => Boolean): (A => Boolean) = (a: A) => (p(a) && q(a))
-    def or(q: A => Boolean):  (A => Boolean) = (a: A) => (p(a) || q(a))
-    def not:                  (A => Boolean) = (a: A) => (!p(a))
+  type Predicate[-A] = A => Boolean
 
-    def exists: List[A] => Boolean = (_.exists(p))
-    def forall: List[A] => Boolean = (_.forall(p))
+  implicit class PredicateOps[A](val p: Predicate[A]) extends AnyVal {
+    def and(q: Predicate[A]): Predicate[A] = (a: A) => (p(a) && q(a))
+    def or(q: Predicate[A]):  Predicate[A] = (a: A) => (p(a) || q(a))
+    def not:                  Predicate[A] = (a: A) => (!p(a))
+
+    def exists: Predicate[List[A]] = (_.exists(p))
+    def forall: Predicate[List[A]] = (_.forall(p))
+
+    def ifSome: Predicate[Option[A]] = (_.exists(p))
   }
 }

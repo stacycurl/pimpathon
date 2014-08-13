@@ -8,6 +8,7 @@ import scala.util.control._
 
 import org.junit.Assert._
 import pimpathon.map._
+import pimpathon.multiMap._
 
 
 class MapTest {

@@ -4,9 +4,10 @@ import org.junit.Test
 import scala.collection.immutable.SortedMap
 
 import org.junit.Assert._
+import pimpathon.list._
+import pimpathon.multiMap._
 import scalaz.std.list._
 import scalaz.syntax.std.boolean._
-import pimpathon.list._
 
 
 class ListTest {

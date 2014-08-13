@@ -1,8 +1,9 @@
+package pimpathon
+
 import scala.collection.generic.CanBuildFrom
-import scalaz._
 
 
-package object pimpathon {
+object multiMap {
   type MultiMap[F[_], K, V] = Map[K, F[V]]
 
   implicit def build[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])

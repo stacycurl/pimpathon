@@ -8,6 +8,7 @@ import scala.collection.{mutable => M}
 import scalaz.Equal
 
 import pimpathon.any._
+import pimpathon.multiMap._
 
 
 object list {

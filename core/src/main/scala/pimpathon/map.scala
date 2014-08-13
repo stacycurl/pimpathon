@@ -1,6 +1,8 @@
 package pimpathon
 
 import scalaz.Order
+
+import pimpathon.multiMap._
 import scalaz.std.iterable._
 import scalaz.syntax.foldable._
 

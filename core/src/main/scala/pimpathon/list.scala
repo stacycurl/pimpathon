@@ -78,10 +78,14 @@ class ListCapturer[A, F[_, _]](list: List[A]) {
     list.flatMap(a => f(a).map(_ -> a))(breakOut)
 }
 
-class MultiMapCanBuildFrom[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
-  extends CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]] {
+trait IgnoreFromCBF[-From, -Elem, +To] extends CanBuildFrom[From, Elem, To] {
+  override def apply(from: From): M.Builder[Elem, To] = apply()
+}
 
-  def apply(from: Nothing): M.Builder[(K, V), MultiMap[F, K, V]] = apply()
+class MultiMapCanBuildFrom[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
+  extends CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]]
+  with IgnoreFromCBF[Nothing, (K, V), MultiMap[F, K, V]] {
+
   def apply(): M.Builder[(K, V), MultiMap[F, K, V]] = new MultiMapBuilder[F, K, V]
 }
 

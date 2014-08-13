@@ -45,5 +45,13 @@ class AnyTest {
     assertEquals(List(None, Some(2), None, Some(4)),
       List(1, 2, 3, 4).map(_.filterSelf(_ % 2 == 0)))
   }
+
+  @Test def withFinally {
+    val strings = new ListBuffer[String]
+
+    strings += "input".withFinally(s => strings += "finally: " + s)(s => {strings += "body: " + s; "done"})
+
+    assertEquals(List("body: input", "finally: input", "done"), strings.toList)
+  }
 }
 

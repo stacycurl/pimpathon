@@ -60,7 +60,7 @@ object PimpathonBuild extends Build {
     ),
     libraryDependencies += "com.novocode" % "junit-interface" % "0.10" % "test",
     initialCommands in console := """import stacycurl.scala.pimpathon._""",
-    minimumCoverage := 85,
+    minimumCoverage := 100,
     highlighting := true,
     failOnMinimumCoverage := true
   )

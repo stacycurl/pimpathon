@@ -2,6 +2,7 @@ package pimpathon
 
 import org.junit.Test
 import scala.collection.{mutable => M}
+import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
 import scala.util.control._
 
@@ -59,5 +60,41 @@ class MapTest {
     assertEquals(Map(1 -> 10, 2 -> 20), result)
     assertEquals(Map(1 -> 10, 2 -> 20), result)
     assertEquals("Shouldn't have iterated over the original map twice", List(1, 2), originalValuesSeen.toList)
+  }
+
+  @Test def multiMapCBF {
+    val cbf = MultiMap.build[List, Int, String]
+    val builder = cbf.apply()
+
+    builder += ((1, "foo"))
+    builder += ((1, "bar"))
+    assertEquals(Map(1 -> List("foo", "bar")), builder.result())
+
+    builder.clear()
+    assertEquals(Map(), builder.result())
+  }
+
+  @Test def ignoreFromCBF {
+    val ucbf = new UnitCanBuildFrom[List[Int], Int]
+
+    assertEquals(UnitBuilder[Int]("apply()"), ucbf.apply())
+    assertEquals(UnitBuilder[Int]("apply(List(1, 2, 3))"), ucbf.apply(List(1, 2, 3)))
+
+    val ucbfi = new UnitCanBuildFrom[List[Int], Int] with IgnoreFromCBF[List[Int], Int, Unit]
+
+    assertEquals(UnitBuilder[Int]("apply()"), ucbfi.apply())
+    assertEquals(UnitBuilder[Int]("apply()"), ucbfi.apply(List(1, 2, 3)))
+  }
+
+  class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
+    def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
+    def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem](s"apply($from)")
+  }
+
+  case class UnitBuilder[E](from: String) extends M.Builder[E, Unit] {
+    def +=(elem: E): this.type = this
+    def clear(): Unit = {}
+    def result(): Unit = ()
+    override def toString = s"UnitBuilder($from)"
   }
 }

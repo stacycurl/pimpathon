@@ -1,5 +1,6 @@
 package pimpathon
 
+import scala.util.{Failure, Success, Try}
 
 
 object either {
@@ -8,6 +9,8 @@ object either {
       either.fold(l => Left[LV, RV](lf(l)), r => Right[LV, RV](rf(r)))
 
     def tap(l: L => Unit, r: R => Unit): Either[L, R] = { either.fold(l, r); either }
+
+    def toTry(implicit ev: L <:< Throwable): Try[R] = either.fold(Failure(_), Success(_))
   }
 }
 

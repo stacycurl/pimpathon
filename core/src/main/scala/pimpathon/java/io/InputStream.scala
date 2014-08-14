@@ -4,11 +4,14 @@ import java.io.{InputStream, OutputStream}
 import scala.annotation.tailrec
 
 import pimpathon.any._
+import pimpathon.java.io.outputStream._
 
 
 object inputStream {
   implicit class InputStreamOps(val is: InputStream) extends AnyVal {
-    def read(os: OutputStream): InputStream = { copy(is, os); is }
+    def read(os: OutputStream, closeIn: Boolean = true, closeOut: Boolean = true): InputStream =
+      is.tap(_ => os.tap(_ => copy(is, os)).closeIf(closeOut)).closeIf(closeIn)
+
     def closeIf(condition: Boolean): InputStream = is.tapIf(_ => condition)(_.close)
   }
 

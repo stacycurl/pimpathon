@@ -21,15 +21,18 @@ class InputStreamTest {
   }
 
   @Test def read {
-    def assertRead(input: String): Unit = {
-      val is: InputStream = new ByteArrayInputStream(input.getBytes)
-      val os: OutputStream = new ByteArrayOutputStream()
+    for {
+      expectedCloseIn  <- List(false, true)
+      expectedCloseOut <- List(false, true)
+      input            <- List("Input", "Repeat" * 100)
+    } {
+      val (is, os) = (createInputStream(input.getBytes), createOutputStream())
 
-      is.read(os)
+      is.read(os, expectedCloseIn, expectedCloseOut)
 
       assertEquals(input, os.toString)
+      assertInputStreamClosed(expectedCloseIn, is.closed)
+      assertOutputStreamClosed(expectedCloseOut, os.closed)
     }
-
-    List("Input", "Repeat" * 100).foreach(assertRead)
   }
 }

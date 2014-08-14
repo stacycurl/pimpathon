@@ -5,9 +5,9 @@ import scala.collection.breakOut
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable._
 import scala.collection.{mutable => M}
-import scalaz.Equal
 
 import pimpathon.any._
+import pimpathon.function._
 import pimpathon.multiMap._
 
 
@@ -37,10 +37,10 @@ object list {
 
     def const[B](elem: B): List[B] = list.map(_ => elem)
 
-    def sharedPrefix(other: List[A])(implicit e: Equal[A] = Equal.equalA[A]): (List[A], List[A], List[A]) = {
+    def sharedPrefix(other: List[A])(implicit compare: A => A => Boolean = equalC[A]): (List[A], List[A], List[A]) = {
       @tailrec def recurse(lefts: List[A], rights: List[A], acc: List[A]): (List[A], List[A], List[A]) = {
         (lefts, rights) match {
-          case (left :: lhs, right :: rhs) if e.equal(left, right) => recurse(lhs, rhs, left :: acc)
+          case (left :: lhs, right :: rhs) if compare(left)(right) => recurse(lhs, rhs, left :: acc)
           case _                                                   => (acc.reverse, lefts, rights)
         }
       }

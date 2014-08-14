@@ -12,8 +12,8 @@ import scalaz.syntax.std.boolean._
 
 class ListTest {
   @Test def uncons {
-    assertEquals("empty", nil[Int].uncons("empty", l => s"size: ${l.size}"))
-    assertEquals("size: 3", List(1, 2, 3).uncons("empty", l => s"size: ${l.size}"))
+    assertEquals("empty", nil[Int].uncons("empty", l => ("size: " + l.size)))
+    assertEquals("size: 3", List(1, 2, 3).uncons("empty", l => ("size: " + l.size)))
   }
 
   @Test def emptyTo {
@@ -167,4 +167,6 @@ class ListTest {
 
     assertEquals((List(1, 2), List(3, 4), List(4, 3)), List(1, 2, 3, 4).sharedPrefix(List(1, 2, 4, 3)))
   }
+
+  private def nil[A]: List[A] = Nil
 }

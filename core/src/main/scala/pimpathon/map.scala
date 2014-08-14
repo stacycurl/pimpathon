@@ -8,7 +8,9 @@ import scalaz.syntax.foldable._
 
 
 object map {
-  implicit class MapOps[K, V](val map: Map[K, V]) extends AnyVal {
+  implicit def mapOps[K, V](map: Map[K, V]): MapOps[K, V] = new MapOps[K, V](map)
+
+  class MapOps[K, V](map: Map[K, V]) {
     def getOrThrow(k: K, message: String): V =
       getOrThrow(k, new IllegalArgumentException(message))
 

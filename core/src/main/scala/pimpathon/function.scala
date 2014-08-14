@@ -3,7 +3,9 @@ package pimpathon
 object function {
   type Predicate[-A] = A => Boolean
 
-  implicit class PredicateOps[A](val p: Predicate[A]) extends AnyVal {
+  implicit def predicateOps[A](p: Predicate[A]): PredicateOps[A] = new PredicateOps[A](p)
+
+  class PredicateOps[A](p: Predicate[A]) {
     def and(q: Predicate[A]): Predicate[A] = (a: A) => (p(a) && q(a))
     def or(q: Predicate[A]):  Predicate[A] = (a: A) => (p(a) || q(a))
     def not:                  Predicate[A] = (a: A) => (!p(a))

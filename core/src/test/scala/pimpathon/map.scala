@@ -3,7 +3,7 @@ package pimpathon
 import org.junit.Test
 import scala.collection.{mutable => M}
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
+import scala.reflect.ClassManifest
 import scala.util.control._
 
 import org.junit.Assert._
@@ -89,13 +89,13 @@ class MapTest {
 
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
-    def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem](s"apply($from)")
+    def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem]("apply(%s)".format(from))
   }
 
   case class UnitBuilder[E](from: String) extends M.Builder[E, Unit] {
     def +=(elem: E): this.type = this
     def clear(): Unit = {}
     def result(): Unit = ()
-    override def toString = s"UnitBuilder($from)"
+    override def toString = "UnitBuilder(%s)".format(from)
   }
 }

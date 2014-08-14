@@ -2,7 +2,6 @@ package pimpathon
 
 import org.junit.Test
 import scala.collection.mutable.ListBuffer
-import scala.util.{Failure, Success, Try}
 
 import org.junit.Assert._
 import pimpathon.either._
@@ -25,13 +24,5 @@ class EitherTest {
     Right[Int, String]("foo").tap(ints += _, strings += _)
     assertEquals(List(1),     ints.toList)
     assertEquals(List("foo"), strings.toList)
-  }
-
-  @Test def toTry {
-    assertEquals(Success[String]("foo"), Right[Throwable, String]("foo").toTry)
-
-    val boom = new Throwable("boom")
-
-    assertEquals(Failure[String](boom), Left[Throwable, String](boom).toTry)
   }
 }

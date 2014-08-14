@@ -4,7 +4,9 @@ import pimpathon.list._
 
 
 object string {
-  implicit class StringOps(val string: String) extends AnyVal {
+  implicit def stringOps(string: String): StringOps = new StringOps(string)
+
+  class StringOps(string: String) {
     def sharedPrefix(other: String): (String, String, String) = {
       val res@(prefix, rest, otherRest) = string.toList.sharedPrefix(other.toList)
 

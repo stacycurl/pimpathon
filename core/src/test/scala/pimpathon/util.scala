@@ -1,20 +1,20 @@
 package pimpathon
 
-import scala.reflect.ClassTag
+import scala.reflect.ClassManifest
 
 
 object util {
-  def intercept[E <: AnyRef](f: => Any)(implicit expected: ClassTag[E]): E = {
-    val clazz = expected.runtimeClass
+  def intercept[E <: AnyRef](f: => Any)(implicit expected: ClassManifest[E]): E = {
+    val clazz = expected.erasure
 
     val caught = try { f; None } catch {
       case u: Throwable => if (clazz.isAssignableFrom(u.getClass)) Some(u) else {
-        sys.error(s"Invalid exception, expected ${clazz.getName}, got: " + u)
+        sys.error("Invalid exception, expected %s, got: ".format(clazz.getName) + u)
       }
     }
 
     caught match {
-      case None => sys.error(s"Expected exception: ${clazz.getName}")
+      case None => sys.error("Expected exception: %s".format(clazz.getName))
       case Some(e) => e.asInstanceOf[E]
     }
   }

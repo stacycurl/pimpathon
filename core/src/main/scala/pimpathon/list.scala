@@ -12,7 +12,9 @@ import pimpathon.multiMap._
 
 
 object list {
-  implicit class ListOps[A](val list: List[A]) extends AnyVal {
+  implicit def listOps[A](list: List[A]): ListOps[A] = new ListOps[A](list)
+
+  class ListOps[A](list: List[A]) {
     def emptyTo(alternative: => List[A]): List[A] = uncons(alternative, _ => list)
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
@@ -51,7 +53,9 @@ object list {
     private def equalBy[B](f: A => B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
   }
 
-  implicit class ListTuple2Ops[K, V](list: List[(K, V)]) {
+  implicit def listTuple2Ops[K, V](list: List[(K, V)]): ListTuple2Ops[K, V] = new ListTuple2Ops[K, V](list)
+
+  class ListTuple2Ops[K, V](list: List[(K, V)]) {
     def toMultiMap[F[_]](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
       : MultiMap[F, K, V] = list.map(kv => kv)(breakOut)
   }

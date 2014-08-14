@@ -9,7 +9,9 @@ import pimpathon.list._
 object file extends FileUtils(".tmp", "temp")
 
 case class FileUtils(suffix: String, prefix: String) {
-  implicit class FileOps(file: File) {
+  implicit def fileOps(file: File): FileOps = new FileOps(file)
+
+  class FileOps(file: File) {
     def named(name: String = file.getName): File = new NamedFile(file, name)
 
     def relativeTo(dir: File): File = {

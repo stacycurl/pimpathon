@@ -172,15 +172,15 @@ class FileTest {
   private def assertIsTemp(
     expectedSuffix: String, expectedPrefix: String, expectedIsFile: Boolean, tmp: File) {
 
-    assertTrue(s"Expected ${tmp.getName} to exist !", tmp.exists)
+    assertTrue("Expected %s to exist !".format(tmp.getName), tmp.exists)
 
-    assertTrue(s"Expected ${tmp.getName}, to begin with $expectedPrefix",
+    assertTrue("Expected %s, to begin with %s".format(tmp.getName, expectedPrefix),
       tmp.getName.startsWith(expectedPrefix))
 
-    assertTrue(s"Expected ${tmp.getName}, to end with $expectedSuffix",
+    assertTrue("Expected %s, to end with %s".format(tmp.getName, expectedSuffix),
       tmp.getName.endsWith(expectedSuffix))
 
-    assertEquals(s"Expected ${tmp.getName} to be a " + (if (expectedIsFile) "file" else "directory"),
+    assertEquals("Expected %s to be a ".format(tmp.getName) + (if (expectedIsFile) "file" else "directory"),
       expectedIsFile, tmp.isFile)
   }
 

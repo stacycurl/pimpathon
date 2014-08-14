@@ -5,7 +5,9 @@ import scala.annotation.tailrec
 
 
 object inputStream {
-  implicit class InputStreamOps(val is: InputStream) extends AnyVal {
+  implicit def inputStreamOps(is: InputStream): InputStreamOps = new InputStreamOps(is)
+
+  class InputStreamOps(is: InputStream) {
     def read(os: OutputStream): InputStream = { copy(is, os); is }
   }
 

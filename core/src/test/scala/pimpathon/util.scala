@@ -1,9 +1,28 @@
 package pimpathon
 
 import scala.reflect.ClassManifest
+import _root_.java.io.{InputStream, OutputStream, ByteArrayInputStream, ByteArrayOutputStream}
+
+import org.junit.Assert._
 
 
 object util {
+  def assertInputStreamClosed(expected: Boolean, closed: Boolean): Unit =
+    assertEquals("expected InputStream to %s closed".format(if (expected) "be" else "not be"), expected, closed)
+
+  def assertOutputStreamClosed(expected: Boolean, closed: Boolean): Unit =
+    assertEquals("expected OutputStream to %s closed".format(if (expected) "be" else "not be"), expected, closed)
+
+  def createInputStream(bytes: Array[Byte] = Array()) = new ByteArrayInputStream(bytes) {
+    var closed = false
+    override def close() = { closed = true; super.close() }
+  }
+
+  def createOutputStream() = new ByteArrayOutputStream() {
+    var closed = false
+    override def close() = { closed = true; super.close() }
+  }
+
   def intercept[E <: AnyRef](f: => Any)(implicit expected: ClassManifest[E]): E = {
     val clazz = expected.erasure
 

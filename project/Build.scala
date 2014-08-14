@@ -54,6 +54,7 @@ object PimpathonBuild extends Build {
       "-feature",
       "-language:higherKinds",
       "-language:implicitConversions",
+      "-language:reflectiveCalls",
       "-Xfatal-warnings",
       "-deprecation",
       "-unchecked"

@@ -5,9 +5,21 @@ import org.junit.Test
 
 import org.junit.Assert._
 import pimpathon.java.io.inputStream._
+import pimpathon.util._
 
 
 class InputStreamTest {
+  @Test def closeIf {
+    val is = createInputStream()
+    assertInputStreamClosed(false, is.closed)
+
+    is.closeIf(false)
+    assertInputStreamClosed(false, is.closed)
+
+    is.closeIf(true)
+    assertInputStreamClosed(true, is.closed)
+  }
+
   @Test def read {
     def assertRead(input: String): Unit = {
       val is: InputStream = new ByteArrayInputStream(input.getBytes)

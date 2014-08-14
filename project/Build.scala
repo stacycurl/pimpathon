@@ -40,7 +40,7 @@ object PimpathonBuild extends Build {
     }
   }
 
-  def commonSettings = graphSettings ++
+  def commonSettings = graphSettings ++ Publishing.settings ++
   // uncomment when you want to reset the formatting of the project
   // scalariformSettings ++
   scalaStyleSettings ++ Seq(

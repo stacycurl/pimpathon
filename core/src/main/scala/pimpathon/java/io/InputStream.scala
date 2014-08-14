@@ -7,15 +7,20 @@ import pimpathon.any._
 import pimpathon.java.io.outputStream._
 
 
-object inputStream {
-  implicit class InputStreamOps(val is: InputStream) extends AnyVal {
-    def read(os: OutputStream, closeIn: Boolean = true, closeOut: Boolean = true): InputStream =
-      is.tap(_ => os.tap(_ => copy(is, os)).closeIf(closeOut)).closeIf(closeIn)
+object inputStream extends InputStreamUtils(closeIn = true, closeOut = true)
+
+case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufSize: Int = 8192) {
+  implicit class InputStreamOps(val is: InputStream) {
+    def read(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): InputStream =
+      is.tap(copy(_, os, closeIn, closeOut))
 
     def closeIf(condition: Boolean): InputStream = is.tapIf(_ => condition)(_.close)
   }
 
-  def copy(is: InputStream, os: OutputStream, buf: Array[Byte] = new Array[Byte](8192)): Unit = {
+  def copy(
+    is: InputStream, os: OutputStream,
+    closeIn: Boolean = closeIn, closeOut: Boolean = closeOut, buf: Array[Byte] = new Array[Byte](bufSize)
+  ): Unit = {
     @tailrec def recurse(): Unit = {
       val len = is.read(buf)
 
@@ -26,5 +31,8 @@ object inputStream {
     }
 
     recurse()
+
+    if (closeIn)  is.close
+    if (closeOut) os.close
   }
 }

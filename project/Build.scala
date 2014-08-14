@@ -1,15 +1,15 @@
 import sbt._
-import Keys._
 
-import net.virtualvoid.sbt.graph.Plugin.graphSettings
-import org.scalastyle.sbt.ScalastylePlugin
-import scoverage.ScoverageSbtPlugin._
-import ScoverageKeys._
-import ScalastylePlugin.{ Settings => scalaStyleSettings }
 import com.typesafe.sbt.SbtScalariform.scalariformSettings
+import net.virtualvoid.sbt.graph.Plugin.graphSettings
+import org.scalastyle.sbt.ScalastylePlugin.{ Settings => scalaStyleSettings }
+
+import sbt.Keys._
+import scoverage.ScoverageSbtPlugin._
+import scoverage.ScoverageSbtPlugin.ScoverageKeys._
+
 
 object PimpathonBuild extends Build {
-
   lazy val pimpathon = Project(
     id = "pimpathon-parent",
     base = file("."),
@@ -20,7 +20,7 @@ object PimpathonBuild extends Build {
   lazy val pimpathonCore = Project(
     id = "pimpathon-core",
     base = file("core"),
-    settings = commonSettings
+    settings = commonSettings ++ Publishing.settings
   )
 
   lazy val pimpathonExamples = Project(
@@ -40,7 +40,7 @@ object PimpathonBuild extends Build {
     }
   }
 
-  def commonSettings = graphSettings ++ Publishing.settings ++
+  def commonSettings = graphSettings ++
   // uncomment when you want to reset the formatting of the project
   // scalariformSettings ++
   scalaStyleSettings ++ instrumentSettings ++ Seq(
@@ -48,7 +48,7 @@ object PimpathonBuild extends Build {
     scalaVersion := "2.11.2",
     maxErrors := 1,
     parallelExecution in Test := true,
-    scalacOptions       := Seq(
+    scalacOptions := Seq(
       "-feature",
       "-language:higherKinds",
       "-language:implicitConversions",
@@ -59,7 +59,7 @@ object PimpathonBuild extends Build {
     ),
     libraryDependencies += "com.novocode"  % "junit-interface" % "0.10"  % "test",
     libraryDependencies += "org.scalaz"   %% "scalaz-core"     % "7.1.0" % "test",
-    initialCommands in console := """import stacycurl.scala.pimpathon._""",
+    initialCommands in console := """import pimpathon._""",
     minimumCoverage := 100,
     highlighting := true,
     failOnMinimumCoverage := true

@@ -27,6 +27,11 @@ class MapTest {
     assertEquals("nonEmpty", Map(1 -> 2).uncons("empty", _ => "nonEmpty"))
   }
 
+  @Test def mapNonEmpty {
+    assertEquals(None, Map.empty[Int, Int].mapNonEmpty(_ => "nonEmpty"))
+    assertEquals(Some("nonEmpty"), Map(1 -> 2).mapNonEmpty(_ => "nonEmpty"))
+  }
+
   @Test def emptyTo {
     assertEquals(Map(1 -> 2), Map.empty[Int, Int].emptyTo(Map(1 -> 2)))
     assertEquals(Map(3 -> 4), Map(3 -> 4).emptyTo(Map(1 -> 2)))

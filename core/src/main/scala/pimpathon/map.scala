@@ -17,6 +17,7 @@ object map {
 
     def emptyTo(empty: => Map[K, V]): Map[K, V] = uncons(empty, _ => map)
 
+    def mapNonEmpty[A](f: Map[K, V] => A): Option[A] = if (map.isEmpty) None else Some(f(map))
     def uncons[A](empty: => A, nonEmpty: Map[K, V] => A): A = if (map.isEmpty) empty else nonEmpty(map)
 
     def keyForMaxValue(implicit O: Ordering[V]): Option[K] = map.maximum(value).map(_._1)

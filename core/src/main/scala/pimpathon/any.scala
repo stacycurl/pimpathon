@@ -1,7 +1,5 @@
 package pimpathon
 
-import scalaz.syntax.std.boolean._
-
 
 object any {
   implicit def anyOps[A](a: A): AnyOps[A] = new AnyOps[A](a)
@@ -19,7 +17,7 @@ object any {
     def lpair[B](f: A => B): (B, A) = (f(a), a)
     def rpair[B](f: A => B): (A, B) = (a, f(a))
 
-    def filterSelf(p: A => Boolean): Option[A] = p(a).option(a)
+    def filterSelf(p: A => Boolean): Option[A] = if (p(a)) Some(a) else None
 
     def withFinally[B](f: A => Unit)(t: A => B): B = try t(a) finally f(a)
   }

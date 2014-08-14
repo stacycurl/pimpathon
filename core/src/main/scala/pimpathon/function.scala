@@ -15,4 +15,6 @@ object function {
 
     def ifSome: Predicate[Option[A]] = (_.exists(p))
   }
+
+  def equalC[A]: A => A => Boolean = (l: A) => (r: A) => l equals r
 }

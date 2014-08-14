@@ -18,9 +18,7 @@ object PimpathonBuild extends Build {
   lazy val pimpathonCore = Project(
     id = "pimpathon-core",
     base = file("core"),
-    settings = commonSettings ++ Seq(
-      libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.0.0"
-    )
+    settings = commonSettings
   )
 
   lazy val pimpathonExamples = Project(
@@ -53,7 +51,8 @@ object PimpathonBuild extends Build {
       "-deprecation",
       "-unchecked"
     ),
-    libraryDependencies += "com.novocode" % "junit-interface" % "0.10" % "test",
+    libraryDependencies += "com.novocode"  % "junit-interface" % "0.10"  % "test",
+    libraryDependencies += "org.scalaz"   %% "scalaz-core"     % "7.0.0" % "test",
     initialCommands in console := """import stacycurl.scala.pimpathon._"""
   )
 }

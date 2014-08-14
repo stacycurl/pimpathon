@@ -1,10 +1,6 @@
 package pimpathon
 
-import scalaz.Order
-
 import pimpathon.multiMap._
-import scalaz.std.iterable._
-import scalaz.syntax.foldable._
 
 
 object map {
@@ -19,19 +15,17 @@ object map {
 
     def emptyTo(empty: => Map[K, V]): Map[K, V] = uncons(empty, _ => map)
 
+    def mapNonEmpty[A](f: Map[K, V] => A): Option[A] = if (map.isEmpty) None else Some(f(map))
     def uncons[A](empty: => A, nonEmpty: Map[K, V] => A): A = if (map.isEmpty) empty else nonEmpty(map)
 
-    def keyForMaxValue(implicit O: Ordering[V]): Option[K] = map.maximum(value).map(_._1)
-    def keyForMinValue(implicit O: Ordering[V]): Option[K] = map.minimum(value).map(_._1)
-    def valueForMaxKey(implicit O: Ordering[K]): Option[V] = map.maximum(key).map(_._2)
-    def valueForMinKey(implicit O: Ordering[K]): Option[V] = map.minimum(key).map(_._2)
+    def keyForMaxValue(implicit O: Ordering[V]): Option[K] = mapNonEmpty(_.maxBy(value)).map(key)
+    def keyForMinValue(implicit O: Ordering[V]): Option[K] = mapNonEmpty(_.minBy(value)).map(key)
+    def valueForMaxKey(implicit O: Ordering[K]): Option[V] = mapNonEmpty(_.maxBy(key)).map(value)
+    def valueForMinKey(implicit O: Ordering[K]): Option[V] = mapNonEmpty(_.minBy(key)).map(value)
 
     def mapValuesEagerly[W](f: V => W): Map[K, W] = map.map { case (k, v) => (k, f(v)) }(collection.breakOut)
 
-    private def key(implicit O: Ordering[K]): Order[(K, V)] =
-      Order.fromScalaOrdering(O).contramap[(K, V)](_._1)
-
-    private def value(implicit O: Ordering[V]): Order[(K, V)] =
-      Order.fromScalaOrdering(O).contramap[(K, V)](_._2)
+    @inline private def key:   ((K, V)) => K = (kv: (K, V)) => kv._1
+    @inline private def value: ((K, V)) => V = (kv: (K, V)) => kv._2
   }
 }

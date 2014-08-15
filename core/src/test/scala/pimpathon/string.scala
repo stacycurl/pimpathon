@@ -20,4 +20,11 @@ class StringTest {
 
     assertEquals(("12", "34", "43"), "1234".sharedPrefix("1243"))
   }
+
+  @Test def suffixWith {
+    assertEquals("", "".suffixWith(""))
+    assertEquals("suffix", "".suffixWith("suffix"))
+    assertEquals("prefix-suffix", "prefix-".suffixWith("suffix"))
+    assertEquals("suffix", "suffix".suffixWith("suffix"))
+  }
 }

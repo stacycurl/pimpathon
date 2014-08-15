@@ -5,7 +5,6 @@ import org.junit.Test
 import scala.util.{Failure, Success}
 
 import org.junit.Assert._
-import pimpathon.any._
 import pimpathon.java.io.outputStream._
 import pimpathon.util._
 
@@ -13,10 +12,7 @@ import pimpathon.util._
 class OutputStreamTest {
   @Test def attemptClose {
     assertEquals(Success(()), createOutputStream().attemptClose())
-
-    new Throwable("boom").tap(boom => {
-      assertEquals(Failure(boom), createOutputStream(onClose = () => throw boom).attemptClose())
-    })
+    assertEquals(Failure(boom), createOutputStream(onClose = () => throw boom).attemptClose())
   }
 
   @Test def closeIf {

@@ -37,4 +37,6 @@ object util {
       case Some(e) => e.asInstanceOf[E]
     }
   }
+
+  val boom = new Throwable("Boom !")
 }

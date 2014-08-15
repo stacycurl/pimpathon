@@ -6,6 +6,7 @@ import scala.util.{Failure, Success}
 
 import org.junit.Assert._
 import pimpathon.any._
+import pimpathon.util._
 
 
 class AnyTest {
@@ -60,10 +61,7 @@ class AnyTest {
 
   @Test def attempt {
     assertEquals(Success(2), 1.attempt(_ * 2))
-
-    new Throwable("boom").tap(boom => {
-      assertEquals(Failure(boom), 1.attempt(_ => throw boom))
-    })
+    assertEquals(Failure(boom), 1.attempt(_ => throw boom))
   }
 }
 

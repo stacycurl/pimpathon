@@ -6,6 +6,7 @@ import scala.util.{Failure, Success, Try}
 
 import org.junit.Assert._
 import pimpathon.either._
+import pimpathon.util._
 
 
 class EitherTest {
@@ -29,9 +30,6 @@ class EitherTest {
 
   @Test def toTry {
     assertEquals(Success[String]("foo"), Right[Throwable, String]("foo").toTry)
-
-    val boom = new Throwable("boom")
-
     assertEquals(Failure[String](boom), Left[Throwable, String](boom).toTry)
   }
 }

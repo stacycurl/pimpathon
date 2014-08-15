@@ -1,6 +1,7 @@
 package pimpathon
 
 import scala.reflect.ClassTag
+import scala.util.Try
 import _root_.java.io.{InputStream, OutputStream, ByteArrayInputStream, ByteArrayOutputStream}
 
 import org.junit.Assert._
@@ -22,6 +23,8 @@ object util {
     var closed = false
     override def close() = { closed = true; super.close(); onClose() }
   }
+
+  def ignoreExceptions(f: => Unit): Unit = Try(f)
 
   def intercept[E <: AnyRef](f: => Any)(implicit expected: ClassTag[E]): E = {
     val clazz = expected.runtimeClass

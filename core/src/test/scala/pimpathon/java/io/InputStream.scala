@@ -31,7 +31,7 @@ class InputStreamTest {
     assertInputStreamClosed(true,  is.closeUnless(false).closed)
   }
 
-  @Test def read {
+  @Test def drain {
     for {
       expectedCloseIn  <- List(false, true)
       expectedCloseOut <- List(false, true)
@@ -39,11 +39,20 @@ class InputStreamTest {
     } {
       val (is, os) = (createInputStream(input.getBytes), createOutputStream())
 
-      is.read(os, expectedCloseIn, expectedCloseOut)
+      is.drain(os, expectedCloseIn, expectedCloseOut)
 
       assertEquals(input, os.toString)
       assertInputStreamClosed(expectedCloseIn, is.closed)
       assertOutputStreamClosed(expectedCloseOut, os.closed)
+    }
+
+    ignoreExceptions {
+      val (is, os) = (createInputStream(), createOutputStream())
+
+      is.drain(os, closeOut = false)
+      is.drain(os, closeIn = false)
+      is.drain(os, closeOut = false, closeIn = false)
+      is.drain(os, closeIn = false, closeOut = false)
     }
   }
 }

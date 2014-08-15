@@ -12,7 +12,7 @@ object inputStream extends InputStreamUtils(closeIn = true, closeOut = true)
 
 case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufSize: Int = 8192) {
   implicit class InputStreamOps[IS <: InputStream](val is: IS) {
-    def read(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): IS =
+    def drain(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): IS =
       is.tap(copy(_, os, closeIn, closeOut))
 
     def attemptClose(): Try[Unit] = Try(is.close)

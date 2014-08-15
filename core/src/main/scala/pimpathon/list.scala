@@ -16,6 +16,7 @@ object list {
     def emptyTo(alternative: => List[A]): List[A] = uncons(alternative, _ => list)
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
+    def mapNonEmpty[B](f: List[A] => B): Option[B] = if (list.isEmpty) None else Some(f(list))
 
     def asMap            = as[Map]
     def asMultiMap[F[_]] = as[({ type MM[K, V] = MultiMap[F, K, V] })#MM]

@@ -21,6 +21,11 @@ class ListTest {
     assertEquals(List(1, 2, 3), List(1, 2, 3).emptyTo(List(1)))
   }
 
+  @Test def mapNonEmpty {
+    assertEquals(None, nil[Int].mapNonEmpty(_.reverse))
+    assertEquals(Some(List(3, 2, 1)), List(1, 2, 3).mapNonEmpty(_.reverse))
+  }
+
 
   @Test def toMultiMap {
     assertEquals(Map(), List.empty[(Int, Int)].toMultiMap[List])

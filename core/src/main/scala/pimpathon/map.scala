@@ -7,8 +7,10 @@ import pimpathon.multiMap._
 
 object map {
   implicit class MapOps[K, V](val map: Map[K, V]) extends AnyVal {
-    def containsAny(ok: Option[K]): Boolean = ok.fold(false)(map.contains)
+    def containsAny(ok: Option[K]): Boolean = ok.exists(map.contains)
+    def containsAll(ok: Option[K]): Boolean = ok.forall(map.contains)
     def containsAny[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.exists(map.contains)
+    def containsAll[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.forall(map.contains)
 
     def get(ok: Option[K]): Option[V] = ok.flatMap(map.get)
 

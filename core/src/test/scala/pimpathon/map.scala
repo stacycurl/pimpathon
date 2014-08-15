@@ -92,7 +92,7 @@ class MapTest {
 
   @Test def keyForMinValue {
     assertEquals(None, Map.empty[Int, String].keyForMinValue)
-    assertEquals(Some(2), Map(2 -> "abc", 2 -> "def").keyForMinValue)
+    assertEquals(Some(1), Map(1 -> "abc", 2 -> "def").keyForMinValue)
   }
 
   @Test def mapValuesEagerly {

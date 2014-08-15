@@ -9,6 +9,7 @@ import scala.collection.{mutable => M}
 import pimpathon.any._
 import pimpathon.function._
 import pimpathon.multiMap._
+import pimpathon.tuple._
 
 
 object list {
@@ -18,11 +19,13 @@ object list {
     def emptyTo(alternative: => List[A]): List[A] = uncons(alternative, _ => list)
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
+    def mapNonEmpty[B](f: List[A] => B): Option[B] = if (list.isEmpty) None else Some(f(list))
 
     def asMap            = as[Map]
     def asMultiMap[F[_]] = as[({ type MM[K, V] = MultiMap[F, K, V] })#MM]
 
     def as[F[_, _]] = new ListCapturer[A, F](list)
+
 
     def attributeCounts[B](f: A => B): Map[B, Int] =
       asMultiMap.withKeys(f).mapValues(_.size)
@@ -32,6 +35,13 @@ object list {
 
     def optAttributeCounts[B](f: A => Option[B]): Map[B, Int] =
       asMultiMap.withSomeKeys(f).mapValues(_.size)
+
+    def fraction(p: Predicate[A]): Double = countWithSize(p).map(_.to[Double].calc(_ / _)).getOrElse(Double.NaN)
+
+    def countWithSize(p: Predicate[A]): Option[(Int, Int)] = mapNonEmpty(_.foldLeft((0, 0)) {
+      case ((passed, size), elem) => (if (p(elem)) passed + 1 else passed, size + 1)
+    })
+
 
     def distinctBy[B](f: A => B): List[A] = list.map(equalBy(f)).distinct.map(_.a)
 

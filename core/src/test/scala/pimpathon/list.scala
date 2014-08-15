@@ -21,6 +21,11 @@ class ListTest {
     assertEquals(List(1, 2, 3), List(1, 2, 3).emptyTo(List(1)))
   }
 
+  @Test def mapNonEmpty {
+    assertEquals(None, nil[Int].mapNonEmpty(_.reverse))
+    assertEquals(Some(List(3, 2, 1)), List(1, 2, 3).mapNonEmpty(_.reverse))
+  }
+
 
   @Test def toMultiMap {
     assertEquals(Map(), List.empty[(Int, Int)].toMultiMap[List])
@@ -126,6 +131,7 @@ class ListTest {
       List(1, 2).asMap.withManyKeys(i => List(-i, i)))
   }
 
+
   @Test def attributeCounts {
     assertEquals(Map(3 -> 2, 4 -> 1), List("foo", "food", "bar").attributeCounts(_.size))
   }
@@ -144,6 +150,14 @@ class ListTest {
       }
     )
   }
+
+  @Test def countWithSize {
+    assertEquals(None, nil[Int].countWithSize(_ < 1))
+    assertEquals(Some((1, 1)), List(0).countWithSize(_ < 1))
+    assertEquals(Some((0, 1)), List(1).countWithSize(_ < 1))
+    assertEquals(Some((1, 2)), List(0, 1).countWithSize(_ < 1))
+  }
+
 
   @Test def distinctBy {
     assertEquals(List("foo", "bard", "foody"),
@@ -166,6 +180,13 @@ class ListTest {
     assertEquals((List(1), Nil, Nil), List(1).sharedPrefix(List(1)))
 
     assertEquals((List(1, 2), List(3, 4), List(4, 3)), List(1, 2, 3, 4).sharedPrefix(List(1, 2, 4, 3)))
+  }
+
+  @Test def fraction {
+    assertEquals(Double.NaN, nil[Int].fraction(_ => true), 0.0001)
+    assertEquals(0.0, List(1).fraction(_ < 1), 0.0001)
+    assertEquals(1.0, List(0).fraction(_ < 1), 0.0001)
+    assertEquals(0.5, List(0, 1).fraction(_ < 1), 0.0001)
   }
 
   private def nil[A]: List[A] = Nil

@@ -75,6 +75,26 @@ class MapTest {
     assertEquals(Map(3 -> 4), Map(3 -> 4).emptyTo(nonEmpty))
   }
 
+  @Test def entryForMaxKey {
+    assertEquals(None, Map.empty[Int, String].entryForMaxKey)
+    assertEquals(Some((2, "max")), Map(1 -> "min", 2 -> "max").entryForMaxKey)
+  }
+
+  @Test def entryForMinKey {
+    assertEquals(None, Map.empty[Int, String].entryForMinKey)
+    assertEquals(Some((1 -> "min")), Map(1 -> "min", 2 -> "max").entryForMinKey)
+  }
+
+  @Test def entryForMaxValue {
+    assertEquals(None, Map.empty[Int, String].entryForMaxValue)
+    assertEquals(Some((2, "def")), Map(1 -> "abc", 2 -> "def").entryForMaxValue)
+  }
+
+  @Test def entryForMinValue {
+    assertEquals(None, Map.empty[Int, String].entryForMinValue)
+    assertEquals(Some((1, "abc")), Map(1 -> "abc", 2 -> "def").entryForMinValue)
+  }
+
   @Test def valueForMaxKey {
     assertEquals(None, Map.empty[Int, String].valueForMaxKey)
     assertEquals(Some("max"), Map(1 -> "min", 2 -> "max").valueForMaxKey)
@@ -92,7 +112,7 @@ class MapTest {
 
   @Test def keyForMinValue {
     assertEquals(None, Map.empty[Int, String].keyForMinValue)
-    assertEquals(Some(2), Map(2 -> "abc", 2 -> "def").keyForMinValue)
+    assertEquals(Some(1), Map(1 -> "abc", 2 -> "def").keyForMinValue)
   }
 
   @Test def mapValuesEagerly {

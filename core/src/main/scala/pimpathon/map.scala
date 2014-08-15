@@ -27,10 +27,15 @@ object map {
     def mapNonEmpty[A](f: Map[K, V] => A): Option[A] = if (map.isEmpty) None else Some(f(map))
     def uncons[A](empty: => A, nonEmpty: Map[K, V] => A): A = if (map.isEmpty) empty else nonEmpty(map)
 
-    def keyForMaxValue(implicit O: Ordering[V]): Option[K] = mapNonEmpty(_.maxBy(value)).map(key)
-    def keyForMinValue(implicit O: Ordering[V]): Option[K] = mapNonEmpty(_.minBy(value)).map(key)
-    def valueForMaxKey(implicit O: Ordering[K]): Option[V] = mapNonEmpty(_.maxBy(key)).map(value)
-    def valueForMinKey(implicit O: Ordering[K]): Option[V] = mapNonEmpty(_.minBy(key)).map(value)
+    def keyForMaxValue(implicit O: Ordering[V]): Option[K] = entryForMaxValue.map(key)
+    def keyForMinValue(implicit O: Ordering[V]): Option[K] = entryForMinValue.map(key)
+    def valueForMaxKey(implicit O: Ordering[K]): Option[V] = entryForMaxKey.map(value)
+    def valueForMinKey(implicit O: Ordering[K]): Option[V] = entryForMinKey.map(value)
+
+    def entryForMaxValue(implicit O: Ordering[V]): Option[(K, V)] = mapNonEmpty(_.maxBy(value))
+    def entryForMinValue(implicit O: Ordering[V]): Option[(K, V)] = mapNonEmpty(_.minBy(value))
+    def entryForMaxKey(implicit O: Ordering[K]): Option[(K, V)] = mapNonEmpty(_.maxBy(key))
+    def entryForMinKey(implicit O: Ordering[K]): Option[(K, V)] = mapNonEmpty(_.minBy(key))
 
     def mapValuesEagerly[W](f: V => W): Map[K, W] = map.map { case (k, v) => (k, f(v)) }(collection.breakOut)
 

@@ -131,6 +131,7 @@ class ListTest {
       List(1, 2).asMap.withManyKeys(i => List(-i, i)))
   }
 
+
   @Test def attributeCounts {
     assertEquals(Map(3 -> 2, 4 -> 1), List("foo", "food", "bar").attributeCounts(_.size))
   }
@@ -179,5 +180,12 @@ class ListTest {
     assertEquals((List(1), Nil, Nil), List(1).sharedPrefix(List(1)))
 
     assertEquals((List(1, 2), List(3, 4), List(4, 3)), List(1, 2, 3, 4).sharedPrefix(List(1, 2, 4, 3)))
+  }
+
+  @Test def fraction {
+    assertEquals(Double.NaN, nil[Int].fraction(_ => true), 0.0001)
+    assertEquals(0.0, List(1).fraction(_ < 1), 0.0001)
+    assertEquals(1.0, List(0).fraction(_ < 1), 0.0001)
+    assertEquals(0.5, List(0, 1).fraction(_ < 1), 0.0001)
   }
 }

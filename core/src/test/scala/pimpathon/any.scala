@@ -22,10 +22,15 @@ class AnyTest {
   }
 
   @Test def tapIf {
-    val ints = new ListBuffer[Int]
+    assertEquals(List(1, 3), new ListBuffer[Int].tap(ints => {
+      List(1, 2, 3).foreach(i => i.tapIf(_ % 2 != 0)(ints += _))
+    }).toList)
+  }
 
-    List(1, 2, 3).foreach(i => i.tapIf(_ % 2 != 0)(ints += _))
-    assertEquals(List(1, 3), ints.toList)
+  @Test def tapUnless {
+    assertEquals(List(2), new ListBuffer[Int].tap(ints => {
+      List(1, 2, 3).foreach(i => i.tapUnless(_ % 2 != 0)(ints += _))
+    }).toList)
   }
 
   @Test def partialMatch {
@@ -47,11 +52,9 @@ class AnyTest {
   }
 
   @Test def withFinally {
-    val strings = new ListBuffer[String]
-
-    strings += "input".withFinally(s => strings += "finally: " + s)(s => {strings += "body: " + s; "done"})
-
-    assertEquals(List("body: input", "finally: input", "done"), strings.toList)
+    assertEquals(List("body: input", "finally: input", "done"), new ListBuffer[String].tap(strings => {
+      strings += "input".withFinally(s => strings += "finally: " + s)(s => {strings += "body: " + s; "done"})
+    }).toList)
   }
 }
 

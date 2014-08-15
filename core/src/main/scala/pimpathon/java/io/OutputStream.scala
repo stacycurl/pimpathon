@@ -15,8 +15,8 @@ class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean) {
     def drain(is: InputStream, closeOut: Boolean = closeOut, closeIn: Boolean = closeIn): OS =
       os.tap(is.drain(_, closeIn, closeOut))
 
-    def attemptClose(): Try[Unit] = Try(os.close)
-    def closeIf(condition: Boolean): OS     = os.tapIf(_ => condition)(_.close)
-    def closeUnless(condition: Boolean): OS = os.tapUnless(_ => condition)(_.close)
+    def attemptClose(): Try[Unit] = Try(os.close())
+    def closeIf(condition: Boolean): OS     = os.tapIf(_ => condition)(_.close())
+    def closeUnless(condition: Boolean): OS = os.tapUnless(_ => condition)(_.close())
   }
 }

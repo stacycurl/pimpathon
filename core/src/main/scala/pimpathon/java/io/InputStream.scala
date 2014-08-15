@@ -15,9 +15,9 @@ case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufSize: Int = 
     def drain(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): IS =
       is.tap(copy(_, os, closeIn, closeOut))
 
-    def attemptClose(): Try[Unit] = Try(is.close)
-    def closeIf(condition: Boolean): IS     = is.tapIf(_ => condition)(_.close)
-    def closeUnless(condition: Boolean): IS = is.tapUnless(_ => condition)(_.close)
+    def attemptClose(): Try[Unit] = Try(is.close())
+    def closeIf(condition: Boolean): IS     = is.tapIf(_ => condition)(_.close())
+    def closeUnless(condition: Boolean): IS = is.tapUnless(_ => condition)(_.close())
   }
 
   def copy(
@@ -33,8 +33,9 @@ case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufSize: Int = 
       }
     }
 
-    Try(recurse())
-    if (closeIn)  is.attemptClose
-    if (closeOut) os.attemptClose
+    try recurse() finally {
+      if (closeIn)  is.attemptClose()
+      if (closeOut) os.attemptClose()
+    }
   }
 }

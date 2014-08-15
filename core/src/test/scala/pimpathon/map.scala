@@ -27,6 +27,21 @@ class MapTest {
     assertTrue(nonEmpty.containsAny(List(1, 2)))
   }
 
+  @Test def containsAll {
+    assertTrue(empty.containsAll(None))
+    assertFalse(empty.containsAll(Some(1)))
+    assertTrue(nonEmpty.containsAll(None))
+    assertFalse(nonEmpty.containsAll(Some(2)))
+    assertTrue(nonEmpty.containsAll(Some(1)))
+
+    assertTrue(empty.containsAll(Nil))
+    assertFalse(empty.containsAll(List(1)))
+    assertTrue(nonEmpty.containsAll(Nil))
+    assertFalse(nonEmpty.containsAll(List(2)))
+    assertTrue(nonEmpty.containsAll(List(1)))
+    assertFalse(nonEmpty.containsAll(List(1, 2)))
+  }
+
   @Test def get {
     assertEquals(None,    Map.empty[Int, Int].get(Some(1)))
     assertEquals(None,    Map.empty[Int, Int].get(None))

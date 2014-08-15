@@ -7,6 +7,13 @@ import pimpathon.string._
 
 
 class StringTest {
+  @Test def prefixWith {
+    assertEquals("", "".prefixWith(""))
+    assertEquals("prefix", "".prefixWith("prefix"))
+    assertEquals("prefix-suffix", "-suffix".prefixWith("prefix"))
+    assertEquals("prefix", "prefix".prefixWith("prefix"))
+  }
+
   @Test def sharedPrefix {
     assertEquals(("", "", ""), "".sharedPrefix(""))
     assertEquals(("1", "", ""), "1".sharedPrefix("1"))

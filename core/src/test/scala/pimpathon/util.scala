@@ -18,9 +18,9 @@ object util {
     override def close() = { closed = true; super.close() }
   }
 
-  def createOutputStream() = new ByteArrayOutputStream() {
+  def createOutputStream(onClose: () => Unit = () => {}) = new ByteArrayOutputStream() {
     var closed = false
-    override def close() = { closed = true; super.close() }
+    override def close() = { closed = true; super.close(); onClose() }
   }
 
   def intercept[E <: AnyRef](f: => Any)(implicit expected: ClassTag[E]): E = {

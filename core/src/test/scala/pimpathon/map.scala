@@ -12,29 +12,52 @@ import pimpathon.multiMap._
 
 
 class MapTest {
+  @Test def containsAny {
+    assertFalse(empty.containsAny(None))
+    assertFalse(empty.containsAny(Some(1)))
+    assertFalse(nonEmpty.containsAny(None))
+    assertFalse(nonEmpty.containsAny(Some(2)))
+    assertTrue(nonEmpty.containsAny(Some(1)))
+
+    assertFalse(empty.containsAny(Nil))
+    assertFalse(empty.containsAny(List(1)))
+    assertFalse(nonEmpty.containsAny(Nil))
+    assertFalse(nonEmpty.containsAny(List(2)))
+    assertTrue(nonEmpty.containsAny(List(1)))
+    assertTrue(nonEmpty.containsAny(List(1, 2)))
+  }
+
+  @Test def get {
+    assertEquals(None,    Map.empty[Int, Int].get(Some(1)))
+    assertEquals(None,    Map.empty[Int, Int].get(None))
+    assertEquals(None,    Map(1 -> 2).get(None))
+    assertEquals(None,    Map(1 -> 2).get(Some(2)))
+    assertEquals(Some(2), Map(1 -> 2).get(Some(1)))
+  }
+
   @Test def getOrThrow {
     assertEquals("missing", util.intercept[IllegalArgumentException] {
-      Map(1 -> 2).getOrThrow(0, "missing")
+      nonEmpty.getOrThrow(0, "missing")
     }.getMessage)
 
     assertEquals("missing", util.intercept[RuntimeException] {
-      Map(1 -> 2).getOrThrow(0, new RuntimeException("missing"))
+      nonEmpty.getOrThrow(0, new RuntimeException("missing"))
     }.getMessage)
   }
 
   @Test def uncons {
-    assertEquals("empty", Map.empty[Int, Int].uncons("empty", _ => "nonEmpty"))
-    assertEquals("nonEmpty", Map(1 -> 2).uncons("empty", _ => "nonEmpty"))
+    assertEquals("empty", empty.uncons("empty", _ => "nonEmpty"))
+    assertEquals("nonEmpty", nonEmpty.uncons("empty", _ => "nonEmpty"))
   }
 
   @Test def mapNonEmpty {
-    assertEquals(None, Map.empty[Int, Int].mapNonEmpty(_ => "nonEmpty"))
-    assertEquals(Some("nonEmpty"), Map(1 -> 2).mapNonEmpty(_ => "nonEmpty"))
+    assertEquals(None, empty.mapNonEmpty(_ => "nonEmpty"))
+    assertEquals(Some("nonEmpty"), nonEmpty.mapNonEmpty(_ => "nonEmpty"))
   }
 
   @Test def emptyTo {
-    assertEquals(Map(1 -> 2), Map.empty[Int, Int].emptyTo(Map(1 -> 2)))
-    assertEquals(Map(3 -> 4), Map(3 -> 4).emptyTo(Map(1 -> 2)))
+    assertEquals(nonEmpty, empty.emptyTo(nonEmpty))
+    assertEquals(Map(3 -> 4), Map(3 -> 4).emptyTo(nonEmpty))
   }
 
   @Test def valueForMaxKey {
@@ -103,4 +126,6 @@ class MapTest {
     def result(): Unit = ()
     override def toString = "UnitBuilder(%s)".format(from)
   }
+
+  private val (empty, nonEmpty) = (Map.empty[Int, Int], Map(1 -> 2))
 }

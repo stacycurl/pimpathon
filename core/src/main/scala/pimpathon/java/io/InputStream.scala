@@ -13,7 +13,7 @@ case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufSize: Int = 
   implicit def inputStreamOps[IS <: InputStream](is: IS): InputStreamOps[IS] = new InputStreamOps[IS](is)
 
   class InputStreamOps[IS <: InputStream](is: IS) {
-    def read(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): IS =
+    def drain(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): IS =
       is.tap(copy(_, os, closeIn, closeOut))
 
     def attemptClose(): Either[Throwable, Unit] = is.attempt(_.close)

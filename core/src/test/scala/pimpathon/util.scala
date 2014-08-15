@@ -23,6 +23,8 @@ object util {
     override def close() = { closed = true; super.close(); onClose() }
   }
 
+  def ignoreExceptions(f: => Unit): Unit = try f catch { case t: Throwable => }
+
   def intercept[E <: AnyRef](f: => Any)(implicit expected: ClassManifest[E]): E = {
     val clazz = expected.erasure
 
@@ -37,4 +39,6 @@ object util {
       case Some(e) => e.asInstanceOf[E]
     }
   }
+
+  val boom = new Throwable("Boom !")
 }

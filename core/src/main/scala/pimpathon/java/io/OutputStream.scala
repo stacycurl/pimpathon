@@ -13,8 +13,8 @@ class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean) {
   implicit def outputStreamOps[OS <: OutputStream](os: OS): OutputStreamOps[OS] = new OutputStreamOps[OS](os)
 
   class OutputStreamOps[OS <: OutputStream](os: OS) {
-    def write(is: InputStream, closeOut: Boolean = closeOut, closeIn: Boolean = closeIn): OS =
-      os.tap(is.read(_, closeIn, closeOut))
+    def drain(is: InputStream, closeOut: Boolean = closeOut, closeIn: Boolean = closeIn): OS =
+      os.tap(is.drain(_, closeIn, closeOut))
 
     def attemptClose(): Either[Throwable, Unit] = os.attempt(_.close)
     def closeIf(condition: Boolean): OS     = os.tapIf(_ => condition)(_.close)

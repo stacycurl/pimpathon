@@ -5,6 +5,7 @@ import scala.collection.mutable.ListBuffer
 
 import org.junit.Assert._
 import pimpathon.either._
+import pimpathon.util._
 
 
 class EitherTest {

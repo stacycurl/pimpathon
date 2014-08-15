@@ -1,5 +1,7 @@
 package pimpathon
 
+import scala.collection.GenTraversableOnce
+
 import pimpathon.multiMap._
 
 
@@ -7,6 +9,11 @@ object map {
   implicit def mapOps[K, V](map: Map[K, V]): MapOps[K, V] = new MapOps[K, V](map)
 
   class MapOps[K, V](map: Map[K, V]) {
+    def containsAny(ok: Option[K]): Boolean = ok.exists(map.contains)
+    def containsAny[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.exists(map.contains)
+
+    def get(ok: Option[K]): Option[V] = ok.flatMap(map.get)
+
     def getOrThrow(k: K, message: String): V =
       getOrThrow(k, new IllegalArgumentException(message))
 

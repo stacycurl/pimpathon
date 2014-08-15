@@ -5,6 +5,7 @@ import scala.collection.mutable.ListBuffer
 
 import org.junit.Assert._
 import pimpathon.any._
+import pimpathon.util._
 
 
 class AnyTest {
@@ -59,10 +60,7 @@ class AnyTest {
 
   @Test def attempt {
     assertEquals(Right(2), 1.attempt(_ * 2))
-
-    new Throwable("boom").tap(boom => {
-      assertEquals(Left(boom), 1.attempt(_ => throw boom))
-    })
+    assertEquals(Left(boom), 1.attempt(_ => throw boom))
   }
 }
 

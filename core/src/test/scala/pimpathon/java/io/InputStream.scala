@@ -2,13 +2,23 @@ package pimpathon.java.io
 
 import java.io.{InputStream, OutputStream, ByteArrayInputStream, ByteArrayOutputStream}
 import org.junit.Test
+import scala.util.{Failure, Success}
 
 import org.junit.Assert._
+import pimpathon.any._
 import pimpathon.java.io.inputStream._
 import pimpathon.util._
 
 
 class InputStreamTest {
+  @Test def attemptClose {
+    assertEquals(Success(()), createInputStream().attemptClose())
+
+    new Throwable("boom").tap(boom => {
+      assertEquals(Failure(boom), createInputStream(onClose = () => throw boom).attemptClose())
+    })
+  }
+
   @Test def closeIf {
     val is = createInputStream()
 

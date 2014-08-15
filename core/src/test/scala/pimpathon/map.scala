@@ -12,6 +12,14 @@ import pimpathon.multiMap._
 
 
 class MapTest {
+  @Test def get {
+    assertEquals(None,    Map.empty[Int, Int].get(Some(1)))
+    assertEquals(None,    Map.empty[Int, Int].get(None))
+    assertEquals(None,    Map(1 -> 2).get(None))
+    assertEquals(None,    Map(1 -> 2).get(Some(2)))
+    assertEquals(Some(2), Map(1 -> 2).get(Some(1)))
+  }
+
   @Test def getOrThrow {
     assertEquals("missing", util.intercept[IllegalArgumentException] {
       Map(1 -> 2).getOrThrow(0, "missing")

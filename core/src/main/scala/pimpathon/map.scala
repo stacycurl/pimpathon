@@ -5,6 +5,8 @@ import pimpathon.multiMap._
 
 object map {
   implicit class MapOps[K, V](val map: Map[K, V]) extends AnyVal {
+    def get(ok: Option[K]): Option[V] = ok.flatMap(map.get)
+
     def getOrThrow(k: K, message: String): V =
       getOrThrow(k, new IllegalArgumentException(message))
 

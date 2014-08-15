@@ -11,13 +11,18 @@ import pimpathon.util._
 class InputStreamTest {
   @Test def closeIf {
     val is = createInputStream()
-    assertInputStreamClosed(false, is.closed)
 
-    is.closeIf(false)
     assertInputStreamClosed(false, is.closed)
+    assertInputStreamClosed(false, is.closeIf(false).closed)
+    assertInputStreamClosed(true,  is.closeIf(true).closed)
+  }
 
-    is.closeIf(true)
-    assertInputStreamClosed(true, is.closed)
+  @Test def closeUnless {
+    val is = createInputStream()
+
+    assertInputStreamClosed(false, is.closed)
+    assertInputStreamClosed(false, is.closeUnless(true).closed)
+    assertInputStreamClosed(true,  is.closeUnless(false).closed)
   }
 
   @Test def read {

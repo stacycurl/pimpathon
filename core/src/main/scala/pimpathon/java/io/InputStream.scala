@@ -10,11 +10,12 @@ import pimpathon.java.io.outputStream._
 object inputStream extends InputStreamUtils(closeIn = true, closeOut = true)
 
 case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufSize: Int = 8192) {
-  implicit class InputStreamOps(val is: InputStream) {
-    def read(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): InputStream =
+  implicit class InputStreamOps[IS <: InputStream](val is: IS) {
+    def read(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): IS =
       is.tap(copy(_, os, closeIn, closeOut))
 
-    def closeIf(condition: Boolean): InputStream = is.tapIf(_ => condition)(_.close)
+    def closeIf(condition: Boolean): IS     = is.tapIf(_ => condition)(_.close)
+    def closeUnless(condition: Boolean): IS = is.tapUnless(_ => condition)(_.close)
   }
 
   def copy(

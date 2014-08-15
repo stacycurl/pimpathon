@@ -150,6 +150,14 @@ class ListTest {
     )
   }
 
+  @Test def countWithSize {
+    assertEquals(None, nil[Int].countWithSize(_ < 1))
+    assertEquals(Some((1, 1)), List(0).countWithSize(_ < 1))
+    assertEquals(Some((0, 1)), List(1).countWithSize(_ < 1))
+    assertEquals(Some((1, 2)), List(0, 1).countWithSize(_ < 1))
+  }
+
+
   @Test def distinctBy {
     assertEquals(List("foo", "bard", "foody"),
       List("foo", "bar", "bard", "food", "foody", "bardo").distinctBy(_.length))

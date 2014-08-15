@@ -56,5 +56,13 @@ class AnyTest {
       strings += "input".withFinally(s => strings += "finally: " + s)(s => {strings += "body: " + s; "done"})
     }).toList)
   }
+
+  @Test def attempt {
+    assertEquals(Right(2), 1.attempt(_ * 2))
+
+    new Throwable("boom").tap(boom => {
+      assertEquals(Left(boom), 1.attempt(_ => throw boom))
+    })
+  }
 }
 

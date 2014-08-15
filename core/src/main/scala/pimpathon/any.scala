@@ -13,6 +13,8 @@ object any {
     def tapIf(p: A => Boolean)(actions: (A => Unit)*): A     = if (p(a)) tap(actions: _*) else a
     def tapUnless(p: A => Boolean)(actions: (A => Unit)*): A = if (p(a)) a else tap(actions: _*)
 
+    def attempt[B](f: A => B): Either[Throwable, B] = try { Right(f(a)) } catch { case t: Throwable => Left(t) }
+
     def partialMatch[B](pf: PartialFunction[A, B]): Option[B] = PartialFunction.condOpt(a)(pf)
 
     def lpair[B](f: A => B): (B, A) = (f(a), a)

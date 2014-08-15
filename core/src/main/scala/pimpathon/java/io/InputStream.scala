@@ -16,6 +16,7 @@ case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufSize: Int = 
     def read(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): IS =
       is.tap(copy(_, os, closeIn, closeOut))
 
+    def attemptClose(): Either[Throwable, Unit] = is.attempt(_.close)
     def closeIf(condition: Boolean): IS     = is.tapIf(_ => condition)(_.close)
     def closeUnless(condition: Boolean): IS = is.tapUnless(_ => condition)(_.close)
   }
@@ -33,9 +34,8 @@ case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufSize: Int = 
       }
     }
 
-    recurse()
-
-    if (closeIn)  is.close
-    if (closeOut) os.close
+    this.attempt(_ => recurse())
+    if (closeIn)  is.attemptClose
+    if (closeOut) os.attemptClose
   }
 }

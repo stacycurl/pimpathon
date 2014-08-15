@@ -13,14 +13,14 @@ object util {
   def assertOutputStreamClosed(expected: Boolean, closed: Boolean): Unit =
     assertEquals("expected OutputStream to %s closed".format(if (expected) "be" else "not be"), expected, closed)
 
-  def createInputStream(bytes: Array[Byte] = Array()) = new ByteArrayInputStream(bytes) {
+  def createInputStream(bytes: Array[Byte] = Array(), onClose: () => Unit = () => {}) = new ByteArrayInputStream(bytes) {
     var closed = false
-    override def close() = { closed = true; super.close() }
+    override def close() = { closed = true; super.close(); onClose() }
   }
 
-  def createOutputStream() = new ByteArrayOutputStream() {
+  def createOutputStream(onClose: () => Unit = () => {}) = new ByteArrayOutputStream() {
     var closed = false
-    override def close() = { closed = true; super.close() }
+    override def close() = { closed = true; super.close(); onClose() }
   }
 
   def intercept[E <: AnyRef](f: => Any)(implicit expected: ClassManifest[E]): E = {

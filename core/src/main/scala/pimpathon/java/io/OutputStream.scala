@@ -16,6 +16,7 @@ class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean) {
     def write(is: InputStream, closeOut: Boolean = closeOut, closeIn: Boolean = closeIn): OS =
       os.tap(is.read(_, closeIn, closeOut))
 
+    def attemptClose(): Either[Throwable, Unit] = os.attempt(_.close)
     def closeIf(condition: Boolean): OS     = os.tapIf(_ => condition)(_.close)
     def closeUnless(condition: Boolean): OS = os.tapUnless(_ => condition)(_.close)
   }

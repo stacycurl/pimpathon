@@ -4,11 +4,20 @@ import java.io.{InputStream, OutputStream, ByteArrayInputStream, ByteArrayOutput
 import org.junit.Test
 
 import org.junit.Assert._
+import pimpathon.any._
 import pimpathon.java.io.outputStream._
 import pimpathon.util._
 
 
 class OutputStreamTest {
+  @Test def attemptClose {
+    assertEquals(Right(()), createOutputStream().attemptClose())
+
+    new Throwable("boom").tap(boom => {
+      assertEquals(Left(boom), createOutputStream(onClose = () => throw boom).attemptClose())
+    })
+  }
+
   @Test def closeIf {
     val os = createOutputStream()
 

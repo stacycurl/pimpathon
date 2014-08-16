@@ -2,6 +2,7 @@ package pimpathon
 
 import scala.collection.GenTraversableOnce
 
+import pimpathon.function._
 import pimpathon.multiMap._
 
 
@@ -19,6 +20,8 @@ object map {
 
     def getOrThrow(k: K, exception: Exception): V =
       map.getOrElse(k, throw exception)
+
+    def findKey(p: Predicate[K]): Option[K] = map.find(kv => p(kv._1)).map(_._1)
 
     def emptyTo(empty: => Map[K, V]): Map[K, V] = uncons(empty, _ => map)
 

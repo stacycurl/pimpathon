@@ -150,6 +150,12 @@ class MapTest {
     assertEquals(UnitBuilder[Int]("apply()"), ucbfi.apply(List(1, 2, 3)))
   }
 
+  @Test def findKey {
+    assertEquals(None, empty.findKey(_ => true))
+    assertEquals(None, nonEmpty.findKey(_ => false))
+    assertEquals(Some(1), nonEmpty.findKey(_ == 1))
+  }
+
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
     def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem](s"apply($from)")

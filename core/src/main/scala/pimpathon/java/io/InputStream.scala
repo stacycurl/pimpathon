@@ -16,6 +16,7 @@ case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufSize: Int = 
       is.tap(copy(_, os, closeIn, closeOut))
 
     def attemptClose(): Try[Unit] = Try(is.close())
+    def closeAfter[A](f: IS => A): A        = is.withFinally(_.attemptClose())(f)
     def closeIf(condition: Boolean): IS     = is.tapIf(_ => condition)(_.close())
     def closeUnless(condition: Boolean): IS = is.tapUnless(_ => condition)(_.close())
   }

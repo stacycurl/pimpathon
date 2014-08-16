@@ -26,6 +26,8 @@ object map {
     def filterValuesNot(p: Predicate[V]): Map[K, V] = map.filterNot(kv => p(kv._2))
     def filterValues(p: Predicate[V]): Map[K, V]    = map.filter(kv => p(kv._2))
 
+    def valueExists(p: Predicate[V]): Boolean = map.exists(kv => p(kv._2))
+
     def emptyTo(empty: => Map[K, V]): Map[K, V]             = uncons(empty, _ => map)
     def mapNonEmpty[A](f: Map[K, V] => A): Option[A]        = if (map.isEmpty) None else Some(f(map))
     def uncons[A](empty: => A, nonEmpty: Map[K, V] => A): A = if (map.isEmpty) empty else nonEmpty(map)

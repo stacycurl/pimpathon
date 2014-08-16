@@ -196,6 +196,12 @@ class MapTest {
     assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterValues(_ == 2))
   }
 
+  @Test def valueExists {
+    assertFalse(empty.valueExists(_ => true))
+    assertFalse(nonEmpty.valueExists(_ => false))
+    assertTrue(nonEmpty.valueExists(_ == 2))
+  }
+
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
     def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem](s"apply($from)")

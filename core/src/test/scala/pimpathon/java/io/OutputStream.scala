@@ -63,4 +63,22 @@ class OutputStreamTest {
       os.drain(is, closeIn = false, closeOut = false)
     }
   }
+
+  @Test def << {
+    for {
+      expectedCloseIn  <- List(false, true)
+      expectedCloseOut <- List(false, true)
+      input            <- List("Input", "Repeat" * 100)
+    } {
+      val (is, os) = (createInputStream(input.getBytes), createOutputStream())
+      val outputStream = OutputStreamUtils(expectedCloseOut, expectedCloseIn)
+      import outputStream._
+
+      os << is
+
+      assertEquals(input, os.toString)
+      assertOutputStreamClosed(expectedCloseOut, os.closed)
+      assertInputStreamClosed(expectedCloseIn, is.closed)
+    }
+  }
 }

@@ -55,17 +55,15 @@ class FileTest {
 
   @Test def relativeTo {
     file.withTempDirectory(dir => {
-      assertEquals("child", createFile(dir, "child").relativeTo(dir).getPath)
+      assertEquals("child", file.file(dir, "child").create().relativeTo(dir).getPath)
 
       assertEquals(dir.getName + "/kid",
-        createFile(dir, "kid").relativeTo(dir.getParentFile).getPath)
+        file.file(dir, "kid").create().relativeTo(dir.getParentFile).getPath)
 
       val parent = createDirectory(dir, "parent")
-
-      assertEquals("parent", parent.relativeTo(dir).getPath)
-      assertEquals("..", dir.relativeTo(parent).getPath)
-
-      assertEquals("parent/child", createFile(parent, "child").relativeTo(dir).getPath)
+      assertEquals("parent",       parent.relativeTo(dir).getPath)
+      assertEquals("..",           dir.relativeTo(parent).getPath)
+      assertEquals("parent/child", file.file(parent, "child").create().relativeTo(dir).getPath)
     })
   }
 
@@ -76,13 +74,11 @@ class FileTest {
     file.withTempDirectory(tmp => assertEquals(List(tmp), tmp.tree))
 
     file.withTempDirectory(tmp => {
-      val temp          = tmp.named()
-      val child         = createFile(tmp, "child")
-      val toddler       = createFile(tmp, "toddler")
-      val teenageParent = createDirectory(tmp, "teenageParent")
-      val brat          = createFile(teenageParent, "brat")
+      val List(child, toddler, brat) =
+        file.files(tmp, "child", "toddler", "parent/brat").map(_.create()).toList
 
-      assertEquals(Set(temp, child, toddler, teenageParent, brat), temp.tree.map(_.named()).toSet)
+      assertEquals(Set(tmp.named(), child, toddler, brat.getParentFile, brat),
+        tmp.tree.map(_.named()).toSet)
     })
   }
 
@@ -131,8 +127,8 @@ class FileTest {
     assert(f.isFile())
     assert(f.exists())
 
-    val suffix = ".sufferin"
-    val prefix = "sucotash-"
+    val prefix = "sufferin-"
+    val suffix = ".sucotash"
 
     val f1 = file.tempFile(suffix)
     assert(f1.isFile())
@@ -153,8 +149,8 @@ class FileTest {
     assert(f.isDirectory())
     assert(f.exists())
 
-    val suffix = ".gosh"
-    val prefix = "darnit-"
+    val prefix = "gosh-"
+    val suffix = ".darnit"
 
     val f1 = file.tempDir(suffix)
     assert(f1.isDirectory())
@@ -210,8 +206,5 @@ class FileTest {
   }
 
   private def createDirectory(parent: File, name: String): File =
-    createFile(parent, name).changeToDirectory()
-
-  private def createFile(parent: File, name: String): File =
-    new File(parent, name).named().create()
+    file.file(parent, name).tap(_.mkdir)
 }

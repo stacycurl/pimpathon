@@ -1,11 +1,13 @@
 package pimpathon
 
-import _root_.java.io.File
+import _root_.java.io.{File, FileInputStream}
 import org.junit.Test
 
 import org.junit.Assert._
 import pimpathon.any._
 import pimpathon.file._
+import pimpathon.java.io.inputStream._
+import pimpathon.util._
 
 
 class FileTest {
@@ -188,6 +190,14 @@ class FileTest {
 
       assertEquals(dir / "child",        child)
       assertEquals(dir / "nested/child", nested)
+    })
+  }
+
+  @Test def readLines {
+    file.withTempFile(tmp => {
+      createInputStream("line1\nline2".getBytes).drain(tmp.outputStream)
+
+      assertEquals(List("line1", "line2"), tmp.readLines)
     })
   }
 

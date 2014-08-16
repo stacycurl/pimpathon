@@ -1,6 +1,7 @@
 package pimpathon
 
-import _root_.java.io.File
+import _root_.java.io.{File, FileOutputStream}
+import scala.io.{BufferedSource, Source}
 import scala.util.Properties
 
 import pimpathon.any._
@@ -27,6 +28,11 @@ case class FileUtils(suffix: String, prefix: String) {
 
     def changeToDirectory(): File = file.tapIf(_.isFile)(_.delete(), _.mkdir())
     def create(): File            = file.tap(_.getParentFile.mkdirs(), _.createNewFile())
+
+    def readLines(): List[String] = source().withFinally(_.close())(_.getLines.toList)
+
+    def outputStream(): FileOutputStream = new FileOutputStream(file)
+    def source(): BufferedSource =  Source.fromFile(file)
 
     private def separator: String = File.separator.replace("\\", "\\\\")
   }

@@ -156,6 +156,12 @@ class MapTest {
     assertEquals(Some(1), nonEmpty.findKey(_ == 1))
   }
 
+  @Test def findValue {
+    assertEquals(None, empty.findValue(_ => true))
+    assertEquals(None, nonEmpty.findValue(_ => false))
+    assertEquals(Some(2), nonEmpty.findValue(_ == 2))
+  }
+
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
     def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem](s"apply($from)")

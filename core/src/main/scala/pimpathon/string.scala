@@ -1,5 +1,8 @@
 package pimpathon
 
+import _root_.java.security.MessageDigest
+
+import pimpathon.array._
 import pimpathon.list._
 
 
@@ -15,6 +18,11 @@ object string {
 
       (fromChars(prefix), fromChars(rest), fromChars(otherRest))
     }
+
+    def prefixPadTo(len: Int, elem: Char): String = (elem.toString * (len - string.length)) + string
+
+
+    def md5: String = MessageDigest.getInstance("MD5").digest(string.getBytes).toHex(length = 32)
   }
 
   def fromChars(chars: List[Char]): String =

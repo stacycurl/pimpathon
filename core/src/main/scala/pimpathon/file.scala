@@ -7,6 +7,7 @@ import scala.util.Properties
 import pimpathon.any._
 import pimpathon.java.io.outputStream._
 import pimpathon.list._
+import pimpathon.string._
 
 
 object file extends FileUtils(".tmp", "temp")
@@ -43,6 +44,8 @@ case class FileUtils(suffix: String, prefix: String) {
 
     def outputStream(append: Boolean = true): FileOutputStream = new FileOutputStream(file, append)
     def source(): BufferedSource =  Source.fromFile(file)
+
+    def md5(): String = readLines().mkString("\n").md5
 
     private def separator: String = File.separator.replace("\\", "\\\\")
   }

@@ -13,22 +13,17 @@ object map {
     def containsAny[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.exists(map.contains)
     def containsAll[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.forall(map.contains)
 
-    def get(ok: Option[K]): Option[V] = ok.flatMap(map.get)
-
-    def getOrThrow(k: K, message: String): V =
-      getOrThrow(k, new IllegalArgumentException(message))
-
-    def getOrThrow(k: K, exception: Exception): V =
-      map.getOrElse(k, throw exception)
+    def get(ok: Option[K]): Option[V]             = ok.flatMap(map.get)
+    def getOrThrow(k: K, message: String): V      = getOrThrow(k, new IllegalArgumentException(message))
+    def getOrThrow(k: K, exception: Exception): V = map.getOrElse(k, throw exception)
 
     def findKey(p: Predicate[K]): Option[K]                 = findEntryWithKey(p).map(_._1)
     def findValue(p: Predicate[V]): Option[V]               = findEntryWithValue(p).map(_._2)
     def findEntryWithKey(p: Predicate[K]): Option[(K, V)]   = map.find(kv => p(kv._1))
     def findEntryWithValue(p: Predicate[V]): Option[(K, V)] = map.find(kv => p(kv._2))
 
-    def emptyTo(empty: => Map[K, V]): Map[K, V] = uncons(empty, _ => map)
-
-    def mapNonEmpty[A](f: Map[K, V] => A): Option[A] = if (map.isEmpty) None else Some(f(map))
+    def emptyTo(empty: => Map[K, V]): Map[K, V]             = uncons(empty, _ => map)
+    def mapNonEmpty[A](f: Map[K, V] => A): Option[A]        = if (map.isEmpty) None else Some(f(map))
     def uncons[A](empty: => A, nonEmpty: Map[K, V] => A): A = if (map.isEmpty) empty else nonEmpty(map)
 
     def keyForMaxValue(implicit O: Ordering[V]): Option[K] = entryForMaxValue.map(key)

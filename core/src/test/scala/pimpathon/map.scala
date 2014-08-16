@@ -77,22 +77,22 @@ class MapTest {
 
   @Test def entryForMaxKey {
     assertEquals(None, Map.empty[Int, String].entryForMaxKey)
-    assertEquals(Some((2, "max")), Map(1 -> "min", 2 -> "max").entryForMaxKey)
+    assertEquals(Some(2 -> "max"), Map(1 -> "min", 2 -> "max").entryForMaxKey)
   }
 
   @Test def entryForMinKey {
     assertEquals(None, Map.empty[Int, String].entryForMinKey)
-    assertEquals(Some((1 -> "min")), Map(1 -> "min", 2 -> "max").entryForMinKey)
+    assertEquals(Some(1 -> "min"), Map(1 -> "min", 2 -> "max").entryForMinKey)
   }
 
   @Test def entryForMaxValue {
     assertEquals(None, Map.empty[Int, String].entryForMaxValue)
-    assertEquals(Some((2, "def")), Map(1 -> "abc", 2 -> "def").entryForMaxValue)
+    assertEquals(Some(2 -> "def"), Map(1 -> "abc", 2 -> "def").entryForMaxValue)
   }
 
   @Test def entryForMinValue {
     assertEquals(None, Map.empty[Int, String].entryForMinValue)
-    assertEquals(Some((1, "abc")), Map(1 -> "abc", 2 -> "def").entryForMinValue)
+    assertEquals(Some(1 -> "abc"), Map(1 -> "abc", 2 -> "def").entryForMinValue)
   }
 
   @Test def valueForMaxKey {
@@ -130,8 +130,8 @@ class MapTest {
     val cbf = MultiMap.build[List, Int, String]
     val builder = cbf.apply()
 
-    builder += ((1, "foo"))
-    builder += ((1, "bar"))
+    builder += 1 -> "foo"
+    builder += 1 -> "bar"
     assertEquals(Map(1 -> List("foo", "bar")), builder.result())
 
     builder.clear()

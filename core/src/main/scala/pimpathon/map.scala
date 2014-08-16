@@ -21,10 +21,10 @@ object map {
     def getOrThrow(k: K, exception: Exception): V =
       map.getOrElse(k, throw exception)
 
-    def findKey(p: Predicate[K]): Option[K]   = findEntryWithKey(p).map(_._1)
-    def findValue(p: Predicate[V]): Option[V] = map.find(kv => p(kv._2)).map(_._2)
-
-    def findEntryWithKey(p: Predicate[K]): Option[(K, V)] = map.find(kv => p(kv._1))
+    def findKey(p: Predicate[K]): Option[K]                 = findEntryWithKey(p).map(_._1)
+    def findValue(p: Predicate[V]): Option[V]               = findEntryWithValue(p).map(_._2)
+    def findEntryWithKey(p: Predicate[K]): Option[(K, V)]   = map.find(kv => p(kv._1))
+    def findEntryWithValue(p: Predicate[V]): Option[(K, V)] = map.find(kv => p(kv._2))
 
     def emptyTo(empty: => Map[K, V]): Map[K, V] = uncons(empty, _ => map)
 

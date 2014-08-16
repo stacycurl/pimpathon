@@ -27,4 +27,8 @@ class StringTest {
     assertEquals("prefix-suffix", "prefix-".suffixWith("suffix"))
     assertEquals("suffix", "suffix".suffixWith("suffix"))
   }
+
+  @Test def prefixPadTo {
+    assertEquals("ppp-suffix", "-suffix".prefixPadTo(10, 'p'))
+  }
 }

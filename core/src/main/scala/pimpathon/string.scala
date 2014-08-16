@@ -13,6 +13,8 @@ object string {
 
       (fromChars(prefix), fromChars(rest), fromChars(otherRest))
     }
+
+    def prefixPadTo(len: Int, elem: Char): String = (elem.toString * (len - string.length)) + string
   }
 
   def fromChars(chars: List[Char]): String =

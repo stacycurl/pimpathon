@@ -24,7 +24,7 @@ case class FileUtils(suffix: String, prefix: String) {
     def path: List[String]     = file.getAbsolutePath.split(separator).toList.filterNot(Set("", "."))
 
     def changeToDirectory(): File = file.tapIf(_.isFile)(_.delete(), _.mkdir())
-    def create(): File            = file.tap(_.createNewFile())
+    def create(): File            = file.tap(_.getParentFile.mkdirs(), _.createNewFile())
 
     private def separator: String = File.separator.replace("\\", "\\\\")
   }

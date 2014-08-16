@@ -11,13 +11,13 @@ import pimpathon.file._
 class FileTest {
   @Test def create {
     file.withTempDirectory(dir => {
-      val child = file.file(dir, "child")
+      val child = dir / "child"
       assertFalse(child.exists)
 
       child.create()
       assertTrue(child.exists)
 
-      val nested = file.file(dir, "parent/child")
+      val nested = dir / "parent/child"
       assertFalse(nested.exists)
 
       nested.create()
@@ -55,15 +55,15 @@ class FileTest {
 
   @Test def relativeTo {
     file.withTempDirectory(dir => {
-      assertEquals("child", file.file(dir, "child").create().relativeTo(dir).getPath)
+      assertEquals("child", (dir / "child").create().relativeTo(dir).getPath)
 
       assertEquals(dir.getName + "/kid",
-        file.file(dir, "kid").create().relativeTo(dir.getParentFile).getPath)
+        (dir / "kid").create().relativeTo(dir.getParentFile).getPath)
 
       val parent = createDirectory(dir, "parent")
       assertEquals("parent",       parent.relativeTo(dir).getPath)
       assertEquals("..",           dir.relativeTo(parent).getPath)
-      assertEquals("parent/child", file.file(parent, "child").create().relativeTo(dir).getPath)
+      assertEquals("parent/child", (parent / "child").create().relativeTo(dir).getPath)
     })
   }
 
@@ -171,11 +171,12 @@ class FileTest {
     assertFalse(dir.exists)
 
     file.withTempDirectory(dir => {
-      val child = file.file(dir, "and this file does not exist")
+      val child = dir / "and this file does not exist"
       assertFalse(child.exists)
       assertEquals(dir, child.getParentFile)
+      assertEquals(child, file.file(dir, "and this file does not exist"))
 
-      val nested = file.file(dir, "parent/child")
+      val nested = dir / "parent/child"
       assertFalse(nested.exists)
       assertEquals(dir, nested.getParentFile.getParentFile)
     })
@@ -185,8 +186,8 @@ class FileTest {
     file.withTempDirectory(dir => {
       val List(child, nested) = file.files(dir, "child", "nested/child").toList
 
-      assertEquals(file.file(dir, "child"), child)
-      assertEquals(file.file(dir, "nested/child"), nested)
+      assertEquals(dir / "child",        child)
+      assertEquals(dir / "nested/child", nested)
     })
   }
 
@@ -205,6 +206,5 @@ class FileTest {
       expectedIsFile, tmp.isFile)
   }
 
-  private def createDirectory(parent: File, name: String): File =
-    file.file(parent, name).tap(_.mkdir)
+  private def createDirectory(parent: File, name: String): File = (parent / name).tap(_.mkdir)
 }

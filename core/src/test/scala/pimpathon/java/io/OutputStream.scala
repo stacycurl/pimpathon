@@ -15,6 +15,14 @@ class OutputStreamTest {
     assertEquals(Failure(boom), createOutputStream(onClose = () => throw boom).attemptClose())
   }
 
+  @Test def closeAfter {
+    val os = createOutputStream()
+
+    assertOutputStreamClosed(false, os.closed)
+    assertEquals("result", os.closeAfter(_ => "result"))
+    assertOutputStreamClosed(true, os.closed)
+  }
+
   @Test def closeIf {
     val os = createOutputStream()
 

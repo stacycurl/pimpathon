@@ -9,12 +9,14 @@ import pimpathon.java.io.inputStream._
 
 object outputStream extends OutputStreamUtils(closeOut = true, closeIn = true)
 
-class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean) {
+case class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean) {
   implicit def outputStreamOps[OS <: OutputStream](os: OS): OutputStreamOps[OS] = new OutputStreamOps[OS](os)
 
   class OutputStreamOps[OS <: OutputStream](os: OS) {
     def drain(is: InputStream, closeOut: Boolean = closeOut, closeIn: Boolean = closeIn): OS =
       os.tap(is.drain(_, closeIn, closeOut))
+
+    def <<(is: InputStream): OS = drain(is)
 
     def attemptClose(): Either[Throwable, Unit] = os.attempt(_.close())
     def closeAfter[A](f: OS => A): A        = os.withFinally(_.attemptClose())(f)

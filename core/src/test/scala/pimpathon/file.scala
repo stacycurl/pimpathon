@@ -215,6 +215,14 @@ class FileTest {
     })
   }
 
+  @Test def writeLines {
+    file.withTempFile(tmp => {
+      assertEquals(List("1", "2"),       tmp.writeLines(List("1", "2")).readLines())
+      assertEquals(List("1", "23", "4"), tmp.writeLines(List("3", "4")).readLines())
+      assertEquals(List("5", "6"),       tmp.writeLines(List("5", "6"), append = false).readLines())
+    })
+  }
+
   private def assertIsTemp(
     expectedSuffix: String, expectedPrefix: String, expectedIsFile: Boolean, tmp: File) {
 

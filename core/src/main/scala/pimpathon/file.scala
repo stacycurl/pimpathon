@@ -36,6 +36,9 @@ case class FileUtils(suffix: String, prefix: String) {
     def writeBytes(bytes: Array[Byte], append: Boolean = true): File =
       file.tap(_.outputStream(append).closeAfter(_.write(bytes)))
 
+    def writeLines(lines: List[String], append: Boolean = true): File =
+      writeBytes(lines.mkString("\n").getBytes, append)
+
     def outputStream(append: Boolean = true): FileOutputStream = new FileOutputStream(file, append)
     def source(): BufferedSource =  Source.fromFile(file)
 

@@ -195,17 +195,23 @@ class FileTest {
 
   @Test def readBytes {
     file.withTempFile(tmp => {
-      createInputStream("contents".getBytes).drain(tmp.outputStream)
-
-      assertEquals("contents", new String(tmp.readBytes))
+      createInputStream("contents".getBytes).drain(tmp.outputStream())
+      assertEquals("contents", new String(tmp.readBytes()))
     })
   }
 
   @Test def readLines {
     file.withTempFile(tmp => {
-      createInputStream("line1\nline2".getBytes).drain(tmp.outputStream)
+      createInputStream("line1\nline2".getBytes).drain(tmp.outputStream())
+      assertEquals(List("line1", "line2"), tmp.readLines())
+    })
+  }
 
-      assertEquals(List("line1", "line2"), tmp.readLines)
+  @Test def writeBytes {
+    file.withTempFile(tmp => {
+      assertEquals(List("12"),   tmp.writeBytes("12".getBytes).readLines())
+      assertEquals(List("1234"), tmp.writeBytes("34".getBytes).readLines())
+      assertEquals(List("56"),   tmp.writeBytes("56".getBytes, append = false).readLines())
     })
   }
 

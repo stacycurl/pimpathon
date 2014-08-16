@@ -5,6 +5,7 @@ import scala.io.{BufferedSource, Source}
 import scala.util.Properties
 
 import pimpathon.any._
+import pimpathon.java.io.outputStream._
 import pimpathon.list._
 
 
@@ -32,7 +33,10 @@ case class FileUtils(suffix: String, prefix: String) {
     def readBytes(): Array[Byte] = source().withFinally(_.close())(_.map(_.toByte).toArray)
     def readLines(): List[String] = source().withFinally(_.close())(_.getLines.toList)
 
-    def outputStream(): FileOutputStream = new FileOutputStream(file)
+    def writeBytes(bytes: Array[Byte], append: Boolean = true): File =
+      file.tap(_.outputStream(append).closeAfter(_.write(bytes)))
+
+    def outputStream(append: Boolean = true): FileOutputStream = new FileOutputStream(file, append)
     def source(): BufferedSource =  Source.fromFile(file)
 
     private def separator: String = File.separator.replace("\\", "\\\\")

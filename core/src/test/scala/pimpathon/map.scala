@@ -77,22 +77,22 @@ class MapTest {
 
   @Test def entryForMaxKey {
     assertEquals(None, Map.empty[Int, String].entryForMaxKey)
-    assertEquals(Some((2, "max")), Map(1 -> "min", 2 -> "max").entryForMaxKey)
+    assertEquals(Some(2 -> "max"), Map(1 -> "min", 2 -> "max").entryForMaxKey)
   }
 
   @Test def entryForMinKey {
     assertEquals(None, Map.empty[Int, String].entryForMinKey)
-    assertEquals(Some((1 -> "min")), Map(1 -> "min", 2 -> "max").entryForMinKey)
+    assertEquals(Some(1 -> "min"), Map(1 -> "min", 2 -> "max").entryForMinKey)
   }
 
   @Test def entryForMaxValue {
     assertEquals(None, Map.empty[Int, String].entryForMaxValue)
-    assertEquals(Some((2, "def")), Map(1 -> "abc", 2 -> "def").entryForMaxValue)
+    assertEquals(Some(2 -> "def"), Map(1 -> "abc", 2 -> "def").entryForMaxValue)
   }
 
   @Test def entryForMinValue {
     assertEquals(None, Map.empty[Int, String].entryForMinValue)
-    assertEquals(Some((1, "abc")), Map(1 -> "abc", 2 -> "def").entryForMinValue)
+    assertEquals(Some(1 -> "abc"), Map(1 -> "abc", 2 -> "def").entryForMinValue)
   }
 
   @Test def valueForMaxKey {
@@ -130,8 +130,8 @@ class MapTest {
     val cbf = MultiMap.build[List, Int, String]
     val builder = cbf.apply()
 
-    builder += ((1, "foo"))
-    builder += ((1, "bar"))
+    builder += 1 -> "foo"
+    builder += 1 -> "bar"
     assertEquals(Map(1 -> List("foo", "bar")), builder.result())
 
     builder.clear()
@@ -148,6 +148,58 @@ class MapTest {
 
     assertEquals(UnitBuilder[Int]("apply()"), ucbfi.apply())
     assertEquals(UnitBuilder[Int]("apply()"), ucbfi.apply(List(1, 2, 3)))
+  }
+
+  @Test def findKey {
+    assertEquals(None, empty.findKey(_ => true))
+    assertEquals(None, nonEmpty.findKey(_ => false))
+    assertEquals(Some(1), nonEmpty.findKey(_ == 1))
+  }
+
+  @Test def findValue {
+    assertEquals(None, empty.findValue(_ => true))
+    assertEquals(None, nonEmpty.findValue(_ => false))
+    assertEquals(Some(2), nonEmpty.findValue(_ == 2))
+  }
+
+  @Test def findEntryWithKey {
+    assertEquals(None, empty.findEntryWithKey(_ => true))
+    assertEquals(None, nonEmpty.findEntryWithKey(_ => false))
+    assertEquals(Some(1 -> 2), nonEmpty.findEntryWithKey(_ == 1))
+  }
+
+  @Test def findEntryWithValue {
+    assertEquals(None, empty.findEntryWithValue(_ => true))
+    assertEquals(None, nonEmpty.findEntryWithValue(_ => false))
+    assertEquals(Some(1 -> 2), nonEmpty.findEntryWithValue(_ == 2))
+  }
+
+  @Test def filterKeysNot {
+    assertEquals(empty, empty.filterKeysNot(_ => true))
+    assertEquals(empty, nonEmpty.filterKeysNot(_ => true))
+    assertEquals(nonEmpty, nonEmpty.filterKeysNot(_ => false))
+    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterKeysNot(_ == 2))
+  }
+
+  @Test def filterValuesNot {
+    assertEquals(empty, empty.filterValuesNot(_ => true))
+    assertEquals(empty, nonEmpty.filterValuesNot(_ => true))
+    assertEquals(nonEmpty, nonEmpty.filterValuesNot(_ => false))
+    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterValuesNot(_ == 3))
+  }
+
+  @Test def filterValues {
+    assertEquals(empty, empty.filterValues(_ => true))
+    assertEquals(empty, nonEmpty.filterValues(_ => false))
+    assertEquals(nonEmpty, nonEmpty.filterValues(_ => true))
+    assertEquals(nonEmpty, nonEmpty.filterValues(_ => true))
+    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterValues(_ == 2))
+  }
+
+  @Test def valueExists {
+    assertFalse(empty.valueExists(_ => true))
+    assertFalse(nonEmpty.valueExists(_ => false))
+    assertTrue(nonEmpty.valueExists(_ == 2))
   }
 
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {

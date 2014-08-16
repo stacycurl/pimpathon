@@ -32,6 +32,7 @@ case class FileUtils(suffix: String, prefix: String) {
   def cwd: File = file(Properties.userDir)
   def file(name: String): File = new File(name)
   def file(parent: File, name: String): File = new File(parent, name)
+  def files(parent: File, names: String*): Stream[File] = names.toStream.map(file(parent, _))
 
   def tempFile(suffix: String = suffix, prefix: String = prefix): File =
     File.createTempFile(prefix, suffix).tap(_.deleteOnExit())

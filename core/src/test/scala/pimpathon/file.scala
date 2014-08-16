@@ -4,18 +4,19 @@ import _root_.java.io.File
 import org.junit.Test
 
 import org.junit.Assert._
+import pimpathon.any._
 import pimpathon.file._
 
 
 class FileTest {
   @Test def create {
-    val tmpFile = file.withTempFile(f => f)
-    assertFalse(tmpFile.exists)
+    file.withTempDirectory(dir => {
+      val child = file.file(dir, "child")
+      assertFalse(child.exists)
 
-    tmpFile.create()
-    assertTrue(tmpFile.exists)
-
-    tmpFile.delete()
+      child.create()
+      assertTrue(child.exists)
+    })
   }
 
   @Test def cwd {
@@ -39,9 +40,7 @@ class FileTest {
     file.withTempDirectory(dir => {
       assertEquals(Set.empty[File], dir.children.toSet)
 
-      val child   = createFile(dir, "child")
-      val toddler = createFile(dir, "toddler")
-
+      val List(child, toddler) = file.files(dir, "child", "toddler").map(_.create()).toList
       assertEquals(Set(child, toddler), dir.children.map(_.named()).toSet)
     })
 
@@ -166,12 +165,27 @@ class FileTest {
   }
 
   @Test def newFile {
-    import file._
-    val dir = file("this directory does not exist")
-    val f = file(dir, "and this file does not exist")
-    assert(!dir.exists)
-    assert(!f.exists)
-    assert(f.getParentFile == dir)
+    val dir = file.file("this directory does not exist")
+    assertFalse(dir.exists)
+
+    file.withTempDirectory(dir => {
+      val child = file.file(dir, "and this file does not exist")
+      assertFalse(child.exists)
+      assertEquals(dir, child.getParentFile)
+
+      val nested = file.file(dir, "parent/child")
+      assertFalse(nested.exists)
+      assertEquals(dir, nested.getParentFile.getParentFile)
+    })
+  }
+
+  @Test def files {
+    file.withTempDirectory(dir => {
+      val List(child, nested) = file.files(dir, "child", "nested/child").toList
+
+      assertEquals(file.file(dir, "child"), child)
+      assertEquals(file.file(dir, "nested/child"), nested)
+    })
   }
 
   private def assertIsTemp(
@@ -190,7 +204,7 @@ class FileTest {
   }
 
   private def createDirectory(parent: File, name: String): File =
-    createFile(parent, name).changeToDirectory
+    createFile(parent, name).changeToDirectory()
 
   private def createFile(parent: File, name: String): File =
     new File(parent, name).named().create()

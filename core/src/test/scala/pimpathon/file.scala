@@ -193,6 +193,14 @@ class FileTest {
     })
   }
 
+  @Test def readBytes {
+    file.withTempFile(tmp => {
+      createInputStream("contents".getBytes).drain(tmp.outputStream)
+
+      assertEquals("contents", new String(tmp.readBytes))
+    })
+  }
+
   @Test def readLines {
     file.withTempFile(tmp => {
       createInputStream("line1\nline2".getBytes).drain(tmp.outputStream)

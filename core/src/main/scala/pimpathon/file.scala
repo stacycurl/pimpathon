@@ -1,6 +1,7 @@
 package pimpathon
 
 import _root_.java.io.File
+import scala.util.Properties
 
 import pimpathon.any._
 import pimpathon.list._
@@ -30,6 +31,7 @@ case class FileUtils(suffix: String, prefix: String) {
     private def separator: String = File.separator.replace("\\", "\\\\")
   }
 
+  def cwd: File = file(Properties.userDir)
   def file(name: String): File = new File(name)
   def file(parent: File, name: String): File = new File(parent, name)
 

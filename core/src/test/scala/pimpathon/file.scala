@@ -18,6 +18,11 @@ class FileTest {
     tmpFile.delete()
   }
 
+  @Test def cwd {
+    // not a great test, but what to do other that use an alternate implementation ?
+    assertEquals("pimpathon", file.cwd.getName)
+  }
+
   @Test def named {
     file.withTempFile(tmp => {
       assertEquals("name", tmp.named("name").toString)

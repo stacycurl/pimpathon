@@ -174,6 +174,12 @@ class MapTest {
     assertEquals(Some(1 -> 2), nonEmpty.findEntryWithValue(_ == 2))
   }
 
+  @Test def filterKeysNot {
+    assertEquals(empty, empty.filterKeysNot(_ => true))
+    assertEquals(empty, nonEmpty.filterKeysNot(_ => true))
+    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterKeysNot(_ == 2))
+  }
+
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
     def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem](s"apply($from)")

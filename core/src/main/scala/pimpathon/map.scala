@@ -22,6 +22,8 @@ object map {
     def findEntryWithKey(p: Predicate[K]): Option[(K, V)]   = map.find(kv => p(kv._1))
     def findEntryWithValue(p: Predicate[V]): Option[(K, V)] = map.find(kv => p(kv._2))
 
+    def filterKeysNot(p: Predicate[K]): Map[K, V] = map.filterNot(kv => p(kv._1))
+
     def emptyTo(empty: => Map[K, V]): Map[K, V]             = uncons(empty, _ => map)
     def mapNonEmpty[A](f: Map[K, V] => A): Option[A]        = if (map.isEmpty) None else Some(f(map))
     def uncons[A](empty: => A, nonEmpty: Map[K, V] => A): A = if (map.isEmpty) empty else nonEmpty(map)

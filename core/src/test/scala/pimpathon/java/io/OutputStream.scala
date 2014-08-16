@@ -14,20 +14,28 @@ class OutputStreamTest {
     assertEquals(Left(boom), createOutputStream(onClose = () => throw boom).attemptClose())
   }
 
+  @Test def closeAfter {
+    val os = createOutputStream()
+
+    assertOutputStreamClosed(false, os.closed)
+    assertEquals("result", os.closeAfter(_ => "result"))
+    assertOutputStreamClosed(true, os.closed)
+  }
+
   @Test def closeIf {
     val os = createOutputStream()
 
-    assertInputStreamClosed(false, os.closed)
-    assertInputStreamClosed(false, os.closeIf(false).closed)
-    assertInputStreamClosed(true,  os.closeIf(true).closed)
+    assertOutputStreamClosed(false, os.closed)
+    assertOutputStreamClosed(false, os.closeIf(false).closed)
+    assertOutputStreamClosed(true,  os.closeIf(true).closed)
   }
 
   @Test def closeUnless {
     val os = createOutputStream()
 
-    assertInputStreamClosed(false, os.closed)
-    assertInputStreamClosed(false, os.closeUnless(true).closed)
-    assertInputStreamClosed(true,  os.closeUnless(false).closed)
+    assertOutputStreamClosed(false, os.closed)
+    assertOutputStreamClosed(false, os.closeUnless(true).closed)
+    assertOutputStreamClosed(true,  os.closeUnless(false).closed)
   }
 
   @Test def drain {

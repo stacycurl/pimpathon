@@ -17,6 +17,7 @@ class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean) {
       os.tap(is.drain(_, closeIn, closeOut))
 
     def attemptClose(): Either[Throwable, Unit] = os.attempt(_.close())
+    def closeAfter[A](f: OS => A): A        = os.withFinally(_.attemptClose())(f)
     def closeIf(condition: Boolean): OS     = os.tapIf(_ => condition)(_.close())
     def closeUnless(condition: Boolean): OS = os.tapUnless(_ => condition)(_.close())
   }

@@ -223,6 +223,12 @@ class FileTest {
     })
   }
 
+  @Test def md5 {
+    file.withTempFile(tmp => {
+      assertEquals("6f1ed002ab5595859014ebf0951522d9", tmp.writeLines(List("blah")).md5())
+    })
+  }
+
   private def assertIsTemp(
     expectedSuffix: String, expectedPrefix: String, expectedIsFile: Boolean, tmp: File) {
 

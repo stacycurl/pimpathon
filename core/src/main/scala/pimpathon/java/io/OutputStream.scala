@@ -15,7 +15,7 @@ case class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean) {
     def drain(is: InputStream, closeOut: Boolean = closeOut, closeIn: Boolean = closeIn): OS =
       os.tap(is.drain(_, closeIn, closeOut))
 
-    def <<(is: InputStream): OS = drain(is)
+    def <<(is: InputStream): OS = drain(is, closeOut = false, closeIn = false)
 
     def attemptClose(): Try[Unit] = Try(os.close())
     def closeAfter[A](f: OS => A): A        = os.withFinally(_.attemptClose())(f)

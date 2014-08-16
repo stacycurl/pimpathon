@@ -177,13 +177,23 @@ class MapTest {
   @Test def filterKeysNot {
     assertEquals(empty, empty.filterKeysNot(_ => true))
     assertEquals(empty, nonEmpty.filterKeysNot(_ => true))
+    assertEquals(nonEmpty, nonEmpty.filterKeysNot(_ => false))
     assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterKeysNot(_ == 2))
   }
 
   @Test def filterValuesNot {
     assertEquals(empty, empty.filterValuesNot(_ => true))
     assertEquals(empty, nonEmpty.filterValuesNot(_ => true))
+    assertEquals(nonEmpty, nonEmpty.filterValuesNot(_ => false))
     assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterValuesNot(_ == 3))
+  }
+
+  @Test def filterValues {
+    assertEquals(empty, empty.filterValues(_ => true))
+    assertEquals(empty, nonEmpty.filterValues(_ => false))
+    assertEquals(nonEmpty, nonEmpty.filterValues(_ => true))
+    assertEquals(nonEmpty, nonEmpty.filterValues(_ => true))
+    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterValues(_ == 2))
   }
 
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {

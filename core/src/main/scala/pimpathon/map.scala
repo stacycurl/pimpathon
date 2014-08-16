@@ -24,6 +24,7 @@ object map {
 
     def filterKeysNot(p: Predicate[K]): Map[K, V]   = map.filterNot(kv => p(kv._1))
     def filterValuesNot(p: Predicate[V]): Map[K, V] = map.filterNot(kv => p(kv._2))
+    def filterValues(p: Predicate[V]): Map[K, V]    = map.filter(kv => p(kv._2))
 
     def emptyTo(empty: => Map[K, V]): Map[K, V]             = uncons(empty, _ => map)
     def mapNonEmpty[A](f: Map[K, V] => A): Option[A]        = if (map.isEmpty) None else Some(f(map))

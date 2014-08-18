@@ -61,7 +61,9 @@ object PimpathonBuild extends Build {
     libraryDependencies += "org.scalaz"   %% "scalaz-core"     % "7.1.0" % "test",
     initialCommands in console := """import pimpathon._""",
     minimumCoverage := 100,
-    highlighting := true,
+    scoverageOutputCobertua := false,
+    scoverageOutputXML := false,
+    scoverageOutputHTML := false,
     failOnMinimumCoverage := true
   )
 }

@@ -9,6 +9,10 @@ import scalaz.std.option._
 
 class OptionTest {
   @Test def getOrThrow {
+    assertEquals("present", Some("present").getOrThrow("missing"))
+    assertEquals("present", Some("present").getOrThrow(new Exception("missing")))
+    assertEquals("present", Some("present").getOrThrow(sys.error("should not be evaluated"): Exception))
+
     assertEquals("missing", util.intercept[NoSuchElementException] {
       None.getOrThrow("missing")
     }.getMessage)

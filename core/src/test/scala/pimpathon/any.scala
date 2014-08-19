@@ -34,6 +34,11 @@ class AnyTest {
     }).toList)
   }
 
+  @Test def cond {
+    assertEquals("true",   "true".cond(_ == "true", _ => "true", _ => "false"))
+    assertEquals("false", "false".cond(_ == "true", _ => "true", _ => "false"))
+  }
+
   @Test def partialMatch {
     assertEquals(Some("Matched"), 1 partialMatch { case 1 => "Matched" })
     assertEquals(None,            0 partialMatch { case 1 => "Matched" })

@@ -17,7 +17,7 @@ object map {
 
     def get(ok: Option[K]): Option[V]             = ok.flatMap(map.get)
     def getOrThrow(k: K, message: String): V      = getOrThrow(k, new IllegalArgumentException(message))
-    def getOrThrow(k: K, exception: Exception): V = map.getOrElse(k, throw exception)
+    def getOrThrow(k: K, exception: => Exception): V = map.getOrElse(k, throw exception)
 
     def findKey(p: Predicate[K]): Option[K]                 = findEntryWithKey(p).map(_._1)
     def findValue(p: Predicate[V]): Option[V]               = findEntryWithValue(p).map(_._2)

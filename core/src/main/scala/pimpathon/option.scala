@@ -6,6 +6,6 @@ object option {
 
   class OptionOps[A](option: Option[A]) {
     def getOrThrow(message: String): A = getOrThrow(new NoSuchElementException(message))
-    def getOrThrow(exception: Exception): A = option.getOrElse(throw exception)
+    def getOrThrow(exception: => Exception): A = option.getOrElse(throw exception)
   }
 }

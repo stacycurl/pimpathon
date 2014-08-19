@@ -16,6 +16,11 @@ class ListTest {
     assertEquals("size: 3", List(1, 2, 3).uncons("empty", l => ("size: " + l.size)))
   }
 
+  @Test def unconsC {
+    assertEquals(0,                  nil[Int].unconsC(0, h => t => t ++ List(h)))
+    assertEquals(List(2, 3, 1), List(1, 2, 3).unconsC(0, h => t => t ++ List(h)))
+  }
+
   @Test def emptyTo {
     assertEquals(List(1), nil[Int].emptyTo(List(1)))
     assertEquals(List(1, 2, 3), List(1, 2, 3).emptyTo(List(1)))
@@ -187,6 +192,11 @@ class ListTest {
     assertEquals(0.0, List(1).fraction(_ < 1), 0.0001)
     assertEquals(1.0, List(0).fraction(_ < 1), 0.0001)
     assertEquals(0.5, List(0, 1).fraction(_ < 1), 0.0001)
+  }
+
+  @Test def batchBy {
+    assertEquals(Nil, nil[Int].batchBy(_ => true))
+    assertEquals(List(List(1, 2, 3)), List(1, 2, 3).batchBy(_ => true))
   }
 
   private def nil[A]: List[A] = Nil

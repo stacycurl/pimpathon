@@ -19,6 +19,12 @@ object list {
     def emptyTo(alternative: => List[A]): List[A] = uncons(alternative, _ => list)
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
+
+    def unconsC[B](empty: => B, nonEmpty: A => List[A] => B): B = list match {
+      case Nil => empty
+      case head :: tail => nonEmpty(head)(tail)
+    }
+
     def mapNonEmpty[B](f: List[A] => B): Option[B] = if (list.isEmpty) None else Some(f(list))
 
     def asMap            = as[Map]
@@ -44,6 +50,17 @@ object list {
 
 
     def distinctBy[B](f: A => B): List[A] = list.map(equalBy(f)).distinct.map(_.a)
+
+    def batchBy[B](f: A => B): List[List[A]] = list.unconsC(empty = Nil, nonEmpty = head => tail => {
+      val (_, batch, batches) = tail.foldLeft((f(head), M.ListBuffer(head), M.ListBuffer[List[A]]())) {
+        case ((currentKey, batch, batches), a) => f(a).cond(_ == currentKey,
+          ifTrue  = key => (key, batch += a,      batches),
+          ifFalse = key => (key, M.ListBuffer(a), batches += batch.toList)
+        )
+      }
+
+      (batches += batch.toList).toList
+    })
 
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 

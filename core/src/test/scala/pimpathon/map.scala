@@ -51,6 +51,10 @@ class MapTest {
   }
 
   @Test def getOrThrow {
+    assertEquals("present", Map(0 -> "present").getOrThrow(0, "missing"))
+    assertEquals("present", Map(0 -> "present").getOrThrow(0, new Exception("missing")))
+    assertEquals("present", Map(0 -> "present").getOrThrow(0, sys.error("should not be evaluated"): Exception))
+
     assertEquals("missing", util.intercept[IllegalArgumentException] {
       nonEmpty.getOrThrow(0, "missing")
     }.getMessage)

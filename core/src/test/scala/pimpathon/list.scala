@@ -193,4 +193,9 @@ class ListTest {
     assertEquals(1.0, List(0).fraction(_ < 1), 0.0001)
     assertEquals(0.5, List(0, 1).fraction(_ < 1), 0.0001)
   }
+
+  @Test def batchBy {
+    assertEquals(Nil, nil[Int].batchBy(_ => true))
+    assertEquals(List(List(1, 2, 3)), List(1, 2, 3).batchBy(_ => true))
+  }
 }

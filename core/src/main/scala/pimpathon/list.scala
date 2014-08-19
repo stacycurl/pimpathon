@@ -49,6 +49,17 @@ object list {
 
     def distinctBy[B](f: A => B): List[A] = list.map(equalBy(f)).distinct.map(_.a)
 
+    def batchBy[B](f: A => B): List[List[A]] = list.unconsC(empty = Nil, nonEmpty = head => tail => {
+      val (_, batch, batches) = tail.foldLeft((f(head), M.ListBuffer(head), M.ListBuffer[List[A]]())) {
+        case ((currentKey, batch, batches), a) => f(a).cond(_ == currentKey,
+          ifTrue  = key => (key, batch += a,      batches),
+          ifFalse = key => (key, M.ListBuffer(a), batches += batch.toList)
+        )
+      }
+
+      (batches += batch.toList).toList
+    })
+
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 
     def const[B](elem: B): List[B] = list.map(_ => elem)

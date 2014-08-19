@@ -17,6 +17,12 @@ object list {
     def emptyTo(alternative: => List[A]): List[A] = uncons(alternative, _ => list)
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
+
+    def unconsC[B](empty: => B, nonEmpty: A => List[A] => B): B = list match {
+      case Nil => empty
+      case head :: tail => nonEmpty(head)(tail)
+    }
+
     def mapNonEmpty[B](f: List[A] => B): Option[B] = if (list.isEmpty) None else Some(f(list))
 
     def asMap            = as[Map]

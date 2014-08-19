@@ -2,6 +2,8 @@ package pimpathon
 
 import scala.util.Try
 
+import pimpathon.function._
+
 
 object any {
   implicit class AnyOps[A](val a: A) extends AnyVal {
@@ -23,5 +25,7 @@ object any {
     def filterSelf(p: A => Boolean): Option[A] = if (p(a)) Some(a) else None
 
     def withFinally[B](f: A => Unit)(t: A => B): B = try t(a) finally f(a)
+
+    def cond[B](p: Predicate[A], ifTrue: A => B, ifFalse: A => B): B = if (p(a)) ifTrue(a) else ifFalse(a)
   }
 }

@@ -9,6 +9,7 @@ import scala.collection.{mutable => M}
 import pimpathon.any._
 import pimpathon.function._
 import pimpathon.multiMap._
+import pimpathon.option._
 import pimpathon.tuple._
 
 
@@ -61,6 +62,13 @@ object list {
 
       (batches += batch.toList).toList
     })
+
+    def headTail: (A, List[A]) = headTailOption.getOrThrow("headTail of empty list")
+    def initLast: (List[A], A) = initLastOption.getOrThrow("initLast of empty list")
+
+    def headTailOption: Option[(A, List[A])] = unconsC(None, head => tail => Some((head, tail)))
+
+    def initLastOption: Option[(List[A], A)] = uncons(None, _ => Some(list.init, list.last))
 
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 

@@ -7,6 +7,9 @@ import org.junit.Assert._
 
 
 object util {
+  def assertException[E <: Throwable](expectedMessage: String)(f: => Unit)
+    (implicit expected: ClassManifest[E]): Unit = assertEquals(expectedMessage, intercept[E](f).getMessage)
+
   def assertInputStreamClosed(expected: Boolean, closed: Boolean): Unit =
     assertEquals("expected InputStream to %s closed".format(if (expected) "be" else "not be"), expected, closed)
 
@@ -25,7 +28,7 @@ object util {
 
   def ignoreExceptions(f: => Unit): Unit = try f catch { case t: Throwable => }
 
-  def intercept[E <: AnyRef](f: => Any)(implicit expected: ClassManifest[E]): E = {
+  def intercept[E <: Throwable](f: => Any)(implicit expected: ClassManifest[E]): E = {
     val clazz = expected.erasure
 
     val caught = try { f; None } catch {

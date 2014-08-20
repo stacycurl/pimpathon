@@ -210,6 +210,10 @@ class MapTest {
     assertEquals(M.Map(1 -> 2), Map(1 -> 2).mutable)
   }
 
+  @Test def reverseToMultiMap {
+    assertEquals(Map(2 -> Set(1, 2)), Map(1 -> 2, 2 -> 2).reverseToMultiMap)
+  }
+
   @Test def multiMap_select {
     assertEquals(Map(1 -> 2, 2 -> 3), Map(1 -> List(2), 2 -> List(3, 4)).select(_.head))
   }

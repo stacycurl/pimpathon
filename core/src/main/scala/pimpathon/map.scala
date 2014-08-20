@@ -50,4 +50,9 @@ object map {
     @inline private def key:   ((K, V)) => K = (kv: (K, V)) => kv._1
     @inline private def value: ((K, V)) => V = (kv: (K, V)) => kv._2
   }
+
+  implicit class MultiMapOps[F[_], K, V](val multiMap: MultiMap[F, K, V]) extends AnyVal {
+    // just an alias for mapValuesEagerly
+    def select[W](f: F[V] => W): Map[K, W] = multiMap.mapValuesEagerly(f)
+  }
 }

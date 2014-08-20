@@ -2,6 +2,7 @@ package pimpathon
 
 import scala.collection.GenTraversableOnce
 import scala.collection.{mutable => M}
+import scala.collection.immutable.{SortedMap, TreeMap}
 
 import pimpathon.function._
 import pimpathon.multiMap._
@@ -47,6 +48,8 @@ object map {
 
     def reverse(f: Set[K] => K): Map[V, K] = reverseToMultiMap.mapValuesEagerly(f)
     def reverseToMultiMap: MultiMap[Set, V, K] = map.map(_.swap)(collection.breakOut)
+
+    def sorted(implicit ordering: Ordering[K]): SortedMap[K, V] = TreeMap.empty[K, V](ordering) ++ map
 
     def mutable: M.Map[K, V] = M.Map.empty[K, V] ++ map
 

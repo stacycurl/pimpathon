@@ -3,6 +3,7 @@ package pimpathon
 import org.junit.Test
 import scala.collection.{mutable => M}
 import scala.collection.generic.CanBuildFrom
+import scala.collection.immutable.TreeMap
 import scala.reflect.ClassTag
 import scala.util.control._
 
@@ -216,6 +217,10 @@ class MapTest {
 
   @Test def reverse {
     assertEquals(Map(2 -> 1), Map(1 -> 2, 2 -> 2).reverse(_.min))
+  }
+
+  @Test def sorted {
+    assertEquals(List(3 -> 4, 1 -> 2), Map(1 -> 2, 3 -> 4).sorted(Ordering.Int.reverse).toList)
   }
 
   @Test def multiMap_select {

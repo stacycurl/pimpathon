@@ -223,6 +223,11 @@ class MapTest {
     assertEquals(List(3 -> 4, 1 -> 2), Map(1 -> 2, 3 -> 4).sorted(Ordering.Int.reverse).toList)
   }
 
+  @Test def andThenM {
+    assertEquals(Map(1 -> 100, 2 -> 200),
+      Map(1 -> 10, 2 -> 20, 3 -> 30).andThenM(Map(10 -> 100, 20 -> 200, 40 -> 400)))
+  }
+
   @Test def multiMap_select {
     assertEquals(Map(1 -> 2, 2 -> 3), Map(1 -> List(2), 2 -> List(3, 4)).select(_.head))
   }

@@ -51,6 +51,8 @@ object map {
 
     def sorted(implicit ordering: Ordering[K]): SortedMap[K, V] = TreeMap.empty[K, V](ordering) ++ map
 
+    def andThenM[W](other: Map[V, W]): Map[K, W] = map.flatMap(kv => other.get(kv._2).map(kv._1 -> _))
+
     def mutable: M.Map[K, V] = M.Map.empty[K, V] ++ map
 
     @inline private def key:   ((K, V)) => K = (kv: (K, V)) => kv._1

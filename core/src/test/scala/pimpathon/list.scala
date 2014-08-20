@@ -187,6 +187,16 @@ class ListTest {
     assertEquals((1, List(2, 3)), List(1, 2, 3).headTail)
   }
 
+  @Test def initLast {
+    assertException[NoSuchElementException]("initLast of empty list") {
+      Nil.initLast
+    }
+
+    assertEquals((Nil, 1),        List(1).initLast)
+    assertEquals((List(1), 2),    List(1, 2).initLast)
+    assertEquals((List(1, 2), 3), List(1, 2, 3).initLast)
+  }
+
   @Test def headTailOption {
     assertEquals(None,                  Nil.headTailOption)
     assertEquals(Some((1, Nil)),        List(1).headTailOption)

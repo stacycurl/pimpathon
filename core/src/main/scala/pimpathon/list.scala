@@ -62,6 +62,7 @@ object list {
     })
 
     def headTail: (A, List[A]) = headTailOption.getOrThrow("headTail of empty list")
+    def initLast: (List[A], A) = initLastOption.getOrThrow("initLast of empty list")
 
     def headTailOption: Option[(A, List[A])] = unconsC(None, head => tail => Some((head, tail)))
 

@@ -1,6 +1,7 @@
 package pimpathon
 
 import scala.collection.GenTraversableOnce
+import scala.collection.{mutable => M}
 
 import pimpathon.function._
 import pimpathon.multiMap._
@@ -45,6 +46,8 @@ object map {
     def entryForMinKey(implicit O: Ordering[K]): Option[(K, V)] = mapNonEmpty(_.minBy(key))
 
     def mapValuesEagerly[W](f: V => W): Map[K, W] = map.map { case (k, v) => (k, f(v)) }(collection.breakOut)
+
+    def mutable: M.Map[K, V] = M.Map.empty[K, V] ++ map
 
     @inline private def key:   ((K, V)) => K = (kv: (K, V)) => kv._1
     @inline private def value: ((K, V)) => V = (kv: (K, V)) => kv._2

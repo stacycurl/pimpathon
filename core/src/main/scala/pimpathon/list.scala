@@ -33,6 +33,9 @@ object list {
 
     def as[F[_, _]] = new ListCapturer[A, F](list)
 
+    def zipToMap[B](values: List[B]): Map[A, B] = zip(values).toMap
+    def zipWith[B, C](values: List[B])(f: ((A, B)) => C): List[C] = zip(values).map(f).toList
+
 
     def attributeCounts[B](f: A => B): Map[B, Int] =
       asMultiMap.withKeys(f).mapValues(_.size)
@@ -103,6 +106,7 @@ object list {
     }
 
     private def equalBy[B](f: A => B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
+    private def zip[B](other: List[B]): Iterator[(A, B)] = list.iterator.zip(other.iterator)
   }
 
   implicit def listTuple2Ops[K, V](list: List[(K, V)]): ListTuple2Ops[K, V] = new ListTuple2Ops[K, V](list)

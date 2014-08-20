@@ -138,6 +138,15 @@ class ListTest {
       List(1, 2).asMap.withManyKeys(i => List(-i, i)))
   }
 
+  @Test def zipToMap {
+    assertEquals(Map.empty[Int, Int], nil[Int].zipToMap(nil[Int]))
+    assertEquals(Map(1 -> 2), List(1).zipToMap(List(2)))
+  }
+
+  @Test def zipWith {
+    assertEquals(List(6), List(2, 0).zipWith[Int, Int](List(3))(lr => lr._1 * lr._2))
+  }
+
 
   @Test def attributeCounts {
     assertEquals(Map(3 -> 2, 4 -> 1), List("foo", "food", "bar").attributeCounts(_.size))

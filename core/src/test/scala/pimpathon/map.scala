@@ -210,6 +210,18 @@ class MapTest {
     assertEquals(M.Map(1 -> 2), Map(1 -> 2).mutable)
   }
 
+  @Test def reverseToMultiMap {
+    assertEquals(Map(2 -> Set(1, 2)), Map(1 -> 2, 2 -> 2).reverseToMultiMap)
+  }
+
+  @Test def reverse {
+    assertEquals(Map(2 -> 1), Map(1 -> 2, 2 -> 2).reverse(_.min))
+  }
+
+  @Test def multiMap_select {
+    assertEquals(Map(1 -> 2, 2 -> 3), Map(1 -> List(2), 2 -> List(3, 4)).select(_.head))
+  }
+
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
     def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem]("apply(%s)".format(from))

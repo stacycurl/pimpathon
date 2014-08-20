@@ -47,9 +47,20 @@ object map {
 
     def mapValuesEagerly[W](f: V => W): Map[K, W] = map.map { case (k, v) => (k, f(v)) }(collection.breakOut)
 
+    def reverse(f: Set[K] => K): Map[V, K] = reverseToMultiMap.mapValuesEagerly(f)
+    def reverseToMultiMap: MultiMap[Set, V, K] = map.map(_.swap)(collection.breakOut)
+
     def mutable: M.Map[K, V] = M.Map.empty[K, V] ++ map
 
     @inline private def key:   ((K, V)) => K = (kv: (K, V)) => kv._1
     @inline private def value: ((K, V)) => V = (kv: (K, V)) => kv._2
+  }
+
+  implicit def multiMapOps[F[_], K, V](multiMap: MultiMap[F, K, V]): MultiMapOps[F, K, V] =
+    new MultiMapOps[F, K, V](multiMap)
+
+  class MultiMapOps[F[_], K, V](val multiMap: MultiMap[F, K, V]) {
+    // just an alias for mapValuesEagerly
+    def select[W](f: F[V] => W): Map[K, W] = multiMap.mapValuesEagerly(f)
   }
 }

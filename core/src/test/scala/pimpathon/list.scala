@@ -175,6 +175,12 @@ class ListTest {
     assertEquals(Some(List(1)), List(0, 1).tailOption)
   }
 
+  @Test def headTailOption {
+    assertEquals(None,               Nil.headTailOption)
+    assertEquals(Some((1, Nil)),     List(1).headTailOption)
+    assertEquals(Some((1, List(2))), List(1, 2).headTailOption)
+  }
+
   @Test def const {
     assertEquals(nil[Int], nil[String].const(1))
     assertEquals(List(1, 1, 1), List('a', 'b', 'c').const(1))

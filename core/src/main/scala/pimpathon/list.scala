@@ -60,6 +60,8 @@ object list {
       (batches += batch.toList).toList
     })
 
+    def headTailOption: Option[(A, List[A])] = unconsC(None, head => tail => Some((head, tail)))
+
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 
     def const[B](elem: B): List[B] = list.map(_ => elem)

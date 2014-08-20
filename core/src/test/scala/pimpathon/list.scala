@@ -143,6 +143,10 @@ class ListTest {
     assertEquals(Map(1 -> 2), List(1).zipToMap(List(2)))
   }
 
+  @Test def zipWith {
+    assertEquals(List(6), List(2, 0).zipWith[Int, Int](List(3))(lr => lr._1 * lr._2))
+  }
+
 
   @Test def attributeCounts {
     assertEquals(Map(3 -> 2, 4 -> 1), List("foo", "food", "bar").attributeCounts(_.size))

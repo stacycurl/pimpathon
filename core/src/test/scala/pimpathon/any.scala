@@ -9,6 +9,10 @@ import pimpathon.util._
 
 
 class AnyTest {
+  @Test def calc {
+    assertEquals("123", "12".calc(_ + "3"))
+  }
+
   @Test def tap_update_withSideEffect {
     val ints = new ListBuffer[Int]
 

@@ -7,6 +7,7 @@ import scala.collection.immutable._
 import scala.collection.{mutable => M}
 
 import pimpathon.any._
+import pimpathon.either._
 import pimpathon.function._
 import pimpathon.multiMap._
 import pimpathon.tuple._
@@ -59,6 +60,55 @@ object list {
 
       (batches += batch.toList).toList
     })
+
+
+    def apoMap[B, C](g: List[B] => C)(f: A => Either[C, B]): C = {
+      @tailrec def recurse(acc: List[B], rest: List[A]): C = rest match {
+        case Nil => g(acc.reverse)
+        case head :: tail => f(head) match {
+          case Left(c) => c
+          case Right(b) => recurse(b :: acc, tail)
+        }
+      }
+
+      recurse(Nil, list)
+    }
+
+    def apo[B](z: B)(f: A => B => Either[B, B]): B = {
+      @tailrec def recurse(rest: List[A], acc: B): B = rest match {
+        case Nil => acc
+        case head :: tail => f(head)(acc) match {
+          case Left(b) => b
+          case Right(b) => recurse(tail, b)
+        }
+      }
+
+      uncons(z, recurse(_, z))
+    }
+
+    def apoMap1[B, C](f: A => Either[C, B]): Either[C, List[B]] = {
+      @tailrec def recurse(acc: List[B], rest: List[A]): Either[C, List[B]] = rest match {
+        case Nil => Right(acc.reverse)
+        case head :: tail => f(head) match {
+          case Right(b) => recurse(b :: acc, tail)
+          case Left(c) => Left(c)
+        }
+      }
+
+      recurse(Nil, list)
+    }
+
+    def seqMap[B](f: A => Option[B]): Option[List[B]] = {
+      val x: Either[Option[List[B]], List[B]] = apoMap1[B, Option[List[B]]](a => f(a).toRight(None))
+      x.leftOr(Some(_))
+
+      apo[List[B]](Nil)(a => bs => f(a) match {
+        case Some(b) => Right(b :: bs)
+        case None    => Left(Nil)
+      })
+
+      apoMap[B, Option[List[B]]](Some(_))(a => f(a).toRight(None))
+    }
 
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 

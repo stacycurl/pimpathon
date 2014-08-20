@@ -198,4 +198,16 @@ class ListTest {
     assertEquals(Nil, nil[Int].batchBy(_ => true))
     assertEquals(List(List(1, 2, 3)), List(1, 2, 3).batchBy(_ => true))
   }
+
+  @Test def seqMap {
+    assertEquals(Some(Nil), nil[Int].seqMap(_ => Some(1)))
+    assertEquals(None, List(1).seqMap(_ => None))
+    assertEquals(Some(List(1)), List(1).seqMap(Some(_)))
+
+    assertEquals(None, List(1, 2, 3).seqMap {
+      case 1 => Some(1)
+      case 2 => None
+      case 3 => sys.error("Shouldn't get here")
+    })
+  }
 }

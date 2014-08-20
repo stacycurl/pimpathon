@@ -247,5 +247,7 @@ class ListTest {
     })
   }
 
-  private def nil[A]: List[A] = Nil
+  @Test def prefixPadTo {
+    assertEquals(List(0, 0, 0, 1, 2, 3), List(1, 2, 3).prefixPadTo(6, 0))
+  }
 }

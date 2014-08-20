@@ -43,5 +43,7 @@ object util {
     }
   }
 
+  def nil[A]: List[A] = Nil
+
   val boom = new Throwable("Boom !")
 }

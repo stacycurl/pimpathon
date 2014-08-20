@@ -176,9 +176,17 @@ class ListTest {
   }
 
   @Test def headTailOption {
-    assertEquals(None,               Nil.headTailOption)
-    assertEquals(Some((1, Nil)),     List(1).headTailOption)
-    assertEquals(Some((1, List(2))), List(1, 2).headTailOption)
+    assertEquals(None,                  Nil.headTailOption)
+    assertEquals(Some((1, Nil)),        List(1).headTailOption)
+    assertEquals(Some((1, List(2))),    List(1, 2).headTailOption)
+    assertEquals(Some((1, List(2, 3))), List(1, 2, 3).headTailOption)
+  }
+
+  @Test def initLastOption {
+    assertEquals(None,                   Nil.initLastOption)
+    assertEquals(Some((Nil, 1)),        List(1).initLastOption)
+    assertEquals(Some((List(1), 2)),    List(1, 2).initLastOption)
+    assertEquals(Some((List(1, 2), 3)), List(1, 2, 3).initLastOption)
   }
 
   @Test def const {

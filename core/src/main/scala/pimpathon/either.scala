@@ -9,6 +9,7 @@ object either {
       either.fold(l => Left[LV, RV](lf(l)), r => Right[LV, RV](rf(r)))
 
     def leftOr(rl: R => L): L = either.fold(identity, rl)
+    def rightOr(lr: L => R): R = either.fold(lr, identity)
 
     def tap(l: L => Unit, r: R => Unit): Either[L, R] = { either.fold(l, r); either }
 

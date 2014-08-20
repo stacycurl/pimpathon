@@ -15,6 +15,11 @@ class EitherTest {
     assertEquals("right !", Right[String, String]("right").leftOr(_ + " !"))
   }
 
+  @Test def rightOr {
+    assertEquals("left !",  Left[String, String]("left").rightOr(_ + " !"))
+    assertEquals("right", Right[String, String]("right").rightOr(_ + " !"))
+  }
+
   @Test def map {
     assertEquals(Left[String, Int]("1"), Left[Int, String](1).map(_.toString, _.length))
     assertEquals(Right[String, Int](3), Right[Int, String]("foo").map(_.toString, _.length))

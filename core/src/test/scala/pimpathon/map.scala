@@ -206,6 +206,10 @@ class MapTest {
     assertTrue(nonEmpty.valueExists(_ == 2))
   }
 
+  @Test def mutable {
+    assertEquals(M.Map(1 -> 2), Map(1 -> 2).mutable)
+  }
+
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
     def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem](s"apply($from)")

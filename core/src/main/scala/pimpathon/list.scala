@@ -68,6 +68,9 @@ object list {
 
     def initLastOption: Option[(List[A], A)] = uncons(None, _ => Some(list.init, list.last))
 
+    def seqMap[B](f: A => Option[B]): Option[List[B]] =
+      apoMap[B, Option[List[B]]](Some(_))(a => f(a).toRight(None))
+
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 
     def const[B](elem: B): List[B] = list.map(_ => elem)
@@ -81,6 +84,18 @@ object list {
       }
 
       recurse(list, other, Nil)
+    }
+
+    private def apoMap[B, C](g: List[B] => C)(f: A => Either[C, B]): C = {
+      @tailrec def recurse(acc: List[B], rest: List[A]): C = rest match {
+        case Nil => g(acc.reverse)
+        case head :: tail => f(head) match {
+          case Left(c) => c
+          case Right(b) => recurse(b :: acc, tail)
+        }
+      }
+
+      recurse(Nil, list)
     }
 
     private def equalBy[B](f: A => B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)

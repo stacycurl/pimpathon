@@ -31,6 +31,8 @@ object list {
 
     def as[F[_, _]] = new ListCapturer[A, F](list)
 
+    def zipToMap[B](values: List[B]): Map[A, B] = list.iterator.zip(values.iterator).toMap
+
 
     def attributeCounts[B](f: A => B): Map[B, Int] =
       asMultiMap.withKeys(f).mapValues(_.size)

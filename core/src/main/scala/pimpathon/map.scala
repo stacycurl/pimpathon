@@ -45,6 +45,7 @@ object map {
 
     def mapValuesEagerly[W](f: V => W): Map[K, W] = map.map { case (k, v) => (k, f(v)) }(collection.breakOut)
 
+    def reverse(f: Set[K] => K): Map[V, K] = reverseToMultiMap.mapValuesEagerly(f)
     def reverseToMultiMap: MultiMap[Set, V, K] = map.map(_.swap)(collection.breakOut)
 
     def mutable: M.Map[K, V] = M.Map.empty[K, V] ++ map

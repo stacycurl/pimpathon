@@ -6,6 +6,8 @@ import scala.collection.immutable.SortedMap
 import org.junit.Assert._
 import pimpathon.list._
 import pimpathon.multiMap._
+import pimpathon.option._
+import pimpathon.util._
 import scalaz.std.list._
 import scalaz.syntax.std.boolean._
 
@@ -173,6 +175,16 @@ class ListTest {
     assertEquals(None,          Nil.tailOption)
     assertEquals(Some(Nil),     List(0).tailOption)
     assertEquals(Some(List(1)), List(0, 1).tailOption)
+  }
+
+  @Test def headTail {
+    assertException[NoSuchElementException]("headTail of empty list") {
+      Nil.headTail
+    }
+
+    assertEquals((1, Nil),        List(1).headTail)
+    assertEquals((1, List(2)),    List(1, 2).headTail)
+    assertEquals((1, List(2, 3)), List(1, 2, 3).headTail)
   }
 
   @Test def headTailOption {

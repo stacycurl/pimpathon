@@ -128,11 +128,16 @@ class FileTest {
   }
 
   @Test def withTempDirectory {
-    assertFalse("Temp directory should not exist after 'withTempDirectory'",
-      file.withTempDirectory(tmp => {
-        assertIsTemp(".tmp", "temp", expectedIsFile = false, tmp); tmp
-      }).exists
-    )
+    val files = file.withTempDirectory(tmp => {
+      def relativeName(file: File): File = file.named("tmp/" + file.relativeTo(tmp).getPath)
+
+      assertIsTemp(".tmp", "temp", expectedIsFile = false, tmp)
+
+      List(tmp, (tmp / "child").create(), (tmp / "parent/child").create()).map(relativeName)
+    })
+
+    assertEquals("Temp directory (and contents) should not exist after 'withTempDirectory'",
+      Nil, files.filter(_.exists()))
 
     assertFalse("Temp directory should not exist after 'withTempDirectory'",
       file.withTempDirectory("suffix")(tmp => {

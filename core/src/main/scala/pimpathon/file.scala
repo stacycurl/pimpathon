@@ -70,7 +70,7 @@ case class FileUtils(suffix: String, prefix: String) {
   def withTempFile[A](suffix: String, prefix: String = prefix)(f: File => A): A = {
     val file = tempFile(suffix, prefix)
 
-    try f(file) finally file.delete
+    try f(file) finally file.deleteRecursively()
   }
 
 

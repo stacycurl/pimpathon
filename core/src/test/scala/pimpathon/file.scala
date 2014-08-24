@@ -36,6 +36,20 @@ class FileTest {
     })
   }
 
+  @Test def deleteRecursively {
+    file.withTempDirectory(tmp => {
+      assertFalse((tmp / "non-existent-file").deleteRecursively().exists)
+      assertFalse((tmp / "existing-file").create().deleteRecursively().exists)
+      assertFalse((tmp / ("existing-dir")).create(directory = true).deleteRecursively().exists)
+
+      val parent = (tmp / "parent").create(directory = true)
+      val children = List(parent / "child", parent / ("parent" + File.separator + "child")).map(_.create())
+
+      assertFalse(parent.deleteRecursively().exists)
+      assertEquals(Nil, children.filter(_.exists))
+    })
+  }
+
   @Test def cwd {
     // not a great test, but what to do other that use an alternate implementation ?
     assertEquals("pimpathon", file.cwd.getName)

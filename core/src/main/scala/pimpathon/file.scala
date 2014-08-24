@@ -33,6 +33,8 @@ case class FileUtils(suffix: String, prefix: String) {
     def create(directory: Boolean = false): File =
       file.tap(_.getParentFile.mkdirs(), f => if (directory) f.mkdir() else f.createNewFile())
 
+    def deleteRecursively(): File = file.tap(_.tree.reverse.foreach(_.delete()))
+
     def readBytes(): Array[Byte] = source().withFinally(_.close())(_.map(_.toByte).toArray)
     def readLines(): List[String] = source().withFinally(_.close())(_.getLines.toList)
 

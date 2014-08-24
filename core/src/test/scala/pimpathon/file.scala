@@ -18,12 +18,21 @@ class FileTest {
 
       child.create()
       assertTrue(child.exists)
+      assertTrue(child.isFile)
 
-      val nested = dir / "parent/child"
+      val childDir = dir / "childDir"
+      assertFalse(childDir.exists)
+
+      childDir.create(directory = true)
+      assertTrue(childDir.exists)
+      assertTrue(childDir.isDirectory)
+
+      val nested = dir / ("parent" + File.separator + "child")
       assertFalse(nested.exists)
 
       nested.create()
       assertTrue(nested.exists)
+      assertTrue(nested.isFile)
     })
   }
 

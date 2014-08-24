@@ -29,7 +29,9 @@ case class FileUtils(suffix: String, prefix: String) {
     def path: List[String]     = file.getAbsolutePath.split(separator).toList.filterNot(Set("", "."))
 
     def changeToDirectory(): File = file.tapIf(_.isFile)(_.delete(), _.mkdir())
-    def create(): File            = file.tap(_.getParentFile.mkdirs(), _.createNewFile())
+
+    def create(directory: Boolean = false): File =
+      file.tap(_.getParentFile.mkdirs(), f => if (directory) f.mkdir() else f.createNewFile())
 
     def readBytes(): Array[Byte] = source().withFinally(_.close())(_.map(_.toByte).toArray)
     def readLines(): List[String] = source().withFinally(_.close())(_.getLines.toList)

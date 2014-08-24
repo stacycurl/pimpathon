@@ -209,6 +209,7 @@ class MapTest {
 
   @Test def mutable {
     assertEquals(M.Map(1 -> 2), Map(1 -> 2).mutable)
+    assertEquals(M.Map(1 -> 2), Map(1 -> 2).toMutable)
   }
 
   @Test def reverseToMultiMap {

@@ -1,6 +1,7 @@
 package pimpathon
 
 import scala.annotation.tailrec
+import scala.collection.{mutable => M}
 
 import pimpathon.any._
 import pimpathon.list._
@@ -14,5 +15,8 @@ object set {
 
       recurse(set.toList).map(_.toSet).toSet
     }
+
+    def mutable: M.Set[A] = M.Set.empty[A] ++ set
+    def toMutable: M.Set[A] = mutable
   }
 }

@@ -31,7 +31,12 @@ case class FileUtils(suffix: String, prefix: String) {
     def path: List[String]     = file.getAbsolutePath.split(separator).toList.filterNot(Set("", "."))
 
     def changeToDirectory(): File = file.tapIf(_.isFile)(_.delete(), _.mkdir())
-    def create(): File            = file.tap(_.getParentFile.mkdirs(), _.createNewFile())
+
+    def create(directory: Boolean = false): File =
+      file.tap(_.getParentFile.mkdirs(), f => if (directory) f.mkdir() else f.createNewFile())
+
+    def deleteRecursively(): File       = file.tap(_.tree.reverse.foreach(_.delete()))
+    def deleteRecursivelyOnExit(): File = file.tap(f => Runtime.getRuntime.addShutdownHook(DeleteRecursively(f)))
 
     def readBytes(): Array[Byte] = source().withFinally(_.close())(_.map(_.toByte).toArray)
     def readLines(): List[String] = source().withFinally(_.close())(_.getLines.toList)
@@ -61,14 +66,14 @@ case class FileUtils(suffix: String, prefix: String) {
     File.createTempFile(prefix, suffix).tap(_.deleteOnExit())
 
   def tempDir(suffix: String = suffix, prefix: String = prefix): File =
-    tempFile(suffix, prefix).changeToDirectory().tap(_.deleteOnExit())
+    File.createTempFile(prefix, suffix).changeToDirectory().tap(_.deleteRecursivelyOnExit())
 
   def withTempFile[A](f: File => A): A = withTempFile(suffix)(f)
 
   def withTempFile[A](suffix: String, prefix: String = prefix)(f: File => A): A = {
-    val file = tempFile(suffix, prefix)
+    val file = File.createTempFile(prefix, suffix)
 
-    try f(file) finally file.delete
+    try f(file) finally file.deleteRecursively()
   }
 
 
@@ -80,5 +85,9 @@ case class FileUtils(suffix: String, prefix: String) {
 
   class NamedFile(file: File, name: String) extends File(file.getPath) {
     override def toString = name
+  }
+
+  case class DeleteRecursively(file: File) extends Thread {
+    override def run() = file.deleteRecursively()
   }
 }

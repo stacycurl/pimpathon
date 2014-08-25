@@ -1,7 +1,9 @@
 package pimpathon
 
 import _root_.java.io.{File, FileInputStream}
+import _root_.java.lang.reflect.Field
 import org.junit.Test
+import scala.collection.JavaConversions._
 
 import org.junit.Assert._
 import pimpathon.any._
@@ -18,12 +20,55 @@ class FileTest {
 
       child.create()
       assertTrue(child.exists)
+      assertTrue(child.isFile)
 
-      val nested = dir / "parent/child"
+      val childDir = dir / "childDir"
+      assertFalse(childDir.exists)
+
+      childDir.create(directory = true)
+      assertTrue(childDir.exists)
+      assertTrue(childDir.isDirectory)
+
+      val nested = dir / "parent" / "child"
       assertFalse(nested.exists)
 
       nested.create()
       assertTrue(nested.exists)
+      assertTrue(nested.isFile)
+    })
+  }
+
+  @Test def deleteRecursively {
+    file.withTempDirectory(tmp => {
+      assertFalse((tmp / "non-existent-file").deleteRecursively().exists)
+      assertFalse((tmp / "existing-file").create().deleteRecursively().exists)
+      assertFalse((tmp / ("existing-dir")).create(directory = true).deleteRecursively().exists)
+
+      val parent = (tmp / "parent").create(directory = true)
+      val children = List(parent / "child", parent / "parent" / "child").map(_.create())
+
+      assertFalse(parent.deleteRecursively().exists)
+      assertEquals(Nil, children.filter(_.exists))
+    })
+  }
+
+  @Test def deleteRecursivelyOnExit {
+    // Check that 'deleteRecursivelyOnExit' registers a DeleteRecursively shutdown hook
+    file.withTempFile(tmp => {
+      tmp.deleteRecursivelyOnExit()
+      assertTrue(shutdownHooks().contains(DeleteRecursively(tmp)))
+      assertFalse(shutdownHooks().contains(DeleteRecursively(file.tempFile())))
+    })
+
+    // Check that running DeleteRecursively works
+    file.withTempDirectory(tmp => {
+      val parent = (tmp / "parent").create(directory = true)
+      val files = parent :: List((parent / "child").create(), (parent / "parent" / "child").create())
+      val deleteRecursively = DeleteRecursively(parent)
+      assertEquals("files should exist before Thread has been run", files, files.filter(_.exists))
+
+      deleteRecursively.run()
+      assertEquals("files should not exist after Thread has been run", Nil, files.filter(_.exists))
     })
   }
 
@@ -62,7 +107,7 @@ class FileTest {
       assertEquals(dir.getName + "/kid",
         (dir / "kid").create().relativeTo(dir.getParentFile).getPath)
 
-      val parent = createDirectory(dir, "parent")
+      val parent = (dir / "parent").create(directory = true)
       assertEquals("parent",       parent.relativeTo(dir).getPath)
       assertEquals("..",           dir.relativeTo(parent).getPath)
       assertEquals("parent/child", (parent / "child").create().relativeTo(dir).getPath)
@@ -105,11 +150,16 @@ class FileTest {
   }
 
   @Test def withTempDirectory {
-    assertFalse("Temp directory should not exist after 'withTempDirectory'",
-      file.withTempDirectory(tmp => {
-        assertIsTemp(".tmp", "temp", expectedIsFile = false, tmp); tmp
-      }).exists
-    )
+    val files = file.withTempDirectory(tmp => {
+      def relativeName(file: File): File = file.named("tmp/" + file.relativeTo(tmp).getPath)
+
+      assertIsTemp(".tmp", "temp", expectedIsFile = false, tmp)
+
+      List(tmp, (tmp / "child").create(), (tmp / "parent" / "child").create()).map(relativeName)
+    })
+
+    assertEquals("Temp directory (and contents) should not exist after 'withTempDirectory'",
+      Nil, files.filter(_.exists()))
 
     assertFalse("Temp directory should not exist after 'withTempDirectory'",
       file.withTempDirectory("suffix")(tmp => {
@@ -126,47 +176,52 @@ class FileTest {
 
   @Test def tempFile {
     val f = file.tempFile()
-    assert(f.isFile())
-    assert(f.exists())
+    assertTrue(f.isFile())
+    assertTrue(f.exists())
 
     val prefix = "sufferin-"
     val suffix = ".sucotash"
 
     val f1 = file.tempFile(suffix)
-    assert(f1.isFile())
-    assert(f1.getName.endsWith(suffix))
+    assertTrue(f1.isFile())
+    assertTrue(f1.getName.endsWith(suffix))
 
     val f2 = file.tempFile(prefix = prefix)
-    assert(f2.isFile())
-    assert(f2.getName.startsWith(prefix))
+    assertTrue(f2.isFile())
+    assertTrue(f2.getName.startsWith(prefix))
 
     val f3 = file.tempFile(suffix, prefix)
-    assert(f3.isFile())
-    assert(f3.getName.startsWith(prefix))
-    assert(f3.getName.endsWith(suffix))
+    assertTrue(f3.isFile())
+    assertTrue(f3.getName.startsWith(prefix))
+    assertTrue(f3.getName.endsWith(suffix))
   }
 
   @Test def tempDir {
     val f = file.tempDir()
-    assert(f.isDirectory())
-    assert(f.exists())
+    assertTrue(f.isDirectory())
+    assertTrue(f.exists())
+    assertTrue(shutdownHooks().contains(DeleteRecursively(f)))
 
     val prefix = "gosh-"
     val suffix = ".darnit"
 
     val f1 = file.tempDir(suffix)
-    assert(f1.isDirectory())
-    assert(f1.getName.endsWith(suffix))
+    assertTrue(f1.isDirectory())
+    assertTrue(f1.getName.endsWith(suffix))
+    assertTrue(shutdownHooks().contains(DeleteRecursively(f1)))
 
     val f2 = file.tempDir(prefix = prefix)
-    assert(f2.isDirectory())
-    assert(f2.getName.startsWith(prefix))
+    assertTrue(f2.isDirectory())
+    assertTrue(f2.getName.startsWith(prefix))
+    assertTrue(shutdownHooks().contains(DeleteRecursively(f2)))
 
     val f3 = file.tempDir(suffix, prefix)
-    assert(f3.isDirectory())
-    assert(f3.getName.startsWith(prefix))
-    assert(f3.getName.endsWith(suffix))
+    assertTrue(f3.isDirectory())
+    assertTrue(f3.getName.startsWith(prefix))
+    assertTrue(f3.getName.endsWith(suffix))
+    assertTrue(shutdownHooks().contains(DeleteRecursively(f3)))
   }
+
 
   @Test def newFile {
     val dir = file.file("this directory does not exist")
@@ -188,8 +243,8 @@ class FileTest {
     file.withTempDirectory(dir => {
       val List(child, nested) = file.files(dir, "child", "nested/child").toList
 
-      assertEquals(dir / "child",        child)
-      assertEquals(dir / "nested/child", nested)
+      assertEquals(dir / "child",            child)
+      assertEquals(dir / "nested" / "child", nested)
     })
   }
 
@@ -242,7 +297,14 @@ class FileTest {
 
     assertEquals("Expected %s to be a ".format(tmp.getName) + (if (expectedIsFile) "file" else "directory"),
       expectedIsFile, tmp.isFile)
+
+    assertFalse("Expected ${tmp.getName} to not be deleted recursively on exit",
+        shutdownHooks().contains(DeleteRecursively(tmp)))
   }
 
-  private def createDirectory(parent: File, name: String): File = (parent / name).tap(_.mkdir)
+  private def shutdownHooks(): Set[Thread] = {
+    asScalaSet(Class.forName("java.lang.ApplicationShutdownHooks")
+      .getDeclaredField("hooks").tap(_.setAccessible(true))
+      .get(null).asInstanceOf[_root_.java.util.Map[Thread, Thread]].keySet).toSet
+  }
 }

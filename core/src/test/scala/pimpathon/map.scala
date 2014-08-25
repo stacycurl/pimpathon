@@ -209,6 +209,7 @@ class MapTest {
 
   @Test def mutable {
     assertEquals(M.Map(1 -> 2), Map(1 -> 2).mutable)
+    assertEquals(M.Map(1 -> 2), Map(1 -> 2).toMutable)
   }
 
   @Test def reverseToMultiMap {
@@ -221,6 +222,11 @@ class MapTest {
 
   @Test def sorted {
     assertEquals(List(3 -> 4, 1 -> 2), Map(1 -> 2, 3 -> 4).sorted(Ordering.Int.reverse).toList)
+  }
+
+  @Test def andThenM {
+    assertEquals(Map(1 -> 100, 2 -> 200),
+      Map(1 -> 10, 2 -> 20, 3 -> 30).andThenM(Map(10 -> 100, 20 -> 200, 40 -> 400)))
   }
 
   @Test def multiMap_select {

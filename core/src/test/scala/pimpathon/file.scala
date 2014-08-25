@@ -55,7 +55,6 @@ class FileTest {
   @Test def deleteRecursivelyOnExit {
     // Check that 'deleteRecursivelyOnExit' registers a DeleteRecursively shutdown hook
     file.withTempFile(tmp => {
-      assertFalse(shutdownHooks().contains(DeleteRecursively(tmp)))
       tmp.deleteRecursivelyOnExit()
       assertTrue(shutdownHooks().contains(DeleteRecursively(tmp)))
       assertFalse(shutdownHooks().contains(DeleteRecursively(file.tempFile())))
@@ -177,46 +176,50 @@ class FileTest {
 
   @Test def tempFile {
     val f = file.tempFile()
-    assert(f.isFile())
-    assert(f.exists())
+    assertTrue(f.isFile())
+    assertTrue(f.exists())
 
     val prefix = "sufferin-"
     val suffix = ".sucotash"
 
     val f1 = file.tempFile(suffix)
-    assert(f1.isFile())
-    assert(f1.getName.endsWith(suffix))
+    assertTrue(f1.isFile())
+    assertTrue(f1.getName.endsWith(suffix))
 
     val f2 = file.tempFile(prefix = prefix)
-    assert(f2.isFile())
-    assert(f2.getName.startsWith(prefix))
+    assertTrue(f2.isFile())
+    assertTrue(f2.getName.startsWith(prefix))
 
     val f3 = file.tempFile(suffix, prefix)
-    assert(f3.isFile())
-    assert(f3.getName.startsWith(prefix))
-    assert(f3.getName.endsWith(suffix))
+    assertTrue(f3.isFile())
+    assertTrue(f3.getName.startsWith(prefix))
+    assertTrue(f3.getName.endsWith(suffix))
   }
 
   @Test def tempDir {
     val f = file.tempDir()
-    assert(f.isDirectory())
-    assert(f.exists())
+    assertTrue(f.isDirectory())
+    assertTrue(f.exists())
+    assertTrue(shutdownHooks().contains(DeleteRecursively(f)))
 
     val prefix = "gosh-"
     val suffix = ".darnit"
 
     val f1 = file.tempDir(suffix)
-    assert(f1.isDirectory())
-    assert(f1.getName.endsWith(suffix))
+    assertTrue(f1.isDirectory())
+    assertTrue(f1.getName.endsWith(suffix))
+    assertTrue(shutdownHooks().contains(DeleteRecursively(f1)))
 
     val f2 = file.tempDir(prefix = prefix)
-    assert(f2.isDirectory())
-    assert(f2.getName.startsWith(prefix))
+    assertTrue(f2.isDirectory())
+    assertTrue(f2.getName.startsWith(prefix))
+    assertTrue(shutdownHooks().contains(DeleteRecursively(f2)))
 
     val f3 = file.tempDir(suffix, prefix)
-    assert(f3.isDirectory())
-    assert(f3.getName.startsWith(prefix))
-    assert(f3.getName.endsWith(suffix))
+    assertTrue(f3.isDirectory())
+    assertTrue(f3.getName.startsWith(prefix))
+    assertTrue(f3.getName.endsWith(suffix))
+    assertTrue(shutdownHooks().contains(DeleteRecursively(f3)))
   }
 
 
@@ -294,6 +297,9 @@ class FileTest {
 
     assertEquals(s"Expected ${tmp.getName} to be a " + (if (expectedIsFile) "file" else "directory"),
       expectedIsFile, tmp.isFile)
+
+    assertFalse("Expected ${tmp.getName} to not be deleted recursively on exit",
+        shutdownHooks().contains(DeleteRecursively(tmp)))
   }
 
   private def shutdownHooks(): Set[Thread] = {

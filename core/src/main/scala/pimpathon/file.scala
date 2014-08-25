@@ -64,12 +64,12 @@ case class FileUtils(suffix: String, prefix: String) {
     File.createTempFile(prefix, suffix).tap(_.deleteOnExit())
 
   def tempDir(suffix: String = suffix, prefix: String = prefix): File =
-    tempFile(suffix, prefix).changeToDirectory().tap(_.deleteOnExit())
+    File.createTempFile(prefix, suffix).changeToDirectory().tap(_.deleteRecursivelyOnExit())
 
   def withTempFile[A](f: File => A): A = withTempFile(suffix)(f)
 
   def withTempFile[A](suffix: String, prefix: String = prefix)(f: File => A): A = {
-    val file = tempFile(suffix, prefix)
+    val file = File.createTempFile(prefix, suffix)
 
     try f(file) finally file.deleteRecursively()
   }

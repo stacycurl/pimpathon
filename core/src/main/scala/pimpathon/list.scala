@@ -13,7 +13,7 @@ import pimpathon.option._
 import pimpathon.tuple._
 
 
-object list {
+object list extends filterMonadic {
   implicit class ListOps[A](val list: List[A]) extends AnyVal {
     def emptyTo(alternative: => List[A]): List[A] = uncons(alternative, _ => list)
 
@@ -105,11 +105,6 @@ object list {
 
     private def equalBy[B](f: A => B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
     private def zip[B](other: List[B]): Iterator[(A, B)] = list.iterator.zip(other.iterator)
-  }
-
-  implicit class ListTuple2Ops[K, V](list: List[(K, V)]) {
-    def toMultiMap[F[_]](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
-      : MultiMap[F, K, V] = list.map(kv => kv)(breakOut)
   }
 }
 

@@ -33,7 +33,8 @@ case class FileUtils(suffix: String, prefix: String) {
     def create(directory: Boolean = false): File =
       file.tap(_.getParentFile.mkdirs(), f => if (directory) f.mkdir() else f.createNewFile())
 
-    def deleteRecursively(): File = file.tap(_.tree.reverse.foreach(_.delete()))
+    def deleteRecursively(): File       = file.tap(_.tree.reverse.foreach(_.delete()))
+    def deleteRecursivelyOnExit(): File = file.tap(f => Runtime.getRuntime.addShutdownHook(DeleteRecursively(f)))
 
     def readBytes(): Array[Byte] = source().withFinally(_.close())(_.map(_.toByte).toArray)
     def readLines(): List[String] = source().withFinally(_.close())(_.getLines.toList)
@@ -82,5 +83,9 @@ case class FileUtils(suffix: String, prefix: String) {
 
   class NamedFile(file: File, name: String) extends File(file.getPath) {
     override def toString = name
+  }
+
+  case class DeleteRecursively(file: File) extends Thread {
+    override def run() = file.deleteRecursively()
   }
 }

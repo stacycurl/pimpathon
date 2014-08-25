@@ -12,5 +12,7 @@ object multiMap {
   object MultiMap {
     def build[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
       : CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]] = new MultiMapCanBuildFrom[F, K, V]
+
+    def empty[F[_], K, V]: MultiMap[F, K, V] = Map.empty[K, F[V]]
   }
 }

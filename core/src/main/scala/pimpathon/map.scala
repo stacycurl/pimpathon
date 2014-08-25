@@ -1,7 +1,7 @@
 package pimpathon
 
-import scala.collection.GenTraversableOnce
-import scala.collection.{mutable => M}
+import scala.collection.{GenTraversableOnce, mutable => M}
+import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.{SortedMap, TreeMap}
 
 import pimpathon.function._
@@ -63,5 +63,16 @@ object map {
   implicit class MultiMapOps[F[_], K, V](val multiMap: MultiMap[F, K, V]) extends AnyVal {
     // just an alias for mapValuesEagerly
     def select[W](f: F[V] => W): Map[K, W] = multiMap.mapValuesEagerly(f)
+
+    def merge(other: MultiMap[F, K, V])(
+      implicit cbf: CanBuildFrom[F[V], V, F[V]], fTraversableOnce: F[V] <:< TraversableOnce[V]
+    ): MultiMap[F, K, V] = {
+      if (multiMap.isEmpty) other else other.foldLeft(multiMap) {
+        case (acc, (key, otherValues)) => acc + ((key, acc.get(key) match {
+          case None         => otherValues
+          case Some(values) => (cbf() ++= values ++= otherValues).result()
+        }))
+      }
+    }
   }
 }

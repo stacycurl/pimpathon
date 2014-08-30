@@ -250,7 +250,7 @@ class FileTest {
 
   @Test def readBytes {
     file.withTempFile(tmp => {
-      createInputStream("contents".getBytes).drain(tmp.outputStream())
+      createInputStream("contents".getBytes).drain(tmp.outputStream)
       assertEquals("contents", new String(tmp.readBytes()))
     })
   }

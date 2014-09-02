@@ -22,6 +22,7 @@ script:
 after_success:
 - sbt ++$TRAVIS_SCALA_VERSION clean $(if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$JAVA_HOME" == "$(jdk_switcher home openjdk6)" ]]; then echo "publish"; fi)
 #- sbt ++$TRAVIS_SCALA_VERSION scalastyleGenerateConfig scalastyle
+- sbt ++$TRAVIS_SCALA_VERSION clean coveralls
 
 env:
   global:

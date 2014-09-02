@@ -1,8 +1,7 @@
 import sbt._
 
-import com.typesafe.sbt.SbtScalariform.scalariformSettings
-import net.virtualvoid.sbt.graph.Plugin.graphSettings
-import org.scalastyle.sbt.ScalastylePlugin.{ Settings => scalaStyleSettings }
+import net.virtualvoid.sbt.graph.{Plugin => GraphPlugin}
+import org.scalastyle.sbt.ScalastylePlugin
 
 import sbt.Keys._
 
@@ -38,10 +37,10 @@ object PimpathonBuild extends Build {
     }
   }
 
-  def commonSettings = graphSettings ++
+  def commonSettings = GraphPlugin.graphSettings ++
   // uncomment when you want to reset the formatting of the project
-  // scalariformSettings ++
-  scalaStyleSettings ++ Seq(
+  // SbtScalariform.scalariformSettings ++
+  ScalastylePlugin.Settings ++ Seq(
     organization := "com.github.stacycurl",
     scalaVersion := "2.9.2",
     maxErrors := 1,

@@ -8,8 +8,6 @@ libraryDependencies ++= Seq(
   plugin("org.scalastyle"   %% "scalastyle-sbt-plugin" % "0.5.0")
   // https://github.com/typelevel/wartremover/issues/108
   //plugin("org.brianmckenna" %% "wartremover" % "0.9")
-  // https://github.com/scoverage/sbt-coveralls/issues/18
-  //plugin("org.scoverage" %% "sbt-coveralls" % "0.98.0")
 )
 
 scalacOptions += "-deprecation"

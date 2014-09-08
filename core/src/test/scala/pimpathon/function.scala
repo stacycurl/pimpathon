@@ -39,14 +39,20 @@ class FunctionTest {
 
 class PartialFunctionTest {
   @Test def starStarStar: Unit = {
-    val left:  PartialFunction[Int, Int] = Map(1 -> 2)
-    val right: PartialFunction[Int, Int] = Map(2 -> 3)
-
-    val composed = left *** right
+    val composed = create(1 -> 2) *** create(2 -> 3)
 
     assertTrue(composed.isDefinedAt((1, 2)))
     assertFalse(composed.isDefinedAt((0, 2)))
     assertFalse(composed.isDefinedAt((1, 0)))
     assertEquals((2, 3), composed.apply((1, 2)))
   }
+
+  @Test def either: Unit = {
+    val either: Int => Either[Int, String] = create(1 -> "2").either
+
+    assertEquals(Right("2"), either(1))
+    assertEquals(Left(5), either(5))
+  }
+
+  private def create[A, B](ab: (A, B)*): PartialFunction[A, B] = ab.toMap
 }

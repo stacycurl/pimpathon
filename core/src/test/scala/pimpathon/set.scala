@@ -8,14 +8,14 @@ import pimpathon.set._
 
 
 class SetTest {
-  @Test def powerSet {
+  @Test def powerSet: Unit = {
     assertEquals(Set(Set.empty[Int]), Set.empty[Int].powerSet)
     assertEquals(Set(Set.empty[Int], Set(1)), Set(1).powerSet)
 
     assertEquals(Set(Set.empty[Int], Set(1), Set(2), Set(1, 2)), Set(1, 2).powerSet)
   }
 
-  @Test def mutable {
+  @Test def mutable: Unit = {
     assertEquals(M.Set(1, 2), Set(1, 2).mutable)
     assertEquals(M.Set(1, 2), Set(1, 2).toMutable)
   }

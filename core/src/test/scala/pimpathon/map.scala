@@ -13,7 +13,7 @@ import pimpathon.multiMap._
 
 
 class MapTest {
-  @Test def containsAny {
+  @Test def containsAny: Unit = {
     assertFalse(empty.containsAny(None))
     assertFalse(empty.containsAny(Some(1)))
     assertFalse(nonEmpty.containsAny(None))
@@ -28,7 +28,7 @@ class MapTest {
     assertTrue(nonEmpty.containsAny(List(1, 2)))
   }
 
-  @Test def containsAll {
+  @Test def containsAll: Unit = {
     assertTrue(empty.containsAll(None))
     assertFalse(empty.containsAll(Some(1)))
     assertTrue(nonEmpty.containsAll(None))
@@ -43,7 +43,7 @@ class MapTest {
     assertFalse(nonEmpty.containsAll(List(1, 2)))
   }
 
-  @Test def get {
+  @Test def get: Unit = {
     assertEquals(None,    Map.empty[Int, Int].get(Some(1)))
     assertEquals(None,    Map.empty[Int, Int].get(None))
     assertEquals(None,    Map(1 -> 2).get(None))
@@ -51,7 +51,7 @@ class MapTest {
     assertEquals(Some(2), Map(1 -> 2).get(Some(1)))
   }
 
-  @Test def getOrThrow {
+  @Test def getOrThrow: Unit = {
     assertEquals("present", Map(0 -> "present").getOrThrow(0, "missing"))
     assertEquals("present", Map(0 -> "present").getOrThrow(0, new Exception("missing")))
     assertEquals("present", Map(0 -> "present").getOrThrow(0, sys.error("should not be evaluated"): Exception))
@@ -65,62 +65,62 @@ class MapTest {
     }.getMessage)
   }
 
-  @Test def uncons {
+  @Test def uncons: Unit = {
     assertEquals("empty", empty.uncons("empty", _ => "nonEmpty"))
     assertEquals("nonEmpty", nonEmpty.uncons("empty", _ => "nonEmpty"))
   }
 
-  @Test def mapNonEmpty {
+  @Test def mapNonEmpty: Unit = {
     assertEquals(None, empty.mapNonEmpty(_ => "nonEmpty"))
     assertEquals(Some("nonEmpty"), nonEmpty.mapNonEmpty(_ => "nonEmpty"))
   }
 
-  @Test def emptyTo {
+  @Test def emptyTo: Unit = {
     assertEquals(nonEmpty, empty.emptyTo(nonEmpty))
     assertEquals(Map(3 -> 4), Map(3 -> 4).emptyTo(nonEmpty))
   }
 
-  @Test def entryForMaxKey {
+  @Test def entryForMaxKey: Unit = {
     assertEquals(None, Map.empty[Int, String].entryForMaxKey)
     assertEquals(Some(2 -> "max"), Map(1 -> "min", 2 -> "max").entryForMaxKey)
   }
 
-  @Test def entryForMinKey {
+  @Test def entryForMinKey: Unit = {
     assertEquals(None, Map.empty[Int, String].entryForMinKey)
     assertEquals(Some(1 -> "min"), Map(1 -> "min", 2 -> "max").entryForMinKey)
   }
 
-  @Test def entryForMaxValue {
+  @Test def entryForMaxValue: Unit = {
     assertEquals(None, Map.empty[Int, String].entryForMaxValue)
     assertEquals(Some(2 -> "def"), Map(1 -> "abc", 2 -> "def").entryForMaxValue)
   }
 
-  @Test def entryForMinValue {
+  @Test def entryForMinValue: Unit = {
     assertEquals(None, Map.empty[Int, String].entryForMinValue)
     assertEquals(Some(1 -> "abc"), Map(1 -> "abc", 2 -> "def").entryForMinValue)
   }
 
-  @Test def valueForMaxKey {
+  @Test def valueForMaxKey: Unit = {
     assertEquals(None, Map.empty[Int, String].valueForMaxKey)
     assertEquals(Some("max"), Map(1 -> "min", 2 -> "max").valueForMaxKey)
   }
 
-  @Test def valueForMinKey {
+  @Test def valueForMinKey: Unit = {
     assertEquals(None, Map.empty[Int, String].valueForMinKey)
     assertEquals(Some("min"), Map(1 -> "min", 2 -> "max").valueForMinKey)
   }
 
-  @Test def keyForMaxValue {
+  @Test def keyForMaxValue: Unit = {
     assertEquals(None, Map.empty[Int, String].keyForMaxValue)
     assertEquals(Some(2), Map(1 -> "abc", 2 -> "def").keyForMaxValue)
   }
 
-  @Test def keyForMinValue {
+  @Test def keyForMinValue: Unit = {
     assertEquals(None, Map.empty[Int, String].keyForMinValue)
     assertEquals(Some(1), Map(1 -> "abc", 2 -> "def").keyForMinValue)
   }
 
-  @Test def mapValuesEagerly {
+  @Test def mapValuesEagerly: Unit = {
     val originalValuesSeen = new M.ListBuffer[Int]
     def update(v: Int) = { originalValuesSeen += v; v * 10 }
 
@@ -131,7 +131,7 @@ class MapTest {
     assertEquals("Shouldn't have iterated over the original map twice", List(1, 2), originalValuesSeen.toList)
   }
 
-  @Test def multiMapCBF {
+  @Test def multiMapCBF: Unit = {
     val cbf = MultiMap.build[List, Int, String]
     val builder = cbf.apply()
 
@@ -143,7 +143,7 @@ class MapTest {
     assertEquals(Map(), builder.result())
   }
 
-  @Test def ignoreFromCBF {
+  @Test def ignoreFromCBF: Unit = {
     val ucbf = new UnitCanBuildFrom[List[Int], Int]
 
     assertEquals(UnitBuilder[Int]("apply()"), ucbf.apply())
@@ -155,45 +155,45 @@ class MapTest {
     assertEquals(UnitBuilder[Int]("apply()"), ucbfi.apply(List(1, 2, 3)))
   }
 
-  @Test def findKey {
+  @Test def findKey: Unit = {
     assertEquals(None, empty.findKey(_ => true))
     assertEquals(None, nonEmpty.findKey(_ => false))
     assertEquals(Some(1), nonEmpty.findKey(_ == 1))
   }
 
-  @Test def findValue {
+  @Test def findValue: Unit = {
     assertEquals(None, empty.findValue(_ => true))
     assertEquals(None, nonEmpty.findValue(_ => false))
     assertEquals(Some(2), nonEmpty.findValue(_ == 2))
   }
 
-  @Test def findEntryWithKey {
+  @Test def findEntryWithKey: Unit = {
     assertEquals(None, empty.findEntryWithKey(_ => true))
     assertEquals(None, nonEmpty.findEntryWithKey(_ => false))
     assertEquals(Some(1 -> 2), nonEmpty.findEntryWithKey(_ == 1))
   }
 
-  @Test def findEntryWithValue {
+  @Test def findEntryWithValue: Unit = {
     assertEquals(None, empty.findEntryWithValue(_ => true))
     assertEquals(None, nonEmpty.findEntryWithValue(_ => false))
     assertEquals(Some(1 -> 2), nonEmpty.findEntryWithValue(_ == 2))
   }
 
-  @Test def filterKeysNot {
+  @Test def filterKeysNot: Unit = {
     assertEquals(empty, empty.filterKeysNot(_ => true))
     assertEquals(empty, nonEmpty.filterKeysNot(_ => true))
     assertEquals(nonEmpty, nonEmpty.filterKeysNot(_ => false))
     assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterKeysNot(_ == 2))
   }
 
-  @Test def filterValuesNot {
+  @Test def filterValuesNot: Unit = {
     assertEquals(empty, empty.filterValuesNot(_ => true))
     assertEquals(empty, nonEmpty.filterValuesNot(_ => true))
     assertEquals(nonEmpty, nonEmpty.filterValuesNot(_ => false))
     assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterValuesNot(_ == 3))
   }
 
-  @Test def filterValues {
+  @Test def filterValues: Unit = {
     assertEquals(empty, empty.filterValues(_ => true))
     assertEquals(empty, nonEmpty.filterValues(_ => false))
     assertEquals(nonEmpty, nonEmpty.filterValues(_ => true))
@@ -201,35 +201,35 @@ class MapTest {
     assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterValues(_ == 2))
   }
 
-  @Test def valueExists {
+  @Test def valueExists: Unit = {
     assertFalse(empty.valueExists(_ => true))
     assertFalse(nonEmpty.valueExists(_ => false))
     assertTrue(nonEmpty.valueExists(_ == 2))
   }
 
-  @Test def mutable {
+  @Test def mutable: Unit = {
     assertEquals(M.Map(1 -> 2), Map(1 -> 2).mutable)
     assertEquals(M.Map(1 -> 2), Map(1 -> 2).toMutable)
   }
 
-  @Test def reverseToMultiMap {
+  @Test def reverseToMultiMap: Unit = {
     assertEquals(Map(2 -> Set(1, 2)), Map(1 -> 2, 2 -> 2).reverseToMultiMap)
   }
 
-  @Test def reverse {
+  @Test def reverse: Unit = {
     assertEquals(Map(2 -> 1), Map(1 -> 2, 2 -> 2).reverse(_.min))
   }
 
-  @Test def sorted {
+  @Test def sorted: Unit = {
     assertEquals(List(3 -> 4, 1 -> 2), Map(1 -> 2, 3 -> 4).sorted(Ordering.Int.reverse).toList)
   }
 
-  @Test def andThenM {
+  @Test def andThenM: Unit = {
     assertEquals(Map(1 -> 100, 2 -> 200),
       Map(1 -> 10, 2 -> 20, 3 -> 30).andThenM(Map(10 -> 100, 20 -> 200, 40 -> 400)))
   }
 
-  @Test def multiMap_merge {
+  @Test def multiMap_merge: Unit = {
     assertEquals(Map(1 -> List(1, 2)), Map(1 -> List(1, 2)).merge(MultiMap.empty[List, Int, Int]))
     assertEquals(Map(1 -> List(1, 2)), MultiMap.empty[List, Int, Int].merge(Map(1 -> List(1, 2))))
     assertEquals(Map(1 -> List(1, 2)), Map(1 -> List(1)).merge(Map(1 -> List(2))))
@@ -237,7 +237,7 @@ class MapTest {
     assertEquals(Map(1 -> Set(1, 2)),  Map(1 -> Set(1)).merge(Map(1 -> Set(2))))
   }
 
-  @Test def multiMap_select {
+  @Test def multiMap_select: Unit = {
     assertEquals(Map(1 -> 2, 2 -> 3), Map(1 -> List(2), 2 -> List(3, 4)).select(_.head))
   }
 

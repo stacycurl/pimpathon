@@ -7,11 +7,11 @@ import pimpathon.tuple._
 
 
 class TupleTest {
-  @Test def calc {
+  @Test def calc: Unit = {
     assertEquals("123abc", ("123", "abc").calc(_ + _))
   }
 
-  @Test def to {
+  @Test def to: Unit = {
     implicit def intToString(i: Int): String = i.toString
     implicit def doubleToString(d: Double): String = d.toString
 

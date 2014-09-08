@@ -85,10 +85,10 @@ case class FileUtils(suffix: String, prefix: String) {
 
 
   class NamedFile(file: File, name: String) extends File(file.getPath) {
-    override def toString = name
+    override def toString: String = name
   }
 
   case class DeleteRecursively(file: File) extends Thread {
-    override def run() = file.deleteRecursively()
+    override def run(): Unit = file.deleteRecursively()
   }
 }

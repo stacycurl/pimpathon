@@ -20,10 +20,12 @@ trait genTraversableLike {
     : GenTraversableLikeOps[A, Repr] = new GenTraversableLikeOps[A, Repr](gtl)
 
   class GenTraversableLikeOps[A, Repr](val list: GenTraversableLike[A, Repr]) {
-    def asMap            = as[Map]
-    def asMultiMap[F[_]] = as[({ type MM[K, V] = MultiMap[F, K, V] })#MM]
+    def asMap: GenTraversableLikeCapturer[A, Map, Repr] = as[Map]
 
-    def as[F[_, _]] = new GenTraversableLikeCapturer[A, F, Repr](list)
+    def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Repr] =
+      as[({ type MM[K, V] = MultiMap[F, K, V] })#MM]
+
+    def as[F[_, _]]: GenTraversableLikeCapturer[A, F, Repr] = new GenTraversableLikeCapturer[A, F, Repr](list)
 
     def attributeCounts[B](f: A => B): Map[B, Int] =
       asMultiMap.withKeys(f).mapValues(_.size)

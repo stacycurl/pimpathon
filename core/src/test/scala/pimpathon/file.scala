@@ -13,7 +13,7 @@ import pimpathon.util._
 
 
 class FileTest {
-  @Test def create {
+  @Test def create: Unit = {
     file.withTempDirectory(dir => {
       val child = dir / "child"
       assertFalse(child.exists)
@@ -38,7 +38,7 @@ class FileTest {
     })
   }
 
-  @Test def deleteRecursively {
+  @Test def deleteRecursively: Unit = {
     file.withTempDirectory(tmp => {
       assertFalse((tmp / "non-existent-file").deleteRecursively().exists)
       assertFalse((tmp / "existing-file").create().deleteRecursively().exists)
@@ -52,7 +52,7 @@ class FileTest {
     })
   }
 
-  @Test def deleteRecursivelyOnExit {
+  @Test def deleteRecursivelyOnExit: Unit = {
     // Check that 'deleteRecursivelyOnExit' registers a DeleteRecursively shutdown hook
     file.withTempFile(tmp => {
       tmp.deleteRecursivelyOnExit()
@@ -72,24 +72,24 @@ class FileTest {
     })
   }
 
-  @Test def cwd {
+  @Test def cwd: Unit = {
     // not a great test, but what to do other that use an alternate implementation ?
     assertEquals("pimpathon", file.cwd.getName)
   }
 
-  @Test def named {
+  @Test def named: Unit = {
     file.withTempFile(tmp => {
       assertEquals("name", tmp.named("name").toString)
     })
   }
 
-  @Test def changeToDirectory {
+  @Test def changeToDirectory: Unit = {
     file.withTempFile(file => {
       assertTrue(file.changeToDirectory().isDirectory)
     })
   }
 
-  @Test def children {
+  @Test def children: Unit = {
     file.withTempDirectory(dir => {
       assertEquals(Set.empty[File], dir.children.toSet)
 
@@ -100,7 +100,7 @@ class FileTest {
     assertEquals(Stream.empty[File], (null: File).children)
   }
 
-  @Test def relativeTo {
+  @Test def relativeTo: Unit = {
     file.withTempDirectory(dir => {
       assertEquals("child", (dir / "child").create().relativeTo(dir).getPath)
 
@@ -114,7 +114,7 @@ class FileTest {
     })
   }
 
-  @Test def tree {
+  @Test def tree: Unit = {
     assertEquals(Nil, new File("non-existent").tree)
 
     file.withTempFile(tmp =>      assertEquals(List(tmp), tmp.tree))
@@ -129,7 +129,7 @@ class FileTest {
     })
   }
 
-  @Test def withTempFile {
+  @Test def withTempFile: Unit = {
     assertFalse("Temp file should not exist after 'withTempFile'",
       file.withTempFile(tmp => {
         assertIsTemp(".tmp", "temp", expectedIsFile = true, tmp); tmp
@@ -149,7 +149,7 @@ class FileTest {
     )
   }
 
-  @Test def withTempDirectory {
+  @Test def withTempDirectory: Unit = {
     val files = file.withTempDirectory(tmp => {
       def relativeName(file: File): File = file.named("tmp/" + file.relativeTo(tmp).getPath)
 
@@ -174,7 +174,7 @@ class FileTest {
     )
   }
 
-  @Test def tempFile {
+  @Test def tempFile: Unit = {
     val f = file.tempFile()
     assertTrue(f.isFile())
     assertTrue(f.exists())
@@ -196,7 +196,7 @@ class FileTest {
     assertTrue(f3.getName.endsWith(suffix))
   }
 
-  @Test def tempDir {
+  @Test def tempDir: Unit = {
     val f = file.tempDir()
     assertTrue(f.isDirectory())
     assertTrue(f.exists())
@@ -223,7 +223,7 @@ class FileTest {
   }
 
 
-  @Test def newFile {
+  @Test def newFile: Unit = {
     val dir = file.file("this directory does not exist")
     assertFalse(dir.exists)
 
@@ -239,7 +239,7 @@ class FileTest {
     })
   }
 
-  @Test def files {
+  @Test def files: Unit = {
     file.withTempDirectory(dir => {
       val List(child, nested) = file.files(dir, "child", "nested/child").toList
 
@@ -248,21 +248,21 @@ class FileTest {
     })
   }
 
-  @Test def readBytes {
+  @Test def readBytes: Unit = {
     file.withTempFile(tmp => {
       createInputStream("contents".getBytes).drain(tmp.outputStream)
       assertEquals("contents", new String(tmp.readBytes()))
     })
   }
 
-  @Test def readLines {
+  @Test def readLines: Unit = {
     file.withTempFile(tmp => {
       createInputStream("line1\nline2".getBytes).drain(tmp.outputStream())
       assertEquals(List("line1", "line2"), tmp.readLines())
     })
   }
 
-  @Test def writeBytes {
+  @Test def writeBytes: Unit = {
     file.withTempFile(tmp => {
       assertEquals(List("12"),   tmp.writeBytes("12".getBytes).readLines())
       assertEquals(List("1234"), tmp.writeBytes("34".getBytes).readLines())
@@ -270,7 +270,7 @@ class FileTest {
     })
   }
 
-  @Test def writeLines {
+  @Test def writeLines: Unit = {
     file.withTempFile(tmp => {
       assertEquals(List("1", "2"),       tmp.writeLines(List("1", "2")).readLines())
       assertEquals(List("1", "23", "4"), tmp.writeLines(List("3", "4")).readLines())
@@ -278,14 +278,14 @@ class FileTest {
     })
   }
 
-  @Test def md5 {
+  @Test def md5: Unit = {
     file.withTempFile(tmp => {
       assertEquals("6f1ed002ab5595859014ebf0951522d9", tmp.writeLines(List("blah")).md5())
     })
   }
 
   private def assertIsTemp(
-    expectedSuffix: String, expectedPrefix: String, expectedIsFile: Boolean, tmp: File) {
+    expectedSuffix: String, expectedPrefix: String, expectedIsFile: Boolean, tmp: File): Unit = {
 
     assertTrue("Expected %s to exist !".format(tmp.getName), tmp.exists)
 

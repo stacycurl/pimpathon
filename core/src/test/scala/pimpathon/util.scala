@@ -22,8 +22,8 @@ object util {
   }
 
   def createOutputStream(onClose: () => Unit = () => {}) = new ByteArrayOutputStream() {
-    var closed = false
-    override def close() = { closed = true; super.close(); onClose() }
+    var closed: Boolean = false
+    override def close(): Unit = { closed = true; super.close(); onClose() }
   }
 
   def ignoreExceptions(f: => Unit): Unit = try f catch { case t: Throwable => }

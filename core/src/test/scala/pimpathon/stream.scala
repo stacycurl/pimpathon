@@ -8,7 +8,7 @@ import pimpathon.stream._
 
 
 class StreamTest {
-  @Test def continuallyWhile {
+  @Test def continuallyWhile: Unit = {
     assertEquals(Stream.empty[Int], stream.continuallyWhile(1)(_ => false))
     assertEquals(List.fill(1000)(1), stream.continuallyWhile(1)(_ => true).take(1000).toList)
 

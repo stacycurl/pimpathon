@@ -7,7 +7,7 @@ import pimpathon.filterMonadic._
 
 
 class FilterMonadicTest {
-  @Test def toMultiMap {
+  @Test def toMultiMap: Unit = {
     assertEquals(Map(), Set.empty[(Int, Int)].toMultiMap[List])
     assertEquals(Map(), List.empty[(Int, Int)].toMultiMap[List])
 

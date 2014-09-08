@@ -10,7 +10,7 @@ import pimpathon.util._
 
 
 class TryTest {
-  @Test def toEither {
+  @Test def toEither: Unit = {
     assertEquals(Right[Throwable, String]("foo"), Success[String]("foo").toEither)
     assertEquals(Left[Throwable, String](boom), Failure[String](boom).toEither)
   }

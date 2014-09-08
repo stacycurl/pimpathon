@@ -17,4 +17,8 @@ class TupleTest {
 
     assertEquals(("123", "456.0"), (123, 456.0).to[String])
   }
+
+  @Test def tmap: Unit = {
+    assertEquals((6, "cba"), (2, "abc").tmap(_ * 3, _.reverse))
+  }
 }

@@ -8,9 +8,9 @@ import pimpathon.any._
 import pimpathon.java.io.outputStream._
 
 
-object inputStream extends InputStreamUtils(closeIn = true, closeOut = true)
+object inputStream extends InputStreamUtils(closeIn = true, closeOut = true, bufferSize = 8192)
 
-case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufSize: Int = 8192) {
+case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufferSize: Int) {
   implicit class InputStreamOps[IS <: InputStream](val is: IS) {
     def drain(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): IS =
       is.tap(copy(_, os, closeIn, closeOut))
@@ -25,18 +25,11 @@ case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufSize: Int = 
 
   def copy(
     is: InputStream, os: OutputStream,
-    closeIn: Boolean = closeIn, closeOut: Boolean = closeOut, buf: Array[Byte] = new Array[Byte](bufSize)
+    closeIn: Boolean = closeIn, closeOut: Boolean = closeOut,
+    buffer: Array[Byte] = new Array[Byte](bufferSize)
   ): Unit = {
-    @tailrec def recurse(): Unit = {
-      val len = is.read(buf)
-
-      if (len > 0) {
-        os.write(buf, 0, len)
-        recurse()
-      }
-    }
-
-    try recurse() finally {
+    try Iterator.continually(is.read(buffer)).takeWhile(_ > 0).foreach(os.write(buffer, 0, _))
+    finally {
       if (closeIn)  is.attemptClose()
       if (closeOut) os.attemptClose()
     }

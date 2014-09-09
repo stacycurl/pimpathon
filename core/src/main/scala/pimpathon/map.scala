@@ -68,11 +68,15 @@ object map {
       implicit cbf: CanBuildFrom[F[V], V, F[V]], fTraversableOnce: F[V] <:< TraversableOnce[V]
     ): MultiMap[F, K, V] = {
       if (multiMap.isEmpty) other else other.foldLeft(multiMap) {
-        case (acc, (key, otherValues)) => acc + ((key, acc.get(key) match {
-          case None         => otherValues
-          case Some(values) => (cbf() ++= values ++= otherValues).result()
-        }))
+        case (acc, (key, otherValues)) => acc.append(key, otherValues)
       }
     }
+
+    def append(key: K, newValues: F[V])(
+      implicit cbf: CanBuildFrom[F[V], V, F[V]], fTraversableOnce: F[V] <:< TraversableOnce[V]
+    ): MultiMap[F, K, V] = multiMap + ((key, multiMap.get(key) match {
+      case None         => newValues
+      case Some(values) => (cbf() ++= values ++= newValues).result()
+    }))
   }
 }

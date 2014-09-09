@@ -241,6 +241,12 @@ class MapTest {
     assertEquals(Map(1 -> 2, 2 -> 3), Map(1 -> List(2), 2 -> List(3, 4)).select(_.head))
   }
 
+  @Test def multiMap_append: Unit = {
+    assertEquals(Map(1 -> List(2, 3)), MultiMap.empty[List, Int, Int].append(1, List(2, 3)))
+    assertEquals(Map(1 -> List(2, 3)), Map(1 -> List(2)).append(1, List(3)))
+    assertEquals(Map(1 -> List(2, 3)), Map(1 -> List(2, 3)).append(1, Nil))
+  }
+
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
     def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem]("apply(%s)".format(from))

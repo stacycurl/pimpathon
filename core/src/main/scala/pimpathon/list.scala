@@ -30,8 +30,6 @@ object list extends filterMonadic with genTraversableLike {
     def zipWith[B, C](values: List[B])(f: ((A, B)) => C): List[C] = zip(values).map(f).toList
 
 
-
-
     def fraction(p: Predicate[A]): Double = countWithSize(p).fold(Double.NaN)(_.to[Double].calc(_ / _))
 
     def countWithSize(p: Predicate[A]): Option[(Int, Int)] = mapNonEmpty(_.foldLeft((0, 0)) {

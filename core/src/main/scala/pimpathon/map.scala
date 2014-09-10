@@ -59,24 +59,4 @@ object map {
     @inline private def key:   ((K, V)) => K = (kv: (K, V)) => kv._1
     @inline private def value: ((K, V)) => V = (kv: (K, V)) => kv._2
   }
-
-  implicit class MultiMapOps[F[_], K, V](val multiMap: MultiMap[F, K, V]) extends AnyVal {
-    // just an alias for mapValuesEagerly
-    def select[W](f: F[V] => W): Map[K, W] = multiMap.mapValuesEagerly(f)
-
-    def merge(other: MultiMap[F, K, V])(
-      implicit cbf: CanBuildFrom[F[V], V, F[V]], fTraversableOnce: F[V] <:< TraversableOnce[V]
-    ): MultiMap[F, K, V] = {
-      if (multiMap.isEmpty) other else other.foldLeft(multiMap) {
-        case (acc, (key, otherValues)) => acc.append(key, otherValues)
-      }
-    }
-
-    def append(key: K, newValues: F[V])(
-      implicit cbf: CanBuildFrom[F[V], V, F[V]], fTraversableOnce: F[V] <:< TraversableOnce[V]
-    ): MultiMap[F, K, V] = multiMap + ((key, multiMap.get(key) match {
-      case None         => newValues
-      case Some(values) => (cbf() ++= values ++= newValues).result()
-    }))
-  }
 }

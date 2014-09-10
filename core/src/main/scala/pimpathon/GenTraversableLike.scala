@@ -1,7 +1,7 @@
 package pimpathon
 
 import scala.annotation.tailrec
-import scala.collection.{breakOut, mutable => M, GenTraversableLike}
+import scala.collection.{breakOut, GenTraversableLike}
 import scala.collection.breakOut
 import scala.collection.generic.{CanBuildFrom, FilterMonadic}
 import scala.collection.immutable._
@@ -58,33 +58,4 @@ class GenTraversableLikeCapturer[A, F[_, _], Repr](list: GenTraversableLike[A, R
 
   def withManyKeys[K](f: A => List[K])(implicit cbf: CBF[K, A]): F[K, A] =
     list.flatMap(a => f(a).map(_ -> a))(breakOut)
-}
-
-trait IgnoreFromCBF[-From, -Elem, +To] extends CanBuildFrom[From, Elem, To] {
-  override def apply(from: From): M.Builder[Elem, To] = apply()
-}
-
-class MultiMapCanBuildFrom[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
-  extends CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]]
-  with IgnoreFromCBF[Nothing, (K, V), MultiMap[F, K, V]] {
-
-  def apply(): M.Builder[(K, V), MultiMap[F, K, V]] = new MultiMapBuilder[F, K, V]
-}
-
-class MultiMapBuilder[F[_], K, V](
-  map: M.Map[K, M.Builder[V, F[V]]] = M.Map.empty[K, M.Builder[V, F[V]]]
-)(
-  implicit fcbf: CanBuildFrom[Nothing, V, F[V]]
-)
-  extends M.Builder[(K, V), MultiMap[F, K, V]] {
-
-  def +=(elem: (K, V)): this.type = add(elem._1, elem._2)
-  def clear(): Unit = map.clear()
-  def result(): Map[K, F[V]] = map.map(kv => (kv._1, kv._2.result()))(breakOut)
-
-  def add(k: K, v: V): this.type = {
-    map.put(k, map.getOrElse(k, fcbf.apply()) += v)
-
-    this
-  }
 }

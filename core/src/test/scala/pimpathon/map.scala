@@ -79,44 +79,44 @@ class MapTest {
     assertEquals(Map(3 -> 4), Map(3 -> 4).emptyTo(nonEmpty))
   }
 
-  @Test def entryForMaxKey: Unit = {
-    assertEquals(None, Map.empty[Int, String].entryForMaxKey)
-    assertEquals(Some(2 -> "max"), Map(1 -> "min", 2 -> "max").entryForMaxKey)
+  @Test def entryFor_maxKey: Unit = {
+    assertEquals(None, Map.empty[Int, String].entryFor.maxKey)
+    assertEquals(Some(2 -> "max"), Map(1 -> "min", 2 -> "max").entryFor.maxKey)
   }
 
-  @Test def entryForMinKey: Unit = {
-    assertEquals(None, Map.empty[Int, String].entryForMinKey)
-    assertEquals(Some(1 -> "min"), Map(1 -> "min", 2 -> "max").entryForMinKey)
+  @Test def entryFor_minKey: Unit = {
+    assertEquals(None, Map.empty[Int, String].entryFor.minKey)
+    assertEquals(Some(1 -> "min"), Map(1 -> "min", 2 -> "max").entryFor.minKey)
   }
 
-  @Test def entryForMaxValue: Unit = {
-    assertEquals(None, Map.empty[Int, String].entryForMaxValue)
-    assertEquals(Some(2 -> "def"), Map(1 -> "abc", 2 -> "def").entryForMaxValue)
+  @Test def entryFor_maxValue: Unit = {
+    assertEquals(None, Map.empty[Int, String].entryFor.maxValue)
+    assertEquals(Some(2 -> "def"), Map(1 -> "abc", 2 -> "def").entryFor.maxValue)
   }
 
-  @Test def entryForMinValue: Unit = {
-    assertEquals(None, Map.empty[Int, String].entryForMinValue)
-    assertEquals(Some(1 -> "abc"), Map(1 -> "abc", 2 -> "def").entryForMinValue)
+  @Test def entryFor_minValue: Unit = {
+    assertEquals(None, Map.empty[Int, String].entryFor.minValue)
+    assertEquals(Some(1 -> "abc"), Map(1 -> "abc", 2 -> "def").entryFor.minValue)
   }
 
-  @Test def valueForMaxKey: Unit = {
-    assertEquals(None, Map.empty[Int, String].valueForMaxKey)
-    assertEquals(Some("max"), Map(1 -> "min", 2 -> "max").valueForMaxKey)
+  @Test def valueFor_maxKey: Unit = {
+    assertEquals(None, Map.empty[Int, String].valueFor.maxKey)
+    assertEquals(Some("max"), Map(1 -> "min", 2 -> "max").valueFor.maxKey)
   }
 
-  @Test def valueForMinKey: Unit = {
-    assertEquals(None, Map.empty[Int, String].valueForMinKey)
-    assertEquals(Some("min"), Map(1 -> "min", 2 -> "max").valueForMinKey)
+  @Test def valueFor_minKey: Unit = {
+    assertEquals(None, Map.empty[Int, String].valueFor.minKey)
+    assertEquals(Some("min"), Map(1 -> "min", 2 -> "max").valueFor.minKey)
   }
 
-  @Test def keyForMaxValue: Unit = {
-    assertEquals(None, Map.empty[Int, String].keyForMaxValue)
-    assertEquals(Some(2), Map(1 -> "abc", 2 -> "def").keyForMaxValue)
+  @Test def keyFor_maxValue: Unit = {
+    assertEquals(None, Map.empty[Int, String].keyFor.maxValue)
+    assertEquals(Some(2), Map(1 -> "abc", 2 -> "def").keyFor.maxValue)
   }
 
-  @Test def keyForMinValue: Unit = {
-    assertEquals(None, Map.empty[Int, String].keyForMinValue)
-    assertEquals(Some(1), Map(1 -> "abc", 2 -> "def").keyForMinValue)
+  @Test def keyFor_minValue: Unit = {
+    assertEquals(None, Map.empty[Int, String].keyFor.minValue)
+    assertEquals(Some(1), Map(1 -> "abc", 2 -> "def").keyFor.minValue)
   }
 
   @Test def mapValuesEagerly: Unit = {
@@ -142,16 +142,16 @@ class MapTest {
     assertEquals(Some(2), nonEmpty.findValue(_ == 2))
   }
 
-  @Test def findEntryWithKey: Unit = {
-    assertEquals(None, empty.findEntryWithKey(_ => true))
-    assertEquals(None, nonEmpty.findEntryWithKey(_ => false))
-    assertEquals(Some(1 -> 2), nonEmpty.findEntryWithKey(_ == 1))
+  @Test def entryFor_matchingKey: Unit = {
+    assertEquals(None, empty.entryFor.matchingKey(_ => true))
+    assertEquals(None, nonEmpty.entryFor.matchingKey(_ => false))
+    assertEquals(Some(1 -> 2), nonEmpty.entryFor.matchingKey(_ == 1))
   }
 
-  @Test def findEntryWithValue: Unit = {
-    assertEquals(None, empty.findEntryWithValue(_ => true))
-    assertEquals(None, nonEmpty.findEntryWithValue(_ => false))
-    assertEquals(Some(1 -> 2), nonEmpty.findEntryWithValue(_ == 2))
+  @Test def entryFor_matchingValue: Unit = {
+    assertEquals(None, empty.entryFor.matchingValue(_ => true))
+    assertEquals(None, nonEmpty.entryFor.matchingValue(_ => false))
+    assertEquals(Some(1 -> 2), nonEmpty.entryFor.matchingValue(_ == 2))
   }
 
   @Test def filterKeysNot: Unit = {

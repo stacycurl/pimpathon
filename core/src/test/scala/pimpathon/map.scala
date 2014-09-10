@@ -9,7 +9,6 @@ import scala.util.control._
 
 import org.junit.Assert._
 import pimpathon.map._
-import pimpathon.multiMap._
 
 
 class MapTest {
@@ -80,44 +79,44 @@ class MapTest {
     assertEquals(Map(3 -> 4), Map(3 -> 4).emptyTo(nonEmpty))
   }
 
-  @Test def entryForMaxKey: Unit = {
-    assertEquals(None, Map.empty[Int, String].entryForMaxKey)
-    assertEquals(Some(2 -> "max"), Map(1 -> "min", 2 -> "max").entryForMaxKey)
+  @Test def entryFor_maxKey: Unit = {
+    assertEquals(None, Map.empty[Int, String].entryFor.maxKey)
+    assertEquals(Some(2 -> "max"), Map(1 -> "min", 2 -> "max").entryFor.maxKey)
   }
 
-  @Test def entryForMinKey: Unit = {
-    assertEquals(None, Map.empty[Int, String].entryForMinKey)
-    assertEquals(Some(1 -> "min"), Map(1 -> "min", 2 -> "max").entryForMinKey)
+  @Test def entryFor_minKey: Unit = {
+    assertEquals(None, Map.empty[Int, String].entryFor.minKey)
+    assertEquals(Some(1 -> "min"), Map(1 -> "min", 2 -> "max").entryFor.minKey)
   }
 
-  @Test def entryForMaxValue: Unit = {
-    assertEquals(None, Map.empty[Int, String].entryForMaxValue)
-    assertEquals(Some(2 -> "def"), Map(1 -> "abc", 2 -> "def").entryForMaxValue)
+  @Test def entryFor_maxValue: Unit = {
+    assertEquals(None, Map.empty[Int, String].entryFor.maxValue)
+    assertEquals(Some(2 -> "def"), Map(1 -> "abc", 2 -> "def").entryFor.maxValue)
   }
 
-  @Test def entryForMinValue: Unit = {
-    assertEquals(None, Map.empty[Int, String].entryForMinValue)
-    assertEquals(Some(1 -> "abc"), Map(1 -> "abc", 2 -> "def").entryForMinValue)
+  @Test def entryFor_minValue: Unit = {
+    assertEquals(None, Map.empty[Int, String].entryFor.minValue)
+    assertEquals(Some(1 -> "abc"), Map(1 -> "abc", 2 -> "def").entryFor.minValue)
   }
 
-  @Test def valueForMaxKey: Unit = {
-    assertEquals(None, Map.empty[Int, String].valueForMaxKey)
-    assertEquals(Some("max"), Map(1 -> "min", 2 -> "max").valueForMaxKey)
+  @Test def valueFor_maxKey: Unit = {
+    assertEquals(None, Map.empty[Int, String].valueFor.maxKey)
+    assertEquals(Some("max"), Map(1 -> "min", 2 -> "max").valueFor.maxKey)
   }
 
-  @Test def valueForMinKey: Unit = {
-    assertEquals(None, Map.empty[Int, String].valueForMinKey)
-    assertEquals(Some("min"), Map(1 -> "min", 2 -> "max").valueForMinKey)
+  @Test def valueFor_minKey: Unit = {
+    assertEquals(None, Map.empty[Int, String].valueFor.minKey)
+    assertEquals(Some("min"), Map(1 -> "min", 2 -> "max").valueFor.minKey)
   }
 
-  @Test def keyForMaxValue: Unit = {
-    assertEquals(None, Map.empty[Int, String].keyForMaxValue)
-    assertEquals(Some(2), Map(1 -> "abc", 2 -> "def").keyForMaxValue)
+  @Test def keyFor_maxValue: Unit = {
+    assertEquals(None, Map.empty[Int, String].keyFor.maxValue)
+    assertEquals(Some(2), Map(1 -> "abc", 2 -> "def").keyFor.maxValue)
   }
 
-  @Test def keyForMinValue: Unit = {
-    assertEquals(None, Map.empty[Int, String].keyForMinValue)
-    assertEquals(Some(1), Map(1 -> "abc", 2 -> "def").keyForMinValue)
+  @Test def keyFor_minValue: Unit = {
+    assertEquals(None, Map.empty[Int, String].keyFor.minValue)
+    assertEquals(Some(1), Map(1 -> "abc", 2 -> "def").keyFor.minValue)
   }
 
   @Test def mapValuesEagerly: Unit = {
@@ -129,30 +128,6 @@ class MapTest {
     assertEquals(Map(1 -> 10, 2 -> 20), result)
     assertEquals(Map(1 -> 10, 2 -> 20), result)
     assertEquals("Shouldn't have iterated over the original map twice", List(1, 2), originalValuesSeen.toList)
-  }
-
-  @Test def multiMapCBF: Unit = {
-    val cbf = MultiMap.build[List, Int, String]
-    val builder = cbf.apply()
-
-    builder += 1 -> "foo"
-    builder += 1 -> "bar"
-    assertEquals(Map(1 -> List("foo", "bar")), builder.result())
-
-    builder.clear()
-    assertEquals(Map(), builder.result())
-  }
-
-  @Test def ignoreFromCBF: Unit = {
-    val ucbf = new UnitCanBuildFrom[List[Int], Int]
-
-    assertEquals(UnitBuilder[Int]("apply()"), ucbf.apply())
-    assertEquals(UnitBuilder[Int]("apply(List(1, 2, 3))"), ucbf.apply(List(1, 2, 3)))
-
-    val ucbfi = new UnitCanBuildFrom[List[Int], Int] with IgnoreFromCBF[List[Int], Int, Unit]
-
-    assertEquals(UnitBuilder[Int]("apply()"), ucbfi.apply())
-    assertEquals(UnitBuilder[Int]("apply()"), ucbfi.apply(List(1, 2, 3)))
   }
 
   @Test def findKey: Unit = {
@@ -167,16 +142,16 @@ class MapTest {
     assertEquals(Some(2), nonEmpty.findValue(_ == 2))
   }
 
-  @Test def findEntryWithKey: Unit = {
-    assertEquals(None, empty.findEntryWithKey(_ => true))
-    assertEquals(None, nonEmpty.findEntryWithKey(_ => false))
-    assertEquals(Some(1 -> 2), nonEmpty.findEntryWithKey(_ == 1))
+  @Test def entryFor_matchingKey: Unit = {
+    assertEquals(None, empty.entryFor.matchingKey(_ => true))
+    assertEquals(None, nonEmpty.entryFor.matchingKey(_ => false))
+    assertEquals(Some(1 -> 2), nonEmpty.entryFor.matchingKey(_ == 1))
   }
 
-  @Test def findEntryWithValue: Unit = {
-    assertEquals(None, empty.findEntryWithValue(_ => true))
-    assertEquals(None, nonEmpty.findEntryWithValue(_ => false))
-    assertEquals(Some(1 -> 2), nonEmpty.findEntryWithValue(_ == 2))
+  @Test def entryFor_matchingValue: Unit = {
+    assertEquals(None, empty.entryFor.matchingValue(_ => true))
+    assertEquals(None, nonEmpty.entryFor.matchingValue(_ => false))
+    assertEquals(Some(1 -> 2), nonEmpty.entryFor.matchingValue(_ == 2))
   }
 
   @Test def filterKeysNot: Unit = {
@@ -227,36 +202,6 @@ class MapTest {
   @Test def andThenM: Unit = {
     assertEquals(Map(1 -> 100, 2 -> 200),
       Map(1 -> 10, 2 -> 20, 3 -> 30).andThenM(Map(10 -> 100, 20 -> 200, 40 -> 400)))
-  }
-
-  @Test def multiMap_merge: Unit = {
-    assertEquals(Map(1 -> List(1, 2)), Map(1 -> List(1, 2)).merge(MultiMap.empty[List, Int, Int]))
-    assertEquals(Map(1 -> List(1, 2)), MultiMap.empty[List, Int, Int].merge(Map(1 -> List(1, 2))))
-    assertEquals(Map(1 -> List(1, 2)), Map(1 -> List(1)).merge(Map(1 -> List(2))))
-    assertEquals(Map(1 -> List(1), 2 -> List(2)), Map(1 -> List(1)).merge(Map(2 -> List(2))))
-    assertEquals(Map(1 -> Set(1, 2)),  Map(1 -> Set(1)).merge(Map(1 -> Set(2))))
-  }
-
-  @Test def multiMap_select: Unit = {
-    assertEquals(Map(1 -> 2, 2 -> 3), Map(1 -> List(2), 2 -> List(3, 4)).select(_.head))
-  }
-
-  @Test def multiMap_append: Unit = {
-    assertEquals(Map(1 -> List(2, 3)), MultiMap.empty[List, Int, Int].append(1, List(2, 3)))
-    assertEquals(Map(1 -> List(2, 3)), Map(1 -> List(2)).append(1, List(3)))
-    assertEquals(Map(1 -> List(2, 3)), Map(1 -> List(2, 3)).append(1, Nil))
-  }
-
-  class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
-    def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
-    def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem]("apply(%s)".format(from))
-  }
-
-  case class UnitBuilder[E](from: String) extends M.Builder[E, Unit] {
-    def +=(elem: E): this.type = this
-    def clear(): Unit = {}
-    def result(): Unit = ()
-    override def toString = "UnitBuilder(%s)".format(from)
   }
 
   private val (empty, nonEmpty) = (Map.empty[Int, Int], Map(1 -> 2))

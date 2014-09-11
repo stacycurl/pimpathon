@@ -13,7 +13,7 @@ import pimpathon.option._
 import pimpathon.tuple._
 
 
-object list extends filterMonadic with genTraversableLike {
+object list extends filterMonadic with genTraversableLike[List] {
   implicit class ListOps[A](val list: List[A]) extends AnyVal {
     def emptyTo(alternative: => List[A]): List[A] = uncons(alternative, _ => list)
 

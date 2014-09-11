@@ -7,7 +7,7 @@ import pimpathon.any._
 import pimpathon.list._
 
 
-object set extends filterMonadic with genTraversableLike {
+object set extends filterMonadic with genTraversableLike[Set] {
   implicit class SetOps[A](val set: Set[A]) extends AnyVal {
     def powerSet: Set[Set[A]] = {
       def recurse(list: List[A]): List[List[A]] =

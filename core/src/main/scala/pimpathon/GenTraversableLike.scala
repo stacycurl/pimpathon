@@ -1,31 +1,31 @@
 package pimpathon
 
-import scala.annotation.tailrec
-import scala.collection.{breakOut, GenTraversableLike}
-import scala.collection.breakOut
-import scala.collection.generic.{CanBuildFrom, FilterMonadic}
-import scala.collection.immutable._
+import scala.collection.{breakOut, mutable => M, GenTraversable, GenTraversableLike}
+import scala.collection.generic.CanBuildFrom
 
 import pimpathon.any._
 import pimpathon.function._
+import pimpathon.map._
 import pimpathon.multiMap._
 import pimpathon.option._
 import pimpathon.tuple._
 
 
-object genTraversableLike extends genTraversableLike
+object genTraversableLike extends genTraversableLike[
+  ({ type CC[A] = GenTraversableLike[A, GenTraversable[A]] })#CC
+]
 
-trait genTraversableLike {
+trait genTraversableLike[CC[_]]  {
   implicit def genTraversableLikeOps[A, Repr](gtl: GenTraversableLike[A, Repr])
     : GenTraversableLikeOps[A, Repr] = new GenTraversableLikeOps[A, Repr](gtl)
 
-  class GenTraversableLikeOps[A, Repr](val list: GenTraversableLike[A, Repr]) {
+  class GenTraversableLikeOps[A, Repr](val gtl: GenTraversableLike[A, Repr]) {
     def asMap: GenTraversableLikeCapturer[A, Map, Repr] = as[Map]
 
     def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Repr] =
       as[({ type MM[K, V] = MultiMap[F, K, V] })#MM]
 
-    def as[F[_, _]]: GenTraversableLikeCapturer[A, F, Repr] = new GenTraversableLikeCapturer[A, F, Repr](list)
+    def as[F[_, _]]: GenTraversableLikeCapturer[A, F, Repr] = new GenTraversableLikeCapturer[A, F, Repr](gtl)
 
     def attributeCounts[B](f: A => B): Map[B, Int] =
       asMultiMap.withKeys(f).mapValues(_.size)
@@ -35,6 +35,12 @@ trait genTraversableLike {
 
     def optAttributeCounts[B](f: A => Option[B]): Map[B, Int] =
       asMultiMap.withSomeKeys(f).mapValues(_.size)
+
+    def ungroupBy[B](f: A => B)(
+      implicit inner: CanBuildFrom[Nothing, A, CC[A]], outer: CanBuildFrom[Nothing, CC[A], CC[CC[A]]]
+    ) = gtl.foldLeft(UngroupBy[A, B, CC](Map(), Map())) {
+      case (ungroupBy, item) => ungroupBy.add(item, f(item))
+    }.values
   }
 }
 
@@ -58,4 +64,14 @@ class GenTraversableLikeCapturer[A, F[_, _], Repr](list: GenTraversableLike[A, R
 
   def withManyKeys[K](f: A => List[K])(implicit cbf: CBF[K, A]): F[K, A] =
     list.flatMap(a => f(a).map(_ -> a))(breakOut)
+}
+
+case class UngroupBy[A, B, CC[_]](ungrouped: Map[Int, M.Builder[A, CC[A]]], counts: Map[B, Int])(
+  implicit inner: CanBuildFrom[Nothing, A, CC[A]], outer: CanBuildFrom[Nothing, CC[A], CC[CC[A]]]) {
+
+  def add(a: A, b: B): UngroupBy[A, B, CC] = copy(ungrouped + entry(count(b), a), counts + ((b, count(b))))
+  def values: CC[CC[A]] = ungrouped.sorted.values.map(_.result)(breakOut(outer))
+
+  private def entry(count: Int, a: A) = (count, ungrouped.getOrElse(count, inner.apply()) += a)
+  private def count(b: B) = counts.getOrElse(b, 0) + 1
 }

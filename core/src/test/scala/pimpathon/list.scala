@@ -134,4 +134,11 @@ class ListTest {
   @Test def prefixPadTo: Unit = {
     assertEquals(List(0, 0, 0, 1, 2, 3), List(1, 2, 3).prefixPadTo(6, 0))
   }
+
+  @Test def ungroupBy: Unit = {
+    assertEquals(List(
+      List('a' -> 1, 'b' -> 1, 'c' -> 1),
+      List('a' -> 2, 'b' -> 2)
+    ), List('a' -> 1, 'a' -> 2, 'b' -> 1, 'c' -> 1, 'b' -> 2).ungroupBy(_._1))
+  }
 }

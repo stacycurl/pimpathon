@@ -17,6 +17,12 @@ object util {
   def assertOutputStreamClosed(expected: Boolean, closed: Boolean): Unit =
     assertEquals("expected OutputStream to %s closed".format(if (expected) "be" else "not be"), expected, closed)
 
+  def assertEqualsSet[A](expected: Set[A], actual: Set[A]): Unit = {
+    val (missing, extra) = (expected -- actual, actual -- expected)
+
+    assertTrue(s"Extra: $extra, Missing: $missing", extra.isEmpty && missing.isEmpty)
+  }
+
   def createInputStream(bytes: Array[Byte] = Array(), onClose: () => Unit = () => {}) = new ByteArrayInputStream(bytes) {
     var closed = false
     override def close() = { closed = true; super.close(); onClose() }

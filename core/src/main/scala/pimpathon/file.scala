@@ -24,8 +24,9 @@ case class FileUtils(suffix: String, prefix: String) {
       new File((relativeDir.const("..") ++ relativeFile).mkString(File.separator))
     }
 
-    def tree: Stream[File]     = if (!file.exists) Stream.empty[File] else file #:: children.flatMap(_.tree)
-    def children: Stream[File] = if (file == null || file.isFile) Stream.empty[File] else file.listFiles.toStream
+    def tree: Stream[File]     = stream.cond(file.exists, file #:: children.flatMap(_.tree))
+    def children: Stream[File] = stream.cond(isReadableDir, file.listFiles.toStream)
+
     def path: List[String]     = file.getAbsolutePath.split(separator).toList.filterNot(Set("", "."))
 
     def changeToDirectory(): File = file.tapIf(_.isFile)(_.delete(), _.mkdir())
@@ -51,6 +52,7 @@ case class FileUtils(suffix: String, prefix: String) {
 
     def md5(): String = readLines().mkString("\n").md5
 
+    private def isReadableDir: Boolean = file != null && file.isDirectory && file.canRead
     private def separator: String = File.separator.replace("\\", "\\\\")
   }
 

@@ -121,10 +121,12 @@ class FileTest {
     file.withTempDirectory(tmp => assertEquals(List(tmp), tmp.tree))
 
     file.withTempDirectory(tmp => {
-      val List(child, toddler, brat) =
-        file.files(tmp, "child", "toddler", "parent/brat").map(_.create()).toList
+      val List(child, toddler, brat, unreadableFile, unreadableChild) = file.files(tmp,
+        "child", "toddler", "parent/brat", "unreadableFile", "unreadableDir/child").map(_.create()).toList
 
-      assertEquals(Set(tmp.named(), child, toddler, brat.getParentFile, brat),
+      val unreadableDir = unreadableChild.getParentFile.tap(_.setReadable(false))
+
+      assertEqualsSet(Set(tmp.named(), child, toddler, brat.getParentFile, brat, unreadableFile, unreadableDir),
         tmp.tree.map(_.named()).toSet)
     })
   }

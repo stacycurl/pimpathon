@@ -13,6 +13,11 @@ import pimpathon.util._
 
 
 class FileTest {
+  @Test def rejectsNull: Unit = {
+    assertEquals("requirement failed: FileOps cannot be used with null files",
+      intercept[Exception](file.FileOps(null: File)).getMessage)
+  }
+
   @Test def create: Unit = {
     file.withTempDirectory(dir => {
       val child = dir / "child"
@@ -96,8 +101,6 @@ class FileTest {
       val List(child, toddler) = file.files(dir, "child", "toddler").map(_.create()).toList
       assertEquals(Set(child, toddler), dir.children.map(_.named()).toSet)
     })
-
-    assertEquals(Stream.empty[File], (null: File).children)
   }
 
   @Test def relativeTo: Unit = {

@@ -14,6 +14,8 @@ object file extends FileUtils(".tmp", "temp")
 
 case class FileUtils(suffix: String, prefix: String) {
   implicit class FileOps(file: File) {
+    require(Option(file).isDefined, "FileOps cannot be used with null files")
+
     // http://rapture.io does this much better
     def /(name: String): File = new File(file, name)
     def named(name: String = file.getName): File = new NamedFile(file, name)
@@ -25,7 +27,7 @@ case class FileUtils(suffix: String, prefix: String) {
     }
 
     def tree: Stream[File]     = stream.cond(file.exists, file #:: children.flatMap(_.tree))
-    def children: Stream[File] = stream.cond(isReadableDir, file.listFiles.toStream)
+    def children: Stream[File] = stream.cond(file.isDirectory && file.canRead, file.listFiles.toStream)
 
     def path: List[String]     = file.getAbsolutePath.split(separator).toList.filterNot(Set("", "."))
 
@@ -52,7 +54,6 @@ case class FileUtils(suffix: String, prefix: String) {
 
     def md5(): String = readLines().mkString("\n").md5
 
-    private def isReadableDir: Boolean = file != null && file.isDirectory && file.canRead
     private def separator: String = File.separator.replace("\\", "\\\\")
   }
 

@@ -7,7 +7,7 @@ import pimpathon.any._
 import pimpathon.list._
 
 
-object set extends filterMonadic with genTraversableLike {
+object set extends filterMonadic with genTraversableLike[Set] {
   implicit def setOps[A](set: Set[A]): SetOps[A] = new SetOps[A](set)
 
   class SetOps[A](val set: Set[A]) {

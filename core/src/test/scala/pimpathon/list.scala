@@ -127,7 +127,7 @@ class ListTest {
     assertEquals(None, List(1, 2, 3).seqMap {
       case 1 => Some(1)
       case 2 => None
-      case 3 => sys.error("Shouldn't get here")
+      case 3 => goBoom
     })
   }
 

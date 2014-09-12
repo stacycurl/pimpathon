@@ -44,5 +44,6 @@ object util {
     }
   }
 
+  def goBoom: Nothing = throw boom
   val boom = new Throwable("Boom !")
 }

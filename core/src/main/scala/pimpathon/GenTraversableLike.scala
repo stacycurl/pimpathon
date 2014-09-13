@@ -38,7 +38,7 @@ trait genTraversableLike[CC[_]]  {
 
     def ungroupBy[B](f: A => B)(
       implicit inner: CanBuildFrom[Nothing, A, CC[A]], outer: CanBuildFrom[Nothing, CC[A], CC[CC[A]]]
-    ) = gtl.foldLeft(UngroupBy[A, B, CC](Map(), Map())) {
+    ): CC[CC[A]] = gtl.foldLeft(UngroupBy[A, B, CC](Map(), Map())) {
       case (ungroupBy, item) => ungroupBy.add(item, f(item))
     }.values
   }

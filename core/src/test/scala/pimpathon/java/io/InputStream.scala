@@ -1,6 +1,6 @@
 package pimpathon.java.io
 
-import java.io.{InputStream, OutputStream, ByteArrayInputStream, ByteArrayOutputStream}
+import java.io.{BufferedInputStream, ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
 import org.junit.Test
 
 import org.junit.Assert._
@@ -9,12 +9,12 @@ import pimpathon.util._
 
 
 class InputStreamTest {
-  @Test def attemptClose {
+  @Test def attemptClose: Unit = {
     assertEquals(Right(()), createInputStream().attemptClose())
     assertEquals(Left(boom), createInputStream(onClose = () => throw boom).attemptClose())
   }
 
-  @Test def closeAfter {
+  @Test def closeAfter: Unit = {
     val is = createInputStream()
 
     assertInputStreamClosed(false, is.closed)
@@ -22,7 +22,7 @@ class InputStreamTest {
     assertInputStreamClosed(true, is.closed)
   }
 
-  @Test def closeIf {
+  @Test def closeIf: Unit = {
     val is = createInputStream()
 
     assertInputStreamClosed(false, is.closed)
@@ -30,7 +30,7 @@ class InputStreamTest {
     assertInputStreamClosed(true,  is.closeIf(true).closed)
   }
 
-  @Test def closeUnless {
+  @Test def closeUnless: Unit = {
     val is = createInputStream()
 
     assertInputStreamClosed(false, is.closed)
@@ -38,7 +38,7 @@ class InputStreamTest {
     assertInputStreamClosed(true,  is.closeUnless(false).closed)
   }
 
-  @Test def drain {
+  @Test def drain: Unit = {
     for {
       expectedCloseIn  <- List(false, true)
       expectedCloseOut <- List(false, true)
@@ -63,7 +63,7 @@ class InputStreamTest {
     }
   }
 
-  @Test def >> {
+  @Test def >> : Unit = {
     val (is, os) = (createInputStream("content".getBytes), createOutputStream())
 
     is >> os
@@ -71,5 +71,12 @@ class InputStreamTest {
     assertEquals("content", os.toString)
     assertInputStreamClosed(false, is.closed)
     assertOutputStreamClosed(false, os.closed)
+  }
+
+  @Test def buffered: Unit = {
+    val (is, os) = (createInputStream("content".getBytes), createOutputStream())
+    (is.buffered: BufferedInputStream).drain(os)
+
+    assertEquals("content", os.toString)
   }
 }

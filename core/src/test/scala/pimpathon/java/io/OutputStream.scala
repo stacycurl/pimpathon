@@ -1,20 +1,21 @@
 package pimpathon.java.io
 
-import java.io.{InputStream, OutputStream, ByteArrayInputStream, ByteArrayOutputStream}
+import java.io.{BufferedOutputStream, ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
 import org.junit.Test
 
 import org.junit.Assert._
+import pimpathon.any._
 import pimpathon.java.io.outputStream._
 import pimpathon.util._
 
 
 class OutputStreamTest {
-  @Test def attemptClose {
+  @Test def attemptClose: Unit = {
     assertEquals(Right(()), createOutputStream().attemptClose())
     assertEquals(Left(boom), createOutputStream(onClose = () => throw boom).attemptClose())
   }
 
-  @Test def closeAfter {
+  @Test def closeAfter: Unit = {
     val os = createOutputStream()
 
     assertOutputStreamClosed(false, os.closed)
@@ -22,7 +23,7 @@ class OutputStreamTest {
     assertOutputStreamClosed(true, os.closed)
   }
 
-  @Test def closeIf {
+  @Test def closeIf: Unit = {
     val os = createOutputStream()
 
     assertOutputStreamClosed(false, os.closed)
@@ -30,7 +31,7 @@ class OutputStreamTest {
     assertOutputStreamClosed(true,  os.closeIf(true).closed)
   }
 
-  @Test def closeUnless {
+  @Test def closeUnless: Unit = {
     val os = createOutputStream()
 
     assertOutputStreamClosed(false, os.closed)
@@ -38,7 +39,7 @@ class OutputStreamTest {
     assertOutputStreamClosed(true,  os.closeUnless(false).closed)
   }
 
-  @Test def drain {
+  @Test def drain: Unit = {
     for {
       expectedCloseIn  <- List(false, true)
       expectedCloseOut <- List(false, true)
@@ -63,7 +64,7 @@ class OutputStreamTest {
     }
   }
 
-  @Test def << {
+  @Test def << : Unit = {
     val (is, os) = (createInputStream("content".getBytes), createOutputStream())
 
     os << is
@@ -71,5 +72,11 @@ class OutputStreamTest {
     assertEquals("content", os.toString)
     assertOutputStreamClosed(false, os.closed)
     assertInputStreamClosed(false, is.closed)
+  }
+
+  @Test def buffered: Unit = {
+    val (is, os) = (createInputStream("content".getBytes), createOutputStream())
+
+    assertEquals("content", os.tap(o => (o.buffered: BufferedOutputStream).drain(is)).toString)
   }
 }

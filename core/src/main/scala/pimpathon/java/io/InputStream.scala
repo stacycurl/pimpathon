@@ -1,6 +1,6 @@
 package pimpathon.java.io
 
-import java.io.{InputStream, OutputStream}
+import java.io.{BufferedInputStream, InputStream, OutputStream}
 import scala.annotation.tailrec
 
 import pimpathon.any._
@@ -22,6 +22,8 @@ case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufferSize: Int
     def closeAfter[A](f: IS => A): A        = is.withFinally(_.attemptClose())(f)
     def closeIf(condition: Boolean): IS     = is.tapIf(_ => condition)(_.close())
     def closeUnless(condition: Boolean): IS = is.tapUnless(_ => condition)(_.close())
+
+    def buffered: BufferedInputStream = new BufferedInputStream(is, bufferSize)
   }
 
   def copy(

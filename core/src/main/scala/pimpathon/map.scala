@@ -46,9 +46,9 @@ object map {
     def mutable: M.Map[K, V] = M.Map.empty[K, V] ++ map
     def toMutable: M.Map[K, V] = mutable
 
-    def entryFor = new MapAndThen[K, V, (K, V)](map, identity[(K, V)])
-    def keyFor   = new MapAndThen[K, V, K](map, key)
-    def valueFor = new MapAndThen[K, V, V](map, value)
+    def entryFor: MapAndThen[K, V, (K, V)] = new MapAndThen[K, V, (K, V)](map, identity[(K, V)])
+    def keyFor:   MapAndThen[K, V, K]      = new MapAndThen[K, V, K](map, key)
+    def valueFor: MapAndThen[K, V, V]      = new MapAndThen[K, V, V](map, value)
   }
 
   class MapAndThen[K, V, A](map: Map[K, V], andThen: ((K, V)) => A) {

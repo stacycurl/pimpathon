@@ -307,6 +307,7 @@ class FileTest {
   @Test def hasExtension: Unit = assertFileNameProperty(_.hasExtension("txt"), "a.txt",   "b.tmp")
   @Test def isScala: Unit      = assertFileNameProperty(_.isScala,             "a.scala", "b.java")
   @Test def isJava: Unit       = assertFileNameProperty(_.isJava,              "a.java",  "b.scala")
+  @Test def isClass: Unit      = assertFileNameProperty(_.isClass,             "a.class", "b.txt")
 
   private def assertFileNameProperty(p: File => Boolean, success: String, failure: String): Unit = {
     file.withTempDirectory(dir => {

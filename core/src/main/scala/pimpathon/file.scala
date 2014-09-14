@@ -20,6 +20,7 @@ case class FileUtils(suffix: String, prefix: String) {
     def hasExtension(extension: String): Boolean = file.getName.endsWith(extension)
     def isScala: Boolean = hasExtension("scala")
     def isJava: Boolean  = hasExtension("java")
+    def isClass: Boolean = hasExtension("class")
 
     // http://rapture.io does this much better
     def /(name: String): File = new File(file, name)

@@ -241,6 +241,9 @@ class FileTest {
     val dir = file.file("this directory does not exist")
     assertFalse(dir.exists)
 
+    val nested = file.file("parent", "file")
+    assertEquals(file.file("parent"), nested.getParentFile)
+
     file.withTempDirectory(dir => {
       val child = dir / "and this file does not exist"
       assertFalse(child.exists)

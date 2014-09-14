@@ -2,6 +2,7 @@ package pimpathon
 
 import org.junit.Test
 import scala.collection.immutable.SortedMap
+import scala.collection.{mutable => M}
 
 import org.junit.Assert._
 import pimpathon.list._
@@ -140,5 +141,15 @@ class ListTest {
       List('a' -> 1, 'b' -> 1, 'c' -> 1),
       List('a' -> 2, 'b' -> 2)
     ), List('a' -> 1, 'a' -> 2, 'b' -> 1, 'c' -> 1, 'b' -> 2).ungroupBy(_._1))
+  }
+
+  @Test def tap: Unit = {
+    val strings = new M.ListBuffer[String]
+
+    nil[Int].tap(strings += "empty", _ => strings += "non-empty")
+    assertEquals(List("empty"), strings.toList)
+
+    List(1).tap(strings += "empty", _ => strings += "non-empty")
+    assertEquals(List("empty", "non-empty"), strings.toList)
   }
 }

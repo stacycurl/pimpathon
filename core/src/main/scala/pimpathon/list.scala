@@ -15,6 +15,8 @@ import pimpathon.tuple._
 
 object list extends filterMonadic with genTraversableLike[List] {
   implicit class ListOps[A](val list: List[A]) extends AnyVal {
+    def tap(empty: => Unit, nonEmpty: List[A] => Unit): List[A] = new AnyOps(list).tap(_.uncons(empty, nonEmpty))
+
     def emptyTo(alternative: => List[A]): List[A] = uncons(alternative, _ => list)
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)

@@ -24,6 +24,7 @@ case class FileUtils(suffix: String, prefix: String) {
     def isJar: Boolean   = hasExtension("jar")
     def isParentOf(other: File): Boolean = other.getParentFile.equals(file)
     def isChildOf(other: File): Boolean  = other.isParentOf(file)
+    def contains(other: File): Boolean   = other.ancestors.exists(_.equals(file))
 
     // http://rapture.io does this much better
     def /(name: String): File = new File(file, name)
@@ -64,6 +65,7 @@ case class FileUtils(suffix: String, prefix: String) {
 
     def md5(): String = readLines().mkString("\n").md5
 
+    private[pimpathon] def ancestors: Stream[File] = Stream.iterate(file)(_.getParentFile).takeWhile(_ != null)
     private def separator: String = File.separator.replace("\\", "\\\\")
   }
 

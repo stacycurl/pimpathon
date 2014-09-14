@@ -316,6 +316,12 @@ class FileTest {
     assertFalse(dir.isParentOf(dir / "child" / "kid"))
   })
 
+  @Test def isChildOf: Unit = file.withTempDirectory(dir => {
+    assertTrue((dir / "child").isChildOf(dir))
+    assertFalse(dir.isChildOf(dir / "child"))
+    assertFalse((dir / "child" / "kid").isChildOf(dir))
+  })
+
   private def assertFileNameProperty(p: File => Boolean, success: String, failure: String): Unit = {
     file.withTempDirectory(dir => {
       assertTrue(p(dir / success))

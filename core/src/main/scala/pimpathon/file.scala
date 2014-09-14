@@ -23,6 +23,7 @@ case class FileUtils(suffix: String, prefix: String) {
     def isClass: Boolean = hasExtension("class")
     def isJar: Boolean   = hasExtension("jar")
     def isParentOf(other: File): Boolean = other.getParentFile.equals(file)
+    def isChildOf(other: File): Boolean  = other.isParentOf(file)
 
     // http://rapture.io does this much better
     def /(name: String): File = new File(file, name)

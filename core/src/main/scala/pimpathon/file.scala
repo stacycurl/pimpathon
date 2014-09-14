@@ -18,6 +18,12 @@ case class FileUtils(suffix: String, prefix: String) {
   class FileOps(file: File) {
     require(Option(file).isDefined, "FileOps cannot be used with null files")
 
+    def missing: Boolean = !file.exists
+    def hasExtension(extension: String): Boolean = file.getName.endsWith(extension)
+    def isScala: Boolean = hasExtension("scala")
+    def isJava: Boolean  = hasExtension("java")
+    def isClass: Boolean = hasExtension("class")
+
     // http://rapture.io does this much better
     def /(name: String): File = new File(file, name)
     def named(name: String = file.getName): File = new NamedFile(file, name)
@@ -28,8 +34,9 @@ case class FileUtils(suffix: String, prefix: String) {
       new File((relativeDir.const("..") ++ relativeFile).mkString(File.separator))
     }
 
-    def tree: Stream[File]     = stream.cond(file.exists, file #:: children.flatMap(_.tree))
-    def children: Stream[File] = stream.cond(file.isDirectory && file.canRead, file.listFiles.toStream)
+    def tree: Stream[File]      = stream.cond(file.exists, file #:: children.flatMap(_.tree))
+    def children: Stream[File]  = stream.cond(file.isDirectory && file.canRead, file.listFiles.toStream)
+    def childDirs: Stream[File] = children.filter(_.isDirectory)
 
     def path: List[String]     = file.getAbsolutePath.split(separator).toList.filterNot(Set("", "."))
 

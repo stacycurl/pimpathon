@@ -24,6 +24,16 @@ class EitherTest {
     assertEquals(Right[String, Int](3), Right[Int, String]("foo").map(_.toString, _.length))
   }
 
+  @Test def leftMap: Unit = {
+    assertEquals(Left[String, String]("1"), Left[Int, String](1).leftMap(_.toString))
+    assertEquals(Right[String, String]("foo"), Right[Int, String]("foo").leftMap(_.toString))
+  }
+
+  @Test def rightMap: Unit = {
+    assertEquals(Left[String, Int]("1"), Left[String, String]("1").rightMap(_.length))
+    assertEquals(Right[Int, Int](3), Right[Int, String]("foo").rightMap(_.length))
+  }
+
   @Test def tap: Unit = {
     val ints    = new ListBuffer[Int]
     val strings = new ListBuffer[String]

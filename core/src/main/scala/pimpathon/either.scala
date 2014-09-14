@@ -8,6 +8,9 @@ object either {
     def map[LV, RV](lf: L => LV, rf: R => RV): Either[LV, RV] =
       either.fold(l => Left[LV, RV](lf(l)), r => Right[LV, RV](rf(r)))
 
+    def leftMap[M](f: L => M): Either[M, R] = map[M, R](f, identity[R])
+    def rightMap[S](f: R => S): Either[L, S] = map[L, S](identity[L], f)
+
     def leftOr(rl: R => L): L = either.fold(identity, rl)
     def rightOr(lr: L => R): R = either.fold(lr, identity)
 

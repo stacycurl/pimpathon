@@ -103,6 +103,15 @@ class FileTest {
     })
   }
 
+  @Test def childDirs: Unit = {
+    file.withTempDirectory(dir => {
+      assertEquals(Set.empty[File], dir.childDirs.toSet)
+
+      val List(child, toddler) = file.files(dir, "child", "parent/toddler").map(_.create()).toList
+      assertEquals(Set(toddler.getParentFile), dir.childDirs.map(_.named()).toSet)
+    })
+  }
+
   @Test def relativeTo: Unit = {
     file.withTempDirectory(dir => {
       assertEquals("child", (dir / "child").create().relativeTo(dir).getPath)
@@ -286,6 +295,24 @@ class FileTest {
   @Test def md5: Unit = {
     file.withTempFile(tmp => {
       assertEquals("6f1ed002ab5595859014ebf0951522d9", tmp.writeLines(List("blah")).md5())
+    })
+  }
+
+  @Test def missing: Unit = {
+    assertTrue(file.withTempFile(tmp => {
+      assertFalse(tmp.missing); tmp
+    }).missing)
+  }
+
+  @Test def hasExtension: Unit = assertFileNameProperty(_.hasExtension("txt"), "a.txt",   "b.tmp")
+  @Test def isScala: Unit      = assertFileNameProperty(_.isScala,             "a.scala", "b.java")
+  @Test def isJava: Unit       = assertFileNameProperty(_.isJava,              "a.java",  "b.scala")
+  @Test def isClass: Unit      = assertFileNameProperty(_.isClass,             "a.class", "b.txt")
+
+  private def assertFileNameProperty(p: File => Boolean, success: String, failure: String): Unit = {
+    file.withTempDirectory(dir => {
+      assertTrue(p(dir / success))
+      assertFalse(p(dir / failure))
     })
   }
 

@@ -337,6 +337,11 @@ class FileTest {
     assertFalse(dir.isContainedIn(dir / "child"))
   })
 
+  @Test def className: Unit = file.withTempDirectory(dir => {
+    assertEquals("Foo", (dir / "Foo.class").className(dir))
+    assertEquals("com.example.Foo", (dir / "com" / "example" / "Foo.class").className(dir))
+  })
+
   private def assertFileNameProperty(p: File => Boolean, success: String, failure: String): Unit = {
     file.withTempDirectory(dir => {
       assertTrue(p(dir / success))

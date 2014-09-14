@@ -25,15 +25,15 @@ class AnyTest {
   @Test def update: Unit = {
     val ints = new ListBuffer[Int]
 
-    1.update(ints += _)
-    assertEquals(List(1), ints.toList)
+    1.update(ints += _, ints += _)
+    assertEquals(List(1, 1), ints.toList)
   }
 
   @Test def withSideEffect: Unit = {
     val ints = new ListBuffer[Int]
 
-    1.withSideEffect(ints += _)
-    assertEquals(List(1), ints.toList)
+    1.withSideEffect(ints += _, ints += _)
+    assertEquals(List(1, 1), ints.toList)
   }
 
   @Test def tapIf: Unit = {

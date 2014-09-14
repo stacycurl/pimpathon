@@ -12,6 +12,7 @@ import pimpathon.util._
 class AnyTest {
   @Test def calc: Unit = {
     assertEquals("123", "12".calc(_ + "3"))
+    assertEquals("123", "12" |> (_ + "3"))
   }
 
   @Test def tap: Unit = {

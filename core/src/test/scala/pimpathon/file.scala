@@ -313,6 +313,15 @@ class FileTest {
     })
   }
 
+  @Test def isScala: Unit = {
+    file.withTempDirectory(dir => {
+      val List(scala, notScala) = file.files(dir, "a.scala", "b.java").toList
+
+      assertTrue(scala.isScala)
+      assertFalse(notScala.isScala)
+    })
+  }
+
   private def assertIsTemp(
     expectedSuffix: String, expectedPrefix: String, expectedIsFile: Boolean, tmp: File): Unit = {
 

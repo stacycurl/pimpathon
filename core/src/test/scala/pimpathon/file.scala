@@ -304,21 +304,14 @@ class FileTest {
     }).missing)
   }
 
-  @Test def hasExtension: Unit = {
+  @Test def hasExtension: Unit = assertFileNameProperty(_.hasExtension("txt"), "a.txt",   "b.tmp")
+  @Test def isScala: Unit      = assertFileNameProperty(_.isScala,             "a.scala", "b.java")
+  @Test def isJava: Unit       = assertFileNameProperty(_.isJava,              "a.java",  "b.scala")
+
+  private def assertFileNameProperty(p: File => Boolean, success: String, failure: String): Unit = {
     file.withTempDirectory(dir => {
-      val List(text, notText) = file.files(dir, "a.txt", "b.tmp").toList
-
-      assertTrue(text.hasExtension("txt"))
-      assertFalse(notText.hasExtension("txt"))
-    })
-  }
-
-  @Test def isScala: Unit = {
-    file.withTempDirectory(dir => {
-      val List(scala, notScala) = file.files(dir, "a.scala", "b.java").toList
-
-      assertTrue(scala.isScala)
-      assertFalse(notScala.isScala)
+      assertTrue(p(dir / success))
+      assertFalse(p(dir / failure))
     })
   }
 

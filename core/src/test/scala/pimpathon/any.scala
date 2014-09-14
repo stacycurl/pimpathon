@@ -1,7 +1,7 @@
 package pimpathon
 
 import org.junit.Test
-import scala.collection.mutable.ListBuffer
+import scala.collection.{mutable => M}
 import scala.util.{Failure, Success}
 
 import org.junit.Assert._
@@ -16,34 +16,34 @@ class AnyTest {
   }
 
   @Test def tap: Unit = {
-    val ints = new ListBuffer[Int]
+    val ints = new M.ListBuffer[Int]
 
     1.tap(ints += _, ints += _)
     assertEquals(List(1, 1), ints.toList)
   }
 
   @Test def update: Unit = {
-    val ints = new ListBuffer[Int]
+    val ints = new M.ListBuffer[Int]
 
     1.update(ints += _, ints += _)
     assertEquals(List(1, 1), ints.toList)
   }
 
   @Test def withSideEffect: Unit = {
-    val ints = new ListBuffer[Int]
+    val ints = new M.ListBuffer[Int]
 
     1.withSideEffect(ints += _, ints += _)
     assertEquals(List(1, 1), ints.toList)
   }
 
   @Test def tapIf: Unit = {
-    assertEquals(List(1, 3), new ListBuffer[Int].tap(ints => {
+    assertEquals(List(1, 3), new M.ListBuffer[Int].tap(ints => {
       List(1, 2, 3).foreach(i => i.tapIf(_ % 2 != 0)(ints += _))
     }).toList)
   }
 
   @Test def tapUnless: Unit = {
-    assertEquals(List(2), new ListBuffer[Int].tap(ints => {
+    assertEquals(List(2), new M.ListBuffer[Int].tap(ints => {
       List(1, 2, 3).foreach(i => i.tapUnless(_ % 2 != 0)(ints += _))
     }).toList)
   }
@@ -72,7 +72,7 @@ class AnyTest {
   }
 
   @Test def withFinally: Unit = {
-    assertEquals(List("body: input", "finally: input", "done"), new ListBuffer[String].tap(strings => {
+    assertEquals(List("body: input", "finally: input", "done"), new M.ListBuffer[String].tap(strings => {
       strings += "input".withFinally(s => strings += "finally: " + s)(s => {strings += "body: " + s; "done"})
     }).toList)
   }
@@ -81,5 +81,11 @@ class AnyTest {
     assertEquals(Success(2), 1.attempt(_ * 2))
     assertEquals(Failure(boom), 1.attempt(_ => throw boom))
   }
-}
 
+  @Test def addTo: Unit = {
+    val ints = new M.ListBuffer[Int]
+
+    1.addTo(ints)
+    assertEquals(List(1), ints.toList)
+  }
+}

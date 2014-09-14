@@ -1,5 +1,6 @@
 package pimpathon
 
+import scala.collection.{mutable => M}
 import scala.util.Try
 
 import pimpathon.function._
@@ -30,5 +31,7 @@ object any {
     def withFinally[B](f: A => Unit)(t: A => B): B = try t(a) finally f(a)
 
     def cond[B](p: Predicate[A], ifTrue: A => B, ifFalse: A => B): B = if (p(a)) ifTrue(a) else ifFalse(a)
+
+    def addTo[To](builder: M.Builder[A, To]): A = tap(builder += _)
   }
 }

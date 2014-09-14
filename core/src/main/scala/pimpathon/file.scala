@@ -17,6 +17,7 @@ case class FileUtils(suffix: String, prefix: String) {
     require(Option(file).isDefined, "FileOps cannot be used with null files")
 
     def missing: Boolean = !file.exists
+    def hasExtension(extension: String): Boolean = file.getName.endsWith(extension)
 
     // http://rapture.io does this much better
     def /(name: String): File = new File(file, name)

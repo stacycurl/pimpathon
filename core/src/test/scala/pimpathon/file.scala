@@ -304,6 +304,15 @@ class FileTest {
     }).missing)
   }
 
+  @Test def hasExtension: Unit = {
+    file.withTempDirectory(dir => {
+      val List(text, notText) = file.files(dir, "a.txt", "b.tmp").toList
+
+      assertTrue(text.hasExtension("txt"))
+      assertFalse(notText.hasExtension("txt"))
+    })
+  }
+
   private def assertIsTemp(
     expectedSuffix: String, expectedPrefix: String, expectedIsFile: Boolean, tmp: File): Unit = {
 

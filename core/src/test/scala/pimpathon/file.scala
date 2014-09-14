@@ -289,6 +289,12 @@ class FileTest {
     })
   }
 
+  @Test def missing: Unit = {
+    assertTrue(file.withTempFile(tmp => {
+      assertFalse(tmp.missing); tmp
+    }).missing)
+  }
+
   private def assertIsTemp(
     expectedSuffix: String, expectedPrefix: String, expectedIsFile: Boolean, tmp: File): Unit = {
 

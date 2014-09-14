@@ -16,6 +16,8 @@ case class FileUtils(suffix: String, prefix: String) {
   implicit class FileOps(file: File) {
     require(Option(file).isDefined, "FileOps cannot be used with null files")
 
+    def missing: Boolean = !file.exists
+
     // http://rapture.io does this much better
     def /(name: String): File = new File(file, name)
     def named(name: String = file.getName): File = new NamedFile(file, name)

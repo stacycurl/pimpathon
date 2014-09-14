@@ -17,6 +17,10 @@ object list extends filterMonadic with genTraversableLike[List] {
   implicit def listOps[A](list: List[A]): ListOps[A] = new ListOps[A](list)
 
   class ListOps[A](list: List[A]) {
+    def tap(empty: => Unit, nonEmpty: List[A] => Unit): List[A] = new AnyOps(list).tap(_.uncons(empty, nonEmpty))
+    def tapEmpty(empty: => Unit): List[A] = tap(empty, _ => {})
+    def tapNonEmpty(nonEmpty: List[A] => Unit): List[A] = tap({}, nonEmpty)
+
     def emptyTo(alternative: => List[A]): List[A] = uncons(alternative, _ => list)
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)

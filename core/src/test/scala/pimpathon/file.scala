@@ -310,6 +310,12 @@ class FileTest {
   @Test def isClass: Unit      = assertFileNameProperty(_.isClass,             "a.class", "b.txt")
   @Test def isJar: Unit        = assertFileNameProperty(_.isJar,               "a.jar",   "b.zip")
 
+  @Test def isParentOf: Unit = file.withTempDirectory(dir => {
+    assertTrue(dir.isParentOf(dir / "child"))
+    assertFalse((dir / "child").isParentOf(dir))
+    assertFalse(dir.isParentOf(dir / "child" / "kid"))
+  })
+
   private def assertFileNameProperty(p: File => Boolean, success: String, failure: String): Unit = {
     file.withTempDirectory(dir => {
       assertTrue(p(dir / success))

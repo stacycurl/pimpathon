@@ -33,9 +33,7 @@ case class FileUtils(suffix: String, prefix: String) {
     def /(name: String): File = new File(file, name)
     def named(name: String = file.getName): File = new NamedFile(file, name)
 
-    def relativeTo(dir: File): File = {
-      val (_, relativeFile, relativeDir) = file.path.sharedPrefix(dir.path)
-
+    def relativeTo(dir: File): File = sharedPaths(dir).calc { case (relativeFile, relativeDir) =>
       new File((relativeDir.const("..") ++ relativeFile).mkString(File.separator))
     }
 
@@ -67,13 +65,16 @@ case class FileUtils(suffix: String, prefix: String) {
     def source(): BufferedSource =  Source.fromFile(file)
 
     def md5(): String = readLines().mkString("\n").md5
+    def className(classDir: File): String = sharedPaths(classDir)._1.mkString(".").stripSuffix(".class")
 
     private[pimpathon] def ancestors: Stream[File] = Stream.iterate(file)(_.getParentFile).takeWhile(_ != null)
     private def separator: String = File.separator.replace("\\", "\\\\")
+    private def sharedPaths(other: File) = file.path.sharedPrefix(other.path).calc(t => (t._2, t._3))
   }
 
   def cwd: File = file(Properties.userDir)
   def file(name: String): File = new File(name)
+  def file(parent: String, name: String): File = new File(parent, name)
   def files(parent: File, names: String*): Stream[File] = names.toStream.map(parent / _)
 
   // @deprecated(message = "Use file / name", since = "16 Aug 2014")

@@ -28,8 +28,9 @@ case class FileUtils(suffix: String, prefix: String) {
       new File((relativeDir.const("..") ++ relativeFile).mkString(File.separator))
     }
 
-    def tree: Stream[File]     = stream.cond(file.exists, file #:: children.flatMap(_.tree))
-    def children: Stream[File] = stream.cond(file.isDirectory && file.canRead, file.listFiles.toStream)
+    def tree: Stream[File]      = stream.cond(file.exists, file #:: children.flatMap(_.tree))
+    def children: Stream[File]  = stream.cond(file.isDirectory && file.canRead, file.listFiles.toStream)
+    def childDirs: Stream[File] = children.filter(_.isDirectory)
 
     def path: List[String]     = file.getAbsolutePath.split(separator).toList.filterNot(Set("", "."))
 

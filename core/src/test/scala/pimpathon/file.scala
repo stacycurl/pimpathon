@@ -103,6 +103,15 @@ class FileTest {
     })
   }
 
+  @Test def childDirs: Unit = {
+    file.withTempDirectory(dir => {
+      assertEquals(Set.empty[File], dir.childDirs.toSet)
+
+      val List(child, toddler) = file.files(dir, "child", "parent/toddler").map(_.create()).toList
+      assertEquals(Set(toddler.getParentFile), dir.childDirs.map(_.named()).toSet)
+    })
+  }
+
   @Test def relativeTo: Unit = {
     file.withTempDirectory(dir => {
       assertEquals("child", (dir / "child").create().relativeTo(dir).getPath)

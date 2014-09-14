@@ -162,4 +162,14 @@ class ListTest {
     nil[Int].tapEmpty(strings += "empty")
     assertEquals(List("empty"), strings.toList)
   }
+
+  @Test def tapNonEmpty: Unit = {
+    val strings = new M.ListBuffer[String]
+
+    nil[Int].tapNonEmpty(_ => strings += "non-empty")
+    assertEquals(nil[String], strings.toList)
+
+    List(1).tapNonEmpty(_ => strings += "non-empty")
+    assertEquals(List("non-empty"), strings.toList)
+  }
 }

@@ -308,6 +308,31 @@ class FileTest {
   @Test def isScala: Unit      = assertFileNameProperty(_.isScala,             "a.scala", "b.java")
   @Test def isJava: Unit       = assertFileNameProperty(_.isJava,              "a.java",  "b.scala")
   @Test def isClass: Unit      = assertFileNameProperty(_.isClass,             "a.class", "b.txt")
+  @Test def isJar: Unit        = assertFileNameProperty(_.isJar,               "a.jar",   "b.zip")
+
+  @Test def isParentOf: Unit = file.withTempDirectory(dir => {
+    assertTrue(dir.isParentOf(dir / "child"))
+    assertFalse((dir / "child").isParentOf(dir))
+    assertFalse(dir.isParentOf(dir / "child" / "kid"))
+  })
+
+  @Test def isChildOf: Unit = file.withTempDirectory(dir => {
+    assertTrue((dir / "child").isChildOf(dir))
+    assertFalse(dir.isChildOf(dir / "child"))
+    assertFalse((dir / "child" / "kid").isChildOf(dir))
+  })
+
+  @Test def contains: Unit = file.withTempDirectory(dir => {
+    assertTrue(dir.contains((dir / "child")))
+    assertTrue(dir.contains((dir / "parent" / "kid")))
+    assertFalse((dir / "child").contains(dir))
+  })
+
+  @Test def isContainedIn: Unit = file.withTempDirectory(dir => {
+    assertTrue((dir / "child").isContainedIn(dir))
+    assertTrue((dir / "parent" / "kid").isContainedIn(dir))
+    assertFalse(dir.isContainedIn(dir / "child"))
+  })
 
   private def assertFileNameProperty(p: File => Boolean, success: String, failure: String): Unit = {
     file.withTempDirectory(dir => {

@@ -20,9 +20,9 @@ class EitherTest {
     assertEquals("right", Right[String, String]("right").rightOr(_ + " !"))
   }
 
-  @Test def map: Unit = {
-    assertEquals(Left[String, Int]("1"), Left[Int, String](1).map(_.toString, _.length))
-    assertEquals(Right[String, Int](3), Right[Int, String]("foo").map(_.toString, _.length))
+  @Test def bimap: Unit = {
+    assertEquals(Left[String, Int]("1"), Left[Int, String](1).bimap(_.toString, _.length))
+    assertEquals(Right[String, Int](3), Right[Int, String]("foo").bimap(_.toString, _.length))
   }
 
   @Test def leftMap: Unit = {

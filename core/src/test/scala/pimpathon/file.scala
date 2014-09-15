@@ -7,12 +7,15 @@ import scala.collection.JavaConversions._
 
 import org.junit.Assert._
 import pimpathon.any._
-import pimpathon.file._
 import pimpathon.java.io.inputStream._
 import pimpathon.util._
 
 
 class FileTest {
+  private val file = new FileUtils(currentTime = util.currentTime)
+
+  import file._
+
   @Test def rejectsNull: Unit = {
     assertEquals("requirement failed: FileOps cannot be used with null files",
       intercept[Exception](file.FileOps(null: File)).getMessage)
@@ -340,6 +343,24 @@ class FileTest {
   @Test def className: Unit = file.withTempDirectory(dir => {
     assertEquals("Foo", (dir / "Foo.class").className(dir))
     assertEquals("com.example.Foo", (dir / "com" / "example" / "Foo.class").className(dir))
+  })
+
+  @Test def touch: Unit = file.withTempDirectory(dir => {
+    withTime(123000) {
+      assertEquals("Should be able to touch non-existent file", 123000, (dir / "child").touch().lastModified)
+      assertEquals(0, (dir / "child").readBytes().length)
+    }
+
+    (dir / "child").writeLines(List("Don't touch this"))
+
+    withTime(456000) {
+      assertEquals("Should be able to touch existing file", 456000, (dir / "child").touch().lastModified)
+      assertEquals("Don't touch this".length, (dir / "child").readBytes().length)
+    }
+
+    withTime(789000) {
+      assertEquals(789000, dir.touch().lastModified)
+    }
   })
 
   private def assertFileNameProperty(p: File => Boolean, success: String, failure: String): Unit = {

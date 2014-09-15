@@ -1,7 +1,7 @@
 package pimpathon
 
 import scala.reflect.ClassTag
-import scala.util.Try
+import scala.util.{DynamicVariable, Try}
 import _root_.java.io.{InputStream, OutputStream, ByteArrayInputStream, ByteArrayOutputStream}
 
 import org.junit.Assert._
@@ -52,4 +52,9 @@ object util {
 
   def goBoom: Nothing = throw boom
   val boom = new Throwable("Boom !")
+
+  def currentTime(): Long = dynamicTime.value
+  def withTime[A](millis: Long)(f: => A): A = dynamicTime.withValue(millis)(f)
+
+  private val dynamicTime = new DynamicVariable[Long](0)
 }

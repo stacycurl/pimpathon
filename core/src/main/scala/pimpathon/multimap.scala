@@ -1,6 +1,6 @@
 package pimpathon
 
-import scala.collection.{breakOut, mutable => M}
+import scala.collection.{breakOut, mutable => M, GenTraversableLike}
 import scala.collection.generic.CanBuildFrom
 
 import pimpathon.map._
@@ -12,22 +12,29 @@ object multiMap {
   implicit def build[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
     : CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]] = MultiMap.build
 
-  implicit class MultiMapOps[F[_], K, V](val multiMap: MultiMap[F, K, V]) extends AnyVal {
+  implicit class MultiMapOps[F[_], K, V](val value: MultiMap[F, K, V]) extends AnyVal {
     // just an alias for mapValuesEagerly
-    def select[W](f: F[V] => W): Map[K, W] = multiMap.mapValuesEagerly(f)
+    def select[W](f: F[V] => W): Map[K, W] = value.mapValuesEagerly(f)
 
     def merge(other: MultiMap[F, K, V])(
       implicit cbf: CanBuildFrom[F[V], V, F[V]], fTraversableOnce: F[V] <:< TraversableOnce[V]
-    ): MultiMap[F, K, V] = if (multiMap.isEmpty) other else other.foldLeft(multiMap) {
+    ): MultiMap[F, K, V] = if (value.isEmpty) other else other.foldLeft(value) {
       case (acc, (key, otherValues)) => acc.append(key, otherValues)
     }
 
     def append(key: K, newValues: F[V])(
       implicit cbf: CanBuildFrom[F[V], V, F[V]], fTraversableOnce: F[V] <:< TraversableOnce[V]
-    ): MultiMap[F, K, V] = multiMap + ((key, multiMap.get(key) match {
+    ): MultiMap[F, K, V] = value + ((key, value.get(key) match {
       case None         => newValues
       case Some(values) => (cbf() ++= values ++= newValues).result()
     }))
+
+    def multiMap: MultiMapConflictingOps[F, K, V] = new MultiMapConflictingOps[F, K, V](value)
+  }
+
+  class MultiMapConflictingOps[F[_], K, V](value: MultiMap[F, K, V]) {
+    // These operations cannot be defined on MultiMapOps because non-implicit methods of the same name exist on Map
+    def head[Repr](implicit gtl: F[V] <:< GenTraversableLike[V, Repr]): Map[K, V] = value.mapValuesEagerly(_.head)
   }
 
   object MultiMap {

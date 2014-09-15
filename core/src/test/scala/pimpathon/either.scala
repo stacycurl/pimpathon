@@ -19,9 +19,9 @@ class EitherTest {
     assertEquals("right", Right[String, String]("right").rightOr(_ + " !"))
   }
 
-  @Test def map: Unit = {
-    assertEquals(Left[String, Int]("1"), Left[Int, String](1).map(_.toString, _.length))
-    assertEquals(Right[String, Int](3), Right[Int, String]("foo").map(_.toString, _.length))
+  @Test def bimap: Unit = {
+    assertEquals(Left[String, Int]("1"), Left[Int, String](1).bimap(_.toString, _.length))
+    assertEquals(Right[String, Int](3), Right[Int, String]("foo").bimap(_.toString, _.length))
   }
 
   @Test def leftMap: Unit = {
@@ -45,5 +45,17 @@ class EitherTest {
     Right[Int, String]("foo").tap(ints += _, strings += _)
     assertEquals(List(1),     ints.toList)
     assertEquals(List("foo"), strings.toList)
+  }
+
+  @Test def rightBias: Unit = {
+    assertEquals(Right[String, Int](3).right, Right[String, Int](3): Either.RightProjection[String, Int])
+    assertEquals(Right[String, Int](3), Right[String, Int](3).right: Either[String, Int])
+
+    val result: Either[String, Int] = for {
+      x <- Right[String, Int](3): Either[String, Int]
+      y <- Right[String, Int](4): Either[String, Int]
+    } yield x + y
+
+    assertEquals(Right[String, Int](7), result)
   }
 }

@@ -52,4 +52,16 @@ class EitherTest {
     assertEquals(Success[String]("foo"), Right[Throwable, String]("foo").toTry)
     assertEquals(Failure[String](boom), Left[Throwable, String](boom).toTry)
   }
+
+  @Test def rightBias: Unit = {
+    assertEquals(Right[String, Int](3).right, Right[String, Int](3): Either.RightProjection[String, Int])
+    assertEquals(Right[String, Int](3), Right[String, Int](3).right: Either[String, Int])
+
+    val result: Either[String, Int] = for {
+      x <- Right[String, Int](3): Either[String, Int]
+      y <- Right[String, Int](4): Either[String, Int]
+    } yield x + y
+
+    assertEquals(Right[String, Int](7), result)
+  }
 }

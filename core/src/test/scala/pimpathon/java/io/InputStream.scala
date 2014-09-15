@@ -1,12 +1,13 @@
 package pimpathon.java.io
 
-import java.io.{BufferedInputStream, ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
+import java.io._
 import org.junit.Test
 import scala.util.{Failure, Success}
 
 import org.junit.Assert._
 import pimpathon.java.io.inputStream._
 import pimpathon.util._
+import pimpathon.any._
 
 
 class InputStreamTest {
@@ -79,5 +80,33 @@ class InputStreamTest {
     (is.buffered: BufferedInputStream).drain(os)
 
     assertEquals("content", os.toString)
+  }
+
+  @Test def readUpToN: Unit =  {
+    def read(text : String, n : Int) = {
+      val (is, os) = (createInputStream(text.getBytes), createOutputStream())
+      is.readUpToN(os, n)
+      os.tap(_.close()).toString
+    }
+
+    assertEquals("cont", read("contents", 4))
+    assertEquals("contents", read("contents", 8))
+    assertEquals("contents", read("contents", 9))
+    assertEquals("", read("contents", 0))
+    intercept[IllegalArgumentException](read("contents", -1))
+  }
+
+  @Test def readN: Unit =  {
+    def read(text : String, n : Int) = {
+      val (is, os) = (createInputStream(text.getBytes), createOutputStream())
+      is.readN(os, n)
+      os.tap(_.close()).toString
+    }
+
+    assertEquals("cont", read("contents", 4))
+    assertEquals("contents", read("contents", 8))
+    assertEquals("", read("contents", 0))
+    intercept[IllegalArgumentException](read("contents", -1))
+    intercept[IOException](read("contents", 9))
   }
 }

@@ -24,5 +24,19 @@ class ArrayTest {
     assertEquals(("contents", 8), read("contents", 8, 8))
     assertEquals(("content",  7), read("contents", 7, 8))
   }
+
+  @Test def copyUpToN: Unit = {
+    def copy(input: String, n: Int, bufferSize: Int): (String, Int) = {
+      val buffer = new Array[Byte](bufferSize)
+      val os = createOutputStream()
+      val count = buffer.copyUpToN(n, createInputStream(input), os)
+
+      (os.toString, count)
+    }
+
+    assertEquals(("contents", 8), copy("contents", 9, 8))
+    assertEquals(("contents", 8), copy("contents", 8, 8))
+    assertEquals(("content",  7), copy("contents", 7, 8))
+  }
 }
 

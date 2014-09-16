@@ -37,5 +37,6 @@ libraryDependencies ++= Seq(
 
 ### Contributors
 
++ Howard Branch <purestgreen@gmail.com> [@purestgreen](https://twitter.com/purestgreen)
 + Sam Halliday <sam.halliday@gmail.com> [@fommil](https://twitter.com/fommil)
 + Stacy Curl <stacy.curl@gmail.com> [@stacycurl](https://twitter.com/stacycurl)

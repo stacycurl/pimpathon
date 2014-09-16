@@ -1,12 +1,12 @@
 package pimpathon.java.io
 
-import java.io.{BufferedOutputStream, ByteArrayInputStream, ByteArrayOutputStream, InputStream, OutputStream}
+import java.io._
 import org.junit.Test
 
 import org.junit.Assert._
-import pimpathon.any._
 import pimpathon.java.io.outputStream._
 import pimpathon.util._
+import pimpathon.any._
 
 
 class OutputStreamTest {
@@ -45,7 +45,7 @@ class OutputStreamTest {
       expectedCloseOut <- List(false, true)
       input            <- List("Input", "Repeat" * 100)
     } {
-      val (is, os) = (createInputStream(input.getBytes), createOutputStream())
+      val (is, os) = (createInputStream(input), createOutputStream())
 
       os.drain(is, expectedCloseOut, expectedCloseIn)
 
@@ -65,7 +65,7 @@ class OutputStreamTest {
   }
 
   @Test def << : Unit = {
-    val (is, os) = (createInputStream("content".getBytes), createOutputStream())
+    val (is, os) = (createInputStream("content"), createOutputStream())
 
     os << is
 
@@ -75,8 +75,34 @@ class OutputStreamTest {
   }
 
   @Test def buffered: Unit = {
-    val (is, os) = (createInputStream("content".getBytes), createOutputStream())
+    val (is, os) = (createInputStream("content"), createOutputStream())
 
     assertEquals("content", os.tap(o => (o.buffered: BufferedOutputStream).drain(is)).toString)
+  }
+
+  @Test def writeUpToN: Unit = {
+    def write(text: String, n: Int): String = {
+      val (is, os) = (createInputStream(text), createOutputStream())
+      os.tap(_.writeUpToN(is, n), _.close()).toString
+    }
+
+    assertEquals("cont", write("contents", 4))
+    assertEquals("contents", write("contents", 8))
+    assertEquals("contents", write("contents", 9))
+    assertEquals("", write("contents", 0))
+    intercept[IllegalArgumentException](write("contents", -1))
+  }
+
+  @Test def writeN: Unit = {
+    def write(text: String, n: Int): String = {
+      val (is, os) = (createInputStream(text), createOutputStream())
+      os.tap(_.writeN(is, n), _.close()).toString
+    }
+
+    assertEquals("cont", write("contents", 4))
+    assertEquals("contents", write("contents", 8))
+    assertEquals("", write("contents", 0))
+    intercept[IllegalArgumentException](write("contents", -1))
+    intercept[IOException](write("contents", 9))
   }
 }

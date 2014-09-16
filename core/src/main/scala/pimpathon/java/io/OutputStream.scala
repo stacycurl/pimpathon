@@ -1,6 +1,6 @@
 package pimpathon.java.io
 
-import java.io.{BufferedOutputStream, InputStream, OutputStream}
+import java.io.{IOException, BufferedOutputStream, InputStream, OutputStream}
 import scala.annotation.tailrec
 
 import pimpathon.any._
@@ -24,5 +24,11 @@ case class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean, bufferSize: In
     def closeUnless(condition: Boolean): OS = os.tapUnless(_ => condition)(_.close())
 
     def buffered: BufferedOutputStream = new BufferedOutputStream(os, bufferSize)
+
+    def writeN(is: InputStream, n: Long): OS = os.tap(_.writeUpToN(is, n).calc(count => if (count != n)
+      throw new IOException("Failed to write %d only %d were available".format(n, count))
+    ))
+
+    def writeUpToN(is: InputStream, n: Long): Long = is.readUpToN(os, n)
   }
 }

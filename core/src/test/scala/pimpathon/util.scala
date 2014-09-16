@@ -23,10 +23,11 @@ object util {
     assertTrue("Extra: %s, Missing: %s".format(extra, missing), extra.isEmpty && missing.isEmpty)
   }
 
-  def createInputStream(bytes: Array[Byte] = Array(), onClose: () => Unit = () => {}) = new ByteArrayInputStream(bytes) {
-    var closed = false
-    override def close() = { closed = true; super.close(); onClose() }
-  }
+  def createInputStream(content: String = "", onClose: () => Unit = () => {}) =
+    new ByteArrayInputStream(content.getBytes) {
+      var closed = false
+      override def close() = { closed = true; super.close(); onClose() }
+    }
 
   def createOutputStream(onClose: () => Unit = () => {}) = new ByteArrayOutputStream() {
     var closed: Boolean = false

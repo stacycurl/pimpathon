@@ -51,6 +51,14 @@ class MultiMapTest {
     assertEquals(Map(1 -> List(2, 3)), Map(1 -> List(2, 3)).append(1, Nil))
   }
 
+  @Test def multiMap_head: Unit = {
+    assertEquals(Map(1 -> 10, 2 -> 20), Map(1 -> List(10, 11), 2 -> List(20)).multiMap.head)
+  }
+
+  @Test def multiMap_tail: Unit = {
+    assertEquals(Map(1 -> List(11)), Map(1 -> List(10, 11), 2 -> List(20)).multiMap.tail)
+  }
+
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
     def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem]("apply(%s)".format(from))

@@ -46,7 +46,7 @@ class InputStreamTest {
       expectedCloseOut <- List(false, true)
       input            <- List("Input", "Repeat" * 100)
     } {
-      val (is, os) = (createInputStream(input.getBytes), createOutputStream())
+      val (is, os) = (createInputStream(input), createOutputStream())
 
       is.drain(os, expectedCloseIn, expectedCloseOut)
 
@@ -66,7 +66,7 @@ class InputStreamTest {
   }
 
   @Test def >> : Unit = {
-    val (is, os) = (createInputStream("content".getBytes), createOutputStream())
+    val (is, os) = (createInputStream("content"), createOutputStream())
 
     is >> os
 
@@ -76,7 +76,7 @@ class InputStreamTest {
   }
 
   @Test def buffered: Unit = {
-    val (is, os) = (createInputStream("content".getBytes), createOutputStream())
+    val (is, os) = (createInputStream("content"), createOutputStream())
     (is.buffered: BufferedInputStream).drain(os)
 
     assertEquals("content", os.toString)
@@ -84,7 +84,7 @@ class InputStreamTest {
 
   @Test def readUpToN: Unit =  {
     def read(text : String, n : Int) = {
-      val (is, os) = (createInputStream(text.getBytes), createOutputStream())
+      val (is, os) = (createInputStream(text), createOutputStream())
       is.readUpToN(os, n)
       os.tap(_.close()).toString
     }
@@ -98,7 +98,7 @@ class InputStreamTest {
 
   @Test def readN: Unit =  {
     def read(text : String, n : Int) = {
-      val (is, os) = (createInputStream(text.getBytes), createOutputStream())
+      val (is, os) = (createInputStream(text), createOutputStream())
       is.readN(os, n)
       os.tap(_.close()).toString
     }

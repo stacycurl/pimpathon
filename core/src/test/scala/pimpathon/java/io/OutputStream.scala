@@ -82,9 +82,9 @@ class OutputStreamTest {
   }
 
   @Test def writeUpToN: Unit = {
-    def write(text : String, n : Int) = {
+    def write(text: String, n: Int): String = {
       val (is, os) = (createInputStream(text), createOutputStream())
-      os.tap(_.closeAfter(_.writeUpToN(is, n))).toString
+      os.tap(_.writeUpToN(is, n), _.close()).toString
     }
 
     assertEquals("cont", write("contents", 4))
@@ -95,9 +95,9 @@ class OutputStreamTest {
   }
 
   @Test def writeN: Unit = {
-    def write(text : String, n : Int) = {
+    def write(text: String, n: Int): String = {
       val (is, os) = (createInputStream(text), createOutputStream())
-      os.tap(_.closeAfter(_.writeN(is, n))).toString
+      os.tap(_.writeN(is, n), _.close()).toString
     }
 
     assertEquals("cont", write("contents", 4))

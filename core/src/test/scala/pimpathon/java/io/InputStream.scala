@@ -82,25 +82,26 @@ class InputStreamTest {
     assertEquals("content", os.toString)
   }
 
-  @Test def readUpToN: Unit =  {
-    def read(text : String, n : Int) = {
+  @Test def readUpToN: Unit = {
+    def read(text: String, n: Int, bufferSize: Int = inputStream.bufferSize): String = {
+      val withBufferSize = new InputStreamUtils(bufferSize = bufferSize); import withBufferSize._
       val (is, os) = (createInputStream(text), createOutputStream())
-      is.readUpToN(os, n)
-      os.tap(_.close()).toString
+      os.tap(is.readUpToN(_, n), _.close()).toString
     }
 
     assertEquals("cont", read("contents", 4))
     assertEquals("contents", read("contents", 8))
+    assertEquals("content", read("contents", 7, 2))
+    assertEquals("content", read("content", 8, 2))
     assertEquals("contents", read("contents", 9))
     assertEquals("", read("contents", 0))
     intercept[IllegalArgumentException](read("contents", -1))
   }
 
-  @Test def readN: Unit =  {
-    def read(text : String, n : Int) = {
+  @Test def readN: Unit = {
+    def read(text: String, n: Int): String = {
       val (is, os) = (createInputStream(text), createOutputStream())
-      is.readN(os, n)
-      os.tap(_.close()).toString
+      os.tap(is.readN(_, n), _.close).toString
     }
 
     assertEquals("cont", read("contents", 4))

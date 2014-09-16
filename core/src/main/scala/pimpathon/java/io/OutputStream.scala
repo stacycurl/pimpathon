@@ -22,16 +22,11 @@ case class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean, bufferSize: In
     def closeUnless(condition: Boolean): OS = os.tapUnless(_ => condition)(_.close())
 
     def buffered: BufferedOutputStream = new BufferedOutputStream(os, bufferSize)
-    def writeN(is: InputStream, n: Long) : OS = os.tap {
-      o =>
-      val count = o.writeUpToN(is, n)
-      if(count != n)
-        throw new IOException("Failed to write " + n + " only " + count + " were available")
-    }
 
-    def writeUpToN(is: InputStream, limit: Long) : Long = {
-        is.readUpToN(os, limit)
-    }
+    def writeN(is: InputStream, n: Long): OS = os.tap(_.writeUpToN(is, n).calc(count => if (count != n)
+      throw new IOException(s"Failed to write $n only $count were available")
+    ))
 
+    def writeUpToN(is: InputStream, n: Long): Long = is.readUpToN(os, n)
   }
 }

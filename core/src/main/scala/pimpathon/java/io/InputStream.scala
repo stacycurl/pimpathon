@@ -1,6 +1,6 @@
 package pimpathon.java.io
 
-import java.io.{BufferedInputStream, InputStream, OutputStream}
+import java.io.{BufferedInputStream, IOException, InputStream, OutputStream}
 import scala.annotation.tailrec
 import scala.util.Try
 
@@ -23,6 +23,32 @@ case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufferSize: Int
     def closeUnless(condition: Boolean): IS = is.tapUnless(_ => condition)(_.close())
 
     def buffered: BufferedInputStream = new BufferedInputStream(is, bufferSize)
+
+    def readN(os: OutputStream, n: Long) : IS = is.tap {
+     i =>
+      val count = i.readUpToN(os, n)
+      if(count != n)
+        throw new IOException("Failed to read " + n + " bytes, only " + count + " were available")
+    }
+
+    def readUpToN(os: OutputStream, limit: Long) : Long = {
+      require(limit >= 0, "You can't read a negative number of bytes!")
+      val buffer: Array[Byte] = new Array[Byte](bufferSize)
+
+      @tailrec def recurse(count : Long) : Long = {
+        if (count == limit) count else {
+          val written = is.read(buffer, 0, scala.math.min(limit - count, bufferSize).toInt)
+
+          if (written == -1) count else {
+            os.write(buffer, 0, written)
+            recurse(count + written)
+          }
+        }
+      }
+
+      recurse(0)
+    }
+
   }
 
   def copy(

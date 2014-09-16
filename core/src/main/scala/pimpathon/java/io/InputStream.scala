@@ -5,12 +5,13 @@ import scala.annotation.tailrec
 import scala.util.Try
 
 import pimpathon.any._
+import pimpathon.array._
 import pimpathon.java.io.outputStream._
 
 
-object inputStream extends InputStreamUtils(closeIn = true, closeOut = true, bufferSize = 8192)
+object inputStream extends InputStreamUtils()
 
-case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufferSize: Int) {
+case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, bufferSize: Int = 8192) {
   implicit class InputStreamOps[IS <: InputStream](val is: IS) {
     def drain(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): IS =
       is.tap(copy(_, os, closeIn, closeOut))
@@ -51,15 +52,15 @@ case class InputStreamUtils(closeIn: Boolean, closeOut: Boolean, bufferSize: Int
 
   }
 
-  def copy(
-    is: InputStream, os: OutputStream,
-    closeIn: Boolean = closeIn, closeOut: Boolean = closeOut,
-    buffer: Array[Byte] = new Array[Byte](bufferSize)
-  ): Unit = {
-    try Iterator.continually(is.read(buffer)).takeWhile(_ > 0).foreach(os.write(buffer, 0, _))
-    finally {
-      if (closeIn)  is.attemptClose()
-      if (closeOut) os.attemptClose()
-    }
+  def copy(is: InputStream, os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): Unit = {
+    withBuffer(buffer => {
+      try Iterator.continually(is.read(buffer)).takeWhile(_ > 0).foreach(os.write(buffer, 0, _))
+      finally {
+        if (closeIn)  is.attemptClose()
+        if (closeOut) os.attemptClose()
+      }
+    })
   }
+
+  private def withBuffer[A](f: Array[Byte] => A): A = new Array[Byte](bufferSize).calc(f)
 }

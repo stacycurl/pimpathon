@@ -71,6 +71,11 @@ class AnyTest {
       List(1, 2, 3, 4).map(_.filterSelf(_ % 2 == 0)))
   }
 
+  @Test def ifSelf: Unit = assertEquals(
+    List(None, Some(2), None, Some(4)),
+    List(1, 2, 3, 4).map(_.ifSelf(_ % 2 == 0))
+  )
+
   @Test def withFinally: Unit = {
     assertEquals(List("body: input", "finally: input", "done"), new M.ListBuffer[String].tap(strings => {
       strings += "input".withFinally(s => strings += "finally: " + s)(s => {strings += "body: " + s; "done"})

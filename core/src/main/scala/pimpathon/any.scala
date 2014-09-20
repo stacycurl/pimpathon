@@ -29,6 +29,9 @@ object any {
     def filterSelf(p: A => Boolean): Option[A] = if (p(a)) Some(a) else None
     def ifSelf(p: A => Boolean): Option[A] = if (p(a)) Some(a) else None
 
+    def filterNotSelf(p: A => Boolean): Option[A] = if (p(a)) None else Some(a)
+    def unlessSelf(p: A => Boolean): Option[A] = if (p(a)) None else Some(a)
+
     def withFinally[B](f: A => Unit)(t: A => B): B = try t(a) finally f(a)
 
     def cond[B](p: Predicate[A], ifTrue: A => B, ifFalse: A => B): B = if (p(a)) ifTrue(a) else ifFalse(a)

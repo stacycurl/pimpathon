@@ -31,6 +31,11 @@ class EitherTest {
     List(Right(123), Left("456")).map(_ valueOr(_.toInt))
   )
 
+  @Test def rescuePF: Unit = assertEquals(
+    List(Right(123), Left("456"), Right(123)),
+    List(Right(123), Left("456"), Left("123")).map(_.rescue(util.partial("123" -> 123)))
+  )
+
   @Test def valueOrPF: Unit = assertEquals(
     List(Right(123), Left("456"), Right(123)),
     List(Right(123), Left("456"), Left("123")).map(_.valueOr(util.partial("123" -> 123)))

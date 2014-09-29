@@ -20,9 +20,10 @@ object either {
     def rightOr(lr: L => R): R = either.fold(lr, identity)
 
     def valueOr(lr: L => R): R = rightOr(lr)
-    def valueOr(pf: PartialFunction[L, R]): Either[L, R] = leftFlatMap(pf.either)
+    def valueOr(pf: PartialFunction[L, R]): Either[L, R] = rescue(pf)
 
     def rescue(lr: L => R): R = rightOr(lr)
+    def rescue(pf: PartialFunction[L, R]): Either[L, R] = leftFlatMap(pf.either)
 
     def tap(l: L => Unit, r: R => Unit): Either[L, R] = { either.fold(l, r); either }
 

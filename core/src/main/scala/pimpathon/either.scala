@@ -2,6 +2,8 @@ package pimpathon
 
 import scala.util.{Failure, Success, Try}
 
+import pimpathon.function._
+
 
 object either {
   implicit class EitherOps[L, R](val either: Either[L, R]) extends AnyVal {
@@ -18,6 +20,7 @@ object either {
     def rightOr(lr: L => R): R = either.fold(lr, identity)
 
     def valueOr(lr: L => R): R = rightOr(lr)
+    def valueOr(pf: PartialFunction[L, R]): Either[L, R] = leftFlatMap(pf.either)
 
     def tap(l: L => Unit, r: R => Unit): Either[L, R] = { either.fold(l, r); either }
 

@@ -26,6 +26,11 @@ class EitherTest {
     List(Right(123), Left("456")).map(_ valueOr(_.toInt))
   )
 
+  @Test def valueOrPF: Unit = assertEquals(
+    List(Right(123), Left("456"), Right(123)),
+    List(Right(123), Left("456"), Left("123")).map(_.valueOr(util.partial("123" -> 123)))
+  )
+
   @Test def bimap: Unit = {
     assertEquals(Left[String, Int]("1"), Left[Int, String](1).bimap(_.toString, _.length))
     assertEquals(Right[String, Int](3), Right[Int, String]("foo").bimap(_.toString, _.length))

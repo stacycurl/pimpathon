@@ -22,6 +22,8 @@ object either {
     def valueOr(lr: L => R): R = rightOr(lr)
     def valueOr(pf: PartialFunction[L, R]): Either[L, R] = leftFlatMap(pf.either)
 
+    def rescue(lr: L => R): R = rightOr(lr)
+
     def tap(l: L => Unit, r: R => Unit): Either[L, R] = { either.fold(l, r); either }
 
     def toTry(implicit ev: L <:< Throwable): Try[R] = either.fold(Failure(_), Success(_))

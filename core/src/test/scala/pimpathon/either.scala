@@ -21,6 +21,11 @@ class EitherTest {
     List(Left("left"), Right("right")).map(_.rightOr(_ + " !"))
   )
 
+  @Test def rescue: Unit = assertEquals(
+    List(123, 456),
+    List(Right(123), Left("456")).map(_ rescue(_.toInt))
+  )
+
   @Test def valueOr: Unit = assertEquals(
     List(123, 456),
     List(Right(123), Left("456")).map(_ valueOr(_.toInt))

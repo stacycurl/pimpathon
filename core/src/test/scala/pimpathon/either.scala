@@ -11,15 +11,20 @@ import pimpathon.util._
 
 
 class EitherTest {
-  @Test def leftOr: Unit = {
-    assertEquals("left",      Left[String, String]("left").leftOr(_ + " !"))
-    assertEquals("right !", Right[String, String]("right").leftOr(_ + " !"))
-  }
+  @Test def leftOr: Unit = assertEquals(
+    List("left", "right !"),
+    List(Left("left"), Right("right")).map(_.leftOr(_ + " !"))
+  )
 
-  @Test def rightOr: Unit = {
-    assertEquals("left !",  Left[String, String]("left").rightOr(_ + " !"))
-    assertEquals("right", Right[String, String]("right").rightOr(_ + " !"))
-  }
+  @Test def rightOr: Unit = assertEquals(
+    List("left !", "right"),
+    List(Left("left"), Right("right")).map(_.rightOr(_ + " !"))
+  )
+
+  @Test def valueOr: Unit = assertEquals(
+    List(123, 456),
+    List(Right(123), Left("456")).map(_ valueOr(_.toInt))
+  )
 
   @Test def bimap: Unit = {
     assertEquals(Left[String, Int]("1"), Left[Int, String](1).bimap(_.toString, _.length))

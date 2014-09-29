@@ -17,6 +17,8 @@ object either {
     def leftOr(rl: R => L): L = either.fold(identity, rl)
     def rightOr(lr: L => R): R = either.fold(lr, identity)
 
+    def valueOr(lr: L => R): R = rightOr(lr)
+
     def tap(l: L => Unit, r: R => Unit): Either[L, R] = { either.fold(l, r); either }
 
     def toTry(implicit ev: L <:< Throwable): Try[R] = either.fold(Failure(_), Success(_))

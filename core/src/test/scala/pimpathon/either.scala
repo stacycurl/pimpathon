@@ -6,6 +6,7 @@ import scala.util.{Failure, Success, Try}
 
 import org.junit.Assert._
 import pimpathon.either._
+import pimpathon.function._
 import pimpathon.util._
 
 
@@ -34,6 +35,11 @@ class EitherTest {
     assertEquals(Left[String, Int]("1"), Left[String, String]("1").rightMap(_.length))
     assertEquals(Right[Int, Int](3), Right[Int, String]("foo").rightMap(_.length))
   }
+
+  @Test def leftFlatMap: Unit = assertEquals(
+    List(Right(123), Left("456"), Right(123)),
+    List(Right(123), Left("456"), Left("123")).map(_.leftFlatMap(partial("123" -> 123).toRight))
+  )
 
   @Test def tap: Unit = {
     val ints    = new ListBuffer[Int]

@@ -57,4 +57,8 @@ class PartialFunctionTest {
     List(1, 5).map(util.partial(1 -> "2").toRight)
   )
 
+  @Test def toLeft: Unit = assertEquals(
+    List(Left("2"), Right(5)),
+    List(1, 5).map(util.partial(1 -> "2").toLeft)
+  )
 }

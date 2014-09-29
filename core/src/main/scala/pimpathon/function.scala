@@ -17,6 +17,7 @@ object function {
   implicit class PartialFunctionOps[In, Out](pf: PartialFunction[In, Out]) {
     def either: In => Either[In, Out] = toRight
     def toRight: In => Either[In, Out] = (in: In) => pf.lift(in).toRight(in)
+    def toLeft:  In => Either[Out, In] = (in: In) => pf.lift(in).toLeft(in)
 
     def ***[In2, Out2](rhs: PartialFunction[In2, Out2]): PartialFunction[(In, In2), (Out, Out2)] =
       new PartialFunction[(In, In2), (Out, Out2)] {

@@ -41,6 +41,11 @@ class EitherTest {
     List(Right(123), Left("456"), Left("123")).map(_.leftFlatMap(partial("123" -> 123).toRight))
   )
 
+  @Test def rightFlatMap: Unit = assertEquals(
+    List(Left(123), Right("456"), Left(123)),
+    List(Left(123), Right("456"), Right("123")).map(_.rightFlatMap(partial("123" -> 123).toLeft))
+  )
+
   @Test def tap: Unit = {
     val ints    = new ListBuffer[Int]
     val strings = new ListBuffer[String]

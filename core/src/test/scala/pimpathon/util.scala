@@ -57,5 +57,7 @@ object util {
   def currentTime(): Long = dynamicTime.value
   def withTime[A](millis: Long)(f: => A): A = dynamicTime.withValue(millis)(f)
 
+  def partial[A, B](entries: (A, B)*): PartialFunction[A, B] = entries.toMap
+
   private val dynamicTime = new DynamicVariable[Long](0)
 }

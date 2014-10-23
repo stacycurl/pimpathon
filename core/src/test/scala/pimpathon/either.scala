@@ -5,19 +5,40 @@ import scala.collection.mutable.ListBuffer
 
 import org.junit.Assert._
 import pimpathon.either._
+import pimpathon.function._
 import pimpathon.util._
 
 
 class EitherTest {
-  @Test def leftOr: Unit = {
-    assertEquals("left",      Left[String, String]("left").leftOr(_ + " !"))
-    assertEquals("right !", Right[String, String]("right").leftOr(_ + " !"))
-  }
+  @Test def leftOr: Unit = assertEquals(
+    List("left", "right !"),
+    List(Left("left"), Right("right")).map(_.leftOr(_ + " !"))
+  )
 
-  @Test def rightOr: Unit = {
-    assertEquals("left !",  Left[String, String]("left").rightOr(_ + " !"))
-    assertEquals("right", Right[String, String]("right").rightOr(_ + " !"))
-  }
+  @Test def rightOr: Unit = assertEquals(
+    List("left !", "right"),
+    List(Left("left"), Right("right")).map(_.rightOr(_ + " !"))
+  )
+
+  @Test def rescue: Unit = assertEquals(
+    List(123, 456),
+    List(Right(123), Left("456")).map(_ rescue(_.toInt))
+  )
+
+  @Test def valueOr: Unit = assertEquals(
+    List(123, 456),
+    List(Right(123), Left("456")).map(_ valueOr(_.toInt))
+  )
+
+  @Test def rescuePF: Unit = assertEquals(
+    List(Right(123), Left("456"), Right(123)),
+    List(Right(123), Left("456"), Left("123")).map(_.rescue(util.partial("123" -> 123)))
+  )
+
+  @Test def valueOrPF: Unit = assertEquals(
+    List(Right(123), Left("456"), Right(123)),
+    List(Right(123), Left("456"), Left("123")).map(_.valueOr(util.partial("123" -> 123)))
+  )
 
   @Test def bimap: Unit = {
     assertEquals(Left[String, Int]("1"), Left[Int, String](1).bimap(_.toString, _.length))
@@ -33,6 +54,16 @@ class EitherTest {
     assertEquals(Left[String, Int]("1"), Left[String, String]("1").rightMap(_.length))
     assertEquals(Right[Int, Int](3), Right[Int, String]("foo").rightMap(_.length))
   }
+
+  @Test def leftFlatMap: Unit = assertEquals(
+    List(Right(123), Left("456"), Right(123)),
+    List(Right(123), Left("456"), Left("123")).map(_.leftFlatMap(partial("123" -> 123).toRight))
+  )
+
+  @Test def rightFlatMap: Unit = assertEquals(
+    List(Left(123), Right("456"), Left(123)),
+    List(Left(123), Right("456"), Right("123")).map(_.rightFlatMap(partial("123" -> 123).toLeft))
+  )
 
   @Test def tap: Unit = {
     val ints    = new ListBuffer[Int]

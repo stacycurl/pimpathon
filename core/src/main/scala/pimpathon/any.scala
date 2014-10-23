@@ -28,6 +28,10 @@ object any {
     def rpair[B](f: A => B): (A, B) = (a, f(a))
 
     def filterSelf(p: A => Boolean): Option[A] = if (p(a)) Some(a) else None
+    def ifSelf(p: A => Boolean): Option[A] = if (p(a)) Some(a) else None
+
+    def filterNotSelf(p: A => Boolean): Option[A] = if (p(a)) None else Some(a)
+    def unlessSelf(p: A => Boolean): Option[A] = if (p(a)) None else Some(a)
 
     def withFinally[B](f: A => Unit)(t: A => B): B = try t(a) finally f(a)
 

@@ -215,5 +215,10 @@ class MapTest {
       Map(1 -> 10, 2 -> 20, 3 -> 30).andThenM(Map(10 -> 100, 20 -> 200, 40 -> 400)))
   }
 
+  @Test def partitionKeysBy: Unit = assertEquals(
+    (Map("foo" -> 2), Map(2 -> 3)),
+    Map(1 -> 2, 2 -> 3).partitionKeysBy { case 1 => "foo" }
+  )
+
   private val (empty, nonEmpty) = (Map.empty[Int, Int], Map(1 -> 2))
 }

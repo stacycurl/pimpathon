@@ -6,6 +6,7 @@ import scala.collection.immutable.{SortedMap, TreeMap}
 
 import pimpathon.function._
 import pimpathon.multiMap._
+import pimpathon.tuple._
 
 
 object map {
@@ -48,6 +49,9 @@ object map {
     def entryFor: MapAndThen[K, V, (K, V)] = new MapAndThen[K, V, (K, V)](map, identity[(K, V)])
     def keyFor:   MapAndThen[K, V, K]      = new MapAndThen[K, V, K](map, key)
     def valueFor: MapAndThen[K, V, V]      = new MapAndThen[K, V, V](map, value)
+
+    def partitionKeysBy[C](pf: PartialFunction[K, C]): (Map[C, V], Map[K, V]) =
+      map.partition(kv => pf.isDefinedAt(kv._1)).tmap(_.mapKeysEagerly(pf), identity)
   }
 
   class MapAndThen[K, V, A](map: Map[K, V], andThen: ((K, V)) => A) {

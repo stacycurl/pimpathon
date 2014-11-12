@@ -220,5 +220,9 @@ class MapTest {
     Map(1 -> 2, 2 -> 3).partitionKeysBy { case 1 => "foo" }
   )
 
+  @Test def partitionValuesBy: Unit = assertEquals(
+    (Map(1 -> "foo"), Map(2 -> 3)),
+    Map(1 -> 2, 2 -> 3).partitionValuesBy { case 2 => "foo" }
+  )
   private val (empty, nonEmpty) = (Map.empty[Int, Int], Map(1 -> 2))
 }

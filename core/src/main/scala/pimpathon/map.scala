@@ -52,6 +52,9 @@ object map {
 
     def partitionKeysBy[C](pf: PartialFunction[K, C]): (Map[C, V], Map[K, V]) =
       map.partition(kv => pf.isDefinedAt(kv._1)).tmap(_.mapKeysEagerly(pf), identity)
+
+    def partitionValuesBy[W](pf: PartialFunction[V, W]): (Map[K, W], Map[K, V]) =
+      map.partition(kv => pf.isDefinedAt(kv._2)).tmap(_.mapValuesEagerly(pf), identity)
   }
 
   class MapAndThen[K, V, A](map: Map[K, V], andThen: ((K, V)) => A) {

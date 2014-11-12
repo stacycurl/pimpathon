@@ -119,6 +119,17 @@ class MapTest {
     assertEquals(Some(1), Map(1 -> "abc", 2 -> "def").keyFor.minValue)
   }
 
+  @Test def mapKeysEagerly: Unit = {
+    val originalKeysSeen = new M.ListBuffer[Int]
+    def update(v: Int) = { originalKeysSeen += v; v * 10 }
+
+    val result = Map(1 -> 1, 2 -> 2).mapKeysEagerly(update)
+    assertEquals("Should have iterated over the original map already", List(1, 2), originalKeysSeen.toList)
+    assertEquals(Map(10 -> 1, 20 -> 2), result)
+    assertEquals(Map(10 -> 1, 20 -> 2), result)
+    assertEquals("Shouldn't have iterated over the original map twice", List(1, 2), originalKeysSeen.toList)
+  }
+
   @Test def mapValuesEagerly: Unit = {
     val originalValuesSeen = new M.ListBuffer[Int]
     def update(v: Int) = { originalValuesSeen += v; v * 10 }

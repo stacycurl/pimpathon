@@ -219,10 +219,15 @@ class MapTest {
     assertEquals(List(3 -> 4, 1 -> 2), Map(1 -> 2, 3 -> 4).sorted(Ordering.Int.reverse).toList)
   }
 
-  @Test def andThenM: Unit = {
-    assertEquals(Map(1 -> 100, 2 -> 200),
-      Map(1 -> 10, 2 -> 20, 3 -> 30).andThenM(Map(10 -> 100, 20 -> 200, 40 -> 400)))
-  }
+  @Test def andThenM: Unit = assertEquals(
+    Map(1 -> 100, 2 -> 200),
+    Map(1 -> 10, 2 -> 20, 3 -> 30).andThenM(Map(10 -> 100, 20 -> 200, 40 -> 400))
+  )
+
+  @Test def composeM: Unit = assertEquals(
+    Map(1 -> 100, 2 -> 200),
+    Map(10 -> 100, 20 -> 200, 40 -> 400).composeM(Map(1 -> 10, 2 -> 20, 3 -> 30))
+  )
 
   @Test def partitionKeysBy: Unit = assertEquals(
     (Map("foo" -> 2), Map(2 -> 3)),

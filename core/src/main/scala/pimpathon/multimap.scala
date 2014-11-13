@@ -28,6 +28,8 @@ object multiMap {
     def append(key: K, newValues: F[V])(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] =
       value + ((key, crf.concat(value.get(key), Some(newValues))))
 
+    def pop(key: K)(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValue(key, crf.pop)
+
     def multiMap: MultiMapConflictingOps[F, K, V] = new MultiMapConflictingOps[F, K, V](value)
   }
 
@@ -35,10 +37,7 @@ object multiMap {
   class MultiMapConflictingOps[F[_], K, V](value: MultiMap[F, K, V]) {
     // These operations cannot be defined on MultiMapOps because non-implicit methods of the same name exist on Map
     def head[Repr](implicit gtl: F[V] <:< GenTraversableLike[V, Repr]): Map[K, V] = value.mapValuesEagerly(_.head)
-
-    def tail(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.flatMap {
-      case (k, fv) => crf.flatMapS(fv)(_.tailOption.filter(_.nonEmpty)).map(k -> _)
-    }
+    def tail(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValues(crf.pop)
   }
 
   object MultiMap {
@@ -84,6 +83,7 @@ object multiMap {
       case (acc, Some(fv)) => acc ++= toStream(fv)
     }.result
 
+    def pop(fv: F[V]): Option[F[V]] = flatMapS(fv)(_.tailOption.filter(_.nonEmpty))
     def flatMapS(fv: F[V])(f: Stream[V] => Option[Stream[V]]): Option[F[V]] = f(toStream(fv)).map(fromStream)
 
     protected val cbf: CanBuildFrom[F[V], V, F[V]]

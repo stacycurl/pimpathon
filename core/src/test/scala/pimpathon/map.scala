@@ -8,6 +8,7 @@ import scala.reflect.ClassManifest
 import scala.util.control._
 
 import org.junit.Assert._
+import pimpathon.any._
 import pimpathon.map._
 
 
@@ -187,9 +188,17 @@ class MapTest {
     assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterValues(_ == 2))
   }
 
+  @Test def keyExists: Unit = {
+    assertFalse(empty.keyExists(_ => true))
+    assertFalse(nonEmpty.keyExists(_ => false))
+    assertFalse(nonEmpty.keyExists(_ == 2))
+    assertTrue(nonEmpty.keyExists(_ == 1))
+  }
+
   @Test def valueExists: Unit = {
     assertFalse(empty.valueExists(_ => true))
     assertFalse(nonEmpty.valueExists(_ => false))
+    assertFalse(nonEmpty.valueExists(_ == 1))
     assertTrue(nonEmpty.valueExists(_ == 2))
   }
 
@@ -210,10 +219,15 @@ class MapTest {
     assertEquals(List(3 -> 4, 1 -> 2), Map(1 -> 2, 3 -> 4).sorted(Ordering.Int.reverse).toList)
   }
 
-  @Test def andThenM: Unit = {
-    assertEquals(Map(1 -> 100, 2 -> 200),
-      Map(1 -> 10, 2 -> 20, 3 -> 30).andThenM(Map(10 -> 100, 20 -> 200, 40 -> 400)))
-  }
+  @Test def andThenM: Unit = assertEquals(
+    Map(1 -> 100, 2 -> 200),
+    Map(1 -> 10, 2 -> 20, 3 -> 30).andThenM(Map(10 -> 100, 20 -> 200, 40 -> 400))
+  )
+
+  @Test def composeM: Unit = assertEquals(
+    Map(1 -> 100, 2 -> 200),
+    Map(10 -> 100, 20 -> 200, 40 -> 400).composeM(Map(1 -> 10, 2 -> 20, 3 -> 30))
+  )
 
   @Test def partitionKeysBy: Unit = assertEquals(
     (Map("foo" -> 2), Map(2 -> 3)),
@@ -224,5 +238,25 @@ class MapTest {
     (Map(1 -> "foo"), Map(2 -> 3)),
     Map(1 -> 2, 2 -> 3).partitionValuesBy { case 2 => "foo" }
   )
+
+  @Test def updateValue: Unit = {
+    assertEquals(empty, nonEmpty.updateValue(1, _ => None))
+    assertEquals(Map(1 -> 1), nonEmpty.updateValue(1, _ => Some(1)))
+    assertEquals(nonEmpty, nonEmpty.updateValue(2, _ => None))
+    assertEquals(nonEmpty, nonEmpty.updateValue(2, _ => Some(3)))
+  }
+
+  @Test def updateKeys: Unit = {
+    assertEquals(empty, nonEmpty.updateKeys(_ => None))
+    assertEquals(Map(2 -> 2), nonEmpty.updateKeys(k => Some(k * 2)))
+    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).updateKeys(k => k.filterSelf(_ == 1)))
+  }
+
+  @Test def updateValues: Unit = {
+    assertEquals(empty, nonEmpty.updateValues(_ => None))
+    assertEquals(Map(1 -> 4), nonEmpty.updateValues(v => Some(v * 2)))
+    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).updateValues(v => v.filterSelf(_ == 2)))
+  }
+
   private val (empty, nonEmpty) = (Map.empty[Int, Int], Map(1 -> 2))
 }

@@ -61,6 +61,7 @@ object map {
     def updateValue(key: K, f: V => Option[V]): Map[K, V] =
       map.get(key).flatMap(f).fold(map - key)(newValue => map + ((key, newValue)))
 
+    def updateKeys[C](f: K => Option[C]): Map[C, V]   = map.flatMap(kv => f(kv._1).map(_ -> kv._2))
     def updateValues[W](f: V => Option[W]): Map[K, W] = map.flatMap(kv => f(kv._2).map(kv._1 -> _))
   }
 

@@ -246,6 +246,12 @@ class MapTest {
     assertEquals(nonEmpty, nonEmpty.updateValue(2, _ => Some(3)))
   }
 
+  @Test def updateKeys: Unit = {
+    assertEquals(empty, nonEmpty.updateKeys(_ => None))
+    assertEquals(Map(2 -> 2), nonEmpty.updateKeys(k => Some(k * 2)))
+    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).updateKeys(k => k.filterSelf(_ == 1)))
+  }
+
   @Test def updateValues: Unit = {
     assertEquals(empty, nonEmpty.updateValues(_ => None))
     assertEquals(Map(1 -> 4), nonEmpty.updateValues(v => Some(v * 2)))

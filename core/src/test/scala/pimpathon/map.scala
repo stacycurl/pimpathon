@@ -188,9 +188,17 @@ class MapTest {
     assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterValues(_ == 2))
   }
 
+  @Test def keyExists: Unit = {
+    assertFalse(empty.keyExists(_ => true))
+    assertFalse(nonEmpty.keyExists(_ => false))
+    assertFalse(nonEmpty.keyExists(_ == 2))
+    assertTrue(nonEmpty.keyExists(_ == 1))
+  }
+
   @Test def valueExists: Unit = {
     assertFalse(empty.valueExists(_ => true))
     assertFalse(nonEmpty.valueExists(_ => false))
+    assertFalse(nonEmpty.valueExists(_ == 1))
     assertTrue(nonEmpty.valueExists(_ == 2))
   }
 

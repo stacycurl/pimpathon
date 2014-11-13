@@ -119,6 +119,17 @@ class MapTest {
     assertEquals(Some(1), Map(1 -> "abc", 2 -> "def").keyFor.minValue)
   }
 
+  @Test def mapKeysEagerly: Unit = {
+    val originalKeysSeen = new M.ListBuffer[Int]
+    def update(v: Int) = { originalKeysSeen += v; v * 10 }
+
+    val result = Map(1 -> 1, 2 -> 2).mapKeysEagerly(update)
+    assertEquals("Should have iterated over the original map already", List(1, 2), originalKeysSeen.toList)
+    assertEquals(Map(10 -> 1, 20 -> 2), result)
+    assertEquals(Map(10 -> 1, 20 -> 2), result)
+    assertEquals("Shouldn't have iterated over the original map twice", List(1, 2), originalKeysSeen.toList)
+  }
+
   @Test def mapValuesEagerly: Unit = {
     val originalValuesSeen = new M.ListBuffer[Int]
     def update(v: Int) = { originalValuesSeen += v; v * 10 }
@@ -204,5 +215,14 @@ class MapTest {
       Map(1 -> 10, 2 -> 20, 3 -> 30).andThenM(Map(10 -> 100, 20 -> 200, 40 -> 400)))
   }
 
+  @Test def partitionKeysBy: Unit = assertEquals(
+    (Map("foo" -> 2), Map(2 -> 3)),
+    Map(1 -> 2, 2 -> 3).partitionKeysBy { case 1 => "foo" }
+  )
+
+  @Test def partitionValuesBy: Unit = assertEquals(
+    (Map(1 -> "foo"), Map(2 -> 3)),
+    Map(1 -> 2, 2 -> 3).partitionValuesBy { case 2 => "foo" }
+  )
   private val (empty, nonEmpty) = (Map.empty[Int, Int], Map(1 -> 2))
 }

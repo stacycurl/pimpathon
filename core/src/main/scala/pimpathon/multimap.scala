@@ -38,6 +38,9 @@ object multiMap {
     // These operations cannot be defined on MultiMapOps because non-implicit methods of the same name exist on Map
     def head[Repr](implicit gtl: F[V] <:< GenTraversableLike[V, Repr]): Map[K, V] = value.mapValuesEagerly(_.head)
     def tail(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValues(crf.pop)
+
+    def reverse(implicit crf: CanRebuildFrom[F, V], cbf: CanBuildFrom[Nothing, K, F[K]]): MultiMap[F, V, K] =
+      value.toStream.flatMap(kvs => crf.toStream(kvs._2).map(_ -> kvs._1))(collection.breakOut)
   }
 
   object MultiMap {
@@ -85,9 +88,9 @@ object multiMap {
 
     def pop(fv: F[V]): Option[F[V]] = flatMapS(fv)(_.tailOption.filter(_.nonEmpty))
     def flatMapS(fv: F[V])(f: Stream[V] => Option[Stream[V]]): Option[F[V]] = f(toStream(fv)).map(fromStream)
+    def toStream(fv: F[V]): Stream[V]
 
     protected val cbf: CanBuildFrom[F[V], V, F[V]]
-    protected def toStream(fv: F[V]): Stream[V]
 
     private def fromStream(to: TraversableOnce[V]): F[V] = (cbf() ++= to).result
   }
@@ -96,8 +99,8 @@ object multiMap {
     implicit def crf[F[_], V](
       implicit cbf0: CanBuildFrom[F[V], V, F[V]], fTraversableOnce: F[V] <:< TraversableOnce[V]
     ): CanRebuildFrom[F, V] = new CanRebuildFrom[F, V] {
+      def toStream(fv: F[V]): Stream[V] = fTraversableOnce(fv).toStream
       protected val cbf: CanBuildFrom[F[V], V, F[V]] = cbf0
-      protected def toStream(fv: F[V]): Stream[V] = fTraversableOnce(fv).toStream
     }
   }
 }

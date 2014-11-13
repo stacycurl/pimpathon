@@ -8,6 +8,7 @@ import scala.reflect.ClassTag
 import scala.util.control._
 
 import org.junit.Assert._
+import pimpathon.any._
 import pimpathon.map._
 
 
@@ -230,6 +231,12 @@ class MapTest {
     assertEquals(Map(1 -> 1), nonEmpty.updateValue(1, _ => Some(1)))
     assertEquals(nonEmpty, nonEmpty.updateValue(2, _ => None))
     assertEquals(nonEmpty, nonEmpty.updateValue(2, _ => Some(3)))
+  }
+
+  @Test def updateValues: Unit = {
+    assertEquals(empty, nonEmpty.updateValues(_ => None))
+    assertEquals(Map(1 -> 4), nonEmpty.updateValues(v => Some(v * 2)))
+    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).updateValues(v => v.filterSelf(_ == 2)))
   }
 
   private val (empty, nonEmpty) = (Map.empty[Int, Int], Map(1 -> 2))

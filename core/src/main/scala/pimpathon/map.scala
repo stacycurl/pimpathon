@@ -29,6 +29,7 @@ object map {
     def filterValuesNot(p: Predicate[V]): Map[K, V] = map.filterNot(kv => p(kv._2))
     def filterValues(p: Predicate[V]): Map[K, V]    = map.filter(kv => p(kv._2))
 
+
     def keyExists(p: Predicate[K]): Boolean = map.exists(kv => p(kv._1))
     def valueExists(p: Predicate[V]): Boolean = map.exists(kv => p(kv._2))
 
@@ -44,7 +45,7 @@ object map {
 
     def sorted(implicit ordering: Ordering[K]): SortedMap[K, V] = TreeMap.empty[K, V](ordering) ++ map
 
-    def andThenM[W](other: Map[V, W]): Map[K, W] = updateValues(other.get)
+    def andThenM[W](other: Map[V, W]): Map[K, W] = updateValues(other.get _)
     def composeM[C](other: Map[C, K]): Map[C, V] = other.andThenM(map)
 
     def mutable: M.Map[K, V] = M.Map.empty[K, V] ++ map
@@ -65,6 +66,9 @@ object map {
 
     def updateKeys[C](f: K => Option[C]): Map[C, V]   = map.flatMap(kv => f(kv._1).map(_ -> kv._2))
     def updateValues[W](f: V => Option[W]): Map[K, W] = map.flatMap(kv => f(kv._2).map(kv._1 -> _))
+
+    def updateKeys[C](pf: PartialFunction[K, C]): Map[C, V] = updateKeys(pf.lift)
+    def updateValues[W](pf: PartialFunction[V, W]): Map[K, W] = updateValues(pf.lift)
   }
 
   class MapAndThen[K, V, A](map: Map[K, V], andThen: ((K, V)) => A) {

@@ -34,7 +34,7 @@ object multiMap {
   class MultiMapConflictingOps[F[_], K, V](value: MultiMap[F, K, V]) {
     // These operations cannot be defined on MultiMapOps because non-implicit methods of the same name exist on Map
     def head[Repr](implicit gtl: F[V] <:< GenTraversableLike[V, Repr]): Map[K, V] = value.mapValuesEagerly(_.head)
-    def tail(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValues(crf.pop)
+    def tail(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValues(crf.pop _)
 
     def reverse(implicit crf: CanRebuildFrom[F, V], cbf: CanBuildFrom[Nothing, K, F[K]]): MultiMap[F, V, K] =
       value.toStream.flatMap(kvs => crf.toStream(kvs._2).map(_ -> kvs._1))(collection.breakOut)

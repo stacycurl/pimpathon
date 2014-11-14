@@ -264,5 +264,11 @@ class MapTest {
     assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).updateValues(v => v.filterSelf(_ == 2)))
   }
 
+  @Test def updateValuesPF: Unit = {
+    assertEquals(empty, nonEmpty.updateValues(util.partial[Int, Int]()))
+    assertEquals(Map(1 -> 4), nonEmpty.updateValues(util.partial(2 -> 4)))
+    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).updateValues(util.partial(2 -> 2)))
+  }
+
   private val (empty, nonEmpty) = (Map.empty[Int, Int], Map(1 -> 2))
 }

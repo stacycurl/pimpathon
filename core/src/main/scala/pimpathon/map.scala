@@ -27,6 +27,7 @@ object map {
     def filterValuesNot(p: Predicate[V]): Map[K, V] = map.filterNot(kv => p(kv._2))
     def filterValues(p: Predicate[V]): Map[K, V]    = map.filter(kv => p(kv._2))
 
+
     def keyExists(p: Predicate[K]): Boolean = map.exists(kv => p(kv._1))
     def valueExists(p: Predicate[V]): Boolean = map.exists(kv => p(kv._2))
 
@@ -63,6 +64,8 @@ object map {
 
     def updateKeys[C](f: K => Option[C]): Map[C, V]   = map.flatMap(kv => f(kv._1).map(_ -> kv._2))
     def updateValues[W](f: V => Option[W]): Map[K, W] = map.flatMap(kv => f(kv._2).map(kv._1 -> _))
+
+    def updateKeys[C](pf: PartialFunction[K, C]): Map[C, V] = updateKeys(pf.lift)
   }
 
   class MapAndThen[K, V, A](map: Map[K, V], andThen: ((K, V)) => A) {

@@ -60,11 +60,14 @@ case class FileUtils (
     def readBytes(): Array[Byte] = source().withFinally(_.close())(_.map(_.toByte).toArray)
     def readLines(): List[String] = source().withFinally(_.close())(_.getLines.toList)
 
+    def write(contents: String, append: Boolean = true): File =
+      writeBytes(contents.getBytes, append)
+
     def writeBytes(bytes: Array[Byte], append: Boolean = true): File =
       file.tap(_.outputStream(append).closeAfter(_.write(bytes)))
 
     def writeLines(lines: List[String], append: Boolean = true): File =
-      writeBytes(lines.mkString("\n").getBytes, append)
+      writeBytes((lines.mkString("\n") + "\n").getBytes, append)
 
     def outputStream: FileOutputStream = outputStream(false)
     def outputStream(append: Boolean = true): FileOutputStream = new FileOutputStream(file, append)

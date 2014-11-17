@@ -58,6 +58,9 @@ case class FileUtils (
     def readBytes(): Array[Byte] = source().withFinally(_.close())(_.map(_.toByte).toArray)
     def readLines(): List[String] = source().withFinally(_.close())(_.getLines.toList)
 
+    def write(contents: String, append: Boolean = true): File =
+      writeBytes(contents.getBytes, append)
+
     def writeBytes(bytes: Array[Byte], append: Boolean = true): File =
       file.tap(_.outputStream(append).closeAfter(_.write(bytes)))
 

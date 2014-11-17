@@ -282,6 +282,13 @@ class FileTest {
     })
   }
 
+  @Test def write: Unit = file.withTempFile(tmp => {
+    assertEquals(List("content"),      tmp.write("content", append = false).readLines())
+    assertEquals(List("contents"),     tmp.write("s", append = true).readLines())
+    assertEquals(List("new content"),  tmp.write("new content", append = false).readLines())
+    assertEquals(List("new contents"), tmp.write("s").readLines())
+  })
+
   @Test def writeBytes: Unit = {
     file.withTempFile(tmp => {
       assertEquals(List("12"),   tmp.writeBytes("12".getBytes).readLines())

@@ -65,7 +65,7 @@ case class FileUtils (
       file.tap(_.outputStream(append).closeAfter(_.write(bytes)))
 
     def writeLines(lines: List[String], append: Boolean = true): File =
-      writeBytes(lines.mkString("\n").getBytes, append)
+      writeBytes((lines.mkString("\n") + "\n").getBytes, append)
 
     def outputStream: FileOutputStream = outputStream(false)
     def outputStream(append: Boolean = true): FileOutputStream = new FileOutputStream(file, append)

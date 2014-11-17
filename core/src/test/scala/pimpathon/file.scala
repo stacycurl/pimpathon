@@ -299,9 +299,9 @@ class FileTest {
 
   @Test def writeLines: Unit = {
     file.withTempFile(tmp => {
-      assertEquals(List("1", "2"),       tmp.writeLines(List("1", "2")).readLines())
-      assertEquals(List("1", "23", "4"), tmp.writeLines(List("3", "4")).readLines())
-      assertEquals(List("5", "6"),       tmp.writeLines(List("5", "6"), append = false).readLines())
+      assertEquals(List("1", "2"),           tmp.writeLines(List("1", "2")).readLines())
+      assertEquals(List("1", "2", "3", "4"), tmp.writeLines(List("3", "4")).readLines())
+      assertEquals(List("5", "6"),           tmp.writeLines(List("5", "6"), append = false).readLines())
     })
   }
 
@@ -362,7 +362,7 @@ class FileTest {
 
     withTime(456000) {
       assertEquals("Should be able to touch existing file", 456000, (dir / "child").touch().lastModified)
-      assertEquals("Don't touch this".length, (dir / "child").readBytes().length)
+      assertEquals("Don't touch this".length + 1, (dir / "child").readBytes().length)
     }
 
     withTime(789000) {

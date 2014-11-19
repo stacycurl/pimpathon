@@ -31,7 +31,7 @@ Builds are available for Scala 2.9.2, 2.9.3, 2.10.4 & 2.11.2
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.github.stacycurl" %% "pimpathon-core" % "1.0.0"
+  "com.github.stacycurl" %% "pimpathon-core" % "1.2.0"
 )
 ```
 

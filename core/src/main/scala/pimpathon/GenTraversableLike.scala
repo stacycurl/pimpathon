@@ -47,8 +47,9 @@ trait genTraversableLike[CC[_]]  {
 class GenTraversableLikeCapturer[A, F[_, _], Repr](list: GenTraversableLike[A, Repr]) {
   type CBF[K, V] = CanBuildFrom[Nothing, (K, V), F[K, V]]
 
-  def withKeys[K](f: A => K)(implicit cbf: CBF[K, A]): F[K, A] = list.map(a => (f(a), a))(breakOut)
-  def withValues[V](f: A => V)(implicit cbf: CBF[A, V]): F[A, V] = list.map(a => (a, f(a)))(breakOut)
+  def withKeys[K](f: A => K)(implicit cbf: CBF[K, A]): F[K, A] = withEntries(a => (f(a), a))
+  def withValues[V](f: A => V)(implicit cbf: CBF[A, V]): F[A, V] = withEntries(a => (a, f(a)))
+  def withEntries[K, V](f: A => ((K, V)))(implicit cbf: CBF[K, V]): F[K, V] = list.map(f)(breakOut)
 
   def withSomeKeys[K](f: A => Option[K])(implicit cbf: CBF[K, A]): F[K, A] =
     list.flatMap(a => f(a).map(_ -> a))(breakOut)

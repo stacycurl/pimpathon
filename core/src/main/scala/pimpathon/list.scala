@@ -42,6 +42,8 @@ object list extends filterMonadic with genTraversableLike[List] {
       case ((passed, size), elem) => (if (p(elem)) passed + 1 else passed, size + 1)
     })
 
+    def sizeGT(value: Int): Boolean = uncons(empty = value < 0, nonEmpty = _.tail.sizeGT(value - 1))
+
 
     def distinctBy[B](f: A => B): List[A] = list.map(equalBy(f)).distinct.map(_.a)
 

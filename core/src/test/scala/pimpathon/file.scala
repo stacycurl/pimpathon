@@ -3,12 +3,13 @@ package pimpathon
 import _root_.java.io.{File, FileInputStream}
 import _root_.java.lang.reflect.Field
 import org.junit.Test
-import scala.collection.JavaConversions._
+import scala.util.Properties
 
 import org.junit.Assert._
 import pimpathon.any._
 import pimpathon.java.io.inputStream._
 import pimpathon.util._
+import scala.collection.JavaConversions._
 
 
 class FileTest {
@@ -80,10 +81,7 @@ class FileTest {
     })
   }
 
-  @Test def cwd: Unit = {
-    // not a great test, but what to do other that use an alternate implementation ?
-    assertEquals("pimpathon", file.cwd.getName)
-  }
+  @Test def cwd: Unit = assertEquals(Properties.userDir, file.cwd.getPath)
 
   @Test def named: Unit = {
     file.withTempFile(tmp => {

@@ -50,6 +50,13 @@ class ListTest {
     assertEquals(Some((1, 2)), List(0, 1).countWithSize(_ < 1))
   }
 
+  @Test def sizeGT: Unit = {
+    assertTrue(nil[Int].sizeGT(-1))
+    assertFalse(nil[Int].sizeGT(0))
+    assertTrue(List(1, 2).sizeGT(1))
+    assertFalse(List(1, 2).sizeGT(2))
+  }
+
 
   @Test def distinctBy: Unit = {
     assertEquals(List("foo", "bard", "foody"),

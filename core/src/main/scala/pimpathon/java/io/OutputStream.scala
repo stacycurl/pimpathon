@@ -18,10 +18,10 @@ case class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean, bufferSize: In
 
     def <<(is: InputStream): OS = drain(is, closeOut = false, closeIn = false)
 
-    def attemptClose(): Either[Throwable, Unit] = os.attempt(_.close())
     def closeAfter[A](f: OS => A): A        = os.withFinally(_.attemptClose())(f)
     def closeIf(condition: Boolean): OS     = os.tapIf(_ => condition)(_.close())
     def closeUnless(condition: Boolean): OS = os.tapUnless(_ => condition)(_.close())
+    def attemptClose(): Either[Throwable, Unit] = os.attempt(_.close())
 
     def buffered: BufferedOutputStream = new BufferedOutputStream(os, bufferSize)
 

@@ -12,13 +12,10 @@ object any {
     def calc[B](f: A => B): B = f(a)
     def |>[B](f: A => B): B = f(a)
 
-    // These methods are aliased to suit individual preferences
-    def tap[Discarded](actions: (A => Discarded)*): A            = { actions.foreach(action => action(a)); a }
-    def update[Discarded](actions: (A => Discarded)*): A         = tap(actions: _*)
-    def withSideEffect[Discarded](actions: (A => Discarded)*): A = tap(actions: _*)
-
     def tapIf(p: A => Boolean)(actions: (A => Unit)*): A     = if (p(a)) tap(actions: _*) else a
     def tapUnless(p: A => Boolean)(actions: (A => Unit)*): A = if (p(a)) a else tap(actions: _*)
+
+    def tapPF[Discarded](action: PartialFunction[A, Discarded]): A = { action.lift(a); a }
 
     def attempt[B](f: A => B): Either[Throwable, B] = try { Right(f(a)) } catch { case t: Throwable => Left(t) }
 
@@ -38,5 +35,10 @@ object any {
     def cond[B](p: Predicate[A], ifTrue: A => B, ifFalse: A => B): B = if (p(a)) ifTrue(a) else ifFalse(a)
 
     def addTo[To](builder: M.Builder[A, To]): A = tap(builder += _)
+
+    // These methods are aliased to suit individual preferences
+    def update[Discarded](actions: (A => Discarded)*): A         = tap(actions: _*)
+    def withSideEffect[Discarded](actions: (A => Discarded)*): A = tap(actions: _*)
+    def tap[Discarded](actions: (A => Discarded)*): A            = { actions.foreach(action => action(a)); a }
   }
 }

@@ -14,15 +14,15 @@ case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, b
   implicit def inputStreamOps[IS <: InputStream](is: IS): InputStreamOps[IS] = new InputStreamOps[IS](is)
 
   class InputStreamOps[IS <: InputStream](is: IS) {
+    def >>(os: OutputStream): IS = drain(os, closeIn = false, closeOut = false)
+
     def drain(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): IS =
       is.tap(copy(_, os, closeIn, closeOut))
 
-    def >>(os: OutputStream): IS = drain(os, closeIn = false, closeOut = false)
-
-    def attemptClose(): Either[Throwable, Unit] = is.attempt(_.close())
     def closeAfter[A](f: IS => A): A        = is.withFinally(_.attemptClose())(f)
     def closeIf(condition: Boolean): IS     = is.tapIf(_ => condition)(_.close())
     def closeUnless(condition: Boolean): IS = is.tapUnless(_ => condition)(_.close())
+    def attemptClose(): Either[Throwable, Unit] = is.attempt(_.close())
 
     def buffered: BufferedInputStream = new BufferedInputStream(is, bufferSize)
 

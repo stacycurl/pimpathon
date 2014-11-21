@@ -21,15 +21,15 @@ case class FileUtils (
     require(Option(file).isDefined, "FileOps cannot be used with null files")
 
     def missing: Boolean = !file.exists
-    def hasExtension(extension: String): Boolean = file.getName.endsWith(extension)
     def isScala: Boolean = hasExtension("scala")
     def isJava: Boolean  = hasExtension("java")
     def isClass: Boolean = hasExtension("class")
     def isJar: Boolean   = hasExtension("jar")
-    def isParentOf(other: File): Boolean    = other.getParentFile.equals(file)
+    def hasExtension(extension: String): Boolean = file.getName.endsWith(extension)
     def isChildOf(other: File): Boolean     = other.isParentOf(file)
-    def contains(other: File): Boolean      = other.ancestors.exists(_.equals(file))
+    def isParentOf(other: File): Boolean    = other.getParentFile.equals(file)
     def isContainedIn(other: File): Boolean = other.contains(file)
+    def contains(other: File): Boolean      = other.ancestors.exists(_.equals(file))
 
     // http://rapture.io does this much better
     def /(name: String): File = new File(file, name)
@@ -38,12 +38,6 @@ case class FileUtils (
     def relativeTo(dir: File): File = sharedPaths(dir).calc { case (relativeFile, relativeDir) =>
       new File((relativeDir.const("..") ++ relativeFile).mkString(File.separator))
     }
-
-    def tree: Stream[File]      = stream.cond(file.exists, file #:: children.flatMap(_.tree))
-    def children: Stream[File]  = stream.cond(file.isDirectory && file.canRead, file.listFiles.toStream)
-    def childDirs: Stream[File] = children.filter(_.isDirectory)
-
-    def path: List[String]     = file.getAbsolutePath.split(separator).toList.filterNot(Set("", "."))
 
     def changeToDirectory(): File = file.tapIf(_.isFile)(_.delete(), _.mkdir())
 
@@ -55,23 +49,30 @@ case class FileUtils (
 
     def touch(): File = create().tap(_.setLastModified(currentTime()))
 
+    def tree: Stream[File]      = stream.cond(file.exists, file #:: children.flatMap(_.tree))
+    def children: Stream[File]  = stream.cond(file.isDirectory && file.canRead, file.listFiles.toStream)
+    def childDirs: Stream[File] = children.filter(_.isDirectory)
+
+    def path: List[String]     = file.getAbsolutePath.split(separator).toList.filterNot(Set("", "."))
+
+    def md5(): String = readLines().mkString("\n").md5
+
     def readBytes(): Array[Byte] = source().withFinally(_.close())(_.map(_.toByte).toArray)
     def readLines(): List[String] = source().withFinally(_.close())(_.getLines.toList)
 
     def write(contents: String, append: Boolean = true): File =
       writeBytes(contents.getBytes, append)
 
-    def writeBytes(bytes: Array[Byte], append: Boolean = true): File =
-      file.tap(_.outputStream(append).closeAfter(_.write(bytes)))
-
     def writeLines(lines: List[String], append: Boolean = true): File =
       writeBytes((lines.mkString("\n") + "\n").getBytes, append)
+
+    def writeBytes(bytes: Array[Byte], append: Boolean = true): File =
+      file.tap(_.outputStream(append).closeAfter(_.write(bytes)))
 
     def outputStream: FileOutputStream = outputStream(false)
     def outputStream(append: Boolean = true): FileOutputStream = new FileOutputStream(file, append)
     def source(): BufferedSource =  Source.fromFile(file)
 
-    def md5(): String = readLines().mkString("\n").md5
     def className(classDir: File): String = sharedPaths(classDir)._1.mkString(".").stripSuffix(".class")
 
     private[pimpathon] def ancestors: Stream[File] = Stream.iterate(file)(_.getParentFile).takeWhile(_ != null)
@@ -91,6 +92,11 @@ case class FileUtils (
   def tempDir(suffix: String = suffix, prefix: String = prefix): File =
     File.createTempFile(prefix, suffix).changeToDirectory().tap(_.deleteRecursivelyOnExit())
 
+  def withTempDirectory[A](f: File => A): A = withTempDirectory(suffix)(f)
+
+  def withTempDirectory[A](suffix: String, prefix: String = prefix)(f: File => A): A =
+    withTempFile[A](suffix, prefix)(tmp => f(tmp.changeToDirectory()))
+
   def withTempFile[A](f: File => A): A = withTempFile(suffix)(f)
 
   def withTempFile[A](suffix: String, prefix: String = prefix)(f: File => A): A = {
@@ -98,12 +104,6 @@ case class FileUtils (
 
     try f(file) finally file.deleteRecursively()
   }
-
-
-  def withTempDirectory[A](f: File => A): A = withTempDirectory(suffix)(f)
-
-  def withTempDirectory[A](suffix: String, prefix: String = prefix)(f: File => A): A =
-    withTempFile[A](suffix, prefix)(tmp => f(tmp.changeToDirectory()))
 
 
   class NamedFile(file: File, name: String) extends File(file.getPath) {

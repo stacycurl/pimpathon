@@ -15,24 +15,14 @@ import pimpathon.tuple._
 
 object list extends filterMonadic with genTraversableLike[List] {
   implicit class ListOps[A](val list: List[A]) extends AnyVal {
-    def tap(empty: => Unit, nonEmpty: List[A] => Unit): List[A] = new AnyOps(list).tap(_.uncons(empty, nonEmpty))
     def tapEmpty(empty: => Unit): List[A] = tap(empty, _ => {})
     def tapNonEmpty(nonEmpty: List[A] => Unit): List[A] = tap({}, nonEmpty)
+    def tap(empty: => Unit, nonEmpty: List[A] => Unit): List[A] = new AnyOps(list).tap(_.uncons(empty, nonEmpty))
 
     def emptyTo(alternative: => List[A]): List[A] = uncons(alternative, _ => list)
 
-    def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
-
-    def unconsC[B](empty: => B, nonEmpty: A => List[A] => B): B = list match {
-      case Nil => empty
-      case head :: tail => nonEmpty(head)(tail)
-    }
-
-    def mapNonEmpty[B](f: List[A] => B): Option[B] = if (list.isEmpty) None else Some(f(list))
-
     def zipToMap[B](values: List[B]): Map[A, B] = zip(values).toMap
     def zipWith[B, C](values: List[B])(f: ((A, B)) => C): List[C] = zip(values).map(f).toList
-
 
     def fraction(p: Predicate[A]): Double = countWithSize(p).fold(Double.NaN)(_.to[Double].calc(_ / _))
 
@@ -67,6 +57,15 @@ object list extends filterMonadic with genTraversableLike[List] {
       apoMap[B, Option[List[B]]](Some(_))(a => f(a).toRight(None))
 
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
+
+    def mapNonEmpty[B](f: List[A] => B): Option[B] = if (list.isEmpty) None else Some(f(list))
+
+    def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
+
+    def unconsC[B](empty: => B, nonEmpty: A => List[A] => B): B = list match {
+      case Nil => empty
+      case head :: tail => nonEmpty(head)(tail)
+    }
 
     def const[B](elem: B): List[B] = list.map(_ => elem)
 

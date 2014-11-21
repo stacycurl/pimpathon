@@ -1,2 +1,5 @@
 *.swp
 target
+.idea
+.idea_modules
+projectFilesBackup

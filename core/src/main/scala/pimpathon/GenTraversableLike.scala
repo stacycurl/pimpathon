@@ -22,11 +22,6 @@ trait genTraversableLike[CC[_]]  {
   class GenTraversableLikeOps[A, Repr](val gtl: GenTraversableLike[A, Repr]) {
     def asMap: GenTraversableLikeCapturer[A, Map, Repr] = as[Map]
 
-    def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Repr] =
-      as[({ type MM[K, V] = MultiMap[F, K, V] })#MM]
-
-    def as[F[_, _]]: GenTraversableLikeCapturer[A, F, Repr] = new GenTraversableLikeCapturer[A, F, Repr](gtl)
-
     def attributeCounts[B](f: A => B): Map[B, Int] =
       asMultiMap.withKeys(f).mapValues(_.size)
 
@@ -35,6 +30,11 @@ trait genTraversableLike[CC[_]]  {
 
     def optAttributeCounts[B](f: A => Option[B]): Map[B, Int] =
       asMultiMap.withSomeKeys(f).mapValues(_.size)
+
+    def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Repr] =
+      as[({ type MM[K, V] = MultiMap[F, K, V] })#MM]
+
+    def as[F[_, _]]: GenTraversableLikeCapturer[A, F, Repr] = new GenTraversableLikeCapturer[A, F, Repr](gtl)
 
     def ungroupBy[B](f: A => B)(
       implicit inner: CanBuildFrom[Nothing, A, CC[A]], outer: CanBuildFrom[Nothing, CC[A], CC[CC[A]]]

@@ -16,7 +16,7 @@ object set extends filterMonadic with genTraversableLike[Set] {
       recurse(set.toList).map(_.toSet).toSet
     }
 
-    def mutable: M.Set[A] = M.Set.empty[A] ++ set
     def toMutable: M.Set[A] = mutable
+    def mutable: M.Set[A] = M.Set.empty[A] ++ set
   }
 }

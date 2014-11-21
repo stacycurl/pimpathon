@@ -19,6 +19,8 @@ object any {
     def tapIf(p: A => Boolean)(actions: (A => Unit)*): A     = if (p(a)) tap(actions: _*) else a
     def tapUnless(p: A => Boolean)(actions: (A => Unit)*): A = if (p(a)) a else tap(actions: _*)
 
+    def tapPF[Discarded](action: PartialFunction[A, Discarded]): A = { action.lift(a); a }
+
     def attempt[B](f: A => B): Try[B] = Try(f(a))
 
     def partialMatch[B](pf: PartialFunction[A, B]): Option[B] = PartialFunction.condOpt(a)(pf)

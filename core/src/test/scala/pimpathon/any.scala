@@ -48,6 +48,12 @@ class AnyTest {
     }).toList
   )
 
+  @Test def tapPF: Unit = assertEquals(
+    List(1, 3), new M.ListBuffer[Int].tap(ints => {
+      List(1, 2, 3).foreach(i => i.tapPF { case i if i % 2 != 0 => ints += i })
+    })
+  )
+
   @Test def cond: Unit = assertEquals(
     List("true", "false"),
     List("true", "false").map(_.cond(_ == "true", _ => "true", _ => "false"))

@@ -36,21 +36,20 @@ object list extends filterMonadic with genTraversableLike[List] {
     def distinctBy[B](f: A => B): List[A] = list.map(equalBy(f)).distinct.map(_.a)
 
     def batchBy[B](f: A => B): List[List[A]] = list.unconsC(empty = Nil, nonEmpty = head => tail => {
-      val (_, batch, batches) = tail.foldLeft((f(head), M.ListBuffer(head), M.ListBuffer[List[A]]())) {
+      val (_, lastBatch, allBatches) = tail.foldLeft((f(head), M.ListBuffer(head), M.ListBuffer[List[A]]())) {
         case ((currentKey, batch, batches), a) => f(a).cond(_ == currentKey,
           ifTrue  = key => (key, batch += a,      batches),
           ifFalse = key => (key, M.ListBuffer(a), batches += batch.toList)
         )
       }
 
-      (batches += batch.toList).toList
+      (allBatches += lastBatch.toList).toList
     })
 
     def headTail: (A, List[A]) = headTailOption.getOrThrow("headTail of empty list")
     def initLast: (List[A], A) = initLastOption.getOrThrow("initLast of empty list")
 
     def headTailOption: Option[(A, List[A])] = unconsC(None, head => tail => Some((head, tail)))
-
     def initLastOption: Option[(List[A], A)] = uncons(None, _ => Some(list.init, list.last))
 
     def seqMap[B](f: A => Option[B]): Option[List[B]] =

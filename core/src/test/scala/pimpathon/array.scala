@@ -8,11 +8,11 @@ import pimpathon.util._
 
 
 class ArrayTest {
-  @Test def toHex: Unit = {
+  @Test def toHex(): Unit = {
     assertEquals("7e57ab1e", Array[Byte](126, 87, -85, 30).toHex)
   }
 
-  @Test def readUpToN: Unit = {
+  @Test def readUpToN(): Unit = {
     def read(input: String, n: Int, bufferSize: Int): (String, Int) = {
       val buffer = new Array[Byte](bufferSize)
       val count = buffer.readUpToN(n, createInputStream(input))
@@ -25,7 +25,7 @@ class ArrayTest {
     assertEquals(("content",  7), read("contents", 7, 8))
   }
 
-  @Test def copyUpToN: Unit = {
+  @Test def copyUpToN(): Unit = {
     def copy(input: String, n: Int, bufferSize: Int): (String, Int) = {
       val buffer = new Array[Byte](bufferSize)
       val os = createOutputStream()

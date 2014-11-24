@@ -9,7 +9,7 @@ import pimpathon.numeric._
 
 
 class NumericTest {
-  @Test def xmap: Unit = {
+  @Test def xmap(): Unit = {
     val numericString =
       implicitly[Numeric[Int]].xmap[String](_.toString, Integer.parseInt)
 

@@ -1,5 +1,7 @@
 package pimpathon
 
+import scala.language.{higherKinds, implicitConversions}
+
 import scala.collection.{breakOut, mutable => M, GenTraversableLike}
 import scala.collection.generic.CanBuildFrom
 
@@ -80,7 +82,7 @@ object multiMap {
   trait CanRebuildFrom[F[_], V] {
     def concat(fvs: Option[F[V]]*): F[V] = fvs.foldLeft(cbf.apply()) {
       case (acc, ofv) => ofv.fold(acc)(fv => acc ++= toStream(fv))
-    }.result
+    }.result()
 
     def pop(fv: F[V]): Option[F[V]] = flatMapS(fv)(_.tailOption.filter(_.nonEmpty))
     def flatMapS(fv: F[V])(f: Stream[V] => Option[Stream[V]]): Option[F[V]] = f(toStream(fv)).map(fromStream)
@@ -88,7 +90,7 @@ object multiMap {
 
     protected val cbf: CanBuildFrom[F[V], V, F[V]]
 
-    private def fromStream(to: TraversableOnce[V]): F[V] = (cbf() ++= to).result
+    private def fromStream(to: TraversableOnce[V]): F[V] = (cbf() ++= to).result()
   }
 
   object CanRebuildFrom {

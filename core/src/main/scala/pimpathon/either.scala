@@ -1,5 +1,7 @@
 package pimpathon
 
+import scala.language.implicitConversions
+
 import scala.util.{Failure, Success, Try}
 
 import pimpathon.function._

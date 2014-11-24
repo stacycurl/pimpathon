@@ -11,12 +11,12 @@ import pimpathon.any._
 
 
 class InputStreamTest {
-  @Test def attemptClose: Unit = {
+  @Test def attemptClose(): Unit = {
     assertEquals(Success(()), createInputStream().attemptClose())
     assertEquals(Failure(boom), createInputStream(onClose = () => throw boom).attemptClose())
   }
 
-  @Test def closeAfter: Unit = {
+  @Test def closeAfter(): Unit = {
     val is = createInputStream()
 
     assertInputStreamClosed(false, is.closed)
@@ -24,7 +24,7 @@ class InputStreamTest {
     assertInputStreamClosed(true, is.closed)
   }
 
-  @Test def closeIf: Unit = {
+  @Test def closeIf(): Unit = {
     val is = createInputStream()
 
     assertInputStreamClosed(false, is.closed)
@@ -32,7 +32,7 @@ class InputStreamTest {
     assertInputStreamClosed(true,  is.closeIf(true).closed)
   }
 
-  @Test def closeUnless: Unit = {
+  @Test def closeUnless(): Unit = {
     val is = createInputStream()
 
     assertInputStreamClosed(false, is.closed)
@@ -40,7 +40,7 @@ class InputStreamTest {
     assertInputStreamClosed(true,  is.closeUnless(false).closed)
   }
 
-  @Test def drain: Unit = {
+  @Test def drain(): Unit = {
     for {
       expectedCloseIn  <- List(false, true)
       expectedCloseOut <- List(false, true)
@@ -65,7 +65,7 @@ class InputStreamTest {
     }
   }
 
-  @Test def >> : Unit = {
+  @Test def >> (): Unit = {
     val (is, os) = (createInputStream("content"), createOutputStream())
 
     is >> os
@@ -75,14 +75,14 @@ class InputStreamTest {
     assertOutputStreamClosed(false, os.closed)
   }
 
-  @Test def buffered: Unit = {
+  @Test def buffered(): Unit = {
     val (is, os) = (createInputStream("content"), createOutputStream())
     (is.buffered: BufferedInputStream).drain(os)
 
     assertEquals("content", os.toString)
   }
 
-  @Test def readUpToN: Unit = {
+  @Test def readUpToN(): Unit = {
     def read(text: String, n: Int, bufferSize: Int = inputStream.bufferSize): String = {
       val withBufferSize = new InputStreamUtils(bufferSize = bufferSize); import withBufferSize._
       val (is, os) = (createInputStream(text), createOutputStream())
@@ -98,10 +98,10 @@ class InputStreamTest {
     intercept[IllegalArgumentException](read("contents", -1))
   }
 
-  @Test def readN: Unit = {
+  @Test def readN(): Unit = {
     def read(text: String, n: Int): String = {
       val (is, os) = (createInputStream(text), createOutputStream())
-      os.tap(is.readN(_, n), _.close).toString
+      os.tap(is.readN(_, n), _.close()).toString
     }
 
     assertEquals("cont", read("contents", 4))

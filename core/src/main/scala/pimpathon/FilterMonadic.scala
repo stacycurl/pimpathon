@@ -1,5 +1,7 @@
 package pimpathon
 
+import scala.language.{higherKinds, implicitConversions}
+
 import scala.collection.breakOut
 import scala.collection.generic.{CanBuildFrom, FilterMonadic}
 

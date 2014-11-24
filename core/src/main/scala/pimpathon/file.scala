@@ -58,7 +58,7 @@ case class FileUtils (
     def md5(): String = readLines().mkString("\n").md5
 
     def readBytes(): Array[Byte] = source().withFinally(_.close())(_.map(_.toByte).toArray)
-    def readLines(): List[String] = source().withFinally(_.close())(_.getLines.toList)
+    def readLines(): List[String] = source().withFinally(_.close())(_.getLines().toList)
 
     def write(contents: String, append: Boolean = true): File =
       writeBytes(contents.getBytes, append)

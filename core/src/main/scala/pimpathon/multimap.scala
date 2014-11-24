@@ -84,7 +84,7 @@ object multiMap {
     def concat(fvs: Option[F[V]]*): F[V] = fvs.foldLeft(cbf.apply()) {
       case (acc, None)     => acc
       case (acc, Some(fv)) => acc ++= toStream(fv)
-    }.result
+    }.result()
 
     def pop(fv: F[V]): Option[F[V]] = flatMapS(fv)(_.tailOption.filter(_.nonEmpty))
     def flatMapS(fv: F[V])(f: Stream[V] => Option[Stream[V]]): Option[F[V]] = f(toStream(fv)).map(fromStream)
@@ -92,7 +92,7 @@ object multiMap {
 
     protected val cbf: CanBuildFrom[F[V], V, F[V]]
 
-    private def fromStream(to: TraversableOnce[V]): F[V] = (cbf() ++= to).result
+    private def fromStream(to: TraversableOnce[V]): F[V] = (cbf() ++= to).result()
   }
 
   object CanRebuildFrom {

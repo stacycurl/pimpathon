@@ -71,7 +71,7 @@ case class UngroupBy[A, B, CC[_]](ungrouped: Map[Int, M.Builder[A, CC[A]]], coun
   implicit inner: CanBuildFrom[Nothing, A, CC[A]], outer: CanBuildFrom[Nothing, CC[A], CC[CC[A]]]) {
 
   def add(a: A, b: B): UngroupBy[A, B, CC] = copy(ungrouped + entry(count(b), a), counts + ((b, count(b))))
-  def values: CC[CC[A]] = ungrouped.sorted.values.map(_.result)(breakOut(outer))
+  def values: CC[CC[A]] = ungrouped.sorted.values.map(_.result())(breakOut(outer))
 
   private def entry(count: Int, a: A) = (count, ungrouped.getOrElse(count, inner.apply()) += a)
   private def count(b: B) = counts.getOrElse(b, 0) + 1

@@ -10,12 +10,12 @@ import pimpathon.any._
 
 
 class OutputStreamTest {
-  @Test def attemptClose: Unit = {
+  @Test def attemptClose(): Unit = {
     assertEquals(Right(()), createOutputStream().attemptClose())
     assertEquals(Left(boom), createOutputStream(onClose = () => throw boom).attemptClose())
   }
 
-  @Test def closeAfter: Unit = {
+  @Test def closeAfter(): Unit = {
     val os = createOutputStream()
 
     assertOutputStreamClosed(false, os.closed)
@@ -23,7 +23,7 @@ class OutputStreamTest {
     assertOutputStreamClosed(true, os.closed)
   }
 
-  @Test def closeIf: Unit = {
+  @Test def closeIf(): Unit = {
     val os = createOutputStream()
 
     assertOutputStreamClosed(false, os.closed)
@@ -31,7 +31,7 @@ class OutputStreamTest {
     assertOutputStreamClosed(true,  os.closeIf(true).closed)
   }
 
-  @Test def closeUnless: Unit = {
+  @Test def closeUnless(): Unit = {
     val os = createOutputStream()
 
     assertOutputStreamClosed(false, os.closed)
@@ -39,7 +39,7 @@ class OutputStreamTest {
     assertOutputStreamClosed(true,  os.closeUnless(false).closed)
   }
 
-  @Test def drain: Unit = {
+  @Test def drain(): Unit = {
     for {
       expectedCloseIn  <- List(false, true)
       expectedCloseOut <- List(false, true)
@@ -64,7 +64,7 @@ class OutputStreamTest {
     }
   }
 
-  @Test def << : Unit = {
+  @Test def << (): Unit = {
     val (is, os) = (createInputStream("content"), createOutputStream())
 
     os << is
@@ -74,13 +74,13 @@ class OutputStreamTest {
     assertInputStreamClosed(false, is.closed)
   }
 
-  @Test def buffered: Unit = {
+  @Test def buffered(): Unit = {
     val (is, os) = (createInputStream("content"), createOutputStream())
 
     assertEquals("content", os.tap(o => (o.buffered: BufferedOutputStream).drain(is)).toString)
   }
 
-  @Test def writeUpToN: Unit = {
+  @Test def writeUpToN(): Unit = {
     def write(text: String, n: Int): String = {
       val (is, os) = (createInputStream(text), createOutputStream())
       os.tap(_.writeUpToN(is, n), _.close()).toString
@@ -93,7 +93,7 @@ class OutputStreamTest {
     intercept[IllegalArgumentException](write("contents", -1))
   }
 
-  @Test def writeN: Unit = {
+  @Test def writeN(): Unit = {
     def write(text: String, n: Int): String = {
       val (is, os) = (createInputStream(text), createOutputStream())
       os.tap(_.writeN(is, n), _.close()).toString

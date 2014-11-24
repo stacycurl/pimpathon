@@ -4,11 +4,10 @@ import org.junit.Test
 
 import org.junit.Assert._
 import pimpathon.option._
-import scalaz.std.option._
 
 
 class OptionTest {
-  @Test def getOrThrow: Unit = {
+  @Test def getOrThrow(): Unit = {
     assertEquals("present", Some("present").getOrThrow("missing"))
     assertEquals("present", Some("present").getOrThrow(new Exception("missing")))
     assertEquals("present", Some("present").getOrThrow(util.goBoom: Exception))

@@ -34,7 +34,12 @@ class FunctionTest {
       List(None, Some(3), Some(4), None, Some(6)).filter(isEven.ifSome))
   }
 
+  @Test def guard(): Unit = {
+    assertEquals(List(None, Some(4), None, Some(8)), List(1, 2, 3, 4).map((isEven guard double).lift))
+  }
+
   private val isEven: (Int => Boolean) = _ % 2 == 0
+  private val double: (Int => Int)     = _ * 2
 }
 
 class PartialFunctionTest {

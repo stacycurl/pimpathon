@@ -12,6 +12,8 @@ object function {
     def forall: Predicate[List[A]] = _.forall(p)
 
     def ifSome: Predicate[Option[A]] = _.exists(p)
+
+    def guard[B](f: A => B): PartialFunction[A, B] = new GuardedPartialFunction[A, B](p, f)
   }
 
   implicit class PartialFunctionOps[In, Out](pf: PartialFunction[In, Out]) {
@@ -24,6 +26,11 @@ object function {
         def isDefinedAt(in: (In, In2)): Boolean = pf.isDefinedAt(in._1) && rhs.isDefinedAt(in._2)
         def apply(in: (In, In2)): (Out, Out2) = (pf.apply(in._1), rhs.apply(in._2))
       }
+  }
+
+  private class GuardedPartialFunction[A, B](p: Predicate[A], f: A => B) extends PartialFunction[A, B] {
+    def isDefinedAt(a: A): Boolean = p(a)
+    def apply(a: A): B = f(a)
   }
 
   def equalC[A]: A => A => Boolean = (l: A) => (r: A) => l equals r

@@ -179,4 +179,9 @@ class ListTest {
     List(1).tapNonEmpty(_ => strings += "non-empty")
     assertEquals(List("non-empty"), strings.toList)
   }
+
+  @Test def amass(): Unit = assertEquals(
+    List(2, -2, 4, -4),
+    List(1, 2, 3, 4).amass { case i if i % 2 == 0 => List(i, -i) }
+  )
 }

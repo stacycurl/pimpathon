@@ -1,9 +1,7 @@
 package pimpathon
 
 import scala.annotation.tailrec
-import scala.collection.{breakOut, mutable => M, GenTraversableLike}
-import scala.collection.breakOut
-import scala.collection.generic.{CanBuildFrom, FilterMonadic}
+import scala.collection.{mutable => M}
 import scala.collection.immutable._
 
 import pimpathon.any._
@@ -58,6 +56,8 @@ object list extends filterMonadic with genTraversableLike[List] {
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 
     def mapNonEmpty[B](f: List[A] => B): Option[B] = if (list.isEmpty) None else Some(f(list))
+
+    def amass[B](pf: PartialFunction[A, List[B]]): List[B] = list.flatMap(a => pf.lift(a).getOrElse(Nil))
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
 

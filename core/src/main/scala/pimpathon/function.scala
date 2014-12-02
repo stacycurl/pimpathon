@@ -3,6 +3,10 @@ package pimpathon
 object function {
   type Predicate[-A] = A => Boolean
 
+  implicit class FunctionOps[A, B](val f: A => B) extends AnyVal {
+    def guardWith(p: Predicate[A]): PartialFunction[A, B] = p guard f
+  }
+
   implicit class PredicateOps[A](val p: Predicate[A]) extends AnyVal {
     def and(q: Predicate[A]): Predicate[A] = (a: A) => p(a) && q(a)
     def or(q: Predicate[A]):  Predicate[A] = (a: A) => p(a) || q(a)

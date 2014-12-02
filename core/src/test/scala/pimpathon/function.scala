@@ -38,6 +38,10 @@ class FunctionTest {
     assertEquals(List(None, Some(4), None, Some(8)), List(1, 2, 3, 4).map((isEven guard double).lift))
   }
 
+  @Test def guardWith(): Unit = {
+    assertEquals(List(None, Some(4), None, Some(8)), List(1, 2, 3, 4).map((double guardWith isEven).lift))
+  }
+
   private val isEven: (Int => Boolean) = _ % 2 == 0
   private val double: (Int => Int)     = _ * 2
 }

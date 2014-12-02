@@ -96,6 +96,11 @@ object list extends filterMonadic with genTraversableLike[List] {
     private def equalBy[B](f: A => B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
     private def zip[B](other: List[B]): Iterator[(A, B)] = list.iterator.zip(other.iterator)
   }
+
+  implicit class ListOfEitherOps[L, R](val list: List[Either[L, R]]) extends AnyVal {
+    def partitionEithers: (List[L], List[R]) = (new M.ListBuffer[L], new M.ListBuffer[R])
+      .tap(lr => list.foreach(_.fold(lr._1 += _, lr._2 += _))).tmap(_.toList, _.toList)
+  }
 }
 
 case class EqualBy[A, B](b: B)(val a: A)

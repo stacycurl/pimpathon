@@ -1,5 +1,13 @@
 package pimpathon
 
+import scala.language.higherKinds
+
+import scala.collection.{GenTraversable, GenTraversableLike}
+import scala.collection.generic.CanBuildFrom
+
+import pimpathon.list._
+
+
 object function {
   type Predicate[-A] = A => Boolean
 
@@ -21,6 +29,12 @@ object function {
   }
 
   implicit class PartialFunctionOps[In, Out](pf: PartialFunction[In, Out]) {
+    type CBF[CC[_], A] = CanBuildFrom[Nothing, A, CC[A]]
+
+    def partition[CC[A] <: GenTraversableLike[A, GenTraversable[A]]](ins: CC[In])
+      (implicit cbf: CBF[CC, Either[In, Out]], icbf: CBF[CC, In], ocbf: CBF[CC, Out]): (CC[In], CC[Out]) =
+        ins.map(either).partitionEithers[CC](icbf, ocbf)
+
     def either: In => Either[In, Out] = toRight
     def toRight: In => Either[In, Out] = (in: In) => pf.lift(in).toRight(in)
     def toLeft:  In => Either[Out, In] = (in: In) => pf.lift(in).toLeft(in)

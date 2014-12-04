@@ -70,4 +70,9 @@ class PartialFunctionTest {
     List(Left("2"), Right(5)),
     List(1, 5).map(util.partial(1 -> "2").toLeft)
   )
+
+  @Test def partition(): Unit = assertEquals(
+    (List(2, 4), List("one", "three")),
+    util.partial(1 -> "one", 3 -> "three").partition(List(1, 2, 3, 4))
+  )
 }

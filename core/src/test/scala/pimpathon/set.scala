@@ -28,5 +28,10 @@ class SetTest {
     assertEquals(ungrouped.map(_.size), ungrouped.map(_.map(group).size))
     assertEquals(original, ungrouped.flatten)
   }
+
+  @Test def partitionByPF(): Unit = assertEquals(
+    (Set(2, 4), Set("one", "three")),
+    Set(1, 2, 3, 4).partitionByPF(util.partial(1 -> "one", 3 -> "three"))
+  )
 }
 

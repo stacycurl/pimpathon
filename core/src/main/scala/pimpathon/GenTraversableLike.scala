@@ -43,6 +43,9 @@ trait genTraversableLike[CC[A] <: GenTraversableLike[A, GenTraversable[A]]]  {
 
     def ungroupBy[B](f: A => B)(implicit inner: CCBF[A, CC], outer: CCBF[CC[A], CC]): CC[CC[A]] =
       gtl.foldLeft(UngroupBy[A, B, CC](Map(), Map())) { case (ungroupBy, item) => ungroupBy.add(item, f(item)) }.values
+
+    def partitionByPF[B](pf: PartialFunction[A, B])
+      (implicit eab: CCBF[Either[A, B], CC], a: CCBF[A, CC], b: CCBF[B, CC]): (CC[A], CC[B]) = pf.partition[CC](gtl)
   }
 
   class GenTraversableLikeOfEitherOps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr]) {

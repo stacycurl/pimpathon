@@ -81,8 +81,6 @@ object list extends filterMonadic with genTraversableLike[List] {
       recurse(list, other, Nil)
     }
 
-    def partitionByPF[B](pf: PartialFunction[A, B]): (List[A], List[B]) = pf.partition(list)
-
     private def apoMap[B, C](g: List[B] => C)(f: A => Either[C, B]): C = {
       @tailrec def recurse(acc: List[B], rest: List[A]): C = rest match {
         case Nil => g(acc.reverse)

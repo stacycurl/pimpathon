@@ -189,4 +189,9 @@ class ListTest {
     (List(1, 2), List("abc", "def")),
     List(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers
   )
+
+  @Test def partitionByPF(): Unit = assertEquals(
+    (List(2, 4), List("one", "three")),
+    List(1, 2, 3, 4).partitionByPF(util.partial(1 -> "one", 3 -> "three"))
+  )
 }

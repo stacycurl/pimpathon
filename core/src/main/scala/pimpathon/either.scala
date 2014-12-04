@@ -21,8 +21,7 @@ object either {
     def leftOr(rl: R => L): L = either.fold(identity, rl)
     def rightOr(lr: L => R): R = either.fold(lr, identity)
 
-    def bimap[LV, RV](lf: L => LV, rf: R => RV): Either[LV, RV] =
-      either.fold(l => Left[LV, RV](lf(l)), r => Right[LV, RV](rf(r)))
+    def bimap[M, S](lf: L => M, rf: R => S): Either[M, S] = either.fold(l => Left[M, S](lf(l)), r => Right[M, S](rf(r)))
 
     def leftFlatMap(f: L => Either[L, R]): Either[L, R] = either.fold(f, Right(_))
     def rightFlatMap(f: R => Either[L, R]): Either[L, R] = either.fold(Left(_), f)

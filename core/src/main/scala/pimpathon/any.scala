@@ -11,8 +11,8 @@ object any {
     def calc[B](f: A => B): B = f(a)
     def |>[B](f: A => B): B = f(a)
 
-    def tapIf(p: A => Boolean)(actions: (A => Unit)*): A     = if (p(a)) tap(actions: _*) else a
-    def tapUnless(p: A => Boolean)(actions: (A => Unit)*): A = if (p(a)) a else tap(actions: _*)
+    def tapIf(p: Predicate[A])(actions: (A => Unit)*): A     = if (p(a)) tap(actions: _*) else a
+    def tapUnless(p: Predicate[A])(actions: (A => Unit)*): A = if (p(a)) a else tap(actions: _*)
 
     def tapPF[Discarded](action: PartialFunction[A, Discarded]): A = { action.lift(a); a }
 
@@ -23,11 +23,11 @@ object any {
     def lpair[B](f: A => B): (B, A) = (f(a), a)
     def rpair[B](f: A => B): (A, B) = (a, f(a))
 
-    def filterSelf(p: A => Boolean): Option[A] = if (p(a)) Some(a) else None
-    def ifSelf(p: A => Boolean): Option[A] = if (p(a)) Some(a) else None
+    def filterSelf(p: Predicate[A]): Option[A] = if (p(a)) Some(a) else None
+    def ifSelf(p: Predicate[A]): Option[A] = if (p(a)) Some(a) else None
 
-    def filterNotSelf(p: A => Boolean): Option[A] = if (p(a)) None else Some(a)
-    def unlessSelf(p: A => Boolean): Option[A] = if (p(a)) None else Some(a)
+    def filterNotSelf(p: Predicate[A]): Option[A] = if (p(a)) None else Some(a)
+    def unlessSelf(p: Predicate[A]): Option[A] = if (p(a)) None else Some(a)
 
     def withFinally[B](f: A => Unit)(t: A => B): B = try t(a) finally f(a)
 

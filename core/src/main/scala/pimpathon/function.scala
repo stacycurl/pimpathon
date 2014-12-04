@@ -3,7 +3,6 @@ package pimpathon
 import scala.language.higherKinds
 
 import scala.collection.{GenTraversable, GenTraversableLike}
-import scala.collection.generic.CanBuildFrom
 
 import pimpathon.list._
 
@@ -29,10 +28,8 @@ object function {
   }
 
   implicit class PartialFunctionOps[In, Out](pf: PartialFunction[In, Out]) {
-    type CBF[CC[_], A] = CanBuildFrom[Nothing, A, CC[A]]
-
     def partition[CC[A] <: GenTraversableLike[A, GenTraversable[A]]](ins: CC[In])
-      (implicit cbf: CBF[CC, Either[In, Out]], icbf: CBF[CC, In], ocbf: CBF[CC, Out]): (CC[In], CC[Out]) =
+      (implicit cbf: CCBF[Either[In, Out], CC], icbf: CCBF[In, CC], ocbf: CCBF[Out, CC]): (CC[In], CC[Out]) =
         ins.map(either).partitionEithers[CC](icbf, ocbf)
 
     def either: In => Either[In, Out] = toRight

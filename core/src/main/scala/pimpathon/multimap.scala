@@ -38,13 +38,13 @@ object multiMap {
     def head[Repr](implicit gtl: F[V] <:< GenTraversableLike[V, Repr]): Map[K, V] = value.mapValuesEagerly(_.head)
     def tail(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValues(crf.pop _)
 
-    def reverse(implicit crf: CanRebuildFrom[F, V], cbf: CanBuildFrom[Nothing, K, F[K]]): MultiMap[F, V, K] =
+    def reverse(implicit crf: CanRebuildFrom[F, V], cbf: CCBF[K, F]): MultiMap[F, V, K] =
       value.toStream.flatMap(kvs => crf.toStream(kvs._2).map(_ -> kvs._1))(collection.breakOut)
   }
 
   object MultiMap {
-    def build[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
-      : CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]] = new MultiMapCanBuildFrom[F, K, V]
+    def build[F[_], K, V](implicit fcbf: CCBF[V, F]): CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]] =
+      new MultiMapCanBuildFrom[F, K, V]
 
     def empty[F[_], K, V]: MultiMap[F, K, V] = Map.empty[K, F[V]]
   }
@@ -54,7 +54,7 @@ object multiMap {
     override def apply(from: From): M.Builder[Elem, To] = apply()
   }
 
-  class MultiMapCanBuildFrom[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
+  class MultiMapCanBuildFrom[F[_], K, V](implicit fcbf: CCBF[V, F])
     extends CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]]
     with IgnoreFromCBF[Nothing, (K, V), MultiMap[F, K, V]] {
 
@@ -64,7 +64,7 @@ object multiMap {
   class MultiMapBuilder[F[_], K, V](
     map: M.Map[K, M.Builder[V, F[V]]] = M.Map.empty[K, M.Builder[V, F[V]]]
   )(
-    implicit fcbf: CanBuildFrom[Nothing, V, F[V]]
+    implicit fcbf: CCBF[V, F]
   )
     extends M.Builder[(K, V), MultiMap[F, K, V]] {
 

@@ -21,6 +21,9 @@ trait genTraversableLike[CC[_]]  {
   implicit def genTraversableLikeOps[A, Repr](gtl: GenTraversableLike[A, Repr])
     : GenTraversableLikeOps[A, Repr] = new GenTraversableLikeOps[A, Repr](gtl)
 
+  implicit def genTraversableLikeOfEitherOps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr])
+    : GenTraversableLikeOfEitherOps[L, R, Repr] = new GenTraversableLikeOfEitherOps[L, R, Repr](gtl)
+
   class GenTraversableLikeOps[A, Repr](val gtl: GenTraversableLike[A, Repr]) {
     def asMap: GenTraversableLikeCapturer[A, Map, Repr] = as[Map]
 
@@ -43,6 +46,12 @@ trait genTraversableLike[CC[_]]  {
     ): CC[CC[A]] = gtl.foldLeft(UngroupBy[A, B, CC](Map(), Map())) {
       case (ungroupBy, item) => ungroupBy.add(item, f(item))
     }.values
+  }
+
+  class GenTraversableLikeOfEitherOps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr]) {
+    def partitionEithers[That[T]]
+      (implicit lcbf: CanBuildFrom[Nothing, L, That[L]], rcbf: CanBuildFrom[Nothing, R, That[R]]): (That[L], That[R]) =
+        (lcbf.apply(), rcbf.apply()).tap(lr => gtl.foreach(_.fold(lr._1 += _, lr._2 += _))).tmap(_.result(), _.result())
   }
 }
 

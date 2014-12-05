@@ -3,6 +3,7 @@ package pimpathon
 import _root_.java.io.{File, FileInputStream}
 import _root_.java.lang.reflect.Field
 import org.junit.Test
+import pimpathon.function.Predicate
 import scala.util.Properties
 
 import org.junit.Assert._
@@ -368,7 +369,7 @@ class FileTest {
     }
   })
 
-  private def assertFileNameProperty(p: File => Boolean, success: String, failure: String): Unit = {
+  private def assertFileNameProperty(p: Predicate[File], success: String, failure: String): Unit = {
     file.withTempDirectory(dir => {
       assertTrue(p(dir / success))
       assertFalse(p(dir / failure))

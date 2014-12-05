@@ -34,7 +34,16 @@ class FunctionTest {
       List(None, Some(3), Some(4), None, Some(6)).filter(isEven.ifSome))
   }
 
-  private val isEven: (Int => Boolean) = _ % 2 == 0
+  @Test def guard(): Unit = {
+    assertEquals(List(None, Some(4), None, Some(8)), List(1, 2, 3, 4).map((isEven guard double).lift))
+  }
+
+  @Test def guardWith(): Unit = {
+    assertEquals(List(None, Some(4), None, Some(8)), List(1, 2, 3, 4).map((double guardWith isEven).lift))
+  }
+
+  private val isEven: Predicate[Int] = _ % 2 == 0
+  private val double: (Int => Int)   = _ * 2
 }
 
 class PartialFunctionTest {
@@ -60,5 +69,10 @@ class PartialFunctionTest {
   @Test def toLeft(): Unit = assertEquals(
     List(Left("2"), Right(5)),
     List(1, 5).map(util.partial(1 -> "2").toLeft)
+  )
+
+  @Test def partition(): Unit = assertEquals(
+    (List(2, 4), List("one", "three")),
+    util.partial(1 -> "one", 3 -> "three").partition(List(1, 2, 3, 4))
   )
 }

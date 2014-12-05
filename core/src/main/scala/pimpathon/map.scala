@@ -1,7 +1,6 @@
 package pimpathon
 
 import scala.collection.{GenTraversableOnce, mutable => M}
-import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.{SortedMap, TreeMap}
 
 import pimpathon.function._

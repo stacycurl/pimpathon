@@ -179,4 +179,19 @@ class ListTest {
     List(1).tapNonEmpty(_ => strings += "non-empty")
     assertEquals(List("non-empty"), strings.toList)
   }
+
+  @Test def amass(): Unit = assertEquals(
+    List(2, -2, 4, -4),
+    List(1, 2, 3, 4).amass { case i if i % 2 == 0 => List(i, -i) }
+  )
+
+  @Test def partitionEithers(): Unit = assertEquals(
+    (List(1, 2), List("abc", "def")),
+    List(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers
+  )
+
+  @Test def partitionByPF(): Unit = assertEquals(
+    (List(2, 4), List("one", "three")),
+    List(1, 2, 3, 4).partitionByPF(util.partial(1 -> "one", 3 -> "three"))
+  )
 }

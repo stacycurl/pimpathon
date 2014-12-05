@@ -6,12 +6,11 @@ import scala.collection.immutable._
 
 import pimpathon.any._
 import pimpathon.function._
-import pimpathon.multiMap._
 import pimpathon.option._
 import pimpathon.tuple._
 
 
-object list extends filterMonadic with genTraversableLike[List] {
+object list extends genTraversableLike[List] {
   implicit class ListOps[A](val list: List[A]) extends AnyVal {
     def tapEmpty(empty: => Unit): List[A] = tap(empty, _ => {})
     def tapNonEmpty(nonEmpty: List[A] => Unit): List[A] = tap({}, nonEmpty)

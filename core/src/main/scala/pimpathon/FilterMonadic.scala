@@ -2,7 +2,7 @@ package pimpathon
 
 import scala.language.{higherKinds, implicitConversions}
 
-import scala.collection.breakOut
+import scala.collection.{GenTraversable, GenTraversableLike, breakOut}
 import scala.collection.generic.FilterMonadic
 
 import pimpathon.multiMap._

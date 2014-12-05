@@ -9,7 +9,6 @@ import pimpathon.any._
 import pimpathon.function._
 import pimpathon.map._
 import pimpathon.multiMap._
-import pimpathon.option._
 import pimpathon.tuple._
 
 
@@ -23,6 +22,9 @@ trait genTraversableLike[CC[A] <: GenTraversableLike[A, GenTraversable[A]]]  {
 
   implicit def genTraversableLikeOfEitherOps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr])
     : GenTraversableLikeOfEitherOps[L, R, Repr] = new GenTraversableLikeOfEitherOps[L, R, Repr](gtl)
+
+  implicit def genTraversableLikeOfTuple2[K, V, Repr](gtl: GenTraversableLike[(K, V), Repr])
+    : GenTraversableLikeOfTuple2[K, V, Repr] = new GenTraversableLikeOfTuple2[K, V, Repr](gtl)
 
   class GenTraversableLikeOps[A](val gtl: CC[A]) {
     def asMap: GenTraversableLikeCapturer[A, Map] = as[Map]
@@ -51,6 +53,10 @@ trait genTraversableLike[CC[A] <: GenTraversableLike[A, GenTraversable[A]]]  {
   class GenTraversableLikeOfEitherOps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr]) {
     def partitionEithers[That[T]](implicit lcbf: CCBF[L, That], rcbf: CCBF[R, That]): (That[L], That[R]) =
       (lcbf.apply(), rcbf.apply()).tap(lr => gtl.foreach(_.fold(lr._1 += _, lr._2 += _))).tmap(_.result(), _.result())
+  }
+
+  class GenTraversableLikeOfTuple2[K, V, Repr](gtl: GenTraversableLike[(K, V), Repr]) {
+    def toMultiMap[F[_]](implicit fcbf: CCBF[V, F]): MultiMap[F, K, V] = gtl.map(kv => kv)(breakOut)
   }
 }
 

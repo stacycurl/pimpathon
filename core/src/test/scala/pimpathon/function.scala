@@ -75,4 +75,8 @@ class PartialFunctionTest {
     (List(2, 4), List("one", "three")),
     util.partial(1 -> "one", 3 -> "three").partition(List(1, 2, 3, 4))
   )
+
+  @Test def unify(): Unit = assertEquals(
+    List(1, 4), List(1, 2).map(util.partial(2 -> 4).unify)
+  )
 }

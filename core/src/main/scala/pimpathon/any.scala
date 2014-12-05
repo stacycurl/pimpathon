@@ -10,7 +10,7 @@ object any {
   implicit class AnyOps[A](val a: A) extends AnyVal {
     def calc[B](f: A => B): B = f(a)
     def |>[B](f: A => B): B = f(a)
-    def transform(pf: PartialFunction[A, A]): A = pf.lift(a).getOrElse(a)
+    def transform(pf: PartialFunction[A, A]): A = pf.unify(a)
 
     def tapIf(p: Predicate[A])(actions: (A => Unit)*): A     = if (p(a)) tap(actions: _*) else a
     def tapUnless(p: Predicate[A])(actions: (A => Unit)*): A = if (p(a)) a else tap(actions: _*)

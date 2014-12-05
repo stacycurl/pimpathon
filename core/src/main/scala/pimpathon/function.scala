@@ -43,6 +43,10 @@ object function {
       }
   }
 
+  implicit class PartialEndoFunctionOps[A](val pf: PartialFunction[A, A]) extends AnyVal {
+    def unify: A => A = (a: A) => pf.lift(a).getOrElse(a)
+  }
+
   private class GuardedPartialFunction[A, B](p: Predicate[A], f: A => B) extends PartialFunction[A, B] {
     def isDefinedAt(a: A): Boolean = p(a)
     def apply(a: A): B = f(a)

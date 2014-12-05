@@ -15,6 +15,11 @@ class AnyTest {
     List("12".calc(_ + "3"), "12" |> (_ + "3"))
   )
 
+  @Test def transform(): Unit = assertEquals(
+    List(1, 4, 3, 8),
+    List(1, 2, 3, 4).map(_.transform(util.partial(2 -> 4, 4 -> 8)))
+  )
+
   @Test def tap(): Unit = {
     val ints = new M.ListBuffer[Int]
 

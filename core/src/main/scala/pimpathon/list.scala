@@ -6,6 +6,8 @@ import scala.collection.immutable._
 
 import pimpathon.any._
 import pimpathon.function._
+import pimpathon.map._
+import pimpathon.multiMap._
 import pimpathon.option._
 import pimpathon.tuple._
 
@@ -29,7 +31,7 @@ object list extends genTraversableLike[List] {
 
     def sizeGT(value: Int): Boolean = uncons(empty = value < 0, nonEmpty = _.tail.sizeGT(value - 1))
 
-
+    def duplicatesBy[B](f: A => B): List[A] = list.asMultiMap[List].withKeys(f).filterValues(_.size > 1).multiMap.values
     def distinctBy[B](f: A => B): List[A] = list.map(equalBy(f)).distinct.map(_.a)
 
     def batchBy[B](f: A => B): List[List[A]] = list.unconsC(empty = Nil, nonEmpty = head => tail => {

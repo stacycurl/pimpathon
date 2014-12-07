@@ -2,10 +2,6 @@ package pimpathon
 
 import org.junit.Test
 import scala.collection.{mutable => M}
-import scala.collection.generic.CanBuildFrom
-import scala.collection.immutable.TreeMap
-import scala.reflect.ClassTag
-import scala.util.control._
 
 import org.junit.Assert._
 import pimpathon.any._
@@ -141,6 +137,10 @@ class MapTest {
     assertEquals(Map(1 -> 10, 2 -> 20), result)
     assertEquals("Shouldn't have iterated over the original map twice", List(1, 2), originalValuesSeen.toList)
   }
+
+  @Test def mapEntries(): Unit = assertEquals(
+    Map("1" -> 2.0, "2" -> 4.0), Map(1 -> 2, 2 -> 4).mapEntries(k => v => (k.toString, v.toDouble))
+  )
 
   @Test def findKey(): Unit = {
     assertEquals(None, empty.findKey(_ => true))

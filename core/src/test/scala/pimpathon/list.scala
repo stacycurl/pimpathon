@@ -1,12 +1,10 @@
 package pimpathon
 
 import org.junit.Test
-import scala.collection.immutable.SortedMap
 import scala.collection.{mutable => M}
 
 import org.junit.Assert._
 import pimpathon.list._
-import pimpathon.option._
 import pimpathon.util._
 import scalaz.std.list._
 
@@ -57,11 +55,19 @@ class ListTest {
     assertFalse(List(1, 2).sizeGT(2))
   }
 
+  @Test def duplicatesBy(): Unit = assertEquals(
+    List("foo", "bar", "bard", "food"), List("foo", "bar", "bard", "food", "foody").duplicatesBy(_.length)
+  )
 
   @Test def distinctBy(): Unit = {
     assertEquals(List("foo", "bard", "foody"),
       List("foo", "bar", "bard", "food", "foody", "bardo").distinctBy(_.length))
   }
+
+  @Test def countBy(): Unit = assertEquals(
+    Map(1 -> List("foo"), 2 -> List("foody", "barby"), 3 -> List("bard", "food", "barb")),
+    List("foo", "bard", "food", "barb", "foody", "barby").countBy(_.length)
+  )
 
   @Test def tailOption(): Unit = {
     assertEquals(None,          Nil.tailOption)

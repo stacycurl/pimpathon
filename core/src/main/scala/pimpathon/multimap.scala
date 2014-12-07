@@ -3,15 +3,17 @@ package pimpathon
 import scala.collection.{breakOut, mutable => M, GenTraversableLike}
 import scala.collection.generic.CanBuildFrom
 
+import pimpathon.builder._
+import pimpathon.function._
 import pimpathon.map._
 import pimpathon.stream._
 
 
 object multiMap {
   type MultiMap[F[_], K, V] = Map[K, F[V]]
+  type MMCBF[F[_], K, V] = CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]]
 
-  implicit def build[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
-    : CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]] = MultiMap.build
+  implicit def build[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]]): MMCBF[F, K, V] = MultiMap.build
 
   implicit def multiMapOps[F[_], K, V](multiMap: MultiMap[F, K, V]): MultiMapOps[F, K, V] =
     new MultiMapOps[F, K, V](multiMap)
@@ -26,7 +28,7 @@ object multiMap {
       }
 
     def append(key: K, newValues: F[V])(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] =
-      value + ((key, crf.concat(value.get(key), Some(newValues))))
+      value + ((key, crf.concat(List(value.get(key), Some(newValues)).flatten)))
 
     def pop(key: K)(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValue(key, crf.pop)
 
@@ -38,15 +40,20 @@ object multiMap {
     // These operations cannot be defined on MultiMapOps because non-implicit methods of the same name exist on Map
     def head[Repr](implicit gtl: F[V] <:< GenTraversableLike[V, Repr]): Map[K, V] = value.mapValuesEagerly(_.head)
     def tail(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValues(crf.pop _)
+    def values(implicit crf: CanRebuildFrom[F, V]): F[V] = crf.concat(value.values)
 
     def reverse(implicit crf: CanRebuildFrom[F, V], cbf: CCBF[K, F]): MultiMap[F, V, K] =
       value.toStream.flatMap(kvs => crf.toStream(kvs._2).map(_ -> kvs._1))(collection.breakOut)
+
+    def mapEntries[C, W](f: K => F[V] => (C, F[W]))(
+      implicit cbmmf: MMCBF[F, C, F[W]], crf: CanRebuildFrom[F, W], crff: CanRebuildFrom[F, F[W]]
+    ): MultiMap[F, C, W] = {
+      value.asMultiMap[F].withEntries(f.tupled).mapValuesEagerly(crf.concat)
+    }
   }
 
   object MultiMap {
-    def build[F[_], K, V](implicit fcbf: CCBF[V, F]): CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]] =
-      new MultiMapCanBuildFrom[F, K, V]
-
+    def build[F[_], K, V](implicit fcbf: CCBF[V, F]): MMCBF[F, K, V] = new MultiMapCanBuildFrom[F, K, V]
     def empty[F[_], K, V]: MultiMap[F, K, V] = Map.empty[K, F[V]]
   }
 
@@ -56,8 +63,7 @@ object multiMap {
   }
 
   class MultiMapCanBuildFrom[F[_], K, V](implicit fcbf: CCBF[V, F])
-    extends CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]]
-    with IgnoreFromCBF[Nothing, (K, V), MultiMap[F, K, V]] {
+    extends MMCBF[F, K, V] with IgnoreFromCBF[Nothing, (K, V), MultiMap[F, K, V]] {
 
     def apply(): M.Builder[(K, V), MultiMap[F, K, V]] = new MultiMapBuilder[F, K, V]
   }
@@ -69,23 +75,16 @@ object multiMap {
   )
     extends M.Builder[(K, V), MultiMap[F, K, V]] {
 
-    def +=(elem: (K, V)): this.type = add(elem._1, elem._2)
+    def +=(elem: (K, V)): this.type = { add(elem._1, elem._2); this }
     def clear(): Unit = map.clear()
     def result(): Map[K, F[V]] = map.map(kv => (kv._1, kv._2.result()))(breakOut)
 
-    def add(k: K, v: V): this.type = {
-      map.put(k, map.getOrElse(k, fcbf.apply()) += v)
-
-      this
-    }
+    private def add(k: K, v: V): Unit = map.put(k, map.getOrElse(k, fcbf.apply()) += v)
   }
 
   trait CanRebuildFrom[F[_], V] {
-    def concat(fvs: Option[F[V]]*): F[V] = fvs.foldLeft(cbf.apply()) {
-      case (acc, None)     => acc
-      case (acc, Some(fv)) => acc ++= toStream(fv)
-    }.result()
-
+    def concat(ffv: F[F[V]])(implicit crff: CanRebuildFrom[F, F[V]]): F[V] = concat(crff.toStream(ffv))
+    def concat(fvs: Iterable[F[V]]): F[V] = (cbf.apply() +++= fvs.map(toStream)) result()
     def pop(fv: F[V]): Option[F[V]] = flatMapS(fv)(_.tailOption.filter(_.nonEmpty))
     def flatMapS(fv: F[V])(f: Stream[V] => Option[Stream[V]]): Option[F[V]] = f(toStream(fv)).map(fromStream)
     def toStream(fv: F[V]): Stream[V]

@@ -42,6 +42,10 @@ class FunctionTest {
     assertEquals(List(None, Some(4), None, Some(8)), List(1, 2, 3, 4).map((double guardWith isEven).lift))
   }
 
+  @Test def tupled(): Unit = {
+    assertEquals(3, ((i: Int) => (j: Int) => i + j).tupled((1, 2)))
+  }
+
   private val isEven: Predicate[Int] = _ % 2 == 0
   private val double: (Int => Int)   = _ * 2
 }
@@ -74,5 +78,9 @@ class PartialFunctionTest {
   @Test def partition(): Unit = assertEquals(
     (List(2, 4), List("one", "three")),
     util.partial(1 -> "one", 3 -> "three").partition(List(1, 2, 3, 4))
+  )
+
+  @Test def unify(): Unit = assertEquals(
+    List(1, 4), List(1, 2).map(util.partial(2 -> 4).unify)
   )
 }

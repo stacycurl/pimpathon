@@ -9,10 +9,24 @@ object function {
   type Predicate[-A] = A => Boolean
 
   implicit def functionOps[A, B](f: A => B): FunctionOps[A, B] = new FunctionOps[A, B](f)
+
+  implicit def curriedFunction2Ops[A, B, C](f: A => B => C): CurriedFunction2Ops[A, B, C] =
+    new CurriedFunction2Ops[A, B, C](f)
+
   implicit def predicateOps[A](p: Predicate[A]): PredicateOps[A] = new PredicateOps[A](p)
 
-  class FunctionOps[A, B](val f: A => B) {
+  implicit def partialFunctionOps[In, Out](pf: PartialFunction[In, Out]): PartialFunctionOps[In, Out] =
+    new PartialFunctionOps[In, Out](pf)
+
+  implicit def partialFunctionEndoOps[A](pf: PartialFunction[A, A]): PartialEndoFunctionOps[A] =
+    new PartialEndoFunctionOps[A](pf)
+
+  class FunctionOps[A, B](f: A => B) {
     def guardWith(p: Predicate[A]): PartialFunction[A, B] = p guard f
+  }
+
+  class CurriedFunction2Ops[A, B, C](f: A => B => C) {
+    def tupled: ((A, B)) => C = Function.uncurried(f).tupled
   }
 
   class PredicateOps[A](p: Predicate[A]) {
@@ -28,9 +42,6 @@ object function {
     def guard[B](f: A => B): PartialFunction[A, B] = new GuardedPartialFunction[A, B](p, f)
   }
 
-  implicit def partialFunctionOps[In, Out](pf: PartialFunction[In, Out]): PartialFunctionOps[In, Out] =
-    new PartialFunctionOps[In, Out](pf)
-
   class PartialFunctionOps[In, Out](pf: PartialFunction[In, Out]) {
     def partition[CC[A] <: GenTraversableLike[A, GenTraversable[A]]](ins: CC[In])
       (implicit cbf: CCBF[Either[In, Out], CC], icbf: CCBF[In, CC], ocbf: CCBF[Out, CC]): (CC[In], CC[Out]) =
@@ -45,6 +56,10 @@ object function {
         def isDefinedAt(in: (In, In2)): Boolean = pf.isDefinedAt(in._1) && rhs.isDefinedAt(in._2)
         def apply(in: (In, In2)): (Out, Out2) = (pf.apply(in._1), rhs.apply(in._2))
       }
+  }
+
+  class PartialEndoFunctionOps[A](pf: PartialFunction[A, A]) {
+    def unify: A => A = (a: A) => pf.lift(a).getOrElse(a)
   }
 
   private class GuardedPartialFunction[A, B](p: Predicate[A], f: A => B) extends PartialFunction[A, B] {

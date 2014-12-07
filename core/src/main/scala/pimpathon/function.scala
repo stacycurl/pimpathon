@@ -14,6 +14,10 @@ object function {
     def guardWith(p: Predicate[A]): PartialFunction[A, B] = p guard f
   }
 
+  implicit class CurriedFunction2Ops[A, B, C](val f: A => B => C) extends AnyVal {
+    def tupled: ((A, B)) => C = Function.uncurried(f).tupled
+  }
+
   implicit class PredicateOps[A](val p: Predicate[A]) extends AnyVal {
     def and(q: Predicate[A]): Predicate[A] = (a: A) => p(a) && q(a)
     def or(q: Predicate[A]):  Predicate[A] = (a: A) => p(a) || q(a)

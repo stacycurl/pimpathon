@@ -64,6 +64,11 @@ class ListTest {
       List("foo", "bar", "bard", "food", "foody", "bardo").distinctBy(_.length))
   }
 
+  @Test def countBy(): Unit = assertEquals(
+    Map(1 -> List("foo"), 2 -> List("foody", "barby"), 3 -> List("bard", "food", "barb")),
+    List("foo", "bard", "food", "barb", "foody", "barby").countBy(_.length)
+  )
+
   @Test def tailOption(): Unit = {
     assertEquals(None,          Nil.tailOption)
     assertEquals(Some(Nil),     List(0).tailOption)

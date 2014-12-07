@@ -64,16 +64,21 @@ class MultiMapTest {
     assertEquals( Set(1, 2, 3), Map(1 ->  Set(1), 2 ->  Set(2, 3)).multiMap.values)
   }
 
+  @Test def multiMap_reverse(): Unit = assertEquals(
+    Map(2 -> List(1), 3 -> List(1, 2), 4 -> List(2)),
+    Map(1 -> List(2, 3), 2 -> List(3, 4)).multiMap.reverse
+  )
+
+  @Test def multiMap_mapEntries(): Unit = assertEquals(
+    Map(0 -> List(20, 21), 1 -> List(10, 11, 30, 31)),
+    Map(1 -> List(10, 11), 2 -> List(20, 21), 3 -> List(30, 31)).multiMap.mapEntries(k => vs => (k % 2, vs))
+  )
+
   @Test def pop(): Unit = {
     assertEquals(Map(1 -> List(3), 2 -> List(3)),    Map(1 -> List(2, 3), 2 -> List(3)).pop(1))
     assertEquals(Map(1 -> List(2, 3)),               Map(1 -> List(2, 3), 2 -> List(3)).pop(2))
     assertEquals(Map(1 -> List(2, 3), 2 -> List(3)), Map(1 -> List(2, 3), 2 -> List(3)).pop(3))
   }
-
-  @Test def multiMap_reverse(): Unit = assertEquals(
-    Map(2 -> List(1), 3 -> List(1, 2), 4 -> List(2)),
-    Map(1 -> List(2, 3), 2 -> List(3, 4)).multiMap.reverse
-  )
 
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")

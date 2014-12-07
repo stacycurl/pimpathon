@@ -6,15 +6,16 @@ import scala.collection.{breakOut, mutable => M, GenTraversableLike}
 import scala.collection.generic.CanBuildFrom
 
 import pimpathon.builder._
+import pimpathon.function._
 import pimpathon.map._
 import pimpathon.stream._
 
 
 object multiMap {
   type MultiMap[F[_], K, V] = Map[K, F[V]]
+  type MMCBF[F[_], K, V] = CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]]
 
-  implicit def build[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]])
-    : CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]] = MultiMap.build
+  implicit def build[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]]): MMCBF[F, K, V] = MultiMap.build
 
   implicit class MultiMapOps[F[_], K, V](val value: MultiMap[F, K, V]) extends AnyVal {
     // just an alias for mapValuesEagerly
@@ -42,12 +43,16 @@ object multiMap {
 
     def reverse(implicit crf: CanRebuildFrom[F, V], cbf: CCBF[K, F]): MultiMap[F, V, K] =
       value.toStream.flatMap(kvs => crf.toStream(kvs._2).map(_ -> kvs._1))(collection.breakOut)
+
+    def mapEntries[C, W](f: K => F[V] => (C, F[W]))(
+      implicit cbmmf: MMCBF[F, C, F[W]], crf: CanRebuildFrom[F, W], crff: CanRebuildFrom[F, F[W]]
+    ): MultiMap[F, C, W] = {
+      value.asMultiMap[F].withEntries(f.tupled).mapValuesEagerly(crf.concat)
+    }
   }
 
   object MultiMap {
-    def build[F[_], K, V](implicit fcbf: CCBF[V, F]): CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]] =
-      new MultiMapCanBuildFrom[F, K, V]
-
+    def build[F[_], K, V](implicit fcbf: CCBF[V, F]): MMCBF[F, K, V] = new MultiMapCanBuildFrom[F, K, V]
     def empty[F[_], K, V]: MultiMap[F, K, V] = Map.empty[K, F[V]]
   }
 
@@ -57,8 +62,7 @@ object multiMap {
   }
 
   class MultiMapCanBuildFrom[F[_], K, V](implicit fcbf: CCBF[V, F])
-    extends CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]]
-    with IgnoreFromCBF[Nothing, (K, V), MultiMap[F, K, V]] {
+    extends MMCBF[F, K, V] with IgnoreFromCBF[Nothing, (K, V), MultiMap[F, K, V]] {
 
     def apply(): M.Builder[(K, V), MultiMap[F, K, V]] = new MultiMapBuilder[F, K, V]
   }
@@ -78,6 +82,7 @@ object multiMap {
   }
 
   trait CanRebuildFrom[F[_], V] {
+    def concat(ffv: F[F[V]])(implicit crff: CanRebuildFrom[F, F[V]]): F[V] = concat(crff.toStream(ffv))
     def concat(fvs: Iterable[F[V]]): F[V] = (cbf.apply() +++= fvs.map(toStream)) result()
     def pop(fv: F[V]): Option[F[V]] = flatMapS(fv)(_.tailOption.filter(_.nonEmpty))
     def flatMapS(fv: F[V])(f: Stream[V] => Option[Stream[V]]): Option[F[V]] = f(toStream(fv)).map(fromStream)

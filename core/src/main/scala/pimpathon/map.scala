@@ -1,6 +1,6 @@
 package pimpathon
 
-import scala.collection.{breakOut, GenTraversableOnce, mutable => M}
+import scala.collection.{breakOut, mutable => M, GenTraversable, GenTraversableOnce}
 import scala.collection.immutable.{SortedMap, TreeMap}
 
 import pimpathon.function._
@@ -8,7 +8,7 @@ import pimpathon.multiMap._
 import pimpathon.tuple._
 
 
-object map {
+object map extends genTraversableLike[GenTraversable] {
   implicit class MapOps[K, V](val map: Map[K, V]) extends AnyVal {
     def containsAny(ok: Option[K]): Boolean = ok.exists(map.contains)
     def containsAll(ok: Option[K]): Boolean = ok.forall(map.contains)

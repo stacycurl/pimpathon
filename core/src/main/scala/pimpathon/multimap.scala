@@ -5,6 +5,7 @@ import scala.language.{higherKinds, implicitConversions}
 import scala.collection.{breakOut, mutable => M, GenTraversableLike}
 import scala.collection.generic.CanBuildFrom
 
+import pimpathon.builder._
 import pimpathon.map._
 import pimpathon.stream._
 
@@ -25,7 +26,7 @@ object multiMap {
       }
 
     def append(key: K, newValues: F[V])(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] =
-      value + ((key, crf.concat(value.get(key), Some(newValues))))
+      value + ((key, crf.concat(List(value.get(key), Some(newValues)).flatten)))
 
     def pop(key: K)(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValue(key, crf.pop)
 
@@ -37,6 +38,7 @@ object multiMap {
     // These operations cannot be defined on MultiMapOps because non-implicit methods of the same name exist on Map
     def head[Repr](implicit gtl: F[V] <:< GenTraversableLike[V, Repr]): Map[K, V] = value.mapValuesEagerly(_.head)
     def tail(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValues(crf.pop _)
+    def values(implicit crf: CanRebuildFrom[F, V]): F[V] = crf.concat(value.values)
 
     def reverse(implicit crf: CanRebuildFrom[F, V], cbf: CCBF[K, F]): MultiMap[F, V, K] =
       value.toStream.flatMap(kvs => crf.toStream(kvs._2).map(_ -> kvs._1))(collection.breakOut)
@@ -68,22 +70,15 @@ object multiMap {
   )
     extends M.Builder[(K, V), MultiMap[F, K, V]] {
 
-    def +=(elem: (K, V)): this.type = add(elem._1, elem._2)
+    def +=(elem: (K, V)): this.type = { add(elem._1, elem._2); this }
     def clear(): Unit = map.clear()
     def result(): Map[K, F[V]] = map.map(kv => (kv._1, kv._2.result()))(breakOut)
 
-    def add(k: K, v: V): this.type = {
-      map.put(k, map.getOrElse(k, fcbf.apply()) += v)
-
-      this
-    }
+    private def add(k: K, v: V): Unit = map.put(k, map.getOrElse(k, fcbf.apply()) += v)
   }
 
   trait CanRebuildFrom[F[_], V] {
-    def concat(fvs: Option[F[V]]*): F[V] = fvs.foldLeft(cbf.apply()) {
-      case (acc, ofv) => ofv.fold(acc)(fv => acc ++= toStream(fv))
-    }.result()
-
+    def concat(fvs: Iterable[F[V]]): F[V] = (cbf.apply() +++= fvs.map(toStream)) result()
     def pop(fv: F[V]): Option[F[V]] = flatMapS(fv)(_.tailOption.filter(_.nonEmpty))
     def flatMapS(fv: F[V])(f: Stream[V] => Option[Stream[V]]): Option[F[V]] = f(toStream(fv)).map(fromStream)
     def toStream(fv: F[V]): Stream[V]

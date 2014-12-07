@@ -59,6 +59,11 @@ class MultiMapTest {
     assertEquals(Map(1 -> List(11)), Map(1 -> List(10, 11), 2 -> List(20)).multiMap.tail)
   }
 
+  @Test def multiMap_values(): Unit = {
+    assertEquals(List(1, 2, 3), Map(1 -> List(1), 2 -> List(2, 3)).multiMap.values)
+    assertEquals( Set(1, 2, 3), Map(1 ->  Set(1), 2 ->  Set(2, 3)).multiMap.values)
+  }
+
   @Test def pop(): Unit = {
     assertEquals(Map(1 -> List(3), 2 -> List(3)),    Map(1 -> List(2, 3), 2 -> List(3)).pop(1))
     assertEquals(Map(1 -> List(2, 3)),               Map(1 -> List(2, 3), 2 -> List(3)).pop(2))

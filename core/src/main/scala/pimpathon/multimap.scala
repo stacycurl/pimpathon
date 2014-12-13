@@ -1,8 +1,9 @@
 package pimpathon
 
-import scala.collection.{breakOut, mutable => M, GenTraversableLike}
+import scala.collection.{breakOut, mutable => M, GenTraversable}
 import scala.collection.generic.CanBuildFrom
 
+import pimpathon.any._
 import pimpathon.builder._
 import pimpathon.function._
 import pimpathon.map._
@@ -32,13 +33,23 @@ object multiMap {
 
     def pop(key: K)(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValue(key, crf.pop)
 
+    def sequence(
+      implicit bf: CanBuildFrom[Nothing, Map[K, V], F[Map[K, V]]],
+      crf: CanRebuildFrom[F, V], gtl: F[V] <:< GenTraversable[V], crsm: CanRebuildFrom[F, Map[K, V]]
+    ): F[Map[K, V]] = crsm.fromStream(value.unfold(_.headTailOption))
+
+    def headTailOption(implicit gtl: F[V] <:< GenTraversable[V], crf: CanRebuildFrom[F, V])
+      : Option[(Map[K, V], MultiMap[F, K, V])] = multiMap.head.filterSelf(_.nonEmpty).map(_ -> multiMap.tail)
+
     def multiMap: MultiMapConflictingOps[F, K, V] = new MultiMapConflictingOps[F, K, V](value)
   }
 
 
   class MultiMapConflictingOps[F[_], K, V](value: MultiMap[F, K, V]) {
     // These operations cannot be defined on MultiMapOps because non-implicit methods of the same name exist on Map
-    def head[Repr](implicit gtl: F[V] <:< GenTraversableLike[V, Repr]): Map[K, V] = value.mapValuesEagerly(_.head)
+    def head(implicit gtl: F[V] <:< GenTraversable[V]): Map[K, V] =
+      value.flatMap { case (k, fv) => fv.filterSelf(_.nonEmpty).map(k -> _.head) }
+
     def tail(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValues(crf.pop _)
     def values(implicit crf: CanRebuildFrom[F, V]): F[V] = crf.concat(value.values)
 
@@ -91,7 +102,7 @@ object multiMap {
 
     protected val cbf: CanBuildFrom[F[V], V, F[V]]
 
-    private def fromStream(to: TraversableOnce[V]): F[V] = (cbf() ++= to).result()
+    def fromStream(to: TraversableOnce[V]): F[V] = (cbf() ++= to).result()
   }
 
   object CanRebuildFrom {

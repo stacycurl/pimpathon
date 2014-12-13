@@ -53,10 +53,22 @@ class MultiMapTest {
 
   @Test def multiMap_head(): Unit = {
     assertEquals(Map(1 -> 10, 2 -> 20), Map(1 -> List(10, 11), 2 -> List(20)).multiMap.head)
+    assertEquals(Map(2 -> 20), Map(1 -> Nil, 2 -> List(20)).multiMap.head)
+    assertEquals(Map(), Map.empty[Int, List[Int]].multiMap.head)
   }
 
   @Test def multiMap_tail(): Unit = {
     assertEquals(Map(1 -> List(11)), Map(1 -> List(10, 11), 2 -> List(20)).multiMap.tail)
+    assertEquals(Map(), Map(1 -> Nil, 2 -> List(20)).multiMap.tail)
+    assertEquals(Map(), Map(1 -> (Nil: List[Int])).multiMap.tail)
+    assertEquals(Map(), Map.empty[Int, List[Int]].multiMap.tail)
+  }
+
+  @Test def headTailOption(): Unit = {
+    assertEquals(Some(Map(1 -> 10, 2 -> 20), Map(1 -> List(11))), Map(1 -> List(10, 11), 2 -> List(20)).headTailOption)
+    assertEquals(Some(Map(2 -> 20), Map()), Map(1 -> Nil, 2 -> List(20)).headTailOption)
+    assertEquals(None, Map(1 -> (Nil: List[Int])).headTailOption)
+    assertEquals(None, Map.empty[Int, List[Int]].headTailOption)
   }
 
   @Test def multiMap_values(): Unit = {
@@ -79,6 +91,11 @@ class MultiMapTest {
     assertEquals(Map(1 -> List(2, 3)),               Map(1 -> List(2, 3), 2 -> List(3)).pop(2))
     assertEquals(Map(1 -> List(2, 3), 2 -> List(3)), Map(1 -> List(2, 3), 2 -> List(3)).pop(3))
   }
+
+  @Test def sequence(): Unit = assertEquals(
+    List(Map(1 -> 10, 2 -> 20), Map(1 -> 11, 2 -> 21)),
+    Map(1 -> List(10, 11), 2 -> List(20, 21)).sequence
+  )
 
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")

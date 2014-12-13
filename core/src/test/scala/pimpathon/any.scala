@@ -107,4 +107,8 @@ class AnyTest {
     List(1),
     new M.ListBuffer[Int].tap(ints => 1.addTo(ints)).toList
   )
+
+  @Test def unfold(): Unit = assertEquals(
+    List('f', 'o', 'o'), "foo".unfold(s => if (s.nonEmpty) Some(s.head, s.tail) else None).toList
+  )
 }

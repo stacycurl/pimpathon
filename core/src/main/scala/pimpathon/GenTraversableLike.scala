@@ -49,7 +49,7 @@ trait genTraversableLike[CC[A] <: GenTraversableLike[A, GenTraversable[A]]]  {
   }
 
   class GenTraversableLikeOfEitherOps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr]) {
-    def partitionEithers[That[T]](implicit lcbf: CCBF[L, That], rcbf: CCBF[R, That]): (That[L], That[R]) =
+    def partitionEithers[That[_]](implicit lcbf: CCBF[L, That], rcbf: CCBF[R, That]): (That[L], That[R]) =
       (lcbf.apply(), rcbf.apply()).tap(lr => gtl.foreach(_.fold(lr._1 += _, lr._2 += _))).tmap(_.result(), _.result())
   }
 
@@ -63,6 +63,7 @@ class GenTraversableLikeCapturer[A, F[_, _]](gtl: GenTraversableLike[A, GenTrave
 
   def withKeys[K](f: A => K)(implicit cbf: CBF[K, A]): F[K, A]   = withEntries(a => (f(a), a))
   def withValues[V](f: A => V)(implicit cbf: CBF[A, V]): F[A, V] = withEntries(a => (a, f(a)))
+  def withConstValue[V](v: V)(implicit  cbf: CBF[A, V]): F[A, V] = withEntries(a => (a, v))
   def withEntries[K, V](f: A => ((K, V)))(implicit cbf: CBF[K, V]): F[K, V] = gtl.map(f)(breakOut)
 
   def withSomeKeys[K](f: A => Option[K])(implicit cbf: CBF[K, A]): F[K, A] =

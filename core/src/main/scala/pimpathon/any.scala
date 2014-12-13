@@ -37,6 +37,11 @@ object any {
 
     def addTo[To](builder: M.Builder[A, To]): A = tap(builder += _)
 
+    def unfold[B](f: A => Option[(B, A)]): Stream[B] = f(a) match {
+      case None            => Stream.empty[B]
+      case Some((b, newA)) => Stream.cons(b, newA.unfold(f))
+    }
+
     // These methods are aliased to suit individual preferences
     def update[Discarded](actions: (A => Discarded)*): A         = tap(actions: _*)
     def withSideEffect[Discarded](actions: (A => Discarded)*): A = tap(actions: _*)

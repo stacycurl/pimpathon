@@ -129,6 +129,14 @@ class GenTraversableLikeTests {
     assertEquals(Map(1 -> 2), Set(1).asMap.withValues(_ * 2))
   }
 
+  @Test def asMap_withConstValue(): Unit = {
+    assertEquals(Map(), List.empty[Int].asMap.withConstValue(2))
+    assertEquals(Map(1 -> 2, 2 -> 2), List(1, 2).asMap.withConstValue(2))
+
+    assertEquals(Map(), Set.empty[Int].asMap.withConstValue(2))
+    assertEquals(Map(1 -> 2, 2 -> 2), Set(1, 2).asMap.withConstValue(2))
+  }
+
   @Test def asMap_withSomeKeys(): Unit = {
     assertEquals(Map(), List.empty[Int].asMap.withSomeKeys(i => Some(i * 2)))
     assertEquals(Map(2 -> 1), List(1, 2).asMap.withSomeKeys(i => (i % 2 == 1).option(i * 2)))

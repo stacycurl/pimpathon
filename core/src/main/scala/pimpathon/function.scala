@@ -43,6 +43,8 @@ object function {
   }
 
   class PartialFunctionOps[In, Out](pf: PartialFunction[In, Out]) {
+    def isUndefinedAt(in: In): Boolean = !pf.isDefinedAt(in)
+
     def partition[CC[A] <: GenTraversableLike[A, GenTraversable[A]]](ins: CC[In])
       (implicit cbf: CCBF[Either[In, Out], CC], icbf: CCBF[In, CC], ocbf: CCBF[Out, CC]): (CC[In], CC[Out]) =
         ins.map(either).partitionEithers[CC](icbf, ocbf)
@@ -50,6 +52,9 @@ object function {
     def either: In => Either[In, Out] = toRight
     def toRight: In => Either[In, Out] = (in: In) => pf.lift(in).toRight(in)
     def toLeft:  In => Either[Out, In] = (in: In) => pf.lift(in).toLeft(in)
+
+    def first[C]: PartialFunction[(In, C), (Out, C)] = ***(identityPF[C])
+    def second[C]: PartialFunction[(C, In), (C, Out)] = identityPF[C] *** pf
 
     def ***[In2, Out2](rhs: PartialFunction[In2, Out2]): PartialFunction[(In, In2), (Out, Out2)] =
       new PartialFunction[(In, In2), (Out, Out2)] {
@@ -67,5 +72,6 @@ object function {
     def apply(a: A): B = f(a)
   }
 
+  def identityPF[A]: PartialFunction[A, A] = { case a => a }
   def equalC[A]: A => A => Boolean = (l: A) => (r: A) => l equals r
 }

@@ -36,6 +36,9 @@ object any {
 
     def addTo[To](builder: M.Builder[A, To]): A = tap(builder += _)
 
+    def unfold[B](f: A => Option[(B, A)]): Stream[B] =
+      f(a).fold(Stream.empty[B])(ba => Stream.cons(ba._1, ba._2.unfold(f)))
+
     // These methods are aliased to suit individual preferences
     def update[Discarded](actions: (A => Discarded)*): A         = tap(actions: _*)
     def withSideEffect[Discarded](actions: (A => Discarded)*): A = tap(actions: _*)

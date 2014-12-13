@@ -5,6 +5,7 @@ import scala.collection.{mutable => M}
 import scala.collection.immutable._
 
 import pimpathon.any._
+import pimpathon.boolean._
 import pimpathon.function._
 import pimpathon.multiMap._
 import pimpathon.option._
@@ -25,7 +26,7 @@ object list extends genTraversableLike[List] {
     def fraction(p: Predicate[A]): Double = countWithSize(p).fold(Double.NaN)(_.to[Double].calc(_ / _))
 
     def countWithSize(p: Predicate[A]): Option[(Int, Int)] = mapNonEmpty(_.foldLeft((0, 0)) {
-      case ((passed, size), elem) => (if (p(elem)) passed + 1 else passed, size + 1)
+      case ((passed, size), elem) => (passed + p(elem).asInt, size + 1)
     })
 
     def sizeGT(value: Int): Boolean = uncons(empty = value < 0, nonEmpty = _.tail.sizeGT(value - 1))

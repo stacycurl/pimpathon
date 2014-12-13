@@ -40,6 +40,8 @@ object function {
     def toRight: In => Either[In, Out] = (in: In) => pf.lift(in).toRight(in)
     def toLeft:  In => Either[Out, In] = (in: In) => pf.lift(in).toLeft(in)
 
+    def first[C]: PartialFunction[(In, C), (Out, C)] = ***(identityPF[C])
+
     def ***[In2, Out2](rhs: PartialFunction[In2, Out2]): PartialFunction[(In, In2), (Out, Out2)] =
       new PartialFunction[(In, In2), (Out, Out2)] {
         def isDefinedAt(in: (In, In2)): Boolean = pf.isDefinedAt(in._1) && rhs.isDefinedAt(in._2)
@@ -56,5 +58,6 @@ object function {
     def apply(a: A): B = f(a)
   }
 
+  def identityPF[A]: PartialFunction[A, A] = PartialFunction(identity[A])
   def equalC[A]: A => A => Boolean = (l: A) => (r: A) => l equals r
 }

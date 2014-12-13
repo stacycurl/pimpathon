@@ -92,6 +92,11 @@ class MultiMapTest {
     assertEquals(Map(1 -> List(2, 3), 2 -> List(3)), Map(1 -> List(2, 3), 2 -> List(3)).pop(3))
   }
 
+  @Test def sequence(): Unit = assertEquals(
+    List(Map(1 -> 10, 2 -> 20), Map(1 -> 11, 2 -> 21)),
+    Map(1 -> List(10, 11), 2 -> List(20, 21)).sequence
+  )
+
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
     def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem](s"apply($from)")

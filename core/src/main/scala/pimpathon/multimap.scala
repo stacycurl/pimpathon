@@ -32,6 +32,11 @@ object multiMap {
 
     def pop(key: K)(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValue(key, crf.pop)
 
+    def sequence(
+      implicit bf: CanBuildFrom[Nothing, Map[K, V], F[Map[K, V]]],
+      crf: CanRebuildFrom[F, V], gtl: F[V] <:< GenTraversable[V], crsm: CanRebuildFrom[F, Map[K, V]]
+    ): F[Map[K, V]] = crsm.fromStream(value.unfold(_.headTailOption))
+
     def headTailOption(implicit gtl: F[V] <:< GenTraversable[V], crf: CanRebuildFrom[F, V])
       : Option[(Map[K, V], MultiMap[F, K, V])] = multiMap.head.filterSelf(_.nonEmpty).map(_ -> multiMap.tail)
 
@@ -96,7 +101,7 @@ object multiMap {
 
     protected val cbf: CanBuildFrom[F[V], V, F[V]]
 
-    private def fromStream(to: TraversableOnce[V]): F[V] = (cbf() ++= to).result()
+    def fromStream(to: TraversableOnce[V]): F[V] = (cbf() ++= to).result()
   }
 
   object CanRebuildFrom {

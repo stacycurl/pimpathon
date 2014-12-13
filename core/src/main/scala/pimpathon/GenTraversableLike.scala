@@ -65,6 +65,7 @@ class GenTraversableLikeCapturer[A, F[_, _]](gtl: GenTraversableLike[A, GenTrave
 
   def withKeys[K](f: A => K)(implicit cbf: CBF[K, A]): F[K, A]   = withEntries(a => (f(a), a))
   def withValues[V](f: A => V)(implicit cbf: CBF[A, V]): F[A, V] = withEntries(a => (a, f(a)))
+  def withConstValue[V](v: V)(implicit  cbf: CBF[A, V]): F[A, V] = withEntries(a => (a, v))
   def withEntries[K, V](f: A => ((K, V)))(implicit cbf: CBF[K, V]): F[K, V] = gtl.map(f)(breakOut)
 
   def withSomeKeys[K](f: A => Option[K])(implicit cbf: CBF[K, A]): F[K, A] =

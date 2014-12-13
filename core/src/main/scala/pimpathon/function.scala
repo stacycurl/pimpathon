@@ -41,6 +41,7 @@ object function {
     def toLeft:  In => Either[Out, In] = (in: In) => pf.lift(in).toLeft(in)
 
     def first[C]: PartialFunction[(In, C), (Out, C)] = ***(identityPF[C])
+    def second[C]: PartialFunction[(C, In), (C, Out)] = identityPF[C] *** pf
 
     def ***[In2, Out2](rhs: PartialFunction[In2, Out2]): PartialFunction[(In, In2), (Out, Out2)] =
       new PartialFunction[(In, In2), (Out, Out2)] {

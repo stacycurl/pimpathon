@@ -55,6 +55,10 @@ class PartialFunctionTest {
     List(Some(2 -> "foo"), None), List(1 -> "foo", 2 -> "bar").map(util.partial(1 -> 2).first[String].lift)
   )
 
+  @Test def second(): Unit = assertEquals(
+    List(Some("foo" -> 2), None), List("foo" -> 1, "bar" -> 2).map(util.partial(1 -> 2).second[String].lift)
+  )
+
   @Test def starStarStar(): Unit = {
     val composed = util.partial(1 -> 2) *** util.partial(2 -> 3)
 

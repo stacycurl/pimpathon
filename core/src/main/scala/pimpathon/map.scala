@@ -49,8 +49,8 @@ object map extends genTraversableLike[GenTraversable] {
     def keyFor:   MapAndThen[K, V, K]      = new MapAndThen[K, V, K](map, key)
     def valueFor: MapAndThen[K, V, V]      = new MapAndThen[K, V, V](map, value)
 
-    def partitionKeysBy[C](pf: PartialFunction[K, C]): (Map[C, V], Map[K, V])   = partitionEntriesBy(pf.first[V]).swap
-    def partitionValuesBy[W](pf: PartialFunction[V, W]): (Map[K, W], Map[K, V]) = partitionEntriesBy(pf.second[K]).swap
+    def partitionKeysBy[C](pf: PartialFunction[K, C]): (Map[K, V], Map[C, V])   = partitionEntriesBy(pf.first[V])
+    def partitionValuesBy[W](pf: PartialFunction[V, W]): (Map[K, V], Map[K, W]) = partitionEntriesBy(pf.second[K])
 
     def partitionEntriesBy[C, W](pf: PartialFunction[(K, V), (C, W)]): (Map[K, V], Map[C, W]) =
       map.partition(kv => !pf.isDefinedAt(kv)).tmap(identity, _.map(pf))

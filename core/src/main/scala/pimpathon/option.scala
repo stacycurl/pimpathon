@@ -1,7 +1,6 @@
 package pimpathon
 
-import scala.util.{Failure, Success, Try}
-
+import scala.util.Try
 
 object option {
   implicit class OptionOps[A](val option: Option[A]) extends AnyVal {

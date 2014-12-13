@@ -5,6 +5,7 @@ import scala.language.{higherKinds, implicitConversions}
 import scala.collection.{breakOut, mutable => M, GenTraversable}
 import scala.collection.generic.CanBuildFrom
 
+import pimpathon.any._
 import pimpathon.builder._
 import pimpathon.function._
 import pimpathon.map._
@@ -30,6 +31,9 @@ object multiMap {
       value + ((key, crf.concat(List(value.get(key), Some(newValues)).flatten)))
 
     def pop(key: K)(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValue(key, crf.pop)
+
+    def headTailOption(implicit gtl: F[V] <:< GenTraversable[V], crf: CanRebuildFrom[F, V])
+      : Option[(Map[K, V], MultiMap[F, K, V])] = multiMap.head.filterSelf(_.nonEmpty).map(_ -> multiMap.tail)
 
     def multiMap: MultiMapConflictingOps[F, K, V] = new MultiMapConflictingOps[F, K, V](value)
   }

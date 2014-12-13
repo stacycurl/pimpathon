@@ -51,6 +51,10 @@ class FunctionTest {
 }
 
 class PartialFunctionTest {
+  @Test def isUndefinedAt(): Unit = assertEquals(
+    List(true, false), List("gibberish", "foo").map(util.partial("foo" -> "bar").isUndefinedAt)
+  )
+
   @Test def first(): Unit = assertEquals(
     List(Some(2 -> "foo"), None), List(1 -> "foo", 2 -> "bar").map(util.partial(1 -> 2).first[String].lift)
   )

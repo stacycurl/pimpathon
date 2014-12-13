@@ -53,7 +53,7 @@ object map extends genTraversableLike[GenTraversable] {
     def partitionValuesBy[W](pf: PartialFunction[V, W]): (Map[K, V], Map[K, W]) = partitionEntriesBy(pf.second[K])
 
     def partitionEntriesBy[C, W](pf: PartialFunction[(K, V), (C, W)]): (Map[K, V], Map[C, W]) =
-      map.partition(kv => !pf.isDefinedAt(kv)).tmap(identity, _.map(pf))
+      map.partition(pf.isUndefinedAt).tmap(identity, _.map(pf))
 
     def mapKeysEagerly[C](f: K => C): Map[C, V]          = map.map { case (k, v) => (f(k), v) }(breakOut)
     def mapValuesEagerly[W](f: V => W): Map[K, W]        = map.map { case (k, v) => (k, f(v)) }(breakOut)

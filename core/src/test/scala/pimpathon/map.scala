@@ -239,6 +239,11 @@ class MapTest {
     Map(1 -> 2, 2 -> 3).partitionValuesBy { case 2 => "foo" }
   )
 
+  @Test def partitionEntriesBy(): Unit = assertEquals(
+    (Map(1 -> 2), Map("foo" -> "oof")),
+    Map(1 -> 2, 2 -> 3).partitionEntriesBy { case (2, 3) => "foo" -> "oof" }
+  )
+
   @Test def updateValue(): Unit = {
     assertEquals(empty, nonEmpty.updateValue(1, _ => None))
     assertEquals(Map(1 -> 1), nonEmpty.updateValue(1, _ => Some(1)))

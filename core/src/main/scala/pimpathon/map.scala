@@ -49,11 +49,11 @@ object map extends genTraversableLike[GenTraversable] {
     def keyFor:   MapAndThen[K, V, K]      = new MapAndThen[K, V, K](map, key)
     def valueFor: MapAndThen[K, V, V]      = new MapAndThen[K, V, V](map, value)
 
-    def partitionKeysBy[C](pf: PartialFunction[K, C]): (Map[C, V], Map[K, V]) =
-      map.partition(kv => pf.isDefinedAt(kv._1)).tmap(_.mapKeysEagerly(pf), identity)
+    def partitionKeysBy[C](pf: PartialFunction[K, C]): (Map[C, V], Map[K, V])   = partitionEntriesBy(pf.first[V]).swap
+    def partitionValuesBy[W](pf: PartialFunction[V, W]): (Map[K, W], Map[K, V]) = partitionEntriesBy(pf.second[K]).swap
 
-    def partitionValuesBy[W](pf: PartialFunction[V, W]): (Map[K, W], Map[K, V]) =
-      map.partition(kv => pf.isDefinedAt(kv._2)).tmap(_.mapValuesEagerly(pf), identity)
+    def partitionEntriesBy[C, W](pf: PartialFunction[(K, V), (C, W)]): (Map[K, V], Map[C, W]) =
+      map.partition(kv => !pf.isDefinedAt(kv)).tmap(identity, _.map(pf))
 
     def mapKeysEagerly[C](f: K => C): Map[C, V]          = map.map { case (k, v) => (f(k), v) }(breakOut)
     def mapValuesEagerly[W](f: V => W): Map[K, W]        = map.map { case (k, v) => (k, f(v)) }(breakOut)

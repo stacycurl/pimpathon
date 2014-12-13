@@ -53,10 +53,14 @@ class MultiMapTest {
 
   @Test def multiMap_head(): Unit = {
     assertEquals(Map(1 -> 10, 2 -> 20), Map(1 -> List(10, 11), 2 -> List(20)).multiMap.head)
+    assertEquals(Map(2 -> 20), Map(1 -> Nil, 2 -> List(20)).multiMap.head)
+    assertEquals(Map(), Map(1 -> (Nil: List[Int])).multiMap.head)
   }
 
   @Test def multiMap_tail(): Unit = {
     assertEquals(Map(1 -> List(11)), Map(1 -> List(10, 11), 2 -> List(20)).multiMap.tail)
+    assertEquals(Map(), Map(1 -> Nil, 2 -> List(20)).multiMap.tail)
+    assertEquals(Map(), Map(1 -> (Nil: List[Int])).multiMap.tail)
   }
 
   @Test def multiMap_values(): Unit = {

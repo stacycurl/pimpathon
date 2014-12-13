@@ -2,7 +2,7 @@ package pimpathon
 
 import scala.language.{higherKinds, implicitConversions}
 
-import scala.collection.{breakOut, mutable => M, GenTraversableLike}
+import scala.collection.{breakOut, mutable => M, GenTraversable}
 import scala.collection.generic.CanBuildFrom
 
 import pimpathon.builder._
@@ -37,7 +37,9 @@ object multiMap {
 
   class MultiMapConflictingOps[F[_], K, V](value: MultiMap[F, K, V]) {
     // These operations cannot be defined on MultiMapOps because non-implicit methods of the same name exist on Map
-    def head[Repr](implicit gtl: F[V] <:< GenTraversableLike[V, Repr]): Map[K, V] = value.mapValuesEagerly(_.head)
+    def head(implicit gtl: F[V] <:< GenTraversable[V]): Map[K, V] =
+      value.flatMap { case (k, fv) => fv.headOption.map(k -> _) }
+
     def tail(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValues(crf.pop _)
     def values(implicit crf: CanRebuildFrom[F, V]): F[V] = crf.concat(value.values)
 

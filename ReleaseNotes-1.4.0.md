@@ -3,3 +3,4 @@
 ### Breaking changes & bug fixes
 
 ### Additions
++ callable.create(=> A): Callable[A]

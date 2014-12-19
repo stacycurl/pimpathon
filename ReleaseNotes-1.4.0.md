@@ -3,4 +3,5 @@
 ### Breaking changes & bug fixes
 
 ### Additions
++ Array[A].copyTo(srcPos, Array[A], destPos, length): Array[A]
 + callable.create(=> A): Callable[A]

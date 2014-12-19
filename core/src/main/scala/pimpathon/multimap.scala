@@ -32,13 +32,15 @@ object multiMap {
 
     def pop(key: K)(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValue(key, crf.pop)
 
-    def sequence(
-      implicit bf: CanBuildFrom[Nothing, Map[K, V], F[Map[K, V]]],
-      crf: CanRebuildFrom[F, V], gtl: F[V] <:< GenTraversable[V], crsm: CanRebuildFrom[F, Map[K, V]]
+    def sequence(implicit bf: CCBF[Map[K, V], F], gtl: F[V] <:< GenTraversable[V],
+      crf: CanRebuildFrom[F, V], crsm: CanRebuildFrom[F, Map[K, V]]
     ): F[Map[K, V]] = crsm.fromStream(value.unfold(_.headTailOption))
 
     def headTailOption(implicit gtl: F[V] <:< GenTraversable[V], crf: CanRebuildFrom[F, V])
       : Option[(Map[K, V], MultiMap[F, K, V])] = multiMap.head.filterSelf(_.nonEmpty).map(_ -> multiMap.tail)
+
+    def flatMapValues[W](f: V => F[W])(implicit crfv: CanRebuildFrom[F, V], crfw: CanRebuildFrom[F, W])
+      : MultiMap[F, K, W] = value.mapValuesEagerly(crfv.flatMap(_)(f))
 
     def multiMap: MultiMapConflictingOps[F, K, V] = new MultiMapConflictingOps[F, K, V](value)
   }
@@ -98,6 +100,9 @@ object multiMap {
     def pop(fv: F[V]): Option[F[V]] = flatMapS(fv)(_.tailOption.filter(_.nonEmpty))
     def flatMapS(fv: F[V])(f: Stream[V] => Option[Stream[V]]): Option[F[V]] = f(toStream(fv)).map(fromStream)
     def toStream(fv: F[V]): Stream[V]
+
+    def flatMap[G[_], W](fv: F[V])(f: V => G[W])(implicit gcrf: CanRebuildFrom[G, W]): G[W] =
+      gcrf.fromStream(toStream(fv).flatMap(v => gcrf.toStream(f(v))))
 
     protected val cbf: CanBuildFrom[F[V], V, F[V]]
 

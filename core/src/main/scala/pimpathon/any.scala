@@ -31,6 +31,7 @@ object any {
     def unlessSelf(p: Predicate[A]): Option[A] = if (p(a)) None else Some(a)
 
     def passesOne(disjuncts: Predicate[A]*): Option[A] = if (function.or(disjuncts: _*).apply(a)) Some(a) else None
+    def passesAll(conjuncts: Predicate[A]*): Option[A] = if (function.and(conjuncts: _*).apply(a)) Some(a) else None
 
     def withFinally[B](f: A => Unit)(t: A => B): B = try t(a) finally f(a)
 

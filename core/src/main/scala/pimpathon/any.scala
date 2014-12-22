@@ -33,6 +33,7 @@ object any {
     def passesOne(disjuncts: Predicate[A]*): Option[A] = if (function.or(disjuncts: _*).apply(a)) Some(a) else None
     def passesAll(conjuncts: Predicate[A]*): Option[A] = if (function.and(conjuncts: _*).apply(a)) Some(a) else None
     def failsOne(disjuncts: Predicate[A]*): Option[A] = if (function.or(disjuncts: _*).apply(a)) None else Some(a)
+    def failsAll(conjuncts: Predicate[A]*): Option[A] = if (function.and(conjuncts: _*).apply(a)) None else Some(a)
 
     def withFinally[B](f: A => Unit)(t: A => B): B = try t(a) finally f(a)
 

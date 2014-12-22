@@ -108,6 +108,11 @@ class AnyTest {
     assertEquals(List(Some(1), Some(2), Some(3), Some(4)), List(1, 2, 3, 4).map(_.failsOne()))
   }
 
+  @Test def failsAll(): Unit = {
+    assertEquals(List(Some(1), None, None, Some(4)), List(1, 2, 3, 4).map(_.failsAll(_ >= 2, _ <= 3)))
+    assertEquals(List(None, None, None, None),       List(1, 2, 3, 4).map(_.failsAll()))
+  }
+
   @Test def withFinally(): Unit = assertEquals(
     List("body: input", "finally: input", "done"), new M.ListBuffer[String].tap(strings => {
       strings += "input".withFinally(s => strings += "finally: " + s)(s => {strings += "body: " + s; "done"})

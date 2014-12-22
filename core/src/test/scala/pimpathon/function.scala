@@ -1,6 +1,7 @@
 package pimpathon
 
 import org.junit.Test
+import scala.util.Random
 
 import org.junit.Assert._
 import pimpathon.function._

@@ -93,6 +93,11 @@ class AnyTest {
     List(1, 2, 3, 4).map(_.unlessSelf(_ % 2 == 0))
   )
 
+  @Test def passesOne(): Unit = {
+    assertEquals(List(Some(1), None, None, Some(4)), List(1, 2, 3, 4).map(_.passesOne(_ < 2, _ > 3)))
+    assertEquals(List(None, None, None, None),       List(1, 2, 3, 4).map(_.passesOne()))
+  }
+
   @Test def withFinally(): Unit = assertEquals(
     List("body: input", "finally: input", "done"), new M.ListBuffer[String].tap(strings => {
       strings += "input".withFinally(s => strings += "finally: " + s)(s => {strings += "body: " + s; "done"})

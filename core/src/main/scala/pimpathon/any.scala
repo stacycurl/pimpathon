@@ -30,6 +30,8 @@ object any {
     def filterNotSelf(p: Predicate[A]): Option[A] = if (p(a)) None else Some(a)
     def unlessSelf(p: Predicate[A]): Option[A] = if (p(a)) None else Some(a)
 
+    def passesOne(disjuncts: Predicate[A]*): Option[A] = if (function.or(disjuncts: _*).apply(a)) Some(a) else None
+
     def withFinally[B](f: A => Unit)(t: A => B): B = try t(a) finally f(a)
 
     def cond[B](p: Predicate[A], ifTrue: A => B, ifFalse: A => B): B = if (p(a)) ifTrue(a) else ifFalse(a)

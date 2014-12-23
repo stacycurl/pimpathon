@@ -12,3 +12,4 @@
 + function.and(Predicate[A]*): Predicate[A]
 + function.or(Predicate[A]*): Predicate[A]
 + callable.create(=> A): Callable[A]
++ classTag.className[A]: String

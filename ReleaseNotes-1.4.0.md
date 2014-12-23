@@ -14,3 +14,4 @@
 + callable.create(=> A): Callable[A]
 + classTag.className[A]: String
 + classTag.simpleClassName[A]: String
++ classTag.klassOf[A]: String

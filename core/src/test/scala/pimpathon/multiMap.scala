@@ -102,6 +102,11 @@ class MultiMapTest {
     Map(1 -> List(10, 11), 2 -> List(20, 21)).sequence
   )
 
+  @Test def sliding(): Unit = assertEquals(
+    List(Map(1 -> List(11, 12), 2 -> List(21, 22)), Map(1 -> List(12, 13), 2 -> List(22, 23))),
+    Map(1 -> List(11, 12, 13), 2 -> List(21, 22, 23)).multiMap.sliding(2)
+  )
+
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
     def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem](s"apply($from)")

@@ -62,6 +62,13 @@ object multiMap {
     ): MultiMap[F, C, W] = {
       value.asMultiMap[F].withEntries(f.tupled).mapValuesEagerly(crf.concat)
     }
+
+    def sliding(size: Int)(implicit bf: CCBF[Map[K, V], F], gtl: F[V] <:< GenTraversable[V],
+      crf: CanRebuildFrom[F, V], crsm: CanRebuildFrom[F, MultiMap[F, K, V]], fcbf: CanBuildFrom[Nothing, V, F[V]]
+    ): F[MultiMap[F, K, V]] = {
+      crsm.fromStream(value.unfold(_.headTailOption).sliding(size)
+        .map(_.flatMap[(K, V), MultiMap[F, K, V]](_.toStream)(breakOut)).toStream)
+    }
   }
 
   object MultiMap {

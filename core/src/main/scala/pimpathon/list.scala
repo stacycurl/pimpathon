@@ -66,8 +66,13 @@ object list extends genTraversableLike[List] {
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
 
     def unconsC[B](empty: => B, nonEmpty: A => List[A] => B): B = list match {
-      case Nil => empty
+      case Nil          => empty
       case head :: tail => nonEmpty(head)(tail)
+    }
+
+    def unsnocC[B](empty: => B, nonEmpty: List[A] => A => B): B = initLastOption match {
+      case None               => empty
+      case Some((init, last)) => nonEmpty(init)(last)
     }
 
     def const[B](elem: B): List[B] = list.map(_ => elem)

@@ -20,6 +20,11 @@ class ListTest {
     assertEquals("head: 1, tail: List(2, 3)", List(1, 2, 3).unconsC("empty", h => t => s"head: $h, tail: $t"))
   }
 
+  @Test def unsnocC(): Unit = {
+    assertEquals("empty",                          nil[Int].unsnocC("empty", i => l => s"init: $i, last: $l"))
+    assertEquals("init: List(1, 2), last: 3", List(1, 2, 3).unsnocC("empty", i => l => s"init: $i, last: $l"))
+  }
+
   @Test def emptyTo(): Unit = {
     assertEquals(List(1), nil[Int].emptyTo(List(1)))
     assertEquals(List(1, 2, 3), List(1, 2, 3).emptyTo(List(1)))

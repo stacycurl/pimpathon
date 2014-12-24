@@ -7,6 +7,7 @@
 + [A].passesAll(Predicate[A]*): Option[A]
 + [A].failsOne(Predicate[A]*): Option[A]
 + [A].failsAll(Predicate[A]*): Option[A]
++ List[A].unsnocC(=> B, List[A] => A => B): B
 + Array[A].copyTo(srcPos, Array[A], destPos, length): Array[A]
 + MultiMap[F, K, V].flatMapValues(V => F[W]): MultiMap[F, K, W]
 + function.and(Predicate[A]*): Predicate[A]

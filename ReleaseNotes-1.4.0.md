@@ -11,6 +11,7 @@
 + MultiMap[F, K, V].flatMapValues(V => F[W]): MultiMap[F, K, W]
 + function.and(Predicate[A]*): Predicate[A]
 + function.or(Predicate[A]*): Predicate[A]
++ inputStream.gunzip: GZIPInputStream
 + callable.create(=> A): Callable[A]
 + classTag.className[A]: String
 + classTag.simpleClassName[A]: String

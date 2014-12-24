@@ -1,6 +1,7 @@
 package pimpathon.java.io
 
 import java.io.{BufferedInputStream, IOException, InputStream, OutputStream}
+import java.util.zip.GZIPInputStream
 import scala.annotation.tailrec
 import scala.util.Try
 
@@ -24,6 +25,7 @@ case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, b
     def attemptClose(): Try[Unit] = Try(is.close())
 
     def buffered: BufferedInputStream = new BufferedInputStream(is, bufferSize)
+    def gunzip: GZIPInputStream = new GZIPInputStream(is, bufferSize)
 
     def readN(os: OutputStream, n: Long): IS = is.tap(_.readUpToN(os, n).calc(count => if (count != n)
       throw new IOException(s"Failed to read $n bytes, only $count were available")

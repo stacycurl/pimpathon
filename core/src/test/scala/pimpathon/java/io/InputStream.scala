@@ -1,6 +1,7 @@
 package pimpathon.java.io
 
 import java.io._
+import java.util.zip.GZIPOutputStream
 import org.junit.Test
 import scala.util.{Failure, Success}
 
@@ -80,6 +81,15 @@ class InputStreamTest {
     (is.buffered: BufferedInputStream).drain(os)
 
     assertEquals("content", os.toString)
+  }
+
+  @Test def gunzip(): Unit = {
+    import pimpathon.java.io.outputStream._
+
+    val os     = createOutputStream().tap(os => new GZIPOutputStream(os).closeAfter(_.write("content".getBytes)))
+    val result = createOutputStream().tap(rs => inputStreamFor(os.toByteArray).gunzip.drain(rs))
+
+    assertEquals("content", result.toString)
   }
 
   @Test def readUpToN(): Unit = {

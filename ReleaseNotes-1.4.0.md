@@ -12,6 +12,7 @@
 + function.and(Predicate[A]*): Predicate[A]
 + function.or(Predicate[A]*): Predicate[A]
 + inputStream.gunzip: GZIPInputStream
++ outputStream.gzip: GZIPOutputStream
 + callable.create(=> A): Callable[A]
 + classTag.className[A]: String
 + classTag.simpleClassName[A]: String

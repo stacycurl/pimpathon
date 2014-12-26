@@ -10,6 +10,7 @@
 + List[A].unsnocC(=> B, List[A] => A => B): B
 + Array[A].copyTo(srcPos, Array[A], destPos, length): Array[A]
 + MultiMap[F, K, V].flatMapValues(V => F[W]): MultiMap[F, K, W]
++ MultiMap[F, K, V].flatMapValuesU(V => G[W]): MultiMap[G, K, W]
 + MultiMap[F, K, V].multiMap.sliding(Int): F[MultiMap[F, K, V]]
 + function.and(Predicate[A]*): Predicate[A]
 + function.or(Predicate[A]*): Predicate[A]

@@ -91,6 +91,18 @@ class MultiMapTest {
     Map(0 -> List(1, 2), 1 -> List(2, 3)).flatMapValues(v => List(v, -v))
   )
 
+  @Test def flatMapValuesU(): Unit = {
+    assertEquals(
+      Map(0 -> Set(1, -1, 2, -2), 1 -> Set(2, -2, 3, -3)),
+      Map(0 -> List(1, 2), 1 -> List(2, 3)).flatMapValuesU(v => Set(v, -v))
+    )
+
+    assertEquals(
+      Map(0 -> List(1, -1, 2, -2), 1 -> List(2, -2, 3, -3)),
+      Map(0 -> Vector(1, 2), 1 -> Vector(2, 3)).flatMapValuesU(v => List(v, -v))
+    )
+  }
+
   @Test def pop(): Unit = {
     assertEquals(Map(1 -> List(3), 2 -> List(3)),    Map(1 -> List(2, 3), 2 -> List(3)).pop(1))
     assertEquals(Map(1 -> List(2, 3)),               Map(1 -> List(2, 3), 2 -> List(3)).pop(2))

@@ -93,24 +93,24 @@ class AnyTest {
     List(1, 2, 3, 4).map(_.unlessSelf(_ % 2 == 0))
   )
 
-  @Test def passesOne(): Unit = {
-    assertEquals(List(Some(1), None, None, Some(4)), List(1, 2, 3, 4).map(_.passesOne(_ < 2, _ > 3)))
-    assertEquals(List(None, None, None, None),       List(1, 2, 3, 4).map(_.passesOne()))
+  @Test def passes_one(): Unit = {
+    assertEquals(List(Some(1), None, None, Some(4)), List(1, 2, 3, 4).map(_.passes.one(_ < 2, _ > 3)))
+    assertEquals(List(None, None, None, None),       List(1, 2, 3, 4).map(_.passes.one()))
   }
 
-  @Test def passesAll(): Unit = {
-    assertEquals(List(None, Some(2), Some(3), None),       List(1, 2, 3, 4).map(_.passesAll(_ >= 2, _ <= 3)))
-    assertEquals(List(Some(1), Some(2), Some(3), Some(4)), List(1, 2, 3, 4).map(_.passesAll()))
+  @Test def passes_all(): Unit = {
+    assertEquals(List(None, Some(2), Some(3), None),       List(1, 2, 3, 4).map(_.passes.all(_ >= 2, _ <= 3)))
+    assertEquals(List(Some(1), Some(2), Some(3), Some(4)), List(1, 2, 3, 4).map(_.passes.all()))
   }
 
-  @Test def failsOne(): Unit = {
-    assertEquals(List(None, Some(2), Some(3), None),       List(1, 2, 3, 4).map(_.failsOne(_ < 2, _ > 3)))
-    assertEquals(List(Some(1), Some(2), Some(3), Some(4)), List(1, 2, 3, 4).map(_.failsOne()))
+  @Test def fails_one(): Unit = {
+    assertEquals(List(None, Some(2), Some(3), None),       List(1, 2, 3, 4).map(_.fails.one(_ < 2, _ > 3)))
+    assertEquals(List(Some(1), Some(2), Some(3), Some(4)), List(1, 2, 3, 4).map(_.fails.one()))
   }
 
-  @Test def failsAll(): Unit = {
-    assertEquals(List(Some(1), None, None, Some(4)), List(1, 2, 3, 4).map(_.failsAll(_ >= 2, _ <= 3)))
-    assertEquals(List(None, None, None, None),       List(1, 2, 3, 4).map(_.failsAll()))
+  @Test def fails_all(): Unit = {
+    assertEquals(List(Some(1), None, None, Some(4)), List(1, 2, 3, 4).map(_.fails.all(_ >= 2, _ <= 3)))
+    assertEquals(List(None, None, None, None),       List(1, 2, 3, 4).map(_.fails.all()))
   }
 
   @Test def withFinally(): Unit = assertEquals(

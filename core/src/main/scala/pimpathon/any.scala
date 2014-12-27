@@ -30,10 +30,8 @@ object any {
     def filterNotSelf(p: Predicate[A]): Option[A] = if (p(a)) None else Some(a)
     def unlessSelf(p: Predicate[A]): Option[A] = if (p(a)) None else Some(a)
 
-    def passesOne(disjuncts: Predicate[A]*): Option[A] = if (function.or(disjuncts: _*).apply(a)) Some(a) else None
-    def passesAll(conjuncts: Predicate[A]*): Option[A] = if (function.and(conjuncts: _*).apply(a)) Some(a) else None
-    def failsOne(disjuncts: Predicate[A]*): Option[A] = if (function.or(disjuncts: _*).apply(a)) None else Some(a)
-    def failsAll(conjuncts: Predicate[A]*): Option[A] = if (function.and(conjuncts: _*).apply(a)) None else Some(a)
+    def passes: AnyCapturer[A] = new AnyCapturer[A](a, b => if (b) Some(a) else None)
+    def fails: AnyCapturer[A]  = new AnyCapturer[A](a, b => if (b) None else Some(a))
 
     def withFinally[B](f: A => Unit)(t: A => B): B = try t(a) finally f(a)
 
@@ -48,5 +46,10 @@ object any {
     def update[Discarded](actions: (A => Discarded)*): A         = tap(actions: _*)
     def withSideEffect[Discarded](actions: (A => Discarded)*): A = tap(actions: _*)
     def tap[Discarded](actions: (A => Discarded)*): A            = { actions.foreach(action => action(a)); a }
+  }
+
+  class AnyCapturer[A](a: A, andThen: Boolean => Option[A]) {
+    def one(disjuncts: Predicate[A]*): Option[A]  = andThen(function.or(disjuncts: _*).apply(a))
+    def all(conjuncts: Predicate[A]*): Option[A]  = andThen(function.and(conjuncts: _*).apply(a))
   }
 }

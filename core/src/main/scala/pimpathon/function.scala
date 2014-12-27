@@ -64,6 +64,7 @@ object function {
   def identityPF[A]: PartialFunction[A, A] = PartialFunction(identity[A])
   def equalC[A]: A => A => Boolean = (l: A) => (r: A) => l equals r
   def nand[A](ps: Predicate[A]*): Predicate[A] = and(ps: _*).not
+  def nor[A](ps: Predicate[A]*): Predicate[A] = or(ps: _*).not
   def or[A](ps: Predicate[A]*): Predicate[A] = ps.foldLeft((a: A) => false)(_ or _)
   def and[A](ps: Predicate[A]*): Predicate[A] = ps.foldLeft((a: A) => true)(_ and _)
 }

@@ -20,6 +20,8 @@ class FunctionTest {
 
   @Test def and(): Unit = {
     assertEquals(List(4, 6), List(2, 3, 4, 6).filter(isEven and (_ > 2)))
+    assertEquals(List(4, 6), List(2, 3, 4, 6).filter(function.and(isEven, _ > 2)))
+    assertTrue(function.and[Int]().apply(Random.nextInt()))
   }
 
   @Test def or(): Unit = {

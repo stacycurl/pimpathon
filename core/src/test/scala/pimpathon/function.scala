@@ -30,6 +30,11 @@ class FunctionTest {
     assertFalse(function.or[Int]().apply(Random.nextInt()))
   }
 
+  @Test def nand(): Unit = {
+    assertEquals(List(2, 3), List(2, 3, 4, 6).filter(function.nand(isEven, _ > 2)))
+    assertFalse(function.nand[Int]().apply(Random.nextInt()))
+  }
+
   @Test def not(): Unit = {
     assertEquals(List(1, 3, 5), List(2, 1, 4, 3, 5).filter(isEven.not))
   }

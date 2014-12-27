@@ -51,5 +51,6 @@ object any {
   class AnyCapturer[A](a: A, andThen: Boolean => Option[A]) {
     def one(disjuncts: Predicate[A]*): Option[A]  = andThen(function.or(disjuncts: _*).apply(a))
     def all(conjuncts: Predicate[A]*): Option[A]  = andThen(function.and(conjuncts: _*).apply(a))
+    def none(conjuncts: Predicate[A]*): Option[A] = andThen(function.nand(conjuncts: _*).apply(a))
   }
 }

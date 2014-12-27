@@ -103,6 +103,11 @@ class AnyTest {
     assertEquals(List(Some(1), Some(2), Some(3), Some(4)), List(1, 2, 3, 4).map(_.passes.all()))
   }
 
+  @Test def passes_none(): Unit = {
+    assertEquals(List(Some(1), None, None, Some(4)), List(1, 2, 3, 4).map(_.passes.none(_ >= 2, _ <= 3)))
+    assertEquals(List(None, None, None, None),       List(1, 2, 3, 4).map(_.passes.none()))
+  }
+
   @Test def fails_one(): Unit = {
     assertEquals(List(None, Some(2), Some(3), None),       List(1, 2, 3, 4).map(_.fails.one(_ < 2, _ > 3)))
     assertEquals(List(Some(1), Some(2), Some(3), Some(4)), List(1, 2, 3, 4).map(_.fails.one()))
@@ -111,6 +116,11 @@ class AnyTest {
   @Test def fails_all(): Unit = {
     assertEquals(List(Some(1), None, None, Some(4)), List(1, 2, 3, 4).map(_.fails.all(_ >= 2, _ <= 3)))
     assertEquals(List(None, None, None, None),       List(1, 2, 3, 4).map(_.fails.all()))
+  }
+
+  @Test def fails_none(): Unit = {
+    assertEquals(List(None, Some(2), Some(3), None),       List(1, 2, 3, 4).map(_.fails.none(_ >= 2, _ <= 3)))
+    assertEquals(List(Some(1), Some(2), Some(3), Some(4)), List(1, 2, 3, 4).map(_.fails.none()))
   }
 
   @Test def withFinally(): Unit = assertEquals(

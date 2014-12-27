@@ -23,6 +23,8 @@ class FunctionTest {
 
   @Test def or(): Unit = {
     assertEquals(List(2, 4, 3), List(2, 1, 4, 3, 5).filter(isEven or (_ == 3)))
+    assertEquals(List(2, 4, 3), List(2, 1, 4, 3, 5).filter(function.or(isEven, _ == 3)))
+    assertFalse(function.or[Int]().apply(Random.nextInt()))
   }
 
   @Test def not(): Unit = {

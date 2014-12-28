@@ -4,6 +4,7 @@
 
 ### Removals
 + List[A].mapNonEmpty(List[A] => B): Option[B]
++ Map[K, V].mapNonEmpty(Map[K, V] => B): Option[B]
 
 ### Additions
 + [A].passes.one(Predicate[A]*): Option[A]
@@ -17,6 +18,7 @@
 + List[A].calcIfNonEmpty(List[A] => B): Option[B]
 + List[A].unsnocC(=> B, List[A] => A => B): B
 + Array[A].copyTo(srcPos, Array[A], destPos, length): Array[A]
++ Map[K, V].calcIfNonEmpty(Map[K, V] => B): Option[B]
 + MultiMap[F, K, V].flatMapValues(V => F[W]): MultiMap[F, K, W]
 + MultiMap[F, K, V].flatMapValuesU(V => G[W]): MultiMap[G, K, W]
 + MultiMap[F, K, V].multiMap.sliding(Int): F[MultiMap[F, K, V]]

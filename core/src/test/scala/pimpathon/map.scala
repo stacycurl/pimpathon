@@ -66,9 +66,9 @@ class MapTest {
     assertEquals("nonEmpty", nonEmpty.uncons("empty", _ => "nonEmpty"))
   }
 
-  @Test def mapNonEmpty(): Unit = {
-    assertEquals(None, empty.mapNonEmpty(_ => "nonEmpty"))
-    assertEquals(Some("nonEmpty"), nonEmpty.mapNonEmpty(_ => "nonEmpty"))
+  @Test def calcIfNonEmpty(): Unit = {
+    assertEquals(None, empty.calcIfNonEmpty(_ => "nonEmpty"))
+    assertEquals(Some("nonEmpty"), nonEmpty.calcIfNonEmpty(_ => "nonEmpty"))
   }
 
   @Test def emptyTo(): Unit = {

@@ -65,6 +65,10 @@ class ListTest {
     assertFalse(List(1, 2).sizeGT(2))
   }
 
+  @Test def duplicates(): Unit = assertEquals(
+    List("bar", "bar", "foo", "foo", "foo"), List("foo", "bar", "foo", "food", "bar", "foo").duplicates
+  )
+
   @Test def duplicatesBy(): Unit = assertEquals(
     List("bard", "food", "foo", "bar"), List("foo", "bar", "bard", "food", "foody").duplicatesBy(_.length)
   )

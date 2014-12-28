@@ -18,6 +18,7 @@
 + [A].fails.none(Predicate[A]*): Option[A]
 + [A].fails.some(Predicate[A]*): Option[A]
 + List[A].calcIfNonEmpty(List[A] => B): Option[B]
++ List[A].duplicates: List[A]
 + List[A].mapIfNonEmpty(A => B): Option[List[B]]
 + List[A].unsnocC(=> B, List[A] => A => B): B
 + List[List[A]].cartesianProduct: List[List[A]]

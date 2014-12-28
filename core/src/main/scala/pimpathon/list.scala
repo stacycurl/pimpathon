@@ -31,6 +31,7 @@ object list extends genTraversableLike[List] {
 
     def sizeGT(value: Int): Boolean = uncons(empty = value < 0, nonEmpty = _.tail.sizeGT(value - 1))
 
+    def duplicates: List[A] = duplicatesBy(identity[A])
     def duplicatesBy[B](f: A => B): List[A] = (countBy(f) - 1).multiMap.values
     def distinctBy[B](f: A => B): List[A] = list.map(equalBy(f)).distinct.map(_.a)
 

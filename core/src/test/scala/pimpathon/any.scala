@@ -20,6 +20,11 @@ class AnyTest {
     List(2, 3, 4).map(_.calcIf(_ % 2 == 0)(_ + 3))
   )
 
+  @Test def calcPF(): Unit = assertEquals(
+    List(None, Some("two"), None, Some("four")),
+    List(1, 2, 3, 4).map(_.calcPF(util.partial(2 -> "two", 4 -> "four")))
+  )
+
   @Test def transform(): Unit = assertEquals(
     List(1, 4, 3, 8),
     List(1, 2, 3, 4).map(_.transform(util.partial(2 -> 4, 4 -> 8)))

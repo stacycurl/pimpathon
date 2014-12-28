@@ -11,6 +11,7 @@ object any {
     def calc[B](f: A => B): B = f(a)
     def |>[B](f: A => B): B = f(a)
     def calcIf[B](p: Predicate[A])(f: A => B): Option[B] = if (p(a)) Some(f(a)) else None
+    def calcPF[B](pf: PartialFunction[A, B]): Option[B] = pf.lift(a)
     def transform(pf: PartialFunction[A, A]): A = pf.unify(a)
 
     def tapIf(p: Predicate[A])(actions: (A => Unit)*): A     = if (p(a)) tap(actions: _*) else a

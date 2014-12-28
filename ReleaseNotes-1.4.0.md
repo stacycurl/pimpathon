@@ -2,6 +2,9 @@
 
 ### Breaking changes & bug fixes
 
+### Removals
++ List[A].mapNonEmpty(List[A] => B): Option[B]
+
 ### Additions
 + [A].passes.one(Predicate[A]*): Option[A]
 + [A].passes.all(Predicate[A]*): Option[A]
@@ -11,6 +14,7 @@
 + [A].fails.all(Predicate[A]*): Option[A]
 + [A].fails.none(Predicate[A]*): Option[A]
 + [A].fails.some(Predicate[A]*): Option[A]
++ List[A].calcIfNonEmpty(List[A] => B): Option[B]
 + List[A].unsnocC(=> B, List[A] => A => B): B
 + Array[A].copyTo(srcPos, Array[A], destPos, length): Array[A]
 + MultiMap[F, K, V].flatMapValues(V => F[W]): MultiMap[F, K, W]

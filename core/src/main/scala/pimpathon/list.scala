@@ -25,7 +25,7 @@ object list extends genTraversableLike[List] {
 
     def fraction(p: Predicate[A]): Double = countWithSize(p).fold(Double.NaN)(_.to[Double].calc(_ / _))
 
-    def countWithSize(p: Predicate[A]): Option[(Int, Int)] = mapNonEmpty(_.foldLeft((0, 0)) {
+    def countWithSize(p: Predicate[A]): Option[(Int, Int)] = calcIfNonEmpty(_.foldLeft((0, 0)) {
       case ((passed, size), elem) => (passed + p(elem).asInt, size + 1)
     })
 
@@ -59,7 +59,7 @@ object list extends genTraversableLike[List] {
 
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 
-    def mapNonEmpty[B](f: List[A] => B): Option[B] = if (list.isEmpty) None else Some(f(list))
+    def calcIfNonEmpty[B](f: List[A] => B): Option[B] = if (list.isEmpty) None else Some(f(list))
 
     def amass[B](pf: PartialFunction[A, List[B]]): List[B] = list.flatMap(a => pf.lift(a).getOrElse(Nil))
 

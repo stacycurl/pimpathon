@@ -35,6 +35,11 @@ class ListTest {
     assertEquals(Some(List(3, 2, 1)), List(1, 2, 3).calcIfNonEmpty(_.reverse))
   }
 
+  @Test def mapIfNonEmpty(): Unit = {
+    assertEquals(None, nil[Int].mapIfNonEmpty(_ * 2))
+    assertEquals(Some(List(2, 4, 6)), List(1, 2, 3).mapIfNonEmpty(_ * 2))
+  }
+
 
   @Test def zipToMap(): Unit = {
     assertEquals(Map.empty[Int, Int], nil[Int].zipToMap(nil[Int]))

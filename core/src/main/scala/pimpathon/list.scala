@@ -60,6 +60,7 @@ object list extends genTraversableLike[List] {
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 
     def calcIfNonEmpty[B](f: List[A] => B): Option[B] = list.calcIf(_.nonEmpty)(f)
+    def mapIfNonEmpty[B](f: A => B): Option[List[B]] = list.calcIf(_.nonEmpty)(_.map(f))
 
     def amass[B](pf: PartialFunction[A, List[B]]): List[B] = list.flatMap(a => pf.lift(a).getOrElse(Nil))
 

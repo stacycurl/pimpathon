@@ -17,6 +17,7 @@
 + [A].fails.none(Predicate[A]*): Option[A]
 + [A].fails.some(Predicate[A]*): Option[A]
 + List[A].calcIfNonEmpty(List[A] => B): Option[B]
++ List[A].mapIfNonEmpty(A => B): Option[List[B]]
 + List[A].unsnocC(=> B, List[A] => A => B): B
 + Array[A].copyTo(srcPos, Array[A], destPos, length): Array[A]
 + Map[K, V].calcIfNonEmpty(Map[K, V] => B): Option[B]

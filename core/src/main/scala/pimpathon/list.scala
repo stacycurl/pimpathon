@@ -106,6 +106,12 @@ object list extends genTraversableLike[List] {
     private def equalBy[B](f: A => B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
     private def zip[B](other: List[B]): Iterator[(A, B)] = list.iterator.zip(other.iterator)
   }
+
+  implicit class MatrixOps[A](val value: List[List[A]]) extends AnyVal {
+    def cartesianProduct: List[List[A]] = value.foldRight(List(Nil): List[List[A]]) {
+      case (item, acc) => for { a <- item; b <- acc } yield a :: b
+    }
+  }
 }
 
 case class EqualBy[A, B](b: B)(val a: A)

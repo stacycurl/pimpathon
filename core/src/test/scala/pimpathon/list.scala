@@ -210,4 +210,9 @@ class ListTest {
     (List(2, 4), List("one", "three")),
     List(1, 2, 3, 4).partitionByPF(util.partial(1 -> "one", 3 -> "three"))
   )
+
+  @Test def cartesianProduct(): Unit = assertEquals(
+    for { a <- List(1, 2); b <- List(10, 20); c <- List(100, 200) } yield List(a, b, c),
+    List(List(1, 2), List(10, 20), List(100, 200)).cartesianProduct
+  )
 }

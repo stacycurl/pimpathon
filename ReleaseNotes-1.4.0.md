@@ -7,6 +7,7 @@
 + Map[K, V].mapNonEmpty(Map[K, V] => B): Option[B]
 
 ### Additions
++ [A].calcIf(Predicate[A])(A => B): Option[B]
 + [A].passes.one(Predicate[A]*): Option[A]
 + [A].passes.all(Predicate[A]*): Option[A]
 + [A].passes.none(Predicate[A]*): Option[A]

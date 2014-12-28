@@ -15,6 +15,11 @@ class AnyTest {
     List("12".calc(_ + "3"), "12" |> (_ + "3"))
   )
 
+  @Test def calcIf(): Unit = assertEquals(
+    List(Some(5), None, Some(7)),
+    List(2, 3, 4).map(_.calcIf(_ % 2 == 0)(_ + 3))
+  )
+
   @Test def transform(): Unit = assertEquals(
     List(1, 4, 3, 8),
     List(1, 2, 3, 4).map(_.transform(util.partial(2 -> 4, 4 -> 8)))

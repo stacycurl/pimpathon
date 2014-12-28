@@ -3,6 +3,7 @@ package pimpathon
 import scala.collection.{breakOut, mutable => M, GenTraversable, GenTraversableOnce}
 import scala.collection.immutable.{SortedMap, TreeMap}
 
+import pimpathon.any._
 import pimpathon.function._
 import pimpathon.multiMap._
 import pimpathon.tuple._
@@ -31,7 +32,7 @@ object map extends genTraversableLike[GenTraversable] {
     def valueExists(p: Predicate[V]): Boolean = map.exists(kv => p(kv._2))
 
     def emptyTo(empty: => Map[K, V]): Map[K, V]             = uncons(empty, _ => map)
-    def calcIfNonEmpty[A](f: Map[K, V] => A): Option[A]     = if (map.isEmpty) None else Some(f(map))
+    def calcIfNonEmpty[A](f: Map[K, V] => A): Option[A]     = map.calcIf(_.nonEmpty)(f)
     def uncons[A](empty: => A, nonEmpty: Map[K, V] => A): A = if (map.isEmpty) empty else nonEmpty(map)
 
     def reverse(f: Set[K] => K): Map[V, K] = reverseToMultiMap.mapValuesEagerly(f)

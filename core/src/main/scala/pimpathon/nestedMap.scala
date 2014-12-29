@@ -12,5 +12,6 @@ object nestedMap {
 
   class NestedMapConflictingOps[K1, K2, V](value: NestedMap[K1, K2, V]) {
     def mapValuesEagerly[W](f: V => W): NestedMap[K1, K2, W] = value.mapValuesEagerly(_.mapValuesEagerly(f))
+    def mapKeysEagerly[C](f: K2 => C): NestedMap[K1, C, V]   = value.mapValuesEagerly(_.mapKeysEagerly(f))
   }
 }

@@ -53,6 +53,8 @@ case class FileUtils (
     def children: Stream[File]  = stream.cond(file.isDirectory && file.canRead, file.listFiles.toStream)
     def childDirs: Stream[File] = children.filter(_.isDirectory)
 
+    def ancestors: Stream[File] = Stream.iterate(file)(_.getParentFile).takeWhile(_ != null)
+
     def path: List[String]     = file.getAbsolutePath.split(separator).toList.filterNot(Set("", "."))
 
     def md5(): String = readLines().mkString("\n").md5
@@ -75,7 +77,6 @@ case class FileUtils (
 
     def className(classDir: File): String = sharedPaths(classDir)._1.mkString(".").stripSuffix(".class")
 
-    private[pimpathon] def ancestors: Stream[File] = Stream.iterate(file)(_.getParentFile).takeWhile(_ != null)
     private def separator: String = File.separator.replace("\\", "\\\\")
     private def sharedPaths(other: File) = file.path.sharedPrefix(other.path).calc(t => (t._2, t._3))
   }

@@ -33,8 +33,9 @@
 + function.or(Predicate[A]*): Predicate[A]
 + function.nand(Predicate[A]*): Predicate[A]
 + function.nor(Predicate[A]*): Predicate[A]
-+ inputStream.gunzip: GZIPInputStream
-+ outputStream.gzip: GZIPOutputStream
++ File.ancestors: Stream[File]
++ InputStream.gunzip: GZIPInputStream
++ OutputStream.gzip: GZIPOutputStream
 + callable.create(=> A): Callable[A]
 + classTag.className[A]: String
 + classTag.simpleClassName[A]: String

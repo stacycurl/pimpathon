@@ -114,6 +114,14 @@ class FileTest {
     })
   }
 
+  @Test def ancestors(): Unit = {
+    file.withTempDirectory(dir => {
+      val List(child) = file.files(dir, "parent/child").map(_.create()).toList
+
+      assertTrue(Set(dir, dir / "parent", child).forall(child.ancestors.contains))
+    })
+  }
+
   @Test def relativeTo(): Unit = {
     file.withTempDirectory(dir => {
       assertEquals("child", (dir / "child").create().relativeTo(dir).getPath)

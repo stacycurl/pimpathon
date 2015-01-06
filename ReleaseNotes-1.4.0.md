@@ -34,6 +34,7 @@
 + function.nand(Predicate[A]*): Predicate[A]
 + function.nor(Predicate[A]*): Predicate[A]
 + File.ancestors: Stream[File]
++ File.isAncestorOf(File): Boolean
 + InputStream.gunzip: GZIPInputStream
 + OutputStream.gzip: GZIPOutputStream
 + callable.create(=> A): Callable[A]

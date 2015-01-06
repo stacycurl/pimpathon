@@ -29,7 +29,8 @@ case class FileUtils (
     def isChildOf(other: File): Boolean     = other.isParentOf(file)
     def isParentOf(other: File): Boolean    = other.getParentFile.equals(file)
     def isContainedIn(other: File): Boolean = other.contains(file)
-    def contains(other: File): Boolean      = other.ancestors.exists(_.equals(file))
+    def contains(other: File): Boolean      = isAncestorOf(other)
+    def isAncestorOf(other: File): Boolean  = other.ancestors.contains(file)
 
     // http://rapture.io does this much better
     def /(name: String): File = new File(file, name)

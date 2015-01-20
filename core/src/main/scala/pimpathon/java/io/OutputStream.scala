@@ -11,7 +11,7 @@ import pimpathon.java.io.inputStream._
 object outputStream extends OutputStreamUtils(closeOut = true, closeIn = true, bufferSize = 8192)
 
 case class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean, bufferSize: Int) {
-  implicit class OutputStreamOps[OS <: OutputStream](val os: OS) {
+  implicit class OutputStreamOps[OS <: OutputStream](os: OS) {
     def <<(is: InputStream): OS = drain(is, closeOut = false, closeIn = false)
 
     def drain(is: InputStream, closeOut: Boolean = closeOut, closeIn: Boolean = closeIn): OS =
@@ -25,7 +25,7 @@ case class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean, bufferSize: In
     def buffered: BufferedOutputStream = new BufferedOutputStream(os, bufferSize)
     def gzip: GZIPOutputStream = new GZIPOutputStream(os, bufferSize)
 
-    def writeN(is: InputStream, n: Long): OS = os.tap(_.writeUpToN(is, n).calc(count => if (count != n)
+    def writeN(is: InputStream, n: Long): OS = os.tap(_.writeUpToN(is, n) |> (count => if (count != n)
       throw new IOException(s"Failed to write $n only $count were available")
     ))
 

@@ -1,8 +1,8 @@
 package pimpathon
 
 import org.junit.Test
-import scala.collection.mutable.ListBuffer
-import scala.util.{Failure, Success, Try}
+import scala.collection.{mutable => M}
+import scala.util.{Failure, Success}
 
 import org.junit.Assert._
 import pimpathon.either._
@@ -67,8 +67,8 @@ class EitherTest {
   )
 
   @Test def tap(): Unit = {
-    val ints    = new ListBuffer[Int]
-    val strings = new ListBuffer[String]
+    val ints    = new M.ListBuffer[Int]
+    val strings = new M.ListBuffer[String]
 
     Left[Int, String](1).tap(ints += _, strings += _)
     assertEquals(List(1), ints.toList)

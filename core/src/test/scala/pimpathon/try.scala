@@ -1,8 +1,7 @@
 package pimpathon
 
 import org.junit.Test
-import scala.collection.mutable.ListBuffer
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 
 import org.junit.Assert._
 import pimpathon.pimpTry._

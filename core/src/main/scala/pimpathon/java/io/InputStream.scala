@@ -13,7 +13,7 @@ import pimpathon.java.io.outputStream._
 object inputStream extends InputStreamUtils()
 
 case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, bufferSize: Int = 8192) {
-  implicit class InputStreamOps[IS <: InputStream](val is: IS) {
+  implicit class InputStreamOps[IS <: InputStream](is: IS) {
     def >>(os: OutputStream): IS = drain(os, closeIn = false, closeOut = false)
 
     def drain(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): IS =
@@ -27,7 +27,7 @@ case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, b
     def buffered: BufferedInputStream = new BufferedInputStream(is, bufferSize)
     def gunzip: GZIPInputStream = new GZIPInputStream(is, bufferSize)
 
-    def readN(os: OutputStream, n: Long): IS = is.tap(_.readUpToN(os, n).calc(count => if (count != n)
+    def readN(os: OutputStream, n: Long): IS = is.tap(_.readUpToN(os, n) |> (count => if (count != n)
       throw new IOException(s"Failed to read $n bytes, only $count were available")
     ))
 
@@ -42,7 +42,6 @@ case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, b
 
       recurse(0)
     })
-
   }
 
   def copy(is: InputStream, os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): Unit = {
@@ -55,5 +54,5 @@ case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, b
     })
   }
 
-  private def withBuffer[A](f: Array[Byte] => A): A = new Array[Byte](bufferSize).calc(f)
+  private def withBuffer[A](f: Array[Byte] => A): A = f(new Array[Byte](bufferSize))
 }

@@ -36,7 +36,7 @@ case class FileUtils (
     def /(name: String): File = new File(file, name)
     def named(name: String = file.getName): File = new NamedFile(file, name)
 
-    def relativeTo(dir: File): File = sharedPaths(dir).calc { case (relativeFile, relativeDir) =>
+    def relativeTo(dir: File): File = sharedPaths(dir) |> { case (relativeFile, relativeDir) =>
       new File((relativeDir.const("..") ++ relativeFile).mkString(File.separator))
     }
 
@@ -79,7 +79,7 @@ case class FileUtils (
     def className(classDir: File): String = sharedPaths(classDir)._1.mkString(".").stripSuffix(".class")
 
     private def separator: String = File.separator.replace("\\", "\\\\")
-    private def sharedPaths(other: File) = file.path.sharedPrefix(other.path).calc(t => (t._2, t._3))
+    private def sharedPaths(other: File) = file.path.sharedPrefix(other.path) |> (t => (t._2, t._3))
   }
 
   def cwd: File = file(Properties.userDir)

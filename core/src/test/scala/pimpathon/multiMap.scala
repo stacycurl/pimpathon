@@ -86,6 +86,11 @@ class MultiMapTest {
     Map(1 -> List(10, 11), 2 -> List(20, 21), 3 -> List(30, 31)).multiMap.mapEntries(k => vs => (k % 2, vs))
   )
 
+  @Test def multiMap_mapEntriesU(): Unit = assertEquals(
+    Map(0 -> Set(20, 21), 1 -> Set(10, 11, 30, 31)),
+    Map(1 -> List(10, 11), 2 -> List(20, 21), 3 -> List(30, 31)).multiMap.mapEntriesU(k => vs => (k % 2, vs.toSet))
+  )
+
   @Test def flatMapValues(): Unit = assertEquals(
     Map(0 -> List(1, -1, 2, -2), 1 -> List(2, -2, 3, -3)),
     Map(0 -> List(1, 2), 1 -> List(2, 3)).flatMapValues(v => List(v, -v))

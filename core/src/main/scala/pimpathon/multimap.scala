@@ -61,10 +61,11 @@ object multiMap {
 
     def mapEntries[C, W](f: K => F[V] => (C, F[W]))(
       implicit cbmmf: MMCBF[F, C, F[W]], crf: CanRebuildFrom[F, W], crff: CanRebuildFrom[F, F[W]]
-    ): MultiMap[F, C, W] = {
-      value.asMultiMap[F].withEntries(f.tupled).mapValuesEagerly(crf.concat)
-    }
+    ): MultiMap[F, C, W] = value.asMultiMap[F].withEntries(f.tupled).mapValuesEagerly(crf.concat)
 
+    def mapEntriesU[C, GW](f: K => F[V] => (C, GW))(
+      implicit cbmmf: MMCBF[F, C, GW], u: CanRebuildFrom.Unapply[GW], crf: CanRebuildFrom[F, GW]
+    ): MultiMap[u.F, C, u.V] = value.asMultiMap[F].withEntries(f.tupled).mapValuesEagerly(u.concat[F](_)(crf))
 
 
     def sliding(size: Int)(implicit bf: CCBF[Map[K, V], F], gtl: F[V] <:< GenTraversable[V],
@@ -124,6 +125,9 @@ object multiMap {
     trait Unapply[FV] {
       type F[_]
       type V
+
+      def concat[G[_]](g_fv: G[FV])(implicit crf: CanRebuildFrom[G, FV]): F[V] =
+        fromStream(for { fv <- crf.toStream(g_fv); v <- toStream(fv) } yield v)
 
       def fromStream(to: TraversableOnce[V]): F[V]
       def toStream(fv: FV): Stream[V]

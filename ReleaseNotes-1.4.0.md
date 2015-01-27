@@ -43,3 +43,4 @@
 + classTag.className[A]: String
 + classTag.simpleClassName[A]: String
 + classTag.klassOf[A]: String
++ mutable.Builder[A, B].on(C => A): mutable.Builder[C, B]

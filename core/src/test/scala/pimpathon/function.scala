@@ -1,6 +1,7 @@
 package pimpathon
 
 import org.junit.Test
+import scala.util.Random
 
 import org.junit.Assert._
 import pimpathon.function._
@@ -19,10 +20,24 @@ class FunctionTest {
 
   @Test def and(): Unit = {
     assertEquals(List(4, 6), List(2, 3, 4, 6).filter(isEven and (_ > 2)))
+    assertEquals(List(4, 6), List(2, 3, 4, 6).filter(function.and(isEven, _ > 2)))
+    assertTrue(function.and[Int]().apply(Random.nextInt()))
   }
 
   @Test def or(): Unit = {
     assertEquals(List(2, 4, 3), List(2, 1, 4, 3, 5).filter(isEven or (_ == 3)))
+    assertEquals(List(2, 4, 3), List(2, 1, 4, 3, 5).filter(function.or(isEven, _ == 3)))
+    assertFalse(function.or[Int]().apply(Random.nextInt()))
+  }
+
+  @Test def nand(): Unit = {
+    assertEquals(List(2, 3), List(2, 3, 4, 6).filter(function.nand(isEven, _ > 2)))
+    assertFalse(function.nand[Int]().apply(Random.nextInt()))
+  }
+
+  @Test def nor(): Unit = {
+    assertEquals(List(1, 5), List(2, 1, 4, 3, 5).filter(function.nor(isEven, _ == 3)))
+    assertTrue(function.nor[Int]().apply(Random.nextInt()))
   }
 
   @Test def not(): Unit = {

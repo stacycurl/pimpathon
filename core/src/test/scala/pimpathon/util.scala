@@ -24,10 +24,12 @@ object util {
   }
 
   def createInputStream(content: String = "", onClose: () => Unit = () => {}) =
-    new ByteArrayInputStream(content.getBytes) {
-      var closed = false
-      override def close() = { closed = true; super.close(); onClose() }
-    }
+    inputStreamFor(content.getBytes, onClose)
+
+  def inputStreamFor(content: Array[Byte], onClose: () => Unit = () => {}) = new ByteArrayInputStream(content) {
+    var closed = false
+    override def close() = { closed = true; super.close(); onClose() }
+  }
 
   def createOutputStream(onClose: () => Unit = () => {}) = new ByteArrayOutputStream() {
     var closed: Boolean = false

@@ -2,6 +2,7 @@ package pimpathon.java.io
 
 import java.io.{IOException, BufferedOutputStream, InputStream, OutputStream}
 import scala.annotation.tailrec
+import java.util.zip.GZIPOutputStream
 
 import pimpathon.any._
 import pimpathon.java.io.inputStream._
@@ -24,8 +25,9 @@ case class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean, bufferSize: In
     def attemptClose(): Either[Throwable, Unit] = os.attempt(_.close())
 
     def buffered: BufferedOutputStream = new BufferedOutputStream(os, bufferSize)
+    def gzip: GZIPOutputStream = new GZIPOutputStream(os, bufferSize)
 
-    def writeN(is: InputStream, n: Long): OS = os.tap(_.writeUpToN(is, n).calc(count => if (count != n)
+    def writeN(is: InputStream, n: Long): OS = os.tap(_.writeUpToN(is, n) |> (count => if (count != n)
       throw new IOException("Failed to write %d only %d were available".format(n, count))
     ))
 

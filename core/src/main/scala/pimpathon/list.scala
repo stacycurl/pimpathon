@@ -14,6 +14,7 @@ import pimpathon.tuple._
 
 object list extends genTraversableLike[List] {
   implicit def listOps[A](list: List[A]): ListOps[A] = new ListOps[A](list)
+  implicit def matrixOps[A](matrix: List[List[A]]): MatrixOps[A] = new MatrixOps[A](matrix)
 
   class ListOps[A](list: List[A]) {
     def tapEmpty(empty: => Unit): List[A] = tap(empty, _ => {})
@@ -27,12 +28,13 @@ object list extends genTraversableLike[List] {
 
     def fraction(p: Predicate[A]): Double = countWithSize(p).map(_.to[Double].calc(_ / _)).getOrElse(Double.NaN)
 
-    def countWithSize(p: Predicate[A]): Option[(Int, Int)] = mapNonEmpty(_.foldLeft((0, 0)) {
+    def countWithSize(p: Predicate[A]): Option[(Int, Int)] = calcIfNonEmpty(_.foldLeft((0, 0)) {
       case ((passed, size), elem) => (passed + p(elem).asInt, size + 1)
     })
 
     def sizeGT(value: Int): Boolean = uncons(empty = value < 0, nonEmpty = _.tail.sizeGT(value - 1))
 
+    def duplicates: List[A] = duplicatesBy(identity[A])
     def duplicatesBy[B](f: A => B): List[A] = (countBy(f) - 1).multiMap.values
     def distinctBy[B](f: A => B): List[A] = list.map(equalBy(f)).distinct.map(_.a)
 
@@ -61,15 +63,21 @@ object list extends genTraversableLike[List] {
 
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 
-    def mapNonEmpty[B](f: List[A] => B): Option[B] = if (list.isEmpty) None else Some(f(list))
+    def calcIfNonEmpty[B](f: List[A] => B): Option[B] = list.calcIf(_.nonEmpty)(f)
+    def mapIfNonEmpty[B](f: A => B): Option[List[B]] = list.calcIf(_.nonEmpty)(_.map(f))
 
     def amass[B](pf: PartialFunction[A, List[B]]): List[B] = list.flatMap(a => pf.lift(a).getOrElse(Nil))
 
     def uncons[B](empty: => B, nonEmpty: List[A] => B): B = if (list.isEmpty) empty else nonEmpty(list)
 
     def unconsC[B](empty: => B, nonEmpty: A => List[A] => B): B = list match {
-      case Nil => empty
+      case Nil          => empty
       case head :: tail => nonEmpty(head)(tail)
+    }
+
+    def unsnocC[B](empty: => B, nonEmpty: List[A] => A => B): B = initLastOption match {
+      case None               => empty
+      case Some((init, last)) => nonEmpty(init)(last)
     }
 
     def const[B](elem: B): List[B] = list.map(_ => elem)
@@ -101,6 +109,12 @@ object list extends genTraversableLike[List] {
 
     private def equalBy[B](f: A => B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
     private def zip[B](other: List[B]): Iterator[(A, B)] = list.iterator.zip(other.iterator)
+  }
+
+  class MatrixOps[A](value: List[List[A]]) {
+    def cartesianProduct: List[List[A]] = value.foldRight(List(Nil): List[List[A]]) {
+      case (item, acc) => for { a <- item; b <- acc } yield a :: b
+    }
   }
 }
 

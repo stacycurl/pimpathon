@@ -2,14 +2,19 @@ package pimpathon
 
 import _root_.java.io.{InputStream, OutputStream}
 import _root_.java.math.BigInteger
-import scala.math
 
 import pimpathon.any._
 import pimpathon.string._
 
 
 object array {
+  implicit def arrayOps[A](array: Array[A]): ArrayOps[A] = new ArrayOps[A](array)
   implicit def byteArrayOps(array: Array[Byte]): ByteArrayOps = new ByteArrayOps(array)
+
+  class ArrayOps[A](array: Array[A]) {
+    def copyTo(srcPos: Int, dest: Array[A], destPos: Int, length: Int): Array[A] =
+      dest.tap(_ => System.arraycopy(array, srcPos, dest, destPos, length))
+  }
 
   class ByteArrayOps(array: Array[Byte]) {
     def toHex(length: Int): String = toHex.prefixPadTo(length, '0')

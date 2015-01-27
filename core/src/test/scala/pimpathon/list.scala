@@ -20,14 +20,24 @@ class ListTest {
     assertEquals(List(2, 3, 1), List(1, 2, 3).unconsC(0, h => t => t ++ List(h)))
   }
 
+  @Test def unsnocC(): Unit = {
+    assertEquals(0,                  nil[Int].unsnocC(0, i => l => l :: i))
+    assertEquals(List(3, 1, 2), List(1, 2, 3).unsnocC(0, i => l => l :: i))
+  }
+
   @Test def emptyTo(): Unit = {
     assertEquals(List(1), nil[Int].emptyTo(List(1)))
     assertEquals(List(1, 2, 3), List(1, 2, 3).emptyTo(List(1)))
   }
 
-  @Test def mapNonEmpty(): Unit = {
-    assertEquals(None, nil[Int].mapNonEmpty(_.reverse))
-    assertEquals(Some(List(3, 2, 1)), List(1, 2, 3).mapNonEmpty(_.reverse))
+  @Test def calcIfNonEmpty(): Unit = {
+    assertEquals(None, nil[Int].calcIfNonEmpty(_.reverse))
+    assertEquals(Some(List(3, 2, 1)), List(1, 2, 3).calcIfNonEmpty(_.reverse))
+  }
+
+  @Test def mapIfNonEmpty(): Unit = {
+    assertEquals(None, nil[Int].mapIfNonEmpty(_ * 2))
+    assertEquals(Some(List(2, 4, 6)), List(1, 2, 3).mapIfNonEmpty(_ * 2))
   }
 
 
@@ -54,6 +64,10 @@ class ListTest {
     assertTrue(List(1, 2).sizeGT(1))
     assertFalse(List(1, 2).sizeGT(2))
   }
+
+  @Test def duplicates(): Unit = assertEquals(
+    List("foo", "foo", "foo", "bar", "bar"), List("foo", "bar", "foo", "food", "bar", "foo").duplicates
+  )
 
   @Test def duplicatesBy(): Unit = assertEquals(
     List("foo", "bar", "bard", "food"), List("foo", "bar", "bard", "food", "foody").duplicatesBy(_.length)
@@ -199,5 +213,10 @@ class ListTest {
   @Test def partitionByPF(): Unit = assertEquals(
     (List(2, 4), List("one", "three")),
     List(1, 2, 3, 4).partitionByPF(util.partial(1 -> "one", 3 -> "three"))
+  )
+
+  @Test def cartesianProduct(): Unit = assertEquals(
+    for { a <- List(1, 2); b <- List(10, 20); c <- List(100, 200) } yield List(a, b, c),
+    List(List(1, 2), List(10, 20), List(100, 200)).cartesianProduct
   )
 }

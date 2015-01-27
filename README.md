@@ -43,8 +43,8 @@ Release notes [1.3.0][r1.3.0], [1.2.0][r1.2.0], [1.1.0][r1.1.0], [1.0.0][r1.0.0]
 [ci]: https://travis-ci.org/stacycurl/pimpathon
 [sonatype]: https://oss.sonatype.org/index.html#nexus-search;quick~pimpathon
 [pimp-my-library]:http://www.artima.com/weblogs/viewpost.jsp?thread=179766
-[r1.0.0]: http://https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.0.0.md
-[r1.1.0]: http://https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.1.0.md
-[r1.2.0]: http://https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.2.0.md
-[r1.3.0]: http://https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.3.0.md
-[r1.4.0]: http://https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.4.0.md
+[r1.0.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.0.0.md
+[r1.1.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.1.0.md
+[r1.2.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.2.0.md
+[r1.3.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.3.0.md
+[r1.4.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.4.0.md

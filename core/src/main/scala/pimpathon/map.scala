@@ -3,6 +3,7 @@ package pimpathon
 import scala.collection.{breakOut, mutable => M, GenTraversable, GenTraversableOnce}
 import scala.collection.immutable.{SortedMap, TreeMap}
 
+import pimpathon.any._
 import pimpathon.function._
 import pimpathon.multiMap._
 import pimpathon.tuple._
@@ -33,7 +34,7 @@ object map extends genTraversableLike[GenTraversable] {
     def valueExists(p: Predicate[V]): Boolean = map.exists(kv => p(kv._2))
 
     def emptyTo(empty: => Map[K, V]): Map[K, V]             = uncons(empty, _ => map)
-    def mapNonEmpty[A](f: Map[K, V] => A): Option[A]        = if (map.isEmpty) None else Some(f(map))
+    def calcIfNonEmpty[A](f: Map[K, V] => A): Option[A]     = map.calcIf(_.nonEmpty)(f)
     def uncons[A](empty: => A, nonEmpty: Map[K, V] => A): A = if (map.isEmpty) empty else nonEmpty(map)
 
     def reverse(f: Set[K] => K): Map[V, K] = reverseToMultiMap.mapValuesEagerly(f)
@@ -72,10 +73,10 @@ object map extends genTraversableLike[GenTraversable] {
   }
 
   class MapAndThen[K, V, A](map: Map[K, V], andThen: ((K, V)) => A) {
-    def maxValue(implicit O: Ordering[V]): Option[A] = map.mapNonEmpty(_.maxBy(value)).map(andThen)
-    def minValue(implicit O: Ordering[V]): Option[A] = map.mapNonEmpty(_.minBy(value)).map(andThen)
-    def maxKey(implicit O: Ordering[K]): Option[A] = map.mapNonEmpty(_.maxBy(key)).map(andThen)
-    def minKey(implicit O: Ordering[K]): Option[A] = map.mapNonEmpty(_.minBy(key)).map(andThen)
+    def maxValue(implicit O: Ordering[V]): Option[A] = map.calcIfNonEmpty(_.maxBy(value)).map(andThen)
+    def minValue(implicit O: Ordering[V]): Option[A] = map.calcIfNonEmpty(_.minBy(value)).map(andThen)
+    def maxKey(implicit O: Ordering[K]): Option[A] = map.calcIfNonEmpty(_.maxBy(key)).map(andThen)
+    def minKey(implicit O: Ordering[K]): Option[A] = map.calcIfNonEmpty(_.minBy(key)).map(andThen)
 
     def matchingKey(p: Predicate[K]): Option[A]   = map.find(kv => p(kv._1)).map(andThen)
     def matchingValue(p: Predicate[V]): Option[A] = map.find(kv => p(kv._2)).map(andThen)

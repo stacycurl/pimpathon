@@ -1,6 +1,7 @@
 package pimpathon.java.io
 
 import java.io.{BufferedInputStream, IOException, InputStream, OutputStream}
+import java.util.zip.GZIPInputStream
 import scala.annotation.tailrec
 
 import pimpathon.any._
@@ -25,8 +26,9 @@ case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, b
     def attemptClose(): Either[Throwable, Unit] = is.attempt(_.close())
 
     def buffered: BufferedInputStream = new BufferedInputStream(is, bufferSize)
+    def gunzip: GZIPInputStream = new GZIPInputStream(is, bufferSize)
 
-    def readN(os: OutputStream, n: Long): IS = is.tap(_.readUpToN(os, n).calc(count => if (count != n)
+    def readN(os: OutputStream, n: Long): IS = is.tap(_.readUpToN(os, n) |> (count => if (count != n)
       throw new IOException("Failed to read %d bytes, only %d were available".format(n, count))
     ))
 
@@ -41,7 +43,6 @@ case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, b
 
       recurse(0)
     })
-
   }
 
   def copy(is: InputStream, os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): Unit = {
@@ -54,5 +55,5 @@ case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, b
     })
   }
 
-  private def withBuffer[A](f: Array[Byte] => A): A = new Array[Byte](bufferSize).calc(f)
+  private def withBuffer[A](f: Array[Byte] => A): A = f(new Array[Byte](bufferSize))
 }

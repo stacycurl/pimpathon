@@ -14,6 +14,16 @@ class AnyTest {
     List("12".calc(_ + "3"), "12" |> (_ + "3"))
   )
 
+  @Test def calcIf(): Unit = assertEquals(
+    List(Some(5), None, Some(7)),
+    List(2, 3, 4).map(_.calcIf(_ % 2 == 0)(_ + 3))
+  )
+
+  @Test def calcPF(): Unit = assertEquals(
+    List(None, Some("two"), None, Some("four")),
+    List(1, 2, 3, 4).map(_.calcPF(util.partial(2 -> "two", 4 -> "four")))
+  )
+
   @Test def transform(): Unit = assertEquals(
     List(1, 4, 3, 8),
     List(1, 2, 3, 4).map(_.transform(util.partial(2 -> 4, 4 -> 8)))
@@ -91,6 +101,46 @@ class AnyTest {
     List(Some(1), None, Some(3), None),
     List(1, 2, 3, 4).map(_.unlessSelf(_ % 2 == 0))
   )
+
+  @Test def passes_one(): Unit = {
+    assertEquals(List(Some(1), None, None, Some(4)), List(1, 2, 3, 4).map(_.passes.one(_ < 2, _ > 3)))
+    assertEquals(List(None, None, None, None),       List(1, 2, 3, 4).map(_.passes.one()))
+  }
+
+  @Test def passes_all(): Unit = {
+    assertEquals(List(None, Some(2), Some(3), None),       List(1, 2, 3, 4).map(_.passes.all(_ >= 2, _ <= 3)))
+    assertEquals(List(Some(1), Some(2), Some(3), Some(4)), List(1, 2, 3, 4).map(_.passes.all()))
+  }
+
+  @Test def passes_none(): Unit = {
+    assertEquals(List(Some(1), None, None, Some(4)), List(1, 2, 3, 4).map(_.passes.none(_ >= 2, _ <= 3)))
+    assertEquals(List(None, None, None, None),       List(1, 2, 3, 4).map(_.passes.none()))
+  }
+
+  @Test def passes_some(): Unit = {
+    assertEquals(List(None, Some(2), Some(3), None),       List(1, 2, 3, 4).map(_.passes.some(_ < 2, _ > 3)))
+    assertEquals(List(Some(1), Some(2), Some(3), Some(4)), List(1, 2, 3, 4).map(_.passes.some()))
+  }
+
+  @Test def fails_one(): Unit = {
+    assertEquals(List(None, Some(2), Some(3), None),       List(1, 2, 3, 4).map(_.fails.one(_ < 2, _ > 3)))
+    assertEquals(List(Some(1), Some(2), Some(3), Some(4)), List(1, 2, 3, 4).map(_.fails.one()))
+  }
+
+  @Test def fails_all(): Unit = {
+    assertEquals(List(Some(1), None, None, Some(4)), List(1, 2, 3, 4).map(_.fails.all(_ >= 2, _ <= 3)))
+    assertEquals(List(None, None, None, None),       List(1, 2, 3, 4).map(_.fails.all()))
+  }
+
+  @Test def fails_none(): Unit = {
+    assertEquals(List(None, Some(2), Some(3), None),       List(1, 2, 3, 4).map(_.fails.none(_ >= 2, _ <= 3)))
+    assertEquals(List(Some(1), Some(2), Some(3), Some(4)), List(1, 2, 3, 4).map(_.fails.none()))
+  }
+
+  @Test def fails_some(): Unit = {
+    assertEquals(List(Some(1), None, None, Some(4)), List(1, 2, 3, 4).map(_.fails.some(_ < 2, _ > 3)))
+    assertEquals(List(None, None, None, None),       List(1, 2, 3, 4).map(_.fails.some()))
+  }
 
   @Test def withFinally(): Unit = assertEquals(
     List("body: input", "finally: input", "done"), new M.ListBuffer[String].tap(strings => {

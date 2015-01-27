@@ -38,5 +38,9 @@ class ArrayTest {
     assertEquals(("contents", 8), copy("contents", 8, 8))
     assertEquals(("content",  7), copy("contents", 7, 8))
   }
+
+  @Test def copyTo(): Unit = assertEquals(
+    List(0, 3, 4, 5, 0), Array(1, 2, 3, 4, 5).copyTo(2, Array(0, 0, 0, 0, 0), 1, 3).toList
+  )
 }
 

@@ -86,6 +86,11 @@ class MultiMapTest {
     Map(1 -> List(10, 11), 2 -> List(20, 21), 3 -> List(30, 31)).multiMap.mapEntries(k => vs => (k % 2, vs))
   )
 
+  @Test def flatMapValues(): Unit = assertEquals(
+    Map(0 -> List(1, -1, 2, -2), 1 -> List(2, -2, 3, -3)),
+    Map(0 -> List(1, 2), 1 -> List(2, 3)).flatMapValues(v => List(v, -v))
+  )
+
   @Test def pop(): Unit = {
     assertEquals(Map(1 -> List(3), 2 -> List(3)),    Map(1 -> List(2, 3), 2 -> List(3)).pop(1))
     assertEquals(Map(1 -> List(2, 3)),               Map(1 -> List(2, 3), 2 -> List(3)).pop(2))
@@ -95,6 +100,11 @@ class MultiMapTest {
   @Test def sequence(): Unit = assertEquals(
     List(Map(1 -> 10, 2 -> 20), Map(1 -> 11, 2 -> 21)),
     Map(1 -> List(10, 11), 2 -> List(20, 21)).sequence
+  )
+
+  @Test def sliding(): Unit = assertEquals(
+    List(Map(1 -> List(11, 12), 2 -> List(21, 22)), Map(1 -> List(12, 13), 2 -> List(22, 23))),
+    Map(1 -> List(11, 12, 13), 2 -> List(21, 22, 23)).multiMap.sliding(2)
   )
 
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {

@@ -6,7 +6,6 @@ import org.junit.Test
 import scala.util.{Failure, Success}
 
 import org.junit.Assert._
-import pimpathon.java.io.inputStream._
 import pimpathon.util._
 import pimpathon.any._
 

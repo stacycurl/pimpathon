@@ -37,6 +37,7 @@
 + function.nor(Predicate[A]*): Predicate[A]
 + File.ancestors: Stream[File]
 + File.isAncestorOf(File): Boolean
++ pimpathon.java.io forwarding package object
 + InputStream.gunzip: GZIPInputStream
 + OutputStream.gzip: GZIPOutputStream
 + callable.create(=> A): Callable[A]

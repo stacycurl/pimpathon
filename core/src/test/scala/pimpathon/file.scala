@@ -284,7 +284,7 @@ class FileTest {
 
   @Test def readBytes(): Unit = {
     file.withTempFile(tmp => {
-      createInputStream("contents").drain(tmp.outputStream)
+      createInputStream("contents").drain(tmp.outputStream())
       assertEquals("contents", new String(tmp.readBytes()))
     })
   }
@@ -299,23 +299,23 @@ class FileTest {
   @Test def write(): Unit = file.withTempFile(tmp => {
     assertEquals(List("content"),      tmp.write("content", append = false).readLines())
     assertEquals(List("contents"),     tmp.write("s", append = true).readLines())
-    assertEquals(List("new content"),  tmp.write("new content", append = false).readLines())
-    assertEquals(List("new contents"), tmp.write("s").readLines())
+    assertEquals(List("new content"),  tmp.write("new content").readLines())
+    assertEquals(List("new contents"), tmp.write("s", append = true).readLines())
   })
 
   @Test def writeBytes(): Unit = {
     file.withTempFile(tmp => {
       assertEquals(List("12"),   tmp.writeBytes("12".getBytes).readLines())
-      assertEquals(List("1234"), tmp.writeBytes("34".getBytes).readLines())
-      assertEquals(List("56"),   tmp.writeBytes("56".getBytes, append = false).readLines())
+      assertEquals(List("1234"), tmp.writeBytes("34".getBytes, append = true).readLines())
+      assertEquals(List("56"),   tmp.writeBytes("56".getBytes).readLines())
     })
   }
 
   @Test def writeLines(): Unit = {
     file.withTempFile(tmp => {
       assertEquals(List("1", "2"),           tmp.writeLines(List("1", "2")).readLines())
-      assertEquals(List("1", "2", "3", "4"), tmp.writeLines(List("3", "4")).readLines())
-      assertEquals(List("5", "6"),           tmp.writeLines(List("5", "6"), append = false).readLines())
+      assertEquals(List("1", "2", "3", "4"), tmp.writeLines(List("3", "4"), append = true).readLines())
+      assertEquals(List("5", "6"),           tmp.writeLines(List("5", "6")).readLines())
     })
   }
 

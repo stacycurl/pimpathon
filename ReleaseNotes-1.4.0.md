@@ -1,10 +1,15 @@
 ## Release Notes 1.4.0-Snapshot
 
 ### Breaking changes & bug fixes
++ File.write        overwrites by default (i.e. append = false, was true before)
++ File.writeLines   overwrites by default (i.e. append = false, was true before)
++ File.writeBytes   overwrites by default (i.e. append = false, was true before)
++ File.outputStream overwrites by default (i.e. append = false, was true before)
 
 ### Removals
 + List[A].mapNonEmpty(List[A] => B): Option[B]
 + Map[K, V].mapNonEmpty(Map[K, V] => B): Option[B]
++ File.outputStream: FileOutputStream
 
 ### Additions
 + [A].calcIf(Predicate[A])(A => B): Option[B]
@@ -35,6 +40,7 @@
 + function.or(Predicate[A]*): Predicate[A]
 + function.nand(Predicate[A]*): Predicate[A]
 + function.nor(Predicate[A]*): Predicate[A]
++ FileUtils append constructor parameter (specifies the default value of append method parameter)
 + File.ancestors: Stream[File]
 + File.isAncestorOf(File): Boolean
 + pimpathon.java.io forwarding package object

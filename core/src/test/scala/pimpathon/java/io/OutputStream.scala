@@ -5,7 +5,6 @@ import java.util.zip.GZIPInputStream
 import org.junit.Test
 
 import org.junit.Assert._
-import pimpathon.java.io.outputStream._
 import pimpathon.util._
 import pimpathon.any._
 
@@ -82,8 +81,6 @@ class OutputStreamTest {
   }
 
   @Test def gzip(): Unit = {
-    import pimpathon.java.io.inputStream._
-
     val os     = createOutputStream().tap(_.gzip.closeAfter(_.write("content".getBytes)))
     val result = createOutputStream().tap(rs => new GZIPInputStream(inputStreamFor(os.toByteArray)).drain(rs))
 

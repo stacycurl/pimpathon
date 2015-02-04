@@ -1,7 +1,6 @@
 package pimpathon
 
-import _root_.java.io.{File, FileInputStream}
-import _root_.java.lang.reflect.Field
+import _root_.java.io.File
 import org.junit.Test
 import pimpathon.function.Predicate
 import scala.util.Properties

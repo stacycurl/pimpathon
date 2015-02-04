@@ -5,7 +5,6 @@ import java.util.zip.GZIPOutputStream
 import org.junit.Test
 
 import org.junit.Assert._
-import pimpathon.java.io.inputStream._
 import pimpathon.util._
 import pimpathon.any._
 

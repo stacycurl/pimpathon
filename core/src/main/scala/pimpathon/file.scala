@@ -13,7 +13,7 @@ import pimpathon.string._
 object file extends FileUtils()
 
 case class FileUtils (
-  suffix: String = ".tmp", prefix: String = "temp",
+  suffix: String = ".tmp", prefix: String = "temp", append: Boolean = false,
   private val currentTime: () => Long = () => System.currentTimeMillis()
 ) {
 
@@ -65,17 +65,16 @@ case class FileUtils (
     def readBytes(): Array[Byte] = source().withFinally(_.close())(_.map(_.toByte).toArray)
     def readLines(): List[String] = source().withFinally(_.close())(_.getLines().toList)
 
-    def write(contents: String, append: Boolean = true): File =
+    def write(contents: String, append: Boolean = append): File =
       writeBytes(contents.getBytes, append)
 
-    def writeLines(lines: List[String], append: Boolean = true): File =
+    def writeLines(lines: List[String], append: Boolean = append): File =
       writeBytes((lines.mkString("\n") + "\n").getBytes, append)
 
-    def writeBytes(bytes: Array[Byte], append: Boolean = true): File =
+    def writeBytes(bytes: Array[Byte], append: Boolean = append): File =
       file.tap(_.outputStream(append).closeAfter(_.write(bytes)))
 
-    def outputStream: FileOutputStream = outputStream(false)
-    def outputStream(append: Boolean = true): FileOutputStream = new FileOutputStream(file, append)
+    def outputStream(append: Boolean = append): FileOutputStream = new FileOutputStream(file, append)
     def source(): BufferedSource =  Source.fromFile(file)
 
     def className(classDir: File): String = sharedPaths(classDir)._1.mkString(".").stripSuffix(".class")

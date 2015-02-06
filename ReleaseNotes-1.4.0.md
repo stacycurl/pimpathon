@@ -40,6 +40,7 @@
 + function.or(Predicate[A]*): Predicate[A]
 + function.nand(Predicate[A]*): Predicate[A]
 + function.nor(Predicate[A]*): Predicate[A]
++ String.emptyTo(String): String
 + FileUtils append constructor parameter (specifies the default value of append method parameter)
 + File.ancestors: Stream[File]
 + File.isAncestorOf(File): Boolean

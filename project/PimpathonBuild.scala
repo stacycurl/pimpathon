@@ -13,7 +13,7 @@ object PimpathonBuild extends Build {
     id = "pimpathon-parent",
     base = file("."),
     settings = commonSettings,
-    aggregate = Seq(pimpathonCore, pimpathonExamples)
+    aggregate = Seq(pimpathonCore, pimpathonFrills)
   )
 
   lazy val pimpathonCore = Project(
@@ -22,12 +22,12 @@ object PimpathonBuild extends Build {
     settings = commonSettings ++ Publishing.settings
   )
 
-  lazy val pimpathonExamples = Project(
-    id = "pimpathon-examples",
-    base = file("examples"),
+  lazy val pimpathonFrills = Project(
+    id = "pimpathon-frills",
+    base = file("frills"),
     dependencies = Seq(pimpathonCore),
-    settings = commonSettings ++ Seq(
-      runAllIn(Compile)
+    settings = commonSettings ++ Publishing.settings ++ Seq(
+      libraryDependencies += "io.argonaut" %% "argonaut" % "6.1-M4" % "provided"
     )
   )
 
@@ -56,8 +56,10 @@ object PimpathonBuild extends Build {
       "-deprecation",
       "-unchecked"
     ),
-    libraryDependencies += "com.novocode"  % "junit-interface" % "0.11"  % "test",
-    libraryDependencies += "org.scalaz"   %% "scalaz-core"     % "7.1.0" % "test",
+    libraryDependencies ++= Seq(
+      "com.novocode"  % "junit-interface" % "0.11"  % "test",
+      "org.scalaz"   %% "scalaz-core"     % "7.1.0" % "test"
+    ),
     initialCommands in console := """import pimpathon._""",
     minimumCoverage := 100,
     highlighting := true,

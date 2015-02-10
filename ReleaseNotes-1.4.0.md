@@ -12,6 +12,7 @@
 + File.outputStream: FileOutputStream
 
 ### Additions
++ frills sub-project
 + [A].calcIf(Predicate[A])(A => B): Option[B]
 + [A].calcPF(PartialFunction[A, B]): Option[B]
 + [A].passes.one(Predicate[A]*): Option[A]
@@ -52,3 +53,4 @@
 + classTag.simpleClassName[A]: String
 + classTag.klassOf[A]: String
 + mutable.Builder[A, B].on(C => A): mutable.Builder[C, B]
++ argonaut.Json.filterNulls: Json

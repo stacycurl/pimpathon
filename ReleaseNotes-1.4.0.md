@@ -12,6 +12,7 @@
 + File.outputStream: FileOutputStream
 
 ### Additions
++ frills sub-project
 + [A].calcIf(Predicate[A])(A => B): Option[B]
 + [A].calcPF(PartialFunction[A, B]): Option[B]
 + [A].passes.one(Predicate[A]*): Option[A]
@@ -40,6 +41,7 @@
 + function.or(Predicate[A]*): Predicate[A]
 + function.nand(Predicate[A]*): Predicate[A]
 + function.nor(Predicate[A]*): Predicate[A]
++ String.emptyTo(String): String
 + FileUtils append constructor parameter (specifies the default value of append method parameter)
 + File.ancestors: Stream[File]
 + File.isAncestorOf(File): Boolean
@@ -51,3 +53,4 @@
 + classTag.simpleClassName[A]: String
 + classTag.klassOf[A]: String
 + mutable.Builder[A, B].on(C => A): mutable.Builder[C, B]
++ argonaut.Json.filterNulls: Json

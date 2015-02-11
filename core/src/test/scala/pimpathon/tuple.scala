@@ -13,6 +13,10 @@ class TupleTest {
     assertEquals("123abc", ("123", "abc").calc(_ + _))
   }
 
+  @Test def calcC(): Unit = {
+    assertEquals("123abc", ("123", "abc").calcC(a => b => a + b))
+  }
+
   @Test def to(): Unit = {
     implicit def intToString(i: Int): String = i.toString
     implicit def doubleToString(d: Double): String = d.toString

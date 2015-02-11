@@ -55,3 +55,4 @@
 + classTag.klassOf[A]: String
 + mutable.Builder[A, B].on(C => A): mutable.Builder[C, B]
 + argonaut.Json.filterNulls: Json
++ scalaz.NonEmptyList[A].distinct: NonEmptyList[A]

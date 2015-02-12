@@ -56,3 +56,4 @@
 + mutable.Builder[A, B].on(C => A): mutable.Builder[C, B]
 + argonaut.Json.filterNulls: Json
 + scalaz.NonEmptyList[A].distinct: NonEmptyList[A]
++ NonEmptyList[A].distinctBy(A => B): NonEmptyList[A]

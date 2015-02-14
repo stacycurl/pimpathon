@@ -26,6 +26,7 @@
 + (A, B).calcC(A => B => C): C
 + Option[A].toSuccessNel(E): ValidationNel[E, A]
 + Option[A].tap(none: => Unit, some: A => Unit): Option[A]
++ Option[A].tapNone(=> Unit): Option[A]
 + List[A].calcIfNonEmpty(List[A] => B): Option[B]
 + List[A].duplicates: List[A]
 + List[A].mapIfNonEmpty(A => B): Option[List[B]]

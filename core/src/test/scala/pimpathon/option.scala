@@ -20,6 +20,16 @@ class OptionTest {
     assertEquals(List("none", "some"), strings.toList)
   }
 
+  @Test def tapNone(): Unit = {
+    val strings = new M.ListBuffer[String]
+
+    none[String].tapNone(strings += "none")
+    assertEquals(List("none"), strings.toList)
+
+    some("some").tapNone(strings += "none")
+    assertEquals(List("none"), strings.toList)
+  }
+
   @Test def getOrThrow(): Unit = {
     assertEquals("present", Some("present").getOrThrow("missing"))
     assertEquals("present", Some("present").getOrThrow(new Exception("missing")))

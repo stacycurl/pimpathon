@@ -124,6 +124,14 @@ class MultiMapTest {
     Map(1 -> List(11, 12, 13), 2 -> List(21, 22, 23)).multiMap.sliding(2)
   )
 
+  @Test def getOrEmpty(): Unit = {
+    assertEquals(List(2), Map(1 → List(2)).getOrEmpty(1))
+    assertEquals(Nil,     Map(1 → List(2)).getOrEmpty(2))
+
+    assertEquals(Set(2), Map(1 → Set(2)).getOrEmpty(1))
+    assertEquals(Set(), Map(1 → Set(2)).getOrEmpty(2))
+  }
+
   class UnitCanBuildFrom[From, Elem] extends CanBuildFrom[From, Elem, Unit] {
     def apply(): M.Builder[Elem, Unit]           = UnitBuilder[Elem]("apply()")
     def apply(from: From): M.Builder[Elem, Unit] = UnitBuilder[Elem](s"apply($from)")

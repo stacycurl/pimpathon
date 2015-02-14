@@ -44,6 +44,8 @@ object multiMap {
     def flatMapValuesU[GW](f: V => GW)(implicit crfv: CanRebuildFrom[F, V], u: CanRebuildFrom.Unapply[GW])
       : MultiMap[u.F, K, u.V] = value.mapValuesEagerly(crfv.flatMap(_)(f))
 
+    def getOrEmpty(k: K)(implicit fcbf: CCBF[V, F]): F[V] = value.getOrElse(k, fcbf.apply().result())
+
     def multiMap: MultiMapConflictingOps[F, K, V] = new MultiMapConflictingOps[F, K, V](value)
   }
 

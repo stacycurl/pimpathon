@@ -1,8 +1,9 @@
 package pimpathon
 
+import scala.collection.{mutable => M}
 import scala.reflect.ClassManifest
 import scala.util.DynamicVariable
-import _root_.java.io.{InputStream, OutputStream, ByteArrayInputStream, ByteArrayOutputStream}
+import _root_.java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 
 import org.junit.Assert._
 
@@ -62,6 +63,9 @@ object util {
   def withTime[A](millis: Long)(f: => A): A = dynamicTime.withValue(millis)(f)
 
   def partial[A, B](entries: (A, B)*): PartialFunction[A, B] = entries.toMap
+
+  def ints    = new M.ListBuffer[Int]
+  def strings = new M.ListBuffer[String]
 
   private val dynamicTime = new DynamicVariable[Long](0)
 }

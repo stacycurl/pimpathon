@@ -23,6 +23,12 @@
 + [A].fails.all(Predicate[A]*): Option[A]
 + [A].fails.none(Predicate[A]*): Option[A]
 + [A].fails.some(Predicate[A]*): Option[A]
++ (A, B).calcC(A => B => C): C
++ (A, B).tap((A => B => Discarded)*): (A, B)
++ Option[A].toSuccessNel(E): ValidationNel[E, A]
++ Option[A].tap(none: => Unit, some: A => Unit): Option[A]
++ Option[A].tapNone(=> Unit): Option[A]
++ Option[A].tapSome(A => Unit): Option[A]
 + List[A].calcIfNonEmpty(List[A] => B): Option[B]
 + List[A].duplicates: List[A]
 + List[A].mapIfNonEmpty(A => B): Option[List[B]]
@@ -34,7 +40,11 @@
 + MultiMap[F, K, V].flatMapValuesU(V => G[W]): MultiMap[G, K, W]
 + MultiMap[F, K, V].multiMap.mapEntriesU(K => F[V] => (C, G[W]): MultiMap[G, C, W]
 + MultiMap[F, K, V].multiMap.sliding(Int): F[MultiMap[F, K, V]]
++ MultiMap[F, K, V].getOrEmpty(K): F[V]
++ NestedMap[K1, K2, V].append(K1, K2, V): NestedMap[K1, K2, V]
++ NestedMap[K1, K2, V] + ((K1, K2, V)): NestedMap[K1, K2, V]
 + NestedMap[K1, K2, V].flipNesting: NestedMap[K2, K1, V]
++ NestedMap[K1, K2, V].getOrEmpty(K1): Map[K2, V]
 + NestedMap[K1, K2, V].nestedMap.mapValuesEagerly(V => W): NestedMap[K1, K2, W]
 + NestedMap[K1, K2, V].nestedMap.mapKeysEagerly(K2 => C): NestedMap[K1, C, W]
 + function.and(Predicate[A]*): Predicate[A]
@@ -53,4 +63,13 @@
 + classTag.simpleClassName[A]: String
 + classTag.klassOf[A]: String
 + mutable.Builder[A, B].on(C => A): mutable.Builder[C, B]
++ mutable.Builder[A, B].reset(): B
++ mutable.Builder[A, B].run((M.Builder[A, B] => Discarded)*): B
 + argonaut.Json.filterNulls: Json
++ scalaz.NonEmptyList[A].distinct: NonEmptyList[A]
++ NonEmptyList[V].asMap.withKeys(V => K): Map[K, V]
++ NonEmptyList[V].asMultiMap[CC[_]].with*(V => K): MultiMap[CC, K, V]
++ NonEmptyList[K].as[F[_. _]].with*(K => V): F[K, V]
++ NonEmptyList[A].distinctBy(A => B): NonEmptyList[A]
++ NonEmptyList[A: Order].max: A
++ NonEmptyList[A: Order].min: A

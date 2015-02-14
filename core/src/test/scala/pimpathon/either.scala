@@ -1,11 +1,12 @@
 package pimpathon
 
 import org.junit.Test
-import scala.collection.{mutable => M}
 
 import org.junit.Assert._
+import pimpathon.builder._
 import pimpathon.either._
 import pimpathon.function._
+import pimpathon.tuple._
 import pimpathon.util._
 
 
@@ -66,16 +67,11 @@ class EitherTest {
   )
 
   @Test def tap(): Unit = {
-    val ints    = new M.ListBuffer[Int]
-    val strings = new M.ListBuffer[String]
+    assertEquals((List(1), Nil),
+      (ints, strings).tap(is => ss => Left[Int, String](1).tap(is += _, ss += _)).tmap(_.reset(), _.reset()))
 
-    Left[Int, String](1).tap(ints += _, strings += _)
-    assertEquals(List(1), ints.toList)
-    assertEquals(Nil,     strings.toList)
-
-    Right[Int, String]("foo").tap(ints += _, strings += _)
-    assertEquals(List(1),     ints.toList)
-    assertEquals(List("foo"), strings.toList)
+    assertEquals((Nil, List("foo")),
+      (ints, strings).tap(is => ss => Right[Int, String]("foo").tap(is += _, ss += _)).tmap(_.reset(), _.reset()))
   }
 
   @Test def rightBias(): Unit = {

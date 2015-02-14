@@ -1,6 +1,6 @@
 package pimpathon
 
-import scala.collection.{mutable => M}
+import scala.collection.{mutable => M, GenTraversable, GenTraversableLike}
 
 import pimpathon.any._
 import pimpathon.list._
@@ -20,4 +20,6 @@ object set extends genTraversableLike[Set] {
     def toMutable: M.Set[A] = mutable
     def mutable: M.Set[A] = M.Set.empty[A] ++ set
   }
+
+  protected def toGTL[sa](s: Set[sa]): GenTraversableLike[sa, GenTraversable[sa]] = s
 }

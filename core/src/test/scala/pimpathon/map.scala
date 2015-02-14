@@ -6,6 +6,7 @@ import scala.collection.{mutable => M}
 import org.junit.Assert._
 import pimpathon.any._
 import pimpathon.map._
+import pimpathon.util._
 
 
 class MapTest {
@@ -117,7 +118,7 @@ class MapTest {
   }
 
   @Test def mapKeysEagerly(): Unit = {
-    val originalKeysSeen = new M.ListBuffer[Int]
+    val originalKeysSeen = ints
     def update(v: Int) = { originalKeysSeen += v; v * 10 }
 
     val result = Map(1 -> 1, 2 -> 2).mapKeysEagerly(update)
@@ -128,7 +129,7 @@ class MapTest {
   }
 
   @Test def mapValuesEagerly(): Unit = {
-    val originalValuesSeen = new M.ListBuffer[Int]
+    val originalValuesSeen = ints
     def update(v: Int) = { originalValuesSeen += v; v * 10 }
 
     val result = Map(1 -> 1, 2 -> 2).mapValuesEagerly(update)

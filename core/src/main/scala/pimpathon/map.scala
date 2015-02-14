@@ -1,6 +1,6 @@
 package pimpathon
 
-import scala.collection.{breakOut, mutable => M, GenTraversable, GenTraversableOnce}
+import scala.collection.{breakOut, mutable => M, GenTraversable, GenTraversableLike, GenTraversableOnce}
 import scala.collection.immutable.{SortedMap, TreeMap}
 
 import pimpathon.any._
@@ -81,6 +81,8 @@ object map extends genTraversableLike[GenTraversable] {
     def matchingKey(p: Predicate[K]): Option[A]   = map.find(kv => p(kv._1)).map(andThen)
     def matchingValue(p: Predicate[V]): Option[A] = map.find(kv => p(kv._2)).map(andThen)
   }
+
+  protected def toGTL[A](gt: GenTraversable[A]): GenTraversableLike[A, GenTraversable[A]] = gt
 
   @inline private def key[K, V]:   ((K, V)) => K = (kv: (K, V)) => kv._1
   @inline private def value[K, V]: ((K, V)) => V = (kv: (K, V)) => kv._2

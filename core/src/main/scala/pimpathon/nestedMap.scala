@@ -20,6 +20,9 @@ object nestedMap {
   class NestedMapOps[K1, K2, V](value: NestedMap[K1, K2, V]) {
     def flipNesting: NestedMap[K2, K1, V] = value.flatMap(o => o._2.map(i => (i._1, o._1, i._2)))(breakOut)
     def nestedMap: NestedMapConflictingOps[K1, K2, V] = new NestedMapConflictingOps[K1, K2, V](value)
+    def +(kkv: (K1, K2, V)): NestedMap[K1, K2, V] = append(kkv._1, kkv._2, kkv._3)
+    def append(k1: K1, k2: K2, v: V): NestedMap[K1, K2, V] = value + ((k1, value.getOrEmpty(k1) + ((k2, v))))
+    def getOrEmpty(k1: K1): Map[K2, V] = value.getOrElse(k1, Map.empty[K2, V])
   }
 
   class NestedMapConflictingOps[K1, K2, V](value: NestedMap[K1, K2, V]) {

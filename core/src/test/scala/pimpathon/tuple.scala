@@ -5,10 +5,16 @@ import scala.language.implicitConversions
 import org.junit.Test
 
 import org.junit.Assert._
+import pimpathon.builder._
 import pimpathon.tuple._
+import pimpathon.util._
 
 
 class TupleTest {
+  @Test def tap(): Unit = {
+    assertEquals(List("foo1"), strings.run(ss => (1, "foo").tap(i => s => ss += (s + i))))
+  }
+
   @Test def calc(): Unit = {
     assertEquals("123abc", ("123", "abc").calc(_ + _))
   }

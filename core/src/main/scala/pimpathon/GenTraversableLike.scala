@@ -51,7 +51,7 @@ abstract class genTraversableLike[CC[A]] {
 
   class GenTraversableLikeOfEitherOps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr]) {
     def partitionEithers[That[_]](implicit lcbf: CCBF[L, That], rcbf: CCBF[R, That]): (That[L], That[R]) =
-      (lcbf.apply(), rcbf.apply()).tap(lr => gtl.foreach(_.fold(lr._1 += _, lr._2 += _))).tmap(_.result(), _.result())
+      (lcbf.apply(), rcbf.apply()).tap(l => r => gtl.foreach(_.fold(l += _, r += _))).tmap(_.result(), _.result())
   }
 
   class GenTraversableLikeOfTuple2[K, V, Repr](gtl: GenTraversableLike[(K, V), Repr]) {

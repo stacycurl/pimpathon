@@ -24,6 +24,7 @@
 + [A].fails.none(Predicate[A]*): Option[A]
 + [A].fails.some(Predicate[A]*): Option[A]
 + (A, B).calcC(A => B => C): C
++ (A, B).tap((A => B => Discarded)*): (A, B)
 + Option[A].toSuccessNel(E): ValidationNel[E, A]
 + Option[A].tap(none: => Unit, some: A => Unit): Option[A]
 + Option[A].tapNone(=> Unit): Option[A]
@@ -63,12 +64,12 @@
 + classTag.klassOf[A]: String
 + mutable.Builder[A, B].on(C => A): mutable.Builder[C, B]
 + mutable.Builder[A, B].reset(): B
-+ mutable.Builder[A, B].run((M.Builder[A, B] => Discarded)\*): B
++ mutable.Builder[A, B].run((M.Builder[A, B] => Discarded)*): B
 + argonaut.Json.filterNulls: Json
 + scalaz.NonEmptyList[A].distinct: NonEmptyList[A]
 + NonEmptyList[V].asMap.withKeys(V => K): Map[K, V]
-+ NonEmptyList[V].asMultiMap[CC[_]].with\*(V => K): MultiMap[CC, K, V]
-+ NonEmptyList[K].as[F[_. _]].with\*(K => V): F[K, V]
++ NonEmptyList[V].asMultiMap[CC[_]].with*(V => K): MultiMap[CC, K, V]
++ NonEmptyList[K].as[F[_. _]].with*(K => V): F[K, V]
 + NonEmptyList[A].distinctBy(A => B): NonEmptyList[A]
 + NonEmptyList[A: Order].max: A
 + NonEmptyList[A: Order].min: A

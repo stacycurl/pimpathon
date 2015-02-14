@@ -1,7 +1,6 @@
 package pimpathon
 
 import org.junit.Test
-import scala.collection.{mutable => M}
 
 import org.junit.Assert._
 import pimpathon.builder._

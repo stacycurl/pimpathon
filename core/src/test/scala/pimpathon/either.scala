@@ -1,13 +1,13 @@
 package pimpathon
 
 import org.junit.Test
-import scala.collection.{mutable => M}
 import scala.util.{Failure, Success}
 
 import org.junit.Assert._
 import pimpathon.builder._
 import pimpathon.either._
 import pimpathon.function._
+import pimpathon.tuple._
 import pimpathon.util._
 
 
@@ -68,15 +68,11 @@ class EitherTest {
   )
 
   @Test def tap(): Unit = {
-    val (is, ss) = (ints, strings)
+    assertEquals((List(1), Nil),
+      (ints, strings).tap(is => ss => Left[Int, String](1).tap(is += _, ss += _)).tmap(_.reset(), _.reset()))
 
-    Left[Int, String](1).tap(is += _, ss += _)
-    assertEquals(List(1), is.reset())
-    assertEquals(Nil,     ss.reset())
-
-    Right[Int, String]("foo").tap(is += _, ss += _)
-    assertEquals(Nil,         is.reset())
-    assertEquals(List("foo"), ss.reset())
+    assertEquals((Nil, List("foo")),
+      (ints, strings).tap(is => ss => Right[Int, String]("foo").tap(is += _, ss += _)).tmap(_.reset(), _.reset()))
   }
 
   @Test def toTry(): Unit = {

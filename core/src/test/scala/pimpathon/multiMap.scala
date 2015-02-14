@@ -5,6 +5,7 @@ import scala.collection.{mutable => M}
 import scala.collection.generic.CanBuildFrom
 
 import org.junit.Assert._
+import pimpathon.builder._
 import pimpathon.multiMap._
 
 
@@ -13,12 +14,9 @@ class MultiMapTest {
     val cbf = MultiMap.build[List, Int, String]
     val builder = cbf.apply()
 
-    builder += 1 -> "foo"
-    builder += 1 -> "bar"
-    assertEquals(Map(1 -> List("foo", "bar")), builder.result())
-
-    builder.clear()
-    assertEquals(Map(), builder.result())
+    builder += (1 -> "foo") += (1 -> "bar")
+    assertEquals(Map(1 -> List("foo", "bar")), builder.reset())
+    assertEquals(Map(), builder.reset())
   }
 
   @Test def ignoreFromCBF(): Unit = {

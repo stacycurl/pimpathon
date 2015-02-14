@@ -62,6 +62,7 @@
 + classTag.simpleClassName[A]: String
 + classTag.klassOf[A]: String
 + mutable.Builder[A, B].on(C => A): mutable.Builder[C, B]
++ mutable.Builder[A, B].reset(): B
 + argonaut.Json.filterNulls: Json
 + scalaz.NonEmptyList[A].distinct: NonEmptyList[A]
 + NonEmptyList[V].asMap.withKeys(V => K): Map[K, V]

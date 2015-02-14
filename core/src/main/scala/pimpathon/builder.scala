@@ -8,8 +8,8 @@ import pimpathon.any._
 object builder {
   implicit class BuilderOps[A, B](val builder: M.Builder[A, B]) extends AnyVal {
     def +++=(xss: TraversableOnce[TraversableOnce[A]]): M.Builder[A, B] = builder.tap(b => xss.foreach(b ++= _))
-
     def on[C](f: C => A): M.Builder[C, B] = new ContramappedBuilder(builder, f)
+    def reset(): B = builder.result().tap(_ => builder.clear())
   }
 
   private class ContramappedBuilder[A, B, C](builder: M.Builder[A, B], f: C => A) extends M.Builder[C, B] {

@@ -19,4 +19,9 @@ class BuilderTest {
     sb.clear()
     assertEquals((Nil, Nil), (sb.result(), ib.result()))
   }
+
+  @Test def reset(): Unit = {
+    assertEquals((Nil, Nil),      new M.ListBuffer[Int]       |> (ib => (ib.reset(), ib.result())))
+    assertEquals((List(1), Nil), (new M.ListBuffer[Int] += 1) |> (ib => (ib.reset(), ib.result())))
+  }
 }

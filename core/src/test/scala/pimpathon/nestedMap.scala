@@ -3,6 +3,7 @@ package pimpathon
 import org.junit.Test
 
 import org.junit.Assert._
+import pimpathon.builder._
 import pimpathon.nestedMap._
 
 
@@ -11,12 +12,9 @@ class NestedMapTest {
     val cbf = NestedMap.build[String, Int, String]
     val builder = cbf.apply()
 
-    builder += (("one", 1, "foo"))
-    builder += (("two", 2, "bar"))
-    assertEquals(Map("one" → Map(1 → "foo"), "two" → Map(2 → "bar")), builder.result())
-
-    builder.clear()
-    assertEquals(NestedMap.empty[String, Int, String], builder.result())
+    builder += (("one", 1, "foo")) += (("two", 2, "bar"))
+    assertEquals(Map("one" → Map(1 → "foo"), "two" → Map(2 → "bar")), builder.reset())
+    assertEquals(NestedMap.empty[String, Int, String], builder.reset())
   }
 
   @Test def nestedMap_mapValuesEagerly(): Unit = assertEquals(

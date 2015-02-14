@@ -1,7 +1,7 @@
 package pimpathon.scalaz
 
 import org.junit.Test
-import scalaz.NonEmptyList
+import scalaz.{Order, NonEmptyList}
 
 import org.junit.Assert._
 import pimpathon.multiMap._
@@ -32,5 +32,11 @@ class NelTests {
 
     assertEquals(Map(1 -> NonEmptyList(1, 3)),
       NonEmptyList(0, 1, 2, 3).asMultiMap[NonEmptyList].withPFKeys { case i if i % 2 == 1 => i % 2 })
+  }
+
+  @Test def max(): Unit = {
+    implicit val intOrder: Order[Int] = scalaz.std.anyVal.intInstance
+
+    assertEquals(3, NonEmptyList(1, 3, 2).max)
   }
 }

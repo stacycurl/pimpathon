@@ -64,3 +64,4 @@
 + NonEmptyList[V].asMultiMap[CC[_]].with\*(V => K): MultiMap[CC, K, V]
 + NonEmptyList[K].as[F[_. _]].with\*(K => V): F[K, V]
 + NonEmptyList[A].distinctBy(A => B): NonEmptyList[A]
++ NonEmptyList[A: Order].max: A

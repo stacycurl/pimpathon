@@ -8,7 +8,7 @@ import pimpathon.multiMap._
 import pimpathon.scalaz.nel._
 
 
-class NelTests {
+class NelTest {
   @Test def distinct(): Unit = {
     assertEquals(NonEmptyList(1, 2), NonEmptyList(1, 2, 1).distinct)
   }

@@ -5,39 +5,26 @@ import scala.util.Success
 import scala.collection.{mutable => M}
 
 import org.junit.Assert._
+import pimpathon.builder._
 import pimpathon.option._
+import pimpathon.util._
 import scalaz.std.option._
 
 
 class OptionTest {
   @Test def tap(): Unit = {
-    val strings = new M.ListBuffer[String]
-
-    none[String].tap(strings += "none", strings += _)
-    assertEquals(List("none"), strings.toList)
-
-    some("some").tap(strings += "none", strings += _)
-    assertEquals(List("none", "some"), strings.toList)
+    assertEquals(List("none"), strings.run(ss => none[String].tap(ss += "none", ss += _)))
+    assertEquals(List("some"), strings.run(ss => some("some").tap(ss += "none", ss += _)))
   }
 
   @Test def tapNone(): Unit = {
-    val strings = new M.ListBuffer[String]
-
-    none[String].tapNone(strings += "none")
-    assertEquals(List("none"), strings.toList)
-
-    some("some").tapNone(strings += "none")
-    assertEquals(List("none"), strings.toList)
+    assertEquals(List("none"), strings.run(ss => none[String].tapNone(ss += "none")))
+    assertEquals(Nil,          strings.run(ss => some("some").tapNone(ss += "none")))
   }
 
   @Test def tapSome(): Unit = {
-    val strings = new M.ListBuffer[String]
-
-    none[String].tapSome(strings += _)
-    assertEquals(List(), strings.toList)
-
-    some("some").tapSome(strings += _)
-    assertEquals(List("some"), strings.toList)
+    assertEquals(Nil,          strings.run(ss => none[String].tapSome(ss += _)))
+    assertEquals(List("some"), strings.run(ss => some("some").tapSome(ss += _)))
   }
 
   @Test def getOrThrow(): Unit = {

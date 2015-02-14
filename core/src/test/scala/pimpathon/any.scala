@@ -1,11 +1,11 @@
 package pimpathon
 
 import org.junit.Test
-import scala.collection.{mutable => M}
 import scala.util.{Failure, Success}
 
 import org.junit.Assert._
 import pimpathon.any._
+import pimpathon.builder._
 import pimpathon.util._
 
 
@@ -30,43 +30,20 @@ class AnyTest {
     List(1, 2, 3, 4).map(_.transform(util.partial(2 -> 4, 4 -> 8)))
   )
 
-  @Test def tap(): Unit = {
-    val ints = new M.ListBuffer[Int]
-
-    1.tap(ints += _, ints += _)
-    assertEquals(List(1, 1), ints.toList)
-  }
-
-  @Test def update(): Unit = {
-    val ints = new M.ListBuffer[Int]
-
-    1.update(ints += _, ints += _)
-    assertEquals(List(1, 1), ints.toList)
-  }
-
-  @Test def withSideEffect(): Unit = {
-    val ints = new M.ListBuffer[Int]
-
-    1.withSideEffect(ints += _, ints += _)
-    assertEquals(List(1, 1), ints.toList)
-  }
+  @Test def tap(): Unit            = assertEquals(List(1, 1), ints.run(is => 1.tap(is += _, is += _)))
+  @Test def update(): Unit         = assertEquals(List(1, 1), ints.run(is => 1.update(is += _, is += _)))
+  @Test def withSideEffect(): Unit = assertEquals(List(1, 1), ints.run(is => 1.withSideEffect(is += _, is += _)))
 
   @Test def tapIf(): Unit = assertEquals(
-    List(1, 3), new M.ListBuffer[Int].tap(ints => {
-      List(1, 2, 3).foreach(i => i.tapIf(_ % 2 != 0)(ints += _))
-    }).toList
-)
+    List(1, 3), ints.tap(is => List(1, 2, 3).foreach(i => i.tapIf(_ % 2 != 0)(is += _)))
+  )
 
   @Test def tapUnless(): Unit = assertEquals(
-    List(2), new M.ListBuffer[Int].tap(ints => {
-      List(1, 2, 3).foreach(i => i.tapUnless(_ % 2 != 0)(ints += _))
-    }).toList
+    List(2), ints.run(is => List(1, 2, 3).foreach(i => i.tapUnless(_ % 2 != 0)(is += _)))
   )
 
   @Test def tapPF(): Unit = assertEquals(
-    List(1, 3), new M.ListBuffer[Int].tap(ints => {
-      List(1, 2, 3).foreach(i => i.tapPF { case j if j % 2 != 0 => ints += j })
-    })
+    List(1, 3), ints.tap(is => List(1, 2, 3).foreach(i => i.tapPF { case j if j % 2 != 0 => is += j }))
   )
 
   @Test def cond(): Unit = assertEquals(
@@ -144,9 +121,9 @@ class AnyTest {
   }
 
   @Test def withFinally(): Unit = assertEquals(
-    List("body: input", "finally: input", "done"), new M.ListBuffer[String].tap(strings => {
-      strings += "input".withFinally(s => strings += "finally: " + s)(s => {strings += "body: " + s; "done"})
-    }).toList
+    List("body: input", "finally: input", "done"), strings.run(ss => {
+      ss += "input".withFinally(s => ss += "finally: " + s)(s => {ss += "body: " + s; "done"})
+    })
   )
 
   @Test def attempt(): Unit = assertEquals(
@@ -154,10 +131,7 @@ class AnyTest {
     List(1.attempt(_ * 2), 1.attempt(_ => throw boom))
   )
 
-  @Test def addTo(): Unit = assertEquals(
-    List(1),
-    new M.ListBuffer[Int].tap(ints => 1.addTo(ints)).toList
-  )
+  @Test def addTo(): Unit = assertEquals(List(1), ints.run(is => 1.addTo(is)))
 
   @Test def unfold(): Unit = assertEquals(
     List('f', 'o', 'o'), "foo".unfold(s => if (s.nonEmpty) Some(s.head, s.tail) else None).toList

@@ -4,6 +4,7 @@ import org.junit.Test
 import scala.collection.{mutable => M}
 
 import org.junit.Assert._
+import pimpathon.builder._
 import pimpathon.list._
 import pimpathon.util._
 import scalaz.std.list._
@@ -171,33 +172,18 @@ class ListTest {
   }
 
   @Test def tap(): Unit = {
-    val strings = new M.ListBuffer[String]
-
-    nil[Int].tap(strings += "empty", _ => strings += "non-empty")
-    assertEquals(List("empty"), strings.toList)
-
-    List(1).tap(strings += "empty", _ => strings += "non-empty")
-    assertEquals(List("empty", "non-empty"), strings.toList)
+    assertEquals(List("empty"),     strings.run(ss => nil[Int].tap(ss += "empty", _ => ss += "non-empty")))
+    assertEquals(List("non-empty"), strings.run(ss =>  List(1).tap(ss += "empty", _ => ss += "non-empty")))
   }
 
   @Test def tapEmpty(): Unit = {
-    val strings = new M.ListBuffer[String]
-
-    List(1).tapEmpty(strings += "empty")
-    assertEquals(nil[String], strings.toList)
-
-    nil[Int].tapEmpty(strings += "empty")
-    assertEquals(List("empty"), strings.toList)
+    assertEquals(List("empty"), strings.run(ss => nil[Int].tapEmpty(ss += "empty")))
+    assertEquals(Nil,           strings.run(ss =>  List(1).tapEmpty(ss += "empty")))
   }
 
   @Test def tapNonEmpty(): Unit = {
-    val strings = new M.ListBuffer[String]
-
-    nil[Int].tapNonEmpty(_ => strings += "non-empty")
-    assertEquals(nil[String], strings.toList)
-
-    List(1).tapNonEmpty(_ => strings += "non-empty")
-    assertEquals(List("non-empty"), strings.toList)
+    assertEquals(Nil,               strings.run(ss => nil[Int].tapNonEmpty(_ => ss += "non-empty")))
+    assertEquals(List("non-empty"), strings.run(ss =>  List(1).tapNonEmpty(_ => ss += "non-empty")))
   }
 
   @Test def amass(): Unit = assertEquals(

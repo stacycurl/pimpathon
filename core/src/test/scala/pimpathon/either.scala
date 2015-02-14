@@ -5,6 +5,7 @@ import scala.collection.{mutable => M}
 import scala.util.{Failure, Success}
 
 import org.junit.Assert._
+import pimpathon.builder._
 import pimpathon.either._
 import pimpathon.function._
 import pimpathon.util._
@@ -67,16 +68,15 @@ class EitherTest {
   )
 
   @Test def tap(): Unit = {
-    val ints    = new M.ListBuffer[Int]
-    val strings = new M.ListBuffer[String]
+    val (is, ss) = (ints, strings)
 
-    Left[Int, String](1).tap(ints += _, strings += _)
-    assertEquals(List(1), ints.toList)
-    assertEquals(Nil,     strings.toList)
+    Left[Int, String](1).tap(is += _, ss += _)
+    assertEquals(List(1), is.reset())
+    assertEquals(Nil,     ss.reset())
 
-    Right[Int, String]("foo").tap(ints += _, strings += _)
-    assertEquals(List(1),     ints.toList)
-    assertEquals(List("foo"), strings.toList)
+    Right[Int, String]("foo").tap(is += _, ss += _)
+    assertEquals(Nil,         is.reset())
+    assertEquals(List("foo"), ss.reset())
   }
 
   @Test def toTry(): Unit = {

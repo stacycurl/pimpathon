@@ -24,6 +24,7 @@
 + [A].fails.none(Predicate[A]*): Option[A]
 + [A].fails.some(Predicate[A]*): Option[A]
 + (A, B).calcC(A => B => C): C
++ Option[A].toSuccessNel(E): ValidationNel[E, A]
 + List[A].calcIfNonEmpty(List[A] => B): Option[B]
 + List[A].duplicates: List[A]
 + List[A].mapIfNonEmpty(A => B): Option[List[B]]

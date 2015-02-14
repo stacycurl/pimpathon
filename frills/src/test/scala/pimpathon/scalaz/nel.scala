@@ -39,4 +39,10 @@ class NelTests {
 
     assertEquals(3, NonEmptyList(1, 3, 2).max)
   }
+
+  @Test def min(): Unit = {
+    implicit val intOrder: Order[Int] = scalaz.std.anyVal.intInstance
+
+    assertEquals(1, NonEmptyList(3, 1, 2).min)
+  }
 }

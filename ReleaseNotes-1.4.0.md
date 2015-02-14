@@ -65,3 +65,4 @@
 + NonEmptyList[K].as[F[_. _]].with\*(K => V): F[K, V]
 + NonEmptyList[A].distinctBy(A => B): NonEmptyList[A]
 + NonEmptyList[A: Order].max: A
++ NonEmptyList[A: Order].min: A

@@ -56,4 +56,7 @@
 + mutable.Builder[A, B].on(C => A): mutable.Builder[C, B]
 + argonaut.Json.filterNulls: Json
 + scalaz.NonEmptyList[A].distinct: NonEmptyList[A]
++ NonEmptyList[V].asMap.withKeys(V => K): Map[K, V]
++ NonEmptyList[V].asMultiMap[CC[_]].with\*(V => K): MultiMap[CC, K, V]
++ NonEmptyList[K].as[F[_. _]].with\*(K => V): F[K, V]
 + NonEmptyList[A].distinctBy(A => B): NonEmptyList[A]

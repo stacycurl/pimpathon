@@ -16,7 +16,7 @@ object multiMap {
   type MultiMap[F[_], K, V] = Map[K, F[V]]
   type MMCBF[F[_], K, V] = CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]]
 
-  implicit def build[F[_], K, V](implicit fcbf: CanBuildFrom[Nothing, V, F[V]]): MMCBF[F, K, V] = MultiMap.build
+  implicit def build[F[_], K, V](implicit fcbne: CanBuildNonEmpty[V, F[V]]): MMCBF[F, K, V] = MultiMap.build
 
   implicit class MultiMapOps[F[_], K, V](val value: MultiMap[F, K, V]) extends AnyVal {
     def select[W](f: F[V] => W): Map[K, W] = value.mapValuesEagerly(f) // just an alias for mapValuesEagerly
@@ -77,7 +77,7 @@ object multiMap {
   }
 
   object MultiMap {
-    def build[F[_], K, V](implicit fcbf: CCBF[V, F]): MMCBF[F, K, V] = new MultiMapCanBuildFrom[F, K, V]
+    def build[F[_], K, V](implicit fcbne: CanBuildNonEmpty[V, F[V]]): MMCBF[F, K, V] = new MultiMapCanBuildFrom[F, K, V]
     def empty[F[_], K, V]: MultiMap[F, K, V] = Map.empty[K, F[V]]
   }
 
@@ -86,7 +86,7 @@ object multiMap {
     override def apply(from: From): M.Builder[Elem, To] = apply()
   }
 
-  class MultiMapCanBuildFrom[F[_], K, V](implicit fcbf: CCBF[V, F])
+  class MultiMapCanBuildFrom[F[_], K, V](implicit fcbne: CanBuildNonEmpty[V, F[V]])
     extends MMCBF[F, K, V] with IgnoreFromCBF[Nothing, (K, V), MultiMap[F, K, V]] {
 
     def apply(): M.Builder[(K, V), MultiMap[F, K, V]] = new MultiMapBuilder[F, K, V]
@@ -95,7 +95,7 @@ object multiMap {
   class MultiMapBuilder[F[_], K, V](
     map: M.Map[K, M.Builder[V, F[V]]] = M.Map.empty[K, M.Builder[V, F[V]]]
   )(
-    implicit fcbf: CCBF[V, F]
+    implicit fcbne: CanBuildNonEmpty[V, F[V]]
   )
     extends M.Builder[(K, V), MultiMap[F, K, V]] {
 
@@ -103,7 +103,7 @@ object multiMap {
     def clear(): Unit = map.clear()
     def result(): Map[K, F[V]] = map.map(kv => (kv._1, kv._2.result()))(breakOut)
 
-    private def add(k: K, v: V): Unit = map.put(k, map.getOrElse(k, fcbf.apply()) += v)
+    private def add(k: K, v: V): Unit = map.put(k, map.get(k).fold(fcbne.builder(v))(_ += v))
   }
 
   trait CanRebuildFrom[F[_], V] {
@@ -148,5 +148,17 @@ object multiMap {
       def toStream(fv: F[V]): Stream[V] = fTraversableOnce(fv).toStream
       protected val cbf: CanBuildFrom[F[V], V, F[V]] = cbf0
     }
+  }
+}
+
+trait CanBuildNonEmpty[-Elem, +To] {
+  def builder(head: Elem): M.Builder[Elem, To]
+}
+
+object CanBuildNonEmpty {
+  implicit def canBuildFromToCBNE[Elem, To](
+    implicit cbf: CanBuildFrom[Nothing, Elem, To]
+  ): CanBuildNonEmpty[Elem, To] = new CanBuildNonEmpty[Elem, To] {
+    def builder(head: Elem): M.Builder[Elem, To] = cbf.apply() += head
   }
 }

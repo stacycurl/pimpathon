@@ -34,7 +34,7 @@ object function {
   implicit class PartialFunctionOps[In, Out](pf: PartialFunction[In, Out]) {
     def isUndefinedAt(in: In): Boolean = !pf.isDefinedAt(in)
 
-    def partition[CC[A] <: GenTraversableLike[A, GenTraversable[A]]](ins: CC[In])
+    def partition[CC[A]](ins: GenTraversableLike[In, GenTraversable[In]])
       (implicit cbf: CCBF[Either[In, Out], CC], icbf: CCBF[In, CC], ocbf: CCBF[Out, CC]): (CC[In], CC[Out]) =
         ins.map(either).partitionEithers[CC](icbf, ocbf)
 

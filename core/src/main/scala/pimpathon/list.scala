@@ -1,7 +1,7 @@
 package pimpathon
 
 import scala.annotation.tailrec
-import scala.collection.{mutable => M}
+import scala.collection.{mutable => M, GenTraversable, GenTraversableLike}
 import scala.collection.immutable._
 
 import pimpathon.any._
@@ -113,6 +113,8 @@ object list extends genTraversableLike[List] {
       case (item, acc) => for { a <- item; b <- acc } yield a :: b
     }
   }
+
+  protected def toGTL[A](l: List[A]): GenTraversableLike[A, GenTraversable[A]] = l
 }
 
 case class EqualBy[A, B](b: B)(val a: A)

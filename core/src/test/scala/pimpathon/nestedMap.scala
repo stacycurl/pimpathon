@@ -43,4 +43,9 @@ class NestedMapTest {
     assertEquals(Map(1 → Map(2 → 3, 3 → 4)),          Map(1 → Map(2 → 3)) + ((1, 3, 4)))
     assertEquals(Map(1 → Map(2 → 3), 2 → Map(3 → 4)), Map(1 → Map(2 → 3)) + ((2, 3, 4)))
   }
+
+  @Test def getOrEmpty(): Unit = {
+    assertEquals(Map(2 → 3), Map(1 → Map(2 → 3)).getOrEmpty(1))
+    assertEquals(Map(),      Map(1 → Map(2 → 3)).getOrEmpty(2))
+  }
 }

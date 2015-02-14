@@ -47,6 +47,7 @@ object PimpathonBuild extends Build {
     scalaVersion := "2.11.2",
     maxErrors := 1,
     parallelExecution in Test := true,
+    parallelExecution in ScoverageTest := false,
     scalacOptions := Seq(
       "-feature",
       "-language:higherKinds",

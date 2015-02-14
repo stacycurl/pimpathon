@@ -8,6 +8,7 @@ import pimpathon.any.AnyOps
 object option {
   implicit class OptionOps[A](val option: Option[A]) extends AnyVal {
     def tapNone(none: => Unit): Option[A] = tap(none, _ => {})
+    def tapSome(some: A => Unit): Option[A] = tap({}, some)
     def tap(none: => Unit, some: A => Unit): Option[A] = new AnyOps(option).tap(_.fold(none)(some))
     def getOrThrow(message: String): A = getOrThrow(new NoSuchElementException(message))
     def getOrThrow(exception: => Exception): A = option.getOrElse(throw exception)

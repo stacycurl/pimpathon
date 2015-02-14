@@ -33,4 +33,14 @@ class NestedMapTest {
     Map(2 → Map(10 → 3), 3 → Map(10 → 4, 20 → 4), 4 → Map(20 → 5)),
     Map(10 → Map(2 → 3, 3 → 4), 20 → Map(3 → 4, 4 → 5)).flipNesting
   )
+
+  @Test def append(): Unit = {
+    assertEquals(Map(1 → Map(2 → 4)),                 Map(1 → Map(2 → 3)).append(1, 2, 4))
+    assertEquals(Map(1 → Map(2 → 3, 3 → 4)),          Map(1 → Map(2 → 3)).append(1, 3, 4))
+    assertEquals(Map(1 → Map(2 → 3), 2 → Map(3 → 4)), Map(1 → Map(2 → 3)).append(2, 3, 4))
+
+    assertEquals(Map(1 → Map(2 → 4)),                 Map(1 → Map(2 → 3)) + ((1, 2, 4)))
+    assertEquals(Map(1 → Map(2 → 3, 3 → 4)),          Map(1 → Map(2 → 3)) + ((1, 3, 4)))
+    assertEquals(Map(1 → Map(2 → 3), 2 → Map(3 → 4)), Map(1 → Map(2 → 3)) + ((2, 3, 4)))
+  }
 }

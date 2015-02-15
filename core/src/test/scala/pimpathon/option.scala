@@ -46,4 +46,9 @@ class OptionTest {
 
     assertEquals(Success[String]("foo"), Some("foo").toTry)
   }
+
+  @Test def invert(): Unit = {
+    assertEquals(None,      some(0).invert(1))
+    assertEquals(Some(1), none[Int].invert(1))
+  }
 }

@@ -241,4 +241,3 @@ class GenTraversableLikeTests {
       List((1, 10), (1, 11), (2, 20), (2, 21)).toMultiMap[Set])
   }
 }
-

@@ -13,5 +13,6 @@ object option {
     def getOrThrow(message: String): A = getOrThrow(new NoSuchElementException(message))
     def getOrThrow(exception: => Exception): A = option.getOrElse(throw exception)
     def toTry: Try[A] = option.fold(pimpTry.failure[A](new NoSuchElementException))(pimpTry.success[A])
+    def invert(a: A): Option[A] = option.fold(Some(a): Option[A])(_ => None)
   }
 }

@@ -34,6 +34,7 @@
 + List[A].duplicates: List[A]
 + List[A].mapIfNonEmpty(A => B): Option[List[B]]
 + List[A].unsnocC(=> B, List[A] => A => B): B
++ List[A].onlyOption: Option[A]
 + List[List[A]].cartesianProduct: List[List[A]]
 + Array[A].copyTo(srcPos, Array[A], destPos, length): Array[A]
 + Map[K, V].calcIfNonEmpty(Map[K, V] => B): Option[B]

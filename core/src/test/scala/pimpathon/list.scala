@@ -11,18 +11,18 @@ import scalaz.std.list._
 
 class ListTest {
   @Test def uncons(): Unit = {
-    assertEquals("empty", nil[Int].uncons("empty", l => s"size: ${l.size}"))
-    assertEquals("size: 3", List(1, 2, 3).uncons("empty", l => s"size: ${l.size}"))
+    assertEquals("empty", nil[Int].uncons("empty", l ⇒ s"size: ${l.size}"))
+    assertEquals("size: 3", List(1, 2, 3).uncons("empty", l ⇒ s"size: ${l.size}"))
   }
 
   @Test def unconsC(): Unit = {
-    assertEquals("empty",                          nil[Int].unconsC("empty", h => t => s"head: $h, tail: $t"))
-    assertEquals("head: 1, tail: List(2, 3)", List(1, 2, 3).unconsC("empty", h => t => s"head: $h, tail: $t"))
+    assertEquals("empty",                          nil[Int].unconsC("empty", h ⇒ t ⇒ s"head: $h, tail: $t"))
+    assertEquals("head: 1, tail: List(2, 3)", List(1, 2, 3).unconsC("empty", h ⇒ t ⇒ s"head: $h, tail: $t"))
   }
 
   @Test def unsnocC(): Unit = {
-    assertEquals("empty",                          nil[Int].unsnocC("empty", i => l => s"init: $i, last: $l"))
-    assertEquals("init: List(1, 2), last: 3", List(1, 2, 3).unsnocC("empty", i => l => s"init: $i, last: $l"))
+    assertEquals("empty",                          nil[Int].unsnocC("empty", i ⇒ l ⇒ s"init: $i, last: $l"))
+    assertEquals("init: List(1, 2), last: 3", List(1, 2, 3).unsnocC("empty", i ⇒ l ⇒ s"init: $i, last: $l"))
   }
 
   @Test def emptyTo(): Unit = {
@@ -43,11 +43,11 @@ class ListTest {
 
   @Test def zipToMap(): Unit = {
     assertEquals(Map.empty[Int, Int], nil[Int].zipToMap(nil[Int]))
-    assertEquals(Map(1 -> 2), List(1).zipToMap(List(2)))
+    assertEquals(Map(1 → 2), List(1).zipToMap(List(2)))
   }
 
   @Test def zipWith(): Unit = {
-    assertEquals(List(6), List(2, 0).zipWith[Int, Int](List(3))(lr => lr._1 * lr._2))
+    assertEquals(List(6), List(2, 0).zipWith[Int, Int](List(3))(lr ⇒ lr._1 * lr._2))
   }
 
 
@@ -79,7 +79,7 @@ class ListTest {
   }
 
   @Test def countBy(): Unit = assertEquals(
-    Map(1 -> List("foo"), 2 -> List("foody", "barby"), 3 -> List("bard", "food", "barb")),
+    Map(1 → List("foo"), 2 → List("foody", "barby"), 3 → List("bard", "food", "barb")),
     List("foo", "bard", "food", "barb", "foody", "barby").countBy(_.length)
   )
 
@@ -136,15 +136,15 @@ class ListTest {
   }
 
   @Test def fraction(): Unit = {
-    assertEquals(Double.NaN, nil[Int].fraction(_ => true), 0.0001)
+    assertEquals(Double.NaN, nil[Int].fraction(_ ⇒ true), 0.0001)
     assertEquals(0.0, List(1).fraction(_ < 1), 0.0001)
     assertEquals(1.0, List(0).fraction(_ < 1), 0.0001)
     assertEquals(0.5, List(0, 1).fraction(_ < 1), 0.0001)
   }
 
   @Test def batchBy(): Unit = {
-    assertEquals(Nil, nil[Int].batchBy(_ => true))
-    assertEquals(List(List(1, 2, 3)), List(1, 2, 3).batchBy(_ => true))
+    assertEquals(Nil, nil[Int].batchBy(_ ⇒ true))
+    assertEquals(List(List(1, 2, 3)), List(1, 2, 3).batchBy(_ ⇒ true))
   }
 
   @Test def prefixPadTo(): Unit = {
@@ -153,29 +153,29 @@ class ListTest {
 
   @Test def ungroupBy(): Unit = {
     assertEquals(List(
-      List('a' -> 1, 'b' -> 1, 'c' -> 1),
-      List('a' -> 2, 'b' -> 2)
-    ), List('a' -> 1, 'a' -> 2, 'b' -> 1, 'c' -> 1, 'b' -> 2).ungroupBy(_._1))
+      List('a' → 1, 'b' → 1, 'c' → 1),
+      List('a' → 2, 'b' → 2)
+    ), List('a' → 1, 'a' → 2, 'b' → 1, 'c' → 1, 'b' → 2).ungroupBy(_._1))
   }
 
   @Test def tap(): Unit = {
-    assertEquals(List("empty"),     strings.run(ss => nil[Int].tap(ss += "empty", _ => ss += "non-empty")))
-    assertEquals(List("non-empty"), strings.run(ss =>  List(1).tap(ss += "empty", _ => ss += "non-empty")))
+    assertEquals(List("empty"),     strings.run(ss ⇒ nil[Int].tap(ss += "empty", _ ⇒ ss += "non-empty")))
+    assertEquals(List("non-empty"), strings.run(ss ⇒  List(1).tap(ss += "empty", _ ⇒ ss += "non-empty")))
   }
 
   @Test def tapEmpty(): Unit = {
-    assertEquals(List("empty"), strings.run(ss => nil[Int].tapEmpty(ss += "empty")))
-    assertEquals(Nil,           strings.run(ss =>  List(1).tapEmpty(ss += "empty")))
+    assertEquals(List("empty"), strings.run(ss ⇒ nil[Int].tapEmpty(ss += "empty")))
+    assertEquals(Nil,           strings.run(ss ⇒  List(1).tapEmpty(ss += "empty")))
   }
 
   @Test def tapNonEmpty(): Unit = {
-    assertEquals(Nil,               strings.run(ss => nil[Int].tapNonEmpty(_ => ss += "non-empty")))
-    assertEquals(List("non-empty"), strings.run(ss =>  List(1).tapNonEmpty(_ => ss += "non-empty")))
+    assertEquals(Nil,               strings.run(ss ⇒ nil[Int].tapNonEmpty(_ ⇒ ss += "non-empty")))
+    assertEquals(List("non-empty"), strings.run(ss ⇒  List(1).tapNonEmpty(_ ⇒ ss += "non-empty")))
   }
 
   @Test def amass(): Unit = assertEquals(
     List(2, -2, 4, -4),
-    List(1, 2, 3, 4).amass { case i if i % 2 == 0 => List(i, -i) }
+    List(1, 2, 3, 4).amass { case i if i % 2 == 0 ⇒ List(i, -i) }
   )
 
   @Test def partitionEithers(): Unit = assertEquals(
@@ -185,11 +185,11 @@ class ListTest {
 
   @Test def partitionByPF(): Unit = assertEquals(
     (List(2, 4), List("one", "three")),
-    List(1, 2, 3, 4).partitionByPF(util.partial(1 -> "one", 3 -> "three"))
+    List(1, 2, 3, 4).partitionByPF(util.partial(1 → "one", 3 → "three"))
   )
 
   @Test def cartesianProduct(): Unit = assertEquals(
-    for { a <- List(1, 2); b <- List(10, 20); c <- List(100, 200) } yield List(a, b, c),
+    for { a ← List(1, 2); b ← List(10, 20); c ← List(100, 200) } yield List(a, b, c),
     List(List(1, 2), List(10, 20), List(100, 200)).cartesianProduct
   )
 

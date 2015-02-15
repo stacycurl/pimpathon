@@ -17,8 +17,8 @@ class JsonTest {
     """[ { "a": null, "b": 3 } ]"""   → """[ { "b": 3 } ]"""
   )
 
-  private def test(f: Json => Json, data: (String, String)*): Unit = data.foreach {
-    case (input, expected) => assertEquals(parse(expected), f(parse(input)))
+  private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
+    case (input, expected) ⇒ assertEquals(parse(expected), f(parse(input)))
   }
 
   private def parse(content: String): Json = Parse.parseOption(content).getOrThrow("Invalid json in test\n" + content)

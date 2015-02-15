@@ -18,7 +18,7 @@ case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, b
     new InputStreamOps[IS](is, this)
 
   def copy(is: InputStream, os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): Unit = {
-    withBuffer(buffer => {
+    withBuffer(buffer ⇒ {
       try Iterator.continually(is.read(buffer)).takeWhile(_ > 0).foreach(os.write(buffer, 0, _))
       finally {
         if (closeIn)  is.attemptClose()
@@ -27,7 +27,7 @@ case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, b
     })
   }
 
-  private[io] def withBuffer[A](f: Array[Byte] => A): A = f(new Array[Byte](bufferSize))
+  private[io] def withBuffer[A](f: Array[Byte] ⇒ A): A = f(new Array[Byte](bufferSize))
 }
 
 class InputStreamOps[IS <: InputStream](is: IS, utils: InputStreamUtils) {
@@ -38,19 +38,19 @@ class InputStreamOps[IS <: InputStream](is: IS, utils: InputStreamUtils) {
   def drain(os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): IS =
     is.tap(copy(_, os, closeIn, closeOut))
 
-  def closeAfter[A](f: IS => A): A        = is.withFinally(_.attemptClose())(f)
-  def closeIf(condition: Boolean): IS     = is.tapIf(_ => condition)(_.close())
-  def closeUnless(condition: Boolean): IS = is.tapUnless(_ => condition)(_.close())
+  def closeAfter[A](f: IS ⇒ A): A         = is.withFinally(_.attemptClose())(f)
+  def closeIf(condition: Boolean): IS     = is.tapIf(_ ⇒ condition)(_.close())
+  def closeUnless(condition: Boolean): IS = is.tapUnless(_ ⇒ condition)(_.close())
   def attemptClose(): Try[Unit] = Try(is.close())
 
   def buffered: BufferedInputStream = new BufferedInputStream(is, bufferSize)
   def gunzip: GZIPInputStream = new GZIPInputStream(is, bufferSize)
 
-  def readN(os: OutputStream, n: Long): IS = is.tap(_.readUpToN(os, n) |> (count => if (count != n)
+  def readN(os: OutputStream, n: Long): IS = is.tap(_.readUpToN(os, n) |> (count ⇒ if (count != n)
     throw new IOException(s"Failed to read $n bytes, only $count were available")
     ))
 
-  def readUpToN(os: OutputStream, n: Long): Long = withBuffer(buffer => {
+  def readUpToN(os: OutputStream, n: Long): Long = withBuffer(buffer ⇒ {
     require(n >= 0, "You can't read a negative number of bytes!")
 
     @tailrec def recurse(count: Long): Long = {

@@ -11,4 +11,3 @@ class ClassTagTest {
 
   @Test def klassOf(): Unit = assertEquals(classOf[ClassTagTest], classTag.klassOf[ClassTagTest])
 }
-

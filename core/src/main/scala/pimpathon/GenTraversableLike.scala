@@ -3,7 +3,7 @@ package pimpathon
 import scala.language.{higherKinds, implicitConversions}
 
 import scala.annotation.tailrec
-import scala.collection.{breakOut, mutable => M, GenTraversable, GenTraversableLike}
+import scala.collection.{breakOut, mutable ⇒ M, GenTraversable, GenTraversableLike}
 import scala.collection.generic.CanBuildFrom
 
 import pimpathon.any._
@@ -29,13 +29,13 @@ abstract class genTraversableLike[CC[A]] {
   class GenTraversableLikeOps[A](gtl: GenTraversableLike[A, GenTraversable[A]]) {
     def asMap: GenTraversableLikeCapturer[A, Map] = as[Map]
 
-    def attributeCounts[B](f: A => B): Map[B, Int] =
+    def attributeCounts[B](f: A ⇒ B): Map[B, Int] =
       asMultiMap.withKeys(f).mapValues(_.size)
 
     def collectAttributeCounts[B](pf: PartialFunction[A, B]): Map[B, Int] =
       optAttributeCounts(pf.lift)
 
-    def optAttributeCounts[B](f: A => Option[B]): Map[B, Int] =
+    def optAttributeCounts[B](f: A ⇒ Option[B]): Map[B, Int] =
       asMultiMap.withSomeKeys(f).mapValues(_.size)
 
     def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM] =
@@ -43,20 +43,20 @@ abstract class genTraversableLike[CC[A]] {
 
     def as[F[_, _]]: GenTraversableLikeCapturer[A, F] = new GenTraversableLikeCapturer[A, F](gtl)
 
-    def ungroupBy[B](f: A => B)(implicit inner: CCBF[A, CC], outer: CCBF[CC[A], CC]): CC[CC[A]] =
-      gtl.foldLeft(UngroupBy[A, B, CC](Map(), Map())) { case (ungroupBy, item) => ungroupBy.add(item, f(item)) }.values
+    def ungroupBy[B](f: A ⇒ B)(implicit inner: CCBF[A, CC], outer: CCBF[CC[A], CC]): CC[CC[A]] =
+      gtl.foldLeft(UngroupBy[A, B, CC](Map(), Map())) { case (ungroupBy, item) ⇒ ungroupBy.add(item, f(item)) }.values
 
     def partitionByPF[B](pf: PartialFunction[A, B])
       (implicit eab: CCBF[Either[A, B], CC], a: CCBF[A, CC], b: CCBF[B, CC]): (CC[A], CC[B]) = pf.partition[CC](gtl)
 
-    def seqMap[B, To](f: A => Option[B])(implicit cbf: CanBuildFrom[Nothing, B, To]): Option[To] = {
+    def seqMap[B, To](f: A ⇒ Option[B])(implicit cbf: CanBuildFrom[Nothing, B, To]): Option[To] = {
       val builder = cbf()
 
       @tailrec def recurse(curr: GenTraversableLike[A, GenTraversable[A]]): Option[To] = curr.headOption match {
-        case None => Some(builder.result())
-        case Some(a) => f(a) match {
-          case None => None
-          case Some(b) => builder += b; recurse(curr.tail)
+        case None ⇒ Some(builder.result())
+        case Some(a) ⇒ f(a) match {
+          case None ⇒ None
+          case Some(b) ⇒ builder += b; recurse(curr.tail)
         }
       }
 
@@ -66,11 +66,11 @@ abstract class genTraversableLike[CC[A]] {
 
   class GenTraversableLikeOfEitherOps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr]) {
     def partitionEithers[That[_]](implicit lcbf: CCBF[L, That], rcbf: CCBF[R, That]): (That[L], That[R]) =
-      (lcbf.apply(), rcbf.apply()).tap(l => r => gtl.foreach(_.fold(l += _, r += _))).tmap(_.result(), _.result())
+      (lcbf.apply(), rcbf.apply()).tap(l ⇒ r ⇒ gtl.foreach(_.fold(l += _, r += _))).tmap(_.result(), _.result())
   }
 
   class GenTraversableLikeOfTuple2[K, V, Repr](gtl: GenTraversableLike[(K, V), Repr]) {
-    def toMultiMap[F[_]](implicit fcbf: CCBF[V, F]): MultiMap[F, K, V] = gtl.map(kv => kv)(breakOut)
+    def toMultiMap[F[_]](implicit fcbf: CCBF[V, F]): MultiMap[F, K, V] = gtl.map(kv ⇒ kv)(breakOut)
   }
 
   protected def toGTL[A](cc: CC[A]): GenTraversableLike[A, GenTraversable[A]]
@@ -80,25 +80,25 @@ class GenTraversableLikeCapturer[A, F[_, _]](gtl: GenTraversableLike[A, GenTrave
   import pimpathon.genTraversableLike._
   type CBF[K, V] = CanBuildFrom[Nothing, (K, V), F[K, V]]
 
-  def withKeys[K](f: A => K)(implicit cbf: CBF[K, A]): F[K, A]   = withEntries(a => (f(a), a))
-  def withValues[V](f: A => V)(implicit cbf: CBF[A, V]): F[A, V] = withEntries(a => (a, f(a)))
-  def withConstValue[V](v: V)(implicit  cbf: CBF[A, V]): F[A, V] = withEntries(a => (a, v))
-  def withEntries[K, V](f: A => ((K, V)))(implicit cbf: CBF[K, V]): F[K, V] = gtl.map(f)(breakOut)
+  def withKeys[K](f: A ⇒ K)(implicit cbf: CBF[K, A]): F[K, A]    = withEntries(a ⇒ (f(a), a))
+  def withValues[V](f: A ⇒ V)(implicit cbf: CBF[A, V]): F[A, V]  = withEntries(a ⇒ (a, f(a)))
+  def withConstValue[V](v: V)(implicit  cbf: CBF[A, V]): F[A, V] = withEntries(a ⇒ (a, v))
+  def withEntries[K, V](f: A ⇒ ((K, V)))(implicit cbf: CBF[K, V]): F[K, V] = gtl.map(f)(breakOut)
 
-  def withSomeKeys[K](f: A => Option[K])(implicit cbf: CBF[K, A]): F[K, A] =
-    gtl.flatMap(a => f(a).map(_ -> a))(breakOut)
+  def withSomeKeys[K](f: A ⇒ Option[K])(implicit cbf: CBF[K, A]): F[K, A] =
+    gtl.flatMap(a ⇒ f(a).map(_ → a))(breakOut)
 
-  def withSomeValues[V](f: A => Option[V])(implicit cbf: CBF[A, V]): F[A, V] =
-    gtl.flatMap(a => f(a).map(a -> _))(breakOut)
+  def withSomeValues[V](f: A ⇒ Option[V])(implicit cbf: CBF[A, V]): F[A, V] =
+    gtl.flatMap(a ⇒ f(a).map(a → _))(breakOut)
 
   def withPFKeys[K](pf: PartialFunction[A, K])(implicit cbf: CBF[K, A]): F[K, A] =
-    gtl.collect { case a if pf.isDefinedAt(a) => (pf(a), a) }(breakOut)
+    gtl.collect { case a if pf.isDefinedAt(a) ⇒ (pf(a), a) }(breakOut)
 
   def withPFValues[V](pf: PartialFunction[A, V])(implicit cbf: CBF[A, V]): F[A, V] =
-    gtl.collect { case a if pf.isDefinedAt(a) => (a, pf(a)) }(breakOut)
+    gtl.collect { case a if pf.isDefinedAt(a) ⇒ (a, pf(a)) }(breakOut)
 
-  def withManyKeys[K](f: A => List[K])(implicit cbf: CBF[K, A]): F[K, A] =
-    gtl.flatMap(a => f(a).map(_ -> a))(breakOut)
+  def withManyKeys[K](f: A ⇒ List[K])(implicit cbf: CBF[K, A]): F[K, A] =
+    gtl.flatMap(a ⇒ f(a).map(_ → a))(breakOut)
 
   def withUniqueKeys[K](f: A ⇒ K)(implicit cbf: CBF[K, A]): Option[F[K, A]] = M.Set[K]().calc(keys ⇒ {
     gtl.seqMap(a ⇒ f(a).calc(key ⇒ if (keys.contains(key)) None else { keys += key; Some(key → a) }))

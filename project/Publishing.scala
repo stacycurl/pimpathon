@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Alois Cochard 
+ * Copyright (c) 2011 Alois Cochard
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,17 +78,17 @@ abstract class Sonatype(build: Build) {
   def settings: Seq[Setting[_]] = Seq(
     credentialsSetting,
     publishMavenStyle := true,
-    publishTo <<= version((v: String) => Some( if (v.trim endsWith "SNAPSHOT") ossSnapshots else ossStaging)),
+    publishTo <<= version((v: String) ⇒ Some( if (v.trim endsWith "SNAPSHOT") ossSnapshots else ossStaging)),
     publishArtifact in Test := false,
-    pomIncludeRepository := (_ => false),
+    pomIncludeRepository := (_ ⇒ false),
     pomExtra <<= scalaVersion(generatePomExtra)
   )
 
   lazy val credentialsSetting = credentials += {
-    Seq("SONATYPE_USERNAME", "SONATYPE_PASSWORD").map(k => sys.env.get(k)) match {
-      case Seq(Some(user), Some(pass)) =>
+    Seq("SONATYPE_USERNAME", "SONATYPE_PASSWORD").map(k ⇒ sys.env.get(k)) match {
+      case Seq(Some(user), Some(pass)) ⇒
         Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
-      case _                           =>
+      case _                           ⇒
         Credentials(Path.userHome / ".ivy2" / ".credentials")
     }
   }

@@ -1,6 +1,6 @@
 package pimpathon
 
-import scala.collection.{mutable => M}
+import scala.collection.{mutable ⇒ M}
 import scala.reflect.ClassTag
 import scala.util.{DynamicVariable, Try}
 import _root_.java.io.{ByteArrayInputStream, ByteArrayOutputStream}
@@ -9,7 +9,7 @@ import org.junit.Assert._
 
 
 object util {
-  def assertException[E <: Throwable](expectedMessage: String)(f: => Unit)
+  def assertException[E <: Throwable](expectedMessage: String)(f: ⇒ Unit)
     (implicit expected: ClassTag[E]): Unit = assertEquals(expectedMessage, intercept[E](f).getMessage)
 
   def assertInputStreamClosed(expected: Boolean, closed: Boolean): Unit =
@@ -24,33 +24,33 @@ object util {
     assertTrue(s"Extra: $extra, Missing: $missing", extra.isEmpty && missing.isEmpty)
   }
 
-  def createInputStream(content: String = "", onClose: () => Unit = () => {}) =
+  def createInputStream(content: String = "", onClose: () ⇒ Unit = () ⇒ {}) =
     inputStreamFor(content.getBytes, onClose)
 
-  def inputStreamFor(content: Array[Byte], onClose: () => Unit = () => {}) = new ByteArrayInputStream(content) {
+  def inputStreamFor(content: Array[Byte], onClose: () ⇒ Unit = () ⇒ {}) = new ByteArrayInputStream(content) {
     var closed = false
     override def close() = { closed = true; super.close(); onClose() }
   }
 
-  def createOutputStream(onClose: () => Unit = () => {}) = new ByteArrayOutputStream() {
+  def createOutputStream(onClose: () ⇒ Unit = () ⇒ {}) = new ByteArrayOutputStream() {
     var closed: Boolean = false
     override def close(): Unit = { closed = true; super.close(); onClose() }
   }
 
-  def ignoreExceptions(f: => Unit): Unit = Try(f)
+  def ignoreExceptions(f: ⇒ Unit): Unit = Try(f)
 
-  def intercept[E <: Throwable](f: => Any)(implicit expected: ClassTag[E]): E = {
+  def intercept[E <: Throwable](f: ⇒ Any)(implicit expected: ClassTag[E]): E = {
     val clazz = expected.runtimeClass
 
     val caught = try { f; None } catch {
-      case u: Throwable => if (clazz.isAssignableFrom(u.getClass)) Some(u) else {
+      case u: Throwable ⇒ if (clazz.isAssignableFrom(u.getClass)) Some(u) else {
         sys.error(s"Invalid exception, expected ${clazz.getName}, got: " + u)
       }
     }
 
     caught match {
-      case None => sys.error(s"Expected exception: ${clazz.getName}")
-      case Some(e) => e.asInstanceOf[E]
+      case None ⇒ sys.error(s"Expected exception: ${clazz.getName}")
+      case Some(e) ⇒ e.asInstanceOf[E]
     }
   }
 
@@ -58,7 +58,7 @@ object util {
   val boom = new Throwable("Boom !")
 
   def currentTime(): Long = dynamicTime.value
-  def withTime[A](millis: Long)(f: => A): A = dynamicTime.withValue(millis)(f)
+  def withTime[A](millis: Long)(f: ⇒ A): A = dynamicTime.withValue(millis)(f)
 
   def partial[A, B](entries: (A, B)*): PartialFunction[A, B] = entries.toMap
 

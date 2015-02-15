@@ -8,6 +8,6 @@ object boolean {
   }
 
   class EitherCapturer[R](value: Boolean, right: R) {
-    def or[L](left: => L): Either[L, R] = if (value) Right(right) else Left(left)
+    def or[L](left: ⇒ L): Either[L, R] = if (value) Right(right) else Left(left)
   }
 }

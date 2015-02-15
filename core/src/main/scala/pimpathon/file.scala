@@ -14,7 +14,7 @@ object file extends FileUtils()
 
 case class FileUtils (
   suffix: String = ".tmp", prefix: String = "temp", append: Boolean = false,
-  private val currentTime: () => Long = () => System.currentTimeMillis()
+  private val currentTime: () ⇒ Long = () ⇒ System.currentTimeMillis()
 ) {
 
   implicit class FileOps(file: File) {
@@ -36,17 +36,17 @@ case class FileUtils (
     def /(name: String): File = new File(file, name)
     def named(name: String = file.getName): File = new NamedFile(file, name)
 
-    def relativeTo(dir: File): File = sharedPaths(dir) |> { case (relativeFile, relativeDir) =>
+    def relativeTo(dir: File): File = sharedPaths(dir) |> { case (relativeFile, relativeDir) ⇒
       new File((relativeDir.const("..") ++ relativeFile).mkString(File.separator))
     }
 
     def changeToDirectory(): File = file.tapIf(_.isFile)(_.delete(), _.mkdir())
 
     def create(directory: Boolean = false): File =
-      file.tap(_.getParentFile.mkdirs(), f => if (directory) f.mkdir() else f.createNewFile())
+      file.tap(_.getParentFile.mkdirs(), f ⇒ if (directory) f.mkdir() else f.createNewFile())
 
     def deleteRecursively(): File       = file.tap(_.tree.reverse.foreach(_.delete()))
-    def deleteRecursivelyOnExit(): File = file.tap(f => Runtime.getRuntime.addShutdownHook(DeleteRecursively(f)))
+    def deleteRecursivelyOnExit(): File = file.tap(f ⇒ Runtime.getRuntime.addShutdownHook(DeleteRecursively(f)))
 
     def touch(): File = create().tap(_.setLastModified(currentTime()))
 
@@ -78,7 +78,7 @@ case class FileUtils (
     def className(classDir: File): String = sharedPaths(classDir)._1.mkString(".").stripSuffix(".class")
 
     private def separator: String = File.separator.replace("\\", "\\\\")
-    private def sharedPaths(other: File) = file.path.sharedPrefix(other.path) |> (t => (t._2, t._3))
+    private def sharedPaths(other: File) = file.path.sharedPrefix(other.path) |> (t ⇒ (t._2, t._3))
   }
 
   def cwd: File = file(Properties.userDir)
@@ -93,18 +93,15 @@ case class FileUtils (
   def tempDir(suffix: String = suffix, prefix: String = prefix): File =
     File.createTempFile(prefix, suffix).changeToDirectory().tap(_.deleteRecursivelyOnExit())
 
-  def withTempDirectory[A](f: File => A): A = withTempDirectory(suffix)(f)
+  def withTempDirectory[A](f: File ⇒ A): A = withTempDirectory(suffix)(f)
 
-  def withTempDirectory[A](suffix: String, prefix: String = prefix)(f: File => A): A =
-    withTempFile[A](suffix, prefix)(tmp => f(tmp.changeToDirectory()))
+  def withTempDirectory[A](suffix: String, prefix: String = prefix)(f: File ⇒ A): A =
+    withTempFile[A](suffix, prefix)(tmp ⇒ f(tmp.changeToDirectory()))
 
-  def withTempFile[A](f: File => A): A = withTempFile(suffix)(f)
+  def withTempFile[A](f: File ⇒ A): A = withTempFile(suffix)(f)
 
-  def withTempFile[A](suffix: String, prefix: String = prefix)(f: File => A): A = {
-    val file = File.createTempFile(prefix, suffix)
-
-    try f(file) finally file.deleteRecursively()
-  }
+  def withTempFile[A](suffix: String, prefix: String = prefix)(f: File ⇒ A): A =
+    File.createTempFile(prefix, suffix).calc(file ⇒ try f(file) finally file.deleteRecursively())
 
 
   class NamedFile(file: File, name: String) extends File(file.getPath) {

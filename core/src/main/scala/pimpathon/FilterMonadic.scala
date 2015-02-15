@@ -15,6 +15,6 @@ trait filterMonadic {
     : FilterMonadicTuple2Ops[K, V, Repr] = new FilterMonadicTuple2Ops[K, V, Repr](fm)
 
   class FilterMonadicTuple2Ops[K, V, Repr](fm: FilterMonadic[(K, V), Repr]) {
-    def toMultiMap[F[_]](implicit fcbf: CCBF[V, F]): MultiMap[F, K, V] = fm.map(kv => kv)(breakOut)
+    def toMultiMap[F[_]](implicit fcbf: CCBF[V, F]): MultiMap[F, K, V] = fm.map(kv ⇒ kv)(breakOut)
   }
 }

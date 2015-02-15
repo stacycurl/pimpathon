@@ -30,8 +30,8 @@ class NelTest {
     assertEquals(Map(true → NonEmptyList("foo", "foody"), false → NonEmptyList("bard")),
       NonEmptyList("foo", "bard", "foody").asMultiMap[NonEmptyList].withKeys(_.contains("foo")))
 
-    assertEquals(Map(1 -> NonEmptyList(1, 3)),
-      NonEmptyList(0, 1, 2, 3).asMultiMap[NonEmptyList].withPFKeys { case i if i % 2 == 1 => i % 2 })
+    assertEquals(Map(1 → NonEmptyList(1, 3)),
+      NonEmptyList(0, 1, 2, 3).asMultiMap[NonEmptyList].withPFKeys { case i if i % 2 == 1 ⇒ i % 2 })
   }
 
   @Test def max(): Unit = {

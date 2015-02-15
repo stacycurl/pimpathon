@@ -14,4 +14,3 @@ class TryTest {
     assertEquals(Left[Throwable, String](boom), Failure[String](boom).toEither)
   }
 }
-

@@ -2,14 +2,14 @@ package pimpathon
 
 object numeric {
   implicit class NumericOps[A](val na: Numeric[A]) extends AnyVal {
-    def xmap[B](aToB: A => B, bToA: B => A): Numeric[B] = na match {
-      case xna: XMappedNumeric[_, _] => xna.xmap(aToB, bToA)
-      case other                     => new XMappedNumeric[A, B](other, aToB, bToA)
+    def xmap[B](aToB: A ⇒ B, bToA: B ⇒ A): Numeric[B] = na match {
+      case xna: XMappedNumeric[_, _] ⇒ xna.xmap(aToB, bToA)
+      case other                     ⇒ new XMappedNumeric[A, B](other, aToB, bToA)
     }
   }
 
-  class XMappedNumeric[A, B](na: Numeric[A], aToB: A => B, bToA: B => A) extends Numeric[B] {
-    def xmap[C](bToC: B => C, cToB: C => B): Numeric[C] =
+  class XMappedNumeric[A, B](na: Numeric[A], aToB: A ⇒ B, bToA: B ⇒ A) extends Numeric[B] {
+    def xmap[C](bToC: B ⇒ C, cToB: C ⇒ B): Numeric[C] =
       new XMappedNumeric[A, C](na, aToB andThen bToC, cToB andThen bToA)
 
     def compare(l: B, r: B): Int = na.compare(bToA(l), bToA(r))

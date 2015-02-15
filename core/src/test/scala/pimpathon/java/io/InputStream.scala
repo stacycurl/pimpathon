@@ -13,14 +13,14 @@ import pimpathon.any._
 class InputStreamTest {
   @Test def attemptClose(): Unit = {
     assertEquals(Success(()), createInputStream().attemptClose())
-    assertEquals(Failure(boom), createInputStream(onClose = () => throw boom).attemptClose())
+    assertEquals(Failure(boom), createInputStream(onClose = () ⇒ throw boom).attemptClose())
   }
 
   @Test def closeAfter(): Unit = {
     val is = createInputStream()
 
     assertInputStreamClosed(false, is.closed)
-    assertEquals("result", is.closeAfter(_ => "result"))
+    assertEquals("result", is.closeAfter(_ ⇒ "result"))
     assertInputStreamClosed(true, is.closed)
   }
 
@@ -42,9 +42,9 @@ class InputStreamTest {
 
   @Test def drain(): Unit = {
     for {
-      expectedCloseIn  <- List(false, true)
-      expectedCloseOut <- List(false, true)
-      input            <- List("Input", "Repeat" * 100)
+      expectedCloseIn  ← List(false, true)
+      expectedCloseOut ← List(false, true)
+      input            ← List("Input", "Repeat" * 100)
     } {
       val (is, os) = (createInputStream(input), createOutputStream())
 
@@ -85,8 +85,8 @@ class InputStreamTest {
   @Test def gunzip(): Unit = {
     import pimpathon.java.io.outputStream._
 
-    val os     = createOutputStream().tap(os => new GZIPOutputStream(os).closeAfter(_.write("content".getBytes)))
-    val result = createOutputStream().tap(rs => inputStreamFor(os.toByteArray).gunzip.drain(rs))
+    val os     = createOutputStream().tap(os ⇒ new GZIPOutputStream(os).closeAfter(_.write("content".getBytes)))
+    val result = createOutputStream().tap(rs ⇒ inputStreamFor(os.toByteArray).gunzip.drain(rs))
 
     assertEquals("content", result.toString)
   }

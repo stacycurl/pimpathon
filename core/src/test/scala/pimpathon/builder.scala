@@ -21,8 +21,8 @@ class BuilderTest {
   }
 
   @Test def reset(): Unit = {
-    assertEquals((Nil, Nil),      ints       |> (ib => (ib.reset(), ib.result())))
-    assertEquals((List(1), Nil), (ints += 1) |> (ib => (ib.reset(), ib.result())))
+    assertEquals((Nil, Nil),      ints       |> (ib ⇒ (ib.reset(), ib.result())))
+    assertEquals((List(1), Nil), (ints += 1) |> (ib ⇒ (ib.reset(), ib.result())))
   }
 
   @Test def run(): Unit = {

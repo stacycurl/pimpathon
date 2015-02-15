@@ -240,4 +240,28 @@ class GenTraversableLikeTests {
     assertEquals(Map(1 -> Set(10, 11), 2 -> Set(20, 21)),
       List((1, 10), (1, 11), (2, 20), (2, 21)).toMultiMap[Set])
   }
+
+  @Test def seqMap(): Unit = {
+    assertEquals(Some(Nil),      nil[Int].seqMap(_ => Some(1)))
+    assertEquals(None,           List(1).seqMap(_ => None))
+    assertEquals(Some(List(1)),  List(1).seqMap(Some(_)))
+
+    assertEquals(None, List(1, 2, 3).seqMap {
+      case 1 => Some(1)
+      case 2 => None
+      case 3 => goBoom
+    })
+
+
+    assertEquals(Some(Nil),        Vector.empty[Int].seqMap(_ => Some(1)))
+    assertEquals(None,             Vector(1).seqMap(_ => None))
+    assertEquals(Some(Vector(1)),  Vector(1).seqMap(Some(_)))
+
+    assertEquals(None, Vector(1, 2, 3).seqMap {
+      case 1 => Some(1)
+      case 2 => None
+      case 3 => goBoom
+    })
+  }
+
 }

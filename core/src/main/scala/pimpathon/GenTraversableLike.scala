@@ -2,10 +2,10 @@ package pimpathon
 
 import scala.language.{higherKinds, implicitConversions}
 
+import scala.annotation.tailrec
 import scala.collection.{breakOut, mutable => M, GenTraversable, GenTraversableLike}
 import scala.collection.generic.CanBuildFrom
 
-import pimpathon.any._
 import pimpathon.function._
 import pimpathon.map._
 import pimpathon.multiMap._
@@ -47,6 +47,20 @@ abstract class genTraversableLike[CC[A]] {
 
     def partitionByPF[B](pf: PartialFunction[A, B])
       (implicit eab: CCBF[Either[A, B], CC], a: CCBF[A, CC], b: CCBF[B, CC]): (CC[A], CC[B]) = pf.partition[CC](gtl)
+
+    def seqMap[B, To](f: A => Option[B])(implicit cbf: CanBuildFrom[Nothing, B, To]): Option[To] = {
+      val builder = cbf()
+
+      @tailrec def recurse(curr: GenTraversableLike[A, GenTraversable[A]]): Option[To] = curr.headOption match {
+        case None => Some(builder.result())
+        case Some(a) => f(a) match {
+          case None => None
+          case Some(b) => builder += b; recurse(curr.tail)
+        }
+      }
+
+      recurse(gtl)
+    }
   }
 
   class GenTraversableLikeOfEitherOps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr]) {

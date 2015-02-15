@@ -57,9 +57,6 @@ object list extends genTraversableLike[List] {
     def headTailOption: Option[(A, List[A])] = unconsC(None, head => tail => Some((head, tail)))
     def initLastOption: Option[(List[A], A)] = uncons(None, _ => Some(list.init, list.last))
 
-    def seqMap[B](f: A => Option[B]): Option[List[B]] =
-      apoMap[B, Option[List[B]]](Some(_))(a => f(a).toRight(None))
-
     def tailOption: Option[List[A]] = uncons(None, nonEmpty => Some(nonEmpty.tail))
 
     def calcIfNonEmpty[B](f: List[A] => B): Option[B] = list.calcIf(_.nonEmpty)(f)
@@ -92,18 +89,6 @@ object list extends genTraversableLike[List] {
       }
 
       recurse(list, other, Nil)
-    }
-
-    private def apoMap[B, C](g: List[B] => C)(f: A => Either[C, B]): C = {
-      @tailrec def recurse(acc: List[B], rest: List[A]): C = rest match {
-        case Nil => g(acc.reverse)
-        case head :: tail => f(head) match {
-          case Left(c) => c
-          case Right(b) => recurse(b :: acc, tail)
-        }
-      }
-
-      recurse(Nil, list)
     }
 
     private def equalBy[B](f: A => B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)

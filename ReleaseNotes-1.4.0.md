@@ -43,6 +43,7 @@
 + MultiMap[F, K, V].multiMap.mapEntriesU(K => F[V] => (C, G[W]): MultiMap[G, C, W]
 + MultiMap[F, K, V].multiMap.sliding(Int): F[MultiMap[F, K, V]]
 + MultiMap[F, K, V].getOrEmpty(K): F[V]
++ MultiMap[F, K, V].onlyOption: Option[Map[K, V]]
 + NestedMap[K1, K2, V].append(K1, K2, V): NestedMap[K1, K2, V]
 + NestedMap[K1, K2, V] + ((K1, K2, V)): NestedMap[K1, K2, V]
 + NestedMap[K1, K2, V].flipNesting: NestedMap[K2, K1, V]

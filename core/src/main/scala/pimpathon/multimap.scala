@@ -31,6 +31,9 @@ object multiMap {
 
     def pop(key: K)(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValue(key, crf.pop)
 
+    def onlyOption(implicit gtl: F[V] <:< GenTraversable[V], crf: CanRebuildFrom[F, V]): Option[Map[K, V]] =
+      headTailOption.map(_._1)
+
     def sequence(implicit bf: CCBF[Map[K, V], F], gtl: F[V] <:< GenTraversable[V],
       crf: CanRebuildFrom[F, V], crsm: CanRebuildFrom[F, Map[K, V]]
     ): F[Map[K, V]] = crsm.fromStream(value.unfold(_.headTailOption))

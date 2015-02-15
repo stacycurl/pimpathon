@@ -112,6 +112,11 @@ class GenTraversableLikeTests {
       Set(1, 2).asMultiMap.withManyKeys(i => List(i, i + 1)))
   }
 
+  @Test def asMultiMap_withUniqueKeys(): Unit = {
+    assertEquals(Some(Map()), List.empty[Int].asMultiMap.withUniqueKeys(_ % 2))
+    assertEquals(Some(Map(0 → List(0), 1 → List(1))), List(0, 1).asMultiMap[List].withUniqueKeys(_ % 2))
+    assertEquals(None, List(0, 1, 2).asMultiMap[List].withUniqueKeys(_ % 2))
+  }
 
   @Test def asMap_withKeys(): Unit = {
     assertEquals(Map(), List.empty[Int].asMap.withKeys(_ * 2))
@@ -190,6 +195,11 @@ class GenTraversableLikeTests {
       Set(1, 2).asMap.withManyKeys(i => List(-i, i)))
   }
 
+  @Test def asMap_withUniqueKeys(): Unit = {
+    assertEquals(None, List(1, 2, 3).asMap.withUniqueKeys(_ % 2))
+    assertEquals(Some(Map(0 → 2, 1 → 1)), List(1, 2).asMap.withUniqueKeys(_ % 2))
+    assertEquals(Some(Map()), nil[Int].asMap.withUniqueKeys(_ % 2))
+  }
 
   @Test def attributeCounts(): Unit = {
     assertEquals(Map(3 -> 2, 4 -> 1), List("foo", "food", "bar").attributeCounts(_.size))

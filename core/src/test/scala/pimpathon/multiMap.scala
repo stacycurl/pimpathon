@@ -62,6 +62,13 @@ class MultiMapTest {
     assertEquals(Map(), Map.empty[Int, List[Int]].multiMap.tail)
   }
 
+  @Test def onlyOption(): Unit = {
+    assertEquals(Some(Map(1 -> 10, 2 -> 20)), Map(1 -> List(10, 11), 2 -> List(20)).onlyOption)
+    assertEquals(Some(Map(2 -> 20)), Map(1 -> Nil, 2 -> List(20)).onlyOption)
+    assertEquals(None, Map(1 -> (Nil: List[Int])).onlyOption)
+    assertEquals(None, Map.empty[Int, List[Int]].onlyOption)
+  }
+
   @Test def headTailOption(): Unit = {
     assertEquals(Some(Map(1 -> 10, 2 -> 20), Map(1 -> List(11))), Map(1 -> List(10, 11), 2 -> List(20)).headTailOption)
     assertEquals(Some(Map(2 -> 20), Map()), Map(1 -> Nil, 2 -> List(20)).headTailOption)

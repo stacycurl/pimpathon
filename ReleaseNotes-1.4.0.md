@@ -69,6 +69,7 @@
 + mutable.Builder[A, B].reset(): B
 + mutable.Builder[A, B].run((M.Builder[A, B] => Discarded)*): B
 + mutable.Map[K, V].retainKeys(Predicate[K]): mutable.Map[K, V]
++ mutable.Map[K, V].retainValues(Predicate[V]): mutable.Map[K, V]
 + argonaut.Json.filterNulls: Json
 + scalaz.NonEmptyList[A].distinct: NonEmptyList[A]
 + NonEmptyList[V].asMap.withKeys(V => K): Map[K, V]

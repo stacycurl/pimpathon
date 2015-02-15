@@ -204,4 +204,10 @@ class ListTest {
     for { a <- List(1, 2); b <- List(10, 20); c <- List(100, 200) } yield List(a, b, c),
     List(List(1, 2), List(10, 20), List(100, 200)).cartesianProduct
   )
+
+  @Test def onlyOption(): Unit = {
+    assertEquals(None, List.empty[Int].onlyOption)
+    assertEquals(None, List(1, 2).onlyOption)
+    assertEquals(Some(1), List(1).onlyOption)
+  }
 }

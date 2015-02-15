@@ -6,6 +6,7 @@ import scala.annotation.tailrec
 import scala.collection.{breakOut, mutable => M, GenTraversable, GenTraversableLike}
 import scala.collection.generic.CanBuildFrom
 
+import pimpathon.any._
 import pimpathon.function._
 import pimpathon.map._
 import pimpathon.multiMap._
@@ -76,6 +77,7 @@ abstract class genTraversableLike[CC[A]] {
 }
 
 class GenTraversableLikeCapturer[A, F[_, _]](gtl: GenTraversableLike[A, GenTraversable[A]]) {
+  import pimpathon.genTraversableLike._
   type CBF[K, V] = CanBuildFrom[Nothing, (K, V), F[K, V]]
 
   def withKeys[K](f: A => K)(implicit cbf: CBF[K, A]): F[K, A]   = withEntries(a => (f(a), a))
@@ -97,6 +99,10 @@ class GenTraversableLikeCapturer[A, F[_, _]](gtl: GenTraversableLike[A, GenTrave
 
   def withManyKeys[K](f: A => List[K])(implicit cbf: CBF[K, A]): F[K, A] =
     gtl.flatMap(a => f(a).map(_ -> a))(breakOut)
+
+  def withUniqueKeys[K](f: A ⇒ K)(implicit cbf: CBF[K, A]): Option[F[K, A]] = M.Set[K]().calc(keys ⇒ {
+    gtl.seqMap(a ⇒ f(a).calc(key ⇒ if (keys.contains(key)) None else { keys += key; Some(key → a) }))
+  })
 }
 
 case class UngroupBy[A, B, CC[_]](ungrouped: Map[Int, M.Builder[A, CC[A]]], counts: Map[B, Int])(

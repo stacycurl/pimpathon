@@ -49,18 +49,19 @@ abstract class genTraversableLike[CC[A]] {
     def partitionByPF[B](pf: PartialFunction[A, B])
       (implicit eab: CCBF[Either[A, B], CC], a: CCBF[A, CC], b: CCBF[B, CC]): (CC[A], CC[B]) = pf.partition[CC](gtl)
 
-    def seqMap[B, To](f: A ⇒ Option[B])(implicit cbf: CanBuildFrom[Nothing, B, To]): Option[To] = {
-      val builder = cbf()
+    def seqMap[B, To](f: A ⇒ Option[B])(implicit cbf: CanBuildFrom[Nothing, B, To]): Option[To] =
+      seqFold[M.Builder[B, To]](cbf())((builder, a) ⇒ f(a).map(builder += _)).map(_.result())
 
-      @tailrec def recurse(curr: GenTraversableLike[A, GenTraversable[A]]): Option[To] = curr.headOption match {
-        case None ⇒ Some(builder.result())
-        case Some(a) ⇒ f(a) match {
+    def seqFold[B](z: B)(op: (B, A) ⇒ Option[B]): Option[B] = { // similar to scalaz' GTL.foldLeftM[Option, B, A]
+      @tailrec def recurse(cur: GenTraversableLike[A, GenTraversable[A]], acc: B): Option[B] = cur.headOption match {
+        case None ⇒ Some(acc)
+        case Some(a) ⇒ op(acc, a) match {
           case None ⇒ None
-          case Some(b) ⇒ builder += b; recurse(curr.tail)
+          case Some(b) ⇒ recurse(cur.tail, b)
         }
       }
 
-      recurse(gtl)
+      recurse(gtl, z)
     }
   }
 
@@ -100,9 +101,11 @@ class GenTraversableLikeCapturer[A, F[_, _]](gtl: GenTraversableLike[A, GenTrave
   def withManyKeys[K](f: A ⇒ List[K])(implicit cbf: CBF[K, A]): F[K, A] =
     gtl.flatMap(a ⇒ f(a).map(_ → a))(breakOut)
 
-  def withUniqueKeys[K](f: A ⇒ K)(implicit cbf: CBF[K, A]): Option[F[K, A]] = M.Set[K]().calc(keys ⇒ {
-    gtl.seqMap(a ⇒ f(a).calc(key ⇒ if (keys.contains(key)) None else { keys += key; Some(key → a) }))
-  })
+  def withUniqueKeys[K](f: A ⇒ K)(implicit cbf: CBF[K, A]): Option[F[K, A]] = {
+    gtl.seqFold[(Set[K], M.Builder[(K, A), F[K, A]])](Set.empty[K], cbf()) {
+      case ((ks, builder), a) ⇒ f(a).calc(k ⇒ if (ks.contains(k)) None else Some(ks + k, builder += ((k, a))))
+    }.map(_._2.result())
+  }
 }
 
 case class UngroupBy[A, B, CC[_]](ungrouped: Map[Int, M.Builder[A, CC[A]]], counts: Map[B, Int])(

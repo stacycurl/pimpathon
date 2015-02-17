@@ -6,7 +6,6 @@ import org.junit.Assert._
 import pimpathon.builder._
 import pimpathon.list._
 import pimpathon.util._
-import scalaz.std.list._
 
 
 class ListTest {

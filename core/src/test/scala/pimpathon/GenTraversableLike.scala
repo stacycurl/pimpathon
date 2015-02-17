@@ -6,10 +6,7 @@ import scala.collection.immutable.SortedMap
 import org.junit.Assert._
 import pimpathon.genTraversableLike._
 import pimpathon.multiMap._
-import pimpathon.option._
 import pimpathon.util._
-import scalaz.std.list._
-import scalaz.syntax.std.boolean._
 
 
 class GenTraversableLikeTests {
@@ -266,5 +263,15 @@ class GenTraversableLikeTests {
       case 2 ⇒ None
       case 3 ⇒ goBoom
     })
+  }
+
+  @Test def seqFold(): Unit = {
+    assertEquals(None, List(1, 2, 3).seqFold(1) {
+      case (1, j) ⇒ Some(1 + j)
+      case (2, _) ⇒ None
+      case _      ⇒ goBoom
+    })
+
+    assertEquals(Some(6), List(1, 2, 3).seqFold(0) { case (i, j) ⇒ Some(i + j) })
   }
 }

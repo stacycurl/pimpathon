@@ -30,6 +30,7 @@
 + Option[A].tapNone(=> Unit): Option[A]
 + Option[A].tapSome(A => Unit): Option[A]
 + Option[A].invert(A): Option[A]
++ GTL[A].seqFold(B)((B, A) => Option[B]): Option[B]
 + GTL[A].seqMap[To](A => Option[B]): Option[To]
 + GTL[A].asMap.withUniqueKeys(A => K): Option[Map[K, A]]
 + GTL[A].asMultiMap[F[_]].withUniqueKeys(A => K): Option[MultiMap[F, K, A]]

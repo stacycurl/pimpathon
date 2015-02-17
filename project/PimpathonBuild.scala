@@ -45,7 +45,6 @@ object PimpathonBuild extends Build {
     scalaVersion := "2.9.2",
     maxErrors := 1,
     parallelExecution in Test := true,
-    parallelExecution in ScoverageTest := false,
     scalacOptions := Seq(
       "-Xfatal-warnings",
       "-deprecation",

@@ -1,14 +1,17 @@
 package pimpathon
 
+import _root_.java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import scala.collection.{mutable ⇒ M}
 import scala.reflect.ClassTag
 import scala.util.{DynamicVariable, Try}
-import _root_.java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import scalaz.syntax.std.ToBooleanOps
+import scalaz.std.ListFunctions
 
 import org.junit.Assert._
 
 
-object util {
+
+object util extends ToBooleanOps with ListFunctions {
   def assertException[E <: Throwable](expectedMessage: String)(f: ⇒ Unit)
     (implicit expected: ClassTag[E]): Unit = assertEquals(expectedMessage, intercept[E](f).getMessage)
 

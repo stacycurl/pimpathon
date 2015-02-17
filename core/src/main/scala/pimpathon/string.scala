@@ -10,13 +10,13 @@ object string {
   implicit def stringOps(string: String): StringOps = new StringOps(string)
 
   class StringOps(string: String) {
-    def emptyTo(alternative: => String): String = if (string.isEmpty) alternative else string
+    def emptyTo(alternative: ⇒ String): String = if (string.isEmpty) alternative else string
 
     def prefixWith(prefix: String): String = if (string.startsWith(prefix)) string else prefix + string
     def suffixWith(suffix: String): String = if (string.endsWith(suffix))   string else string + suffix
 
     def sharedPrefix(other: String): (String, String, String) = {
-      val res@(prefix, rest, otherRest) = string.toList.sharedPrefix(other.toList)
+      val (prefix, rest, otherRest) = string.toList.sharedPrefix(other.toList)
 
       (fromChars(prefix), fromChars(rest), fromChars(otherRest))
     }
@@ -28,6 +28,5 @@ object string {
   }
 
   def fromChars(chars: List[Char]): String =
-    (for(c <- chars) yield c)(collection.breakOut)
+    (for(c ← chars) yield c)(collection.breakOut)
 }
-

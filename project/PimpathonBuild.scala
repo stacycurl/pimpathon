@@ -1,6 +1,6 @@
 import sbt._
 
-import net.virtualvoid.sbt.graph.{Plugin => GraphPlugin}
+import net.virtualvoid.sbt.graph.{Plugin ⇒ GraphPlugin}
 import org.scalastyle.sbt.ScalastylePlugin
 
 import sbt.Keys._
@@ -33,7 +33,7 @@ object PimpathonBuild extends Build {
 
   def runAllIn(config: Configuration) = {
     runAll in config <<= (discoveredMainClasses in config, runner in run, fullClasspath in config, streams) map {
-      (classes, runner, cp, s) => classes.foreach(c => runner.run(c, Attributed.data(cp), Seq(), s.log))
+      (classes, runner, cp, s) ⇒ classes.foreach(c ⇒ runner.run(c, Attributed.data(cp), Seq(), s.log))
     }
   }
 

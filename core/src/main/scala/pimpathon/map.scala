@@ -1,6 +1,6 @@
 package pimpathon
 
-import scala.collection.{breakOut, mutable => M, GenTraversable, GenTraversableLike, GenTraversableOnce}
+import scala.collection.{breakOut, mutable ⇒ M, GenTraversable, GenTraversableLike, GenTraversableOnce}
 import scala.collection.immutable.{SortedMap, TreeMap}
 
 import pimpathon.any._
@@ -18,26 +18,26 @@ object map extends genTraversableLike[GenTraversable] {
     def containsAny[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.exists(map.contains)
     def containsAll[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.forall(map.contains)
 
-    def get(ok: Option[K]): Option[V]                = ok.flatMap(map.get)
-    def getOrThrow(k: K, message: String): V         = getOrThrow(k, new IllegalArgumentException(message))
-    def getOrThrow(k: K, exception: => Exception): V = map.getOrElse(k, throw exception)
+    def get(ok: Option[K]): Option[V]               = ok.flatMap(map.get)
+    def getOrThrow(k: K, message: String): V        = getOrThrow(k, new IllegalArgumentException(message))
+    def getOrThrow(k: K, exception: ⇒ Exception): V = map.getOrElse(k, throw exception)
 
     def findKey(p: Predicate[K]): Option[K]   = keyFor.matchingKey(p)
     def findValue(p: Predicate[V]): Option[V] = valueFor.matchingValue(p)
 
-    def filterKeysNot(p: Predicate[K]): Map[K, V]   = map.filterNot(kv => p(kv._1))
-    def filterValuesNot(p: Predicate[V]): Map[K, V] = map.filterNot(kv => p(kv._2))
-    def filterValues(p: Predicate[V]): Map[K, V]    = map.filter(kv => p(kv._2))
+    def filterKeysNot(p: Predicate[K]): Map[K, V]   = map.filterNot(kv ⇒ p(kv._1))
+    def filterValuesNot(p: Predicate[V]): Map[K, V] = map.filterNot(kv ⇒ p(kv._2))
+    def filterValues(p: Predicate[V]): Map[K, V]    = map.filter(kv ⇒ p(kv._2))
 
 
-    def keyExists(p: Predicate[K]): Boolean = map.exists(kv => p(kv._1))
-    def valueExists(p: Predicate[V]): Boolean = map.exists(kv => p(kv._2))
+    def keyExists(p: Predicate[K]): Boolean   = map.exists(kv ⇒ p(kv._1))
+    def valueExists(p: Predicate[V]): Boolean = map.exists(kv ⇒ p(kv._2))
 
-    def emptyTo(empty: => Map[K, V]): Map[K, V]             = uncons(empty, _ => map)
-    def calcIfNonEmpty[A](f: Map[K, V] => A): Option[A]     = map.calcIf(_.nonEmpty)(f)
-    def uncons[A](empty: => A, nonEmpty: Map[K, V] => A): A = if (map.isEmpty) empty else nonEmpty(map)
+    def emptyTo(empty: ⇒ Map[K, V]): Map[K, V]            = uncons(empty, _ ⇒ map)
+    def calcIfNonEmpty[A](f: Map[K, V] ⇒ A): Option[A]    = map.calcIf(_.nonEmpty)(f)
+    def uncons[A](empty: ⇒ A, nonEmpty: Map[K, V] ⇒ A): A = if (map.isEmpty) empty else nonEmpty(map)
 
-    def reverse(f: Set[K] => K): Map[V, K] = reverseToMultiMap.mapValuesEagerly(f)
+    def reverse(f: Set[K] ⇒ K): Map[V, K] = reverseToMultiMap.mapValuesEagerly(f)
     def reverseToMultiMap: MultiMap[Set, V, K] = map.map(_.swap)(breakOut)
 
     def sorted(implicit ordering: Ordering[K]): SortedMap[K, V] = TreeMap.empty[K, V](ordering) ++ map
@@ -58,32 +58,32 @@ object map extends genTraversableLike[GenTraversable] {
     def partitionEntriesBy[C, W](pf: PartialFunction[(K, V), (C, W)]): (Map[K, V], Map[C, W]) =
       map.partition(pf.isUndefinedAt).tmap(identity, _.map(pf))
 
-    def mapKeysEagerly[C](f: K => C): Map[C, V]          = map.map { case (k, v) => (f(k), v) }(breakOut)
-    def mapValuesEagerly[W](f: V => W): Map[K, W]        = map.map { case (k, v) => (k, f(v)) }(breakOut)
-    def mapEntries[C, W](f: K => V => (C, W)): Map[C, W] = map.map { case (k, v) => f(k)(v)   }(breakOut)
+    def mapKeysEagerly[C](f: K ⇒ C): Map[C, V]         = map.map { case (k, v) ⇒ (f(k), v) }(breakOut)
+    def mapValuesEagerly[W](f: V ⇒ W): Map[K, W]       = map.map { case (k, v) ⇒ (k, f(v)) }(breakOut)
+    def mapEntries[C, W](f: K ⇒ V ⇒ (C, W)): Map[C, W] = map.map { case (k, v) ⇒ f(k)(v)   }(breakOut)
 
-    def updateValue(key: K, f: V => Option[V]): Map[K, V] =
-      map.get(key).flatMap(f).map(newValue => map + ((key, newValue))).getOrElse(map - key)
+    def updateValue(key: K, f: V ⇒ Option[V]): Map[K, V] =
+      map.get(key).flatMap(f).map(newValue ⇒ map + ((key, newValue))).getOrElse(map - key)
 
     def updateKeys[C](pf: PartialFunction[K, C]): Map[C, V] = updateKeys(pf.lift)
     def updateValues[W](pf: PartialFunction[V, W]): Map[K, W] = updateValues(pf.lift)
 
-    def updateKeys[C](f: K => Option[C]): Map[C, V]   = map.flatMap(kv => f(kv._1).map(_ -> kv._2))
-    def updateValues[W](f: V => Option[W]): Map[K, W] = map.flatMap(kv => f(kv._2).map(kv._1 -> _))
+    def updateKeys[C](f: K ⇒ Option[C]): Map[C, V]   = map.flatMap(kv ⇒ f(kv._1).map(_ → kv._2))
+    def updateValues[W](f: V ⇒ Option[W]): Map[K, W] = map.flatMap(kv ⇒ f(kv._2).map(kv._1 → _))
   }
 
-  class MapAndThen[K, V, A](map: Map[K, V], andThen: ((K, V)) => A) {
+  class MapAndThen[K, V, A](map: Map[K, V], andThen: ((K, V)) ⇒ A) {
     def maxValue(implicit O: Ordering[V]): Option[A] = map.calcIfNonEmpty(_.maxBy(value)).map(andThen)
     def minValue(implicit O: Ordering[V]): Option[A] = map.calcIfNonEmpty(_.minBy(value)).map(andThen)
     def maxKey(implicit O: Ordering[K]): Option[A] = map.calcIfNonEmpty(_.maxBy(key)).map(andThen)
     def minKey(implicit O: Ordering[K]): Option[A] = map.calcIfNonEmpty(_.minBy(key)).map(andThen)
 
-    def matchingKey(p: Predicate[K]): Option[A]   = map.find(kv => p(kv._1)).map(andThen)
-    def matchingValue(p: Predicate[V]): Option[A] = map.find(kv => p(kv._2)).map(andThen)
+    def matchingKey(p: Predicate[K]): Option[A]   = map.find(kv ⇒ p(kv._1)).map(andThen)
+    def matchingValue(p: Predicate[V]): Option[A] = map.find(kv ⇒ p(kv._2)).map(andThen)
   }
 
   protected def toGTL[A](gt: GenTraversable[A]): GenTraversableLike[A, GenTraversable[A]] = gt
 
-  @inline private def key[K, V]:   ((K, V)) => K = (kv: (K, V)) => kv._1
-  @inline private def value[K, V]: ((K, V)) => V = (kv: (K, V)) => kv._2
+  @inline private def key[K, V]:   ((K, V)) ⇒ K = (kv: (K, V)) ⇒ kv._1
+  @inline private def value[K, V]: ((K, V)) ⇒ V = (kv: (K, V)) ⇒ kv._2
 }

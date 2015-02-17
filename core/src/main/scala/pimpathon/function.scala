@@ -6,11 +6,11 @@ import pimpathon.list._
 
 
 object function {
-  type Predicate[-A] = A => Boolean
+  type Predicate[-A] = A ⇒ Boolean
 
-  implicit def functionOps[A, B](f: A => B): FunctionOps[A, B] = new FunctionOps[A, B](f)
+  implicit def functionOps[A, B](f: A ⇒ B): FunctionOps[A, B] = new FunctionOps[A, B](f)
 
-  implicit def curriedFunction2Ops[A, B, C](f: A => B => C): CurriedFunction2Ops[A, B, C] =
+  implicit def curriedFunction2Ops[A, B, C](f: A ⇒ B ⇒ C): CurriedFunction2Ops[A, B, C] =
     new CurriedFunction2Ops[A, B, C](f)
 
   implicit def predicateOps[A](p: Predicate[A]): PredicateOps[A] = new PredicateOps[A](p)
@@ -21,25 +21,25 @@ object function {
   implicit def partialFunctionEndoOps[A](pf: PartialFunction[A, A]): PartialEndoFunctionOps[A] =
     new PartialEndoFunctionOps[A](pf)
 
-  class FunctionOps[A, B](f: A => B) {
+  class FunctionOps[A, B](f: A ⇒ B) {
     def guardWith(p: Predicate[A]): PartialFunction[A, B] = p guard f
   }
 
-  class CurriedFunction2Ops[A, B, C](f: A => B => C) {
-    def tupled: ((A, B)) => C = Function.uncurried(f).tupled
+  class CurriedFunction2Ops[A, B, C](f: A ⇒ B ⇒ C) {
+    def tupled: ((A, B)) ⇒ C = Function.uncurried(f).tupled
   }
 
   class PredicateOps[A](p: Predicate[A]) {
-    def and(q: Predicate[A]): Predicate[A] = (a: A) => p(a) && q(a)
-    def or(q: Predicate[A]):  Predicate[A] = (a: A) => p(a) || q(a)
-    def not:                  Predicate[A] = (a: A) => !p(a)
+    def and(q: Predicate[A]): Predicate[A] = (a: A) ⇒ p(a) && q(a)
+    def or(q: Predicate[A]):  Predicate[A] = (a: A) ⇒ p(a) || q(a)
+    def not:                  Predicate[A] = (a: A) ⇒ !p(a)
 
     def exists: Predicate[List[A]] = _.exists(p)
     def forall: Predicate[List[A]] = _.forall(p)
 
     def ifSome: Predicate[Option[A]] = _.exists(p)
 
-    def guard[B](f: A => B): PartialFunction[A, B] = new GuardedPartialFunction[A, B](p, f)
+    def guard[B](f: A ⇒ B): PartialFunction[A, B] = new GuardedPartialFunction[A, B](p, f)
   }
 
   class PartialFunctionOps[In, Out](pf: PartialFunction[In, Out]) {
@@ -49,11 +49,11 @@ object function {
       (implicit cbf: CCBF[Either[In, Out], CC], icbf: CCBF[In, CC], ocbf: CCBF[Out, CC]): (CC[In], CC[Out]) =
         ins.map(either).partitionEithers[CC](icbf, ocbf)
 
-    def either: In => Either[In, Out] = toRight
-    def toRight: In => Either[In, Out] = (in: In) => pf.lift(in).toRight(in)
-    def toLeft:  In => Either[Out, In] = (in: In) => pf.lift(in).toLeft(in)
+    def either:  In ⇒ Either[In, Out] = toRight
+    def toRight: In ⇒ Either[In, Out] = (in: In) ⇒ pf.lift(in).toRight(in)
+    def toLeft:  In ⇒ Either[Out, In] = (in: In) ⇒ pf.lift(in).toLeft(in)
 
-    def first[C]: PartialFunction[(In, C), (Out, C)] = ***(identityPF[C])
+    def first[C]:  PartialFunction[(In, C), (Out, C)] = ***(identityPF[C])
     def second[C]: PartialFunction[(C, In), (C, Out)] = identityPF[C] *** pf
 
     def ***[In2, Out2](rhs: PartialFunction[In2, Out2]): PartialFunction[(In, In2), (Out, Out2)] =
@@ -64,18 +64,18 @@ object function {
   }
 
   class PartialEndoFunctionOps[A](pf: PartialFunction[A, A]) {
-    def unify: A => A = (a: A) => pf.lift(a).getOrElse(a)
+    def unify: A ⇒ A = (a: A) ⇒ pf.lift(a).getOrElse(a)
   }
 
-  private class GuardedPartialFunction[A, B](p: Predicate[A], f: A => B) extends PartialFunction[A, B] {
+  private class GuardedPartialFunction[A, B](p: Predicate[A], f: A ⇒ B) extends PartialFunction[A, B] {
     def isDefinedAt(a: A): Boolean = p(a)
     def apply(a: A): B = f(a)
   }
 
-  def identityPF[A]: PartialFunction[A, A] = { case a => a }
-  def equalC[A]: A => A => Boolean = (l: A) => (r: A) => l equals r
+  def identityPF[A]: PartialFunction[A, A] = { case a ⇒ a }
+  def equalC[A]: A ⇒ A ⇒ Boolean = (l: A) ⇒ (r: A) ⇒ l equals r
   def nand[A](ps: Predicate[A]*): Predicate[A] = and(ps: _*).not
-  def nor[A](ps: Predicate[A]*): Predicate[A] = or(ps: _*).not
-  def or[A](ps: Predicate[A]*): Predicate[A] = ps.foldLeft((a: A) => false)(_ or _)
-  def and[A](ps: Predicate[A]*): Predicate[A] = ps.foldLeft((a: A) => true)(_ and _)
+  def nor[A](ps: Predicate[A]*): Predicate[A]  = or(ps: _*).not
+  def or[A](ps: Predicate[A]*): Predicate[A]   = ps.foldLeft((a: A) ⇒ false)(_ or _)
+  def and[A](ps: Predicate[A]*): Predicate[A]  = ps.foldLeft((a: A) ⇒ true)(_ and _)
 }

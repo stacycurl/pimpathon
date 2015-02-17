@@ -1,10 +1,8 @@
 package pimpathon.argonaut
 
 import argonaut._
-import pimpathon.function.Predicate
-
 import argonaut.Json._
-import scalaz.std.iterable._
+import pimpathon.function.Predicate
 
 
 object json {
@@ -20,6 +18,6 @@ object json {
       JsonObject(obj.toInsertionMap.filter(p).map(_.filter(p)))
 
     private def filter(p: Predicate[Json], array: JsonArray): JsonArray =
-      array.collect { case j if p(j) => j.filter(p) }
+      array.collect { case j if p(j) ⇒ j.filter(p) }
   }
 }

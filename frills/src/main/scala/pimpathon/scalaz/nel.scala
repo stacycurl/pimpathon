@@ -1,6 +1,6 @@
 package pimpathon.scalaz
 
-import scala.collection.{mutable => M, GenTraversable, GenTraversableLike}
+import scala.collection.{mutable ⇒ M, GenTraversable, GenTraversableLike}
 import scalaz.{NonEmptyList, Order}
 
 import pimpathon.{CanBuildNonEmpty, genTraversableLike}
@@ -18,11 +18,11 @@ object nel extends genTraversableLike[NonEmptyList] {
 
   class NelOps[A](nel: NonEmptyList[A]) {
     def distinct: NonEmptyList[A] = lift(_.distinct)
-    def distinctBy[B](f: A => B): NonEmptyList[A] = lift(_.distinctBy(f))
+    def distinctBy[B](f: A ⇒ B): NonEmptyList[A] = lift(_.distinctBy(f))
     def max(implicit o: Order[A]): A = nel.list.max(o.toScalaOrdering)
     def min(implicit o: Order[A]): A = nel.list.min(o.toScalaOrdering)
 
-    private def lift(f: List[A] => List[A]): NonEmptyList[A] = f(nel.list).headTail.calc(NonEmptyList.nel)
+    private def lift(f: List[A] ⇒ List[A]): NonEmptyList[A] = f(nel.list).headTail.calc(NonEmptyList.nel)
   }
 
   protected def toGTL[A](nel: NonEmptyList[A]): GenTraversableLike[A, GenTraversable[A]] = nel.list

@@ -21,38 +21,38 @@ class AnyTest {
 
   @Test def calcPF(): Unit = assertEquals(
     List(None, Some("two"), None, Some("four")),
-    List(1, 2, 3, 4).map(_.calcPF(util.partial(2 -> "two", 4 -> "four")))
+    List(1, 2, 3, 4).map(_.calcPF(util.partial(2 → "two", 4 → "four")))
   )
 
   @Test def transform(): Unit = assertEquals(
     List(1, 4, 3, 8),
-    List(1, 2, 3, 4).map(_.transform(util.partial(2 -> 4, 4 -> 8)))
+    List(1, 2, 3, 4).map(_.transform(util.partial(2 → 4, 4 → 8)))
   )
 
-  @Test def tap(): Unit            = assertEquals(List(1, 1), ints.run(is => 1.tap(is += _, is += _)))
-  @Test def update(): Unit         = assertEquals(List(1, 1), ints.run(is => 1.update(is += _, is += _)))
-  @Test def withSideEffect(): Unit = assertEquals(List(1, 1), ints.run(is => 1.withSideEffect(is += _, is += _)))
+  @Test def tap(): Unit            = assertEquals(List(1, 1), ints.run(is ⇒ 1.tap(is += _, is += _)))
+  @Test def update(): Unit         = assertEquals(List(1, 1), ints.run(is ⇒ 1.update(is += _, is += _)))
+  @Test def withSideEffect(): Unit = assertEquals(List(1, 1), ints.run(is ⇒ 1.withSideEffect(is += _, is += _)))
 
   @Test def tapIf(): Unit = assertEquals(
-    List(1, 3), ints.tap(is => List(1, 2, 3).foreach(i => i.tapIf(_ % 2 != 0)(is += _)))
+    List(1, 3), ints.tap(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapIf(_ % 2 != 0)(is += _)))
   )
 
   @Test def tapUnless(): Unit = assertEquals(
-    List(2), ints.run(is => List(1, 2, 3).foreach(i => i.tapUnless(_ % 2 != 0)(is += _)))
+    List(2), ints.run(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapUnless(_ % 2 != 0)(is += _)))
   )
 
   @Test def tapPF(): Unit = assertEquals(
-    List(1, 3), ints.tap(is => List(1, 2, 3).foreach(i => i.tapPF { case j if j % 2 != 0 => is += j }))
+    List(1, 3), ints.tap(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapPF { case j if j % 2 != 0 ⇒ is += j }))
   )
 
   @Test def cond(): Unit = assertEquals(
     List("true", "false"),
-    List("true", "false").map(_.cond(_ == "true", _ => "true", _ => "false"))
+    List("true", "false").map(_.cond(_ == "true", _ ⇒ "true", _ ⇒ "false"))
   )
 
   @Test def partialMatch(): Unit = assertEquals(
     List(Some("Matched"), None),
-    List(1, 0).map(i => i partialMatch { case 1 => "Matched" })
+    List(1, 0).map(i ⇒ i partialMatch { case 1 ⇒ "Matched" })
   )
 
   @Test def lpair(): Unit = assertEquals((10, 1), 1.lpair(_ * 10))
@@ -120,19 +120,19 @@ class AnyTest {
   }
 
   @Test def withFinally(): Unit = assertEquals(
-    List("body: input", "finally: input", "done"), strings.run(ss => {
-      ss += "input".withFinally(s => ss += "finally: " + s)(s => {ss += "body: " + s; "done"})
+    List("body: input", "finally: input", "done"), strings.run(ss ⇒ {
+      ss += "input".withFinally(s ⇒ ss += "finally: " + s)(s ⇒ {ss += "body: " + s; "done"})
     })
   )
 
   @Test def attempt(): Unit = {
     assertEquals(Right(2), 1.attempt(_ * 2))
-    assertEquals(Left(boom), 1.attempt(_ => throw boom))
+    assertEquals(Left(boom), 1.attempt(_ ⇒ throw boom))
   }
 
-  @Test def addTo(): Unit = assertEquals(List(1), ints.run(is => 1.addTo(is)))
+  @Test def addTo(): Unit = assertEquals(List(1), ints.run(is ⇒ 1.addTo(is)))
 
   @Test def unfold(): Unit = assertEquals(
-    List('f', 'o', 'o'), "foo".unfold(s => if (s.nonEmpty) Some(s.head, s.tail) else None).toList
+    List('f', 'o', 'o'), "foo".unfold(s ⇒ if (s.nonEmpty) Some(s.head, s.tail) else None).toList
   )
 }

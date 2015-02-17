@@ -1,7 +1,6 @@
 package pimpathon
 
 import org.junit.Test
-import scalaz.std.list._
 
 import org.junit.Assert._
 import scala.math.Numeric._

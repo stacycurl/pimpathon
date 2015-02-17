@@ -1,7 +1,7 @@
 package pimpathon
 
 import org.junit.Test
-import scala.collection.{mutable => M}
+import scala.collection.{mutable ⇒ M}
 
 import org.junit.Assert._
 import pimpathon.any._
@@ -43,15 +43,15 @@ class MapTest {
   @Test def get(): Unit = {
     assertEquals(None,    Map.empty[Int, Int].get(Some(1)))
     assertEquals(None,    Map.empty[Int, Int].get(None))
-    assertEquals(None,    Map(1 -> 2).get(None))
-    assertEquals(None,    Map(1 -> 2).get(Some(2)))
-    assertEquals(Some(2), Map(1 -> 2).get(Some(1)))
+    assertEquals(None,    Map(1 → 2).get(None))
+    assertEquals(None,    Map(1 → 2).get(Some(2)))
+    assertEquals(Some(2), Map(1 → 2).get(Some(1)))
   }
 
   @Test def getOrThrow(): Unit = {
-    assertEquals("present", Map(0 -> "present").getOrThrow(0, "missing"))
-    assertEquals("present", Map(0 -> "present").getOrThrow(0, new Exception("missing")))
-    assertEquals("present", Map(0 -> "present").getOrThrow(0, util.goBoom: Exception))
+    assertEquals("present", Map(0 → "present").getOrThrow(0, "missing"))
+    assertEquals("present", Map(0 → "present").getOrThrow(0, new Exception("missing")))
+    assertEquals("present", Map(0 → "present").getOrThrow(0, util.goBoom: Exception))
 
     assertEquals("missing", util.intercept[IllegalArgumentException] {
       nonEmpty.getOrThrow(0, "missing")
@@ -63,68 +63,68 @@ class MapTest {
   }
 
   @Test def uncons(): Unit = {
-    assertEquals("empty", empty.uncons("empty", _ => "nonEmpty"))
-    assertEquals("nonEmpty", nonEmpty.uncons("empty", _ => "nonEmpty"))
+    assertEquals("empty", empty.uncons("empty", _ ⇒ "nonEmpty"))
+    assertEquals("nonEmpty", nonEmpty.uncons("empty", _ ⇒ "nonEmpty"))
   }
 
   @Test def calcIfNonEmpty(): Unit = {
-    assertEquals(None, empty.calcIfNonEmpty(_ => "nonEmpty"))
-    assertEquals(Some("nonEmpty"), nonEmpty.calcIfNonEmpty(_ => "nonEmpty"))
+    assertEquals(None, empty.calcIfNonEmpty(_ ⇒ "nonEmpty"))
+    assertEquals(Some("nonEmpty"), nonEmpty.calcIfNonEmpty(_ ⇒ "nonEmpty"))
   }
 
   @Test def emptyTo(): Unit = {
     assertEquals(nonEmpty, empty.emptyTo(nonEmpty))
-    assertEquals(Map(3 -> 4), Map(3 -> 4).emptyTo(nonEmpty))
+    assertEquals(Map(3 → 4), Map(3 → 4).emptyTo(nonEmpty))
   }
 
   @Test def entryFor_maxKey(): Unit = {
     assertEquals(None, Map.empty[Int, String].entryFor.maxKey)
-    assertEquals(Some(2 -> "max"), Map(1 -> "min", 2 -> "max").entryFor.maxKey)
+    assertEquals(Some(2 → "max"), Map(1 → "min", 2 → "max").entryFor.maxKey)
   }
 
   @Test def entryFor_minKey(): Unit = {
     assertEquals(None, Map.empty[Int, String].entryFor.minKey)
-    assertEquals(Some(1 -> "min"), Map(1 -> "min", 2 -> "max").entryFor.minKey)
+    assertEquals(Some(1 → "min"), Map(1 → "min", 2 → "max").entryFor.minKey)
   }
 
   @Test def entryFor_maxValue(): Unit = {
     assertEquals(None, Map.empty[Int, String].entryFor.maxValue)
-    assertEquals(Some(2 -> "def"), Map(1 -> "abc", 2 -> "def").entryFor.maxValue)
+    assertEquals(Some(2 → "def"), Map(1 → "abc", 2 → "def").entryFor.maxValue)
   }
 
   @Test def entryFor_minValue(): Unit = {
     assertEquals(None, Map.empty[Int, String].entryFor.minValue)
-    assertEquals(Some(1 -> "abc"), Map(1 -> "abc", 2 -> "def").entryFor.minValue)
+    assertEquals(Some(1 → "abc"), Map(1 → "abc", 2 → "def").entryFor.minValue)
   }
 
   @Test def valueFor_maxKey(): Unit = {
     assertEquals(None, Map.empty[Int, String].valueFor.maxKey)
-    assertEquals(Some("max"), Map(1 -> "min", 2 -> "max").valueFor.maxKey)
+    assertEquals(Some("max"), Map(1 → "min", 2 → "max").valueFor.maxKey)
   }
 
   @Test def valueFor_minKey(): Unit = {
     assertEquals(None, Map.empty[Int, String].valueFor.minKey)
-    assertEquals(Some("min"), Map(1 -> "min", 2 -> "max").valueFor.minKey)
+    assertEquals(Some("min"), Map(1 → "min", 2 → "max").valueFor.minKey)
   }
 
   @Test def keyFor_maxValue(): Unit = {
     assertEquals(None, Map.empty[Int, String].keyFor.maxValue)
-    assertEquals(Some(2), Map(1 -> "abc", 2 -> "def").keyFor.maxValue)
+    assertEquals(Some(2), Map(1 → "abc", 2 → "def").keyFor.maxValue)
   }
 
   @Test def keyFor_minValue(): Unit = {
     assertEquals(None, Map.empty[Int, String].keyFor.minValue)
-    assertEquals(Some(1), Map(1 -> "abc", 2 -> "def").keyFor.minValue)
+    assertEquals(Some(1), Map(1 → "abc", 2 → "def").keyFor.minValue)
   }
 
   @Test def mapKeysEagerly(): Unit = {
     val originalKeysSeen = ints
     def update(v: Int) = { originalKeysSeen += v; v * 10 }
 
-    val result = Map(1 -> 1, 2 -> 2).mapKeysEagerly(update)
+    val result = Map(1 → 1, 2 → 2).mapKeysEagerly(update)
     assertEquals("Should have iterated over the original map already", List(1, 2), originalKeysSeen.toList)
-    assertEquals(Map(10 -> 1, 20 -> 2), result)
-    assertEquals(Map(10 -> 1, 20 -> 2), result)
+    assertEquals(Map(10 → 1, 20 → 2), result)
+    assertEquals(Map(10 → 1, 20 → 2), result)
     assertEquals("Shouldn't have iterated over the original map twice", List(1, 2), originalKeysSeen.toList)
   }
 
@@ -132,149 +132,149 @@ class MapTest {
     val originalValuesSeen = ints
     def update(v: Int) = { originalValuesSeen += v; v * 10 }
 
-    val result = Map(1 -> 1, 2 -> 2).mapValuesEagerly(update)
+    val result = Map(1 → 1, 2 → 2).mapValuesEagerly(update)
     assertEquals("Should have iterated over the original map already", List(1, 2), originalValuesSeen.toList)
-    assertEquals(Map(1 -> 10, 2 -> 20), result)
-    assertEquals(Map(1 -> 10, 2 -> 20), result)
+    assertEquals(Map(1 → 10, 2 → 20), result)
+    assertEquals(Map(1 → 10, 2 → 20), result)
     assertEquals("Shouldn't have iterated over the original map twice", List(1, 2), originalValuesSeen.toList)
   }
 
   @Test def mapEntries(): Unit = assertEquals(
-    Map("1" -> 2.0, "2" -> 4.0), Map(1 -> 2, 2 -> 4).mapEntries(k => v => (k.toString, v.toDouble))
+    Map("1" → 2.0, "2" → 4.0), Map(1 → 2, 2 → 4).mapEntries(k ⇒ v ⇒ (k.toString, v.toDouble))
   )
 
   @Test def findKey(): Unit = {
-    assertEquals(None, empty.findKey(_ => true))
-    assertEquals(None, nonEmpty.findKey(_ => false))
+    assertEquals(None, empty.findKey(_ ⇒ true))
+    assertEquals(None, nonEmpty.findKey(_ ⇒ false))
     assertEquals(Some(1), nonEmpty.findKey(_ == 1))
   }
 
   @Test def findValue(): Unit = {
-    assertEquals(None, empty.findValue(_ => true))
-    assertEquals(None, nonEmpty.findValue(_ => false))
+    assertEquals(None, empty.findValue(_ ⇒ true))
+    assertEquals(None, nonEmpty.findValue(_ ⇒ false))
     assertEquals(Some(2), nonEmpty.findValue(_ == 2))
   }
 
   @Test def entryFor_matchingKey(): Unit = {
-    assertEquals(None, empty.entryFor.matchingKey(_ => true))
-    assertEquals(None, nonEmpty.entryFor.matchingKey(_ => false))
-    assertEquals(Some(1 -> 2), nonEmpty.entryFor.matchingKey(_ == 1))
+    assertEquals(None, empty.entryFor.matchingKey(_ ⇒ true))
+    assertEquals(None, nonEmpty.entryFor.matchingKey(_ ⇒ false))
+    assertEquals(Some(1 → 2), nonEmpty.entryFor.matchingKey(_ == 1))
   }
 
   @Test def entryFor_matchingValue(): Unit = {
-    assertEquals(None, empty.entryFor.matchingValue(_ => true))
-    assertEquals(None, nonEmpty.entryFor.matchingValue(_ => false))
-    assertEquals(Some(1 -> 2), nonEmpty.entryFor.matchingValue(_ == 2))
+    assertEquals(None, empty.entryFor.matchingValue(_ ⇒ true))
+    assertEquals(None, nonEmpty.entryFor.matchingValue(_ ⇒ false))
+    assertEquals(Some(1 → 2), nonEmpty.entryFor.matchingValue(_ == 2))
   }
 
   @Test def filterKeysNot(): Unit = {
-    assertEquals(empty, empty.filterKeysNot(_ => true))
-    assertEquals(empty, nonEmpty.filterKeysNot(_ => true))
-    assertEquals(nonEmpty, nonEmpty.filterKeysNot(_ => false))
-    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterKeysNot(_ == 2))
+    assertEquals(empty, empty.filterKeysNot(_ ⇒ true))
+    assertEquals(empty, nonEmpty.filterKeysNot(_ ⇒ true))
+    assertEquals(nonEmpty, nonEmpty.filterKeysNot(_ ⇒ false))
+    assertEquals(nonEmpty, Map(1 → 2, 2 → 3).filterKeysNot(_ == 2))
   }
 
   @Test def filterValuesNot(): Unit = {
-    assertEquals(empty, empty.filterValuesNot(_ => true))
-    assertEquals(empty, nonEmpty.filterValuesNot(_ => true))
-    assertEquals(nonEmpty, nonEmpty.filterValuesNot(_ => false))
-    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterValuesNot(_ == 3))
+    assertEquals(empty, empty.filterValuesNot(_ ⇒ true))
+    assertEquals(empty, nonEmpty.filterValuesNot(_ ⇒ true))
+    assertEquals(nonEmpty, nonEmpty.filterValuesNot(_ ⇒ false))
+    assertEquals(nonEmpty, Map(1 → 2, 2 → 3).filterValuesNot(_ == 3))
   }
 
   @Test def filterValues(): Unit = {
-    assertEquals(empty, empty.filterValues(_ => true))
-    assertEquals(empty, nonEmpty.filterValues(_ => false))
-    assertEquals(nonEmpty, nonEmpty.filterValues(_ => true))
-    assertEquals(nonEmpty, nonEmpty.filterValues(_ => true))
-    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).filterValues(_ == 2))
+    assertEquals(empty, empty.filterValues(_ ⇒ true))
+    assertEquals(empty, nonEmpty.filterValues(_ ⇒ false))
+    assertEquals(nonEmpty, nonEmpty.filterValues(_ ⇒ true))
+    assertEquals(nonEmpty, nonEmpty.filterValues(_ ⇒ true))
+    assertEquals(nonEmpty, Map(1 → 2, 2 → 3).filterValues(_ == 2))
   }
 
   @Test def keyExists(): Unit = {
-    assertFalse(empty.keyExists(_ => true))
-    assertFalse(nonEmpty.keyExists(_ => false))
+    assertFalse(empty.keyExists(_ ⇒ true))
+    assertFalse(nonEmpty.keyExists(_ ⇒ false))
     assertFalse(nonEmpty.keyExists(_ == 2))
     assertTrue(nonEmpty.keyExists(_ == 1))
   }
 
   @Test def valueExists(): Unit = {
-    assertFalse(empty.valueExists(_ => true))
-    assertFalse(nonEmpty.valueExists(_ => false))
+    assertFalse(empty.valueExists(_ ⇒ true))
+    assertFalse(nonEmpty.valueExists(_ ⇒ false))
     assertFalse(nonEmpty.valueExists(_ == 1))
     assertTrue(nonEmpty.valueExists(_ == 2))
   }
 
   @Test def mutable(): Unit = {
-    assertEquals(M.Map(1 -> 2), Map(1 -> 2).mutable)
-    assertEquals(M.Map(1 -> 2), Map(1 -> 2).toMutable)
+    assertEquals(M.Map(1 → 2), Map(1 → 2).mutable)
+    assertEquals(M.Map(1 → 2), Map(1 → 2).toMutable)
   }
 
   @Test def reverseToMultiMap(): Unit = {
-    assertEquals(Map(2 -> Set(1, 2)), Map(1 -> 2, 2 -> 2).reverseToMultiMap)
+    assertEquals(Map(2 → Set(1, 2)), Map(1 → 2, 2 → 2).reverseToMultiMap)
   }
 
   @Test def reverse(): Unit = {
-    assertEquals(Map(2 -> 1), Map(1 -> 2, 2 -> 2).reverse(_.min))
+    assertEquals(Map(2 → 1), Map(1 → 2, 2 → 2).reverse(_.min))
   }
 
   @Test def sorted(): Unit = {
-    assertEquals(List(3 -> 4, 1 -> 2), Map(1 -> 2, 3 -> 4).sorted(Ordering.Int.reverse).toList)
+    assertEquals(List(3 → 4, 1 → 2), Map(1 → 2, 3 → 4).sorted(Ordering.Int.reverse).toList)
   }
 
   @Test def andThenM(): Unit = assertEquals(
-    Map(1 -> 100, 2 -> 200),
-    Map(1 -> 10, 2 -> 20, 3 -> 30).andThenM(Map(10 -> 100, 20 -> 200, 40 -> 400))
+    Map(1 → 100, 2 → 200),
+    Map(1 → 10, 2 → 20, 3 → 30).andThenM(Map(10 → 100, 20 → 200, 40 → 400))
   )
 
   @Test def composeM(): Unit = assertEquals(
-    Map(1 -> 100, 2 -> 200),
-    Map(10 -> 100, 20 -> 200, 40 -> 400).composeM(Map(1 -> 10, 2 -> 20, 3 -> 30))
+    Map(1 → 100, 2 → 200),
+    Map(10 → 100, 20 → 200, 40 → 400).composeM(Map(1 → 10, 2 → 20, 3 → 30))
   )
 
   @Test def partitionKeysBy(): Unit = assertEquals(
-    (Map(2 -> 3), Map("foo" -> 2)),
-    Map(1 -> 2, 2 -> 3).partitionKeysBy { case 1 => "foo" }
+    (Map(2 → 3), Map("foo" → 2)),
+    Map(1 → 2, 2 → 3).partitionKeysBy { case 1 ⇒ "foo" }
   )
 
   @Test def partitionValuesBy(): Unit = assertEquals(
-    (Map(2 -> 3), Map(1 -> "foo")),
-    Map(1 -> 2, 2 -> 3).partitionValuesBy { case 2 => "foo" }
+    (Map(2 → 3), Map(1 → "foo")),
+    Map(1 → 2, 2 → 3).partitionValuesBy { case 2 ⇒ "foo" }
   )
 
   @Test def partitionEntriesBy(): Unit = assertEquals(
-    (Map(1 -> 2), Map("foo" -> "oof")),
-    Map(1 -> 2, 2 -> 3).partitionEntriesBy { case (2, 3) => "foo" -> "oof" }
+    (Map(1 → 2), Map("foo" → "oof")),
+    Map(1 → 2, 2 → 3).partitionEntriesBy { case (2, 3) ⇒ "foo" → "oof" }
   )
 
   @Test def updateValue(): Unit = {
-    assertEquals(empty, nonEmpty.updateValue(1, _ => None))
-    assertEquals(Map(1 -> 1), nonEmpty.updateValue(1, _ => Some(1)))
-    assertEquals(nonEmpty, nonEmpty.updateValue(2, _ => None))
-    assertEquals(nonEmpty, nonEmpty.updateValue(2, _ => Some(3)))
+    assertEquals(empty,      nonEmpty.updateValue(1, _ ⇒ None))
+    assertEquals(Map(1 → 1), nonEmpty.updateValue(1, _ ⇒ Some(1)))
+    assertEquals(nonEmpty,   nonEmpty.updateValue(2, _ ⇒ None))
+    assertEquals(nonEmpty,   nonEmpty.updateValue(2, _ ⇒ Some(3)))
   }
 
   @Test def updateKeys(): Unit = {
-    assertEquals(empty, nonEmpty.updateKeys(_ => None))
-    assertEquals(Map(2 -> 2), nonEmpty.updateKeys(k => Some(k * 2)))
-    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).updateKeys(k => k.filterSelf(_ == 1)))
+    assertEquals(empty, nonEmpty.updateKeys(_ ⇒ None))
+    assertEquals(Map(2 → 2), nonEmpty.updateKeys(k ⇒ Some(k * 2)))
+    assertEquals(nonEmpty, Map(1 → 2, 2 → 3).updateKeys(k ⇒ k.filterSelf(_ == 1)))
   }
 
   @Test def updateKeysPF(): Unit = {
     assertEquals(empty, nonEmpty.updateKeys(util.partial[Int, Int]()))
-    assertEquals(Map(2 -> 2), nonEmpty.updateKeys(util.partial(1 -> 2)))
-    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).updateKeys(util.partial(1 -> 1)))
+    assertEquals(Map(2 → 2), nonEmpty.updateKeys(util.partial(1 → 2)))
+    assertEquals(nonEmpty, Map(1 → 2, 2 → 3).updateKeys(util.partial(1 → 1)))
   }
 
   @Test def updateValues(): Unit = {
-    assertEquals(empty, nonEmpty.updateValues(_ => None))
-    assertEquals(Map(1 -> 4), nonEmpty.updateValues(v => Some(v * 2)))
-    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).updateValues(v => v.filterSelf(_ == 2)))
+    assertEquals(empty, nonEmpty.updateValues(_ ⇒ None))
+    assertEquals(Map(1 → 4), nonEmpty.updateValues(v ⇒ Some(v * 2)))
+    assertEquals(nonEmpty, Map(1 → 2, 2 → 3).updateValues(v ⇒ v.filterSelf(_ == 2)))
   }
 
   @Test def updateValuesPF(): Unit = {
     assertEquals(empty, nonEmpty.updateValues(util.partial[Int, Int]()))
-    assertEquals(Map(1 -> 4), nonEmpty.updateValues(util.partial(2 -> 4)))
-    assertEquals(nonEmpty, Map(1 -> 2, 2 -> 3).updateValues(util.partial(2 -> 2)))
+    assertEquals(Map(1 → 4), nonEmpty.updateValues(util.partial(2 → 4)))
+    assertEquals(nonEmpty, Map(1 → 2, 2 → 3).updateValues(util.partial(2 → 2)))
   }
 
-  private val (empty, nonEmpty) = (Map.empty[Int, Int], Map(1 -> 2))
+  private val (empty, nonEmpty) = (Map.empty[Int, Int], Map(1 → 2))
 }

@@ -29,10 +29,16 @@
 + Option[A].tap(none: => Unit, some: A => Unit): Option[A]
 + Option[A].tapNone(=> Unit): Option[A]
 + Option[A].tapSome(A => Unit): Option[A]
++ Option[A].invert(A): Option[A]
++ GTL[A].seqFold(B)((B, A) => Option[B]): Option[B]
++ GTL[A].seqMap[To](A => Option[B]): Option[To]
++ GTL[A].asMap.withUniqueKeys(A => K): Option[Map[K, A]]
++ GTL[A].asMultiMap[F[_]].withUniqueKeys(A => K): Option[MultiMap[F, K, A]]
 + List[A].calcIfNonEmpty(List[A] => B): Option[B]
 + List[A].duplicates: List[A]
 + List[A].mapIfNonEmpty(A => B): Option[List[B]]
 + List[A].unsnocC(=> B, List[A] => A => B): B
++ List[A].onlyOption: Option[A]
 + List[List[A]].cartesianProduct: List[List[A]]
 + Array[A].copyTo(srcPos, Array[A], destPos, length): Array[A]
 + Map[K, V].calcIfNonEmpty(Map[K, V] => B): Option[B]
@@ -41,6 +47,7 @@
 + MultiMap[F, K, V].multiMap.mapEntriesU(K => F[V] => (C, G[W]): MultiMap[G, C, W]
 + MultiMap[F, K, V].multiMap.sliding(Int): F[MultiMap[F, K, V]]
 + MultiMap[F, K, V].getOrEmpty(K): F[V]
++ MultiMap[F, K, V].onlyOption: Option[Map[K, V]]
 + NestedMap[K1, K2, V].append(K1, K2, V): NestedMap[K1, K2, V]
 + NestedMap[K1, K2, V] + ((K1, K2, V)): NestedMap[K1, K2, V]
 + NestedMap[K1, K2, V].flipNesting: NestedMap[K2, K1, V]
@@ -65,6 +72,8 @@
 + mutable.Builder[A, B].on(C => A): mutable.Builder[C, B]
 + mutable.Builder[A, B].reset(): B
 + mutable.Builder[A, B].run((M.Builder[A, B] => Discarded)*): B
++ mutable.Map[K, V].retainKeys(Predicate[K]): mutable.Map[K, V]
++ mutable.Map[K, V].retainValues(Predicate[V]): mutable.Map[K, V]
 + argonaut.Json.filterNulls: Json
 + scalaz.NonEmptyList[A].distinct: NonEmptyList[A]
 + NonEmptyList[V].asMap.withKeys(V => K): Map[K, V]

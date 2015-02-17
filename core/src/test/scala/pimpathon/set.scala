@@ -1,7 +1,7 @@
 package pimpathon
 
 import org.junit.Test
-import scala.collection.{mutable => M}
+import scala.collection.{mutable ⇒ M}
 
 import org.junit.Assert._
 import pimpathon.set._
@@ -22,7 +22,7 @@ class SetTest {
 
   @Test def ungroupBy(): Unit = {
     def group(ci: (Char, Int)): Char = ci._1
-    val original = Set('a' -> 1, 'a' -> 2, 'b' -> 1, 'c' -> 1, 'b' -> 2)
+    val original = Set('a' → 1, 'a' → 2, 'b' → 1, 'c' → 1, 'b' → 2)
     val ungrouped = original.ungroupBy(group)
 
     assertEquals(ungrouped.map(_.size), ungrouped.map(_.map(group).size))
@@ -31,7 +31,6 @@ class SetTest {
 
   @Test def partitionByPF(): Unit = assertEquals(
     (Set(2, 4), Set("one", "three")),
-    Set(1, 2, 3, 4).partitionByPF(util.partial(1 -> "one", 3 -> "three"))
+    Set(1, 2, 3, 4).partitionByPF(util.partial(1 → "one", 3 → "three"))
   )
 }
-

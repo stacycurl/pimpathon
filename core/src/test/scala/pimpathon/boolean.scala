@@ -4,7 +4,6 @@ import org.junit.Test
 
 import org.junit.Assert._
 import pimpathon.boolean._
-import pimpathon.util._
 
 
 class BooleanTest {

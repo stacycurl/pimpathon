@@ -1,7 +1,7 @@
 package pimpathon
 
 import org.junit.Test
-import scala.collection.{mutable => M}
+import scala.collection.{mutable ⇒ M}
 
 import org.junit.Assert._
 import pimpathon.stream._
@@ -14,16 +14,16 @@ class StreamTest {
   }
 
   @Test def continuallyWhile(): Unit = {
-    assertEquals(Stream.empty[Int], stream.continuallyWhile(1)(_ => false))
-    assertEquals(List.fill(1000)(1), stream.continuallyWhile(1)(_ => true).take(1000).toList)
+    assertEquals(Stream.empty[Int], stream.continuallyWhile(1)(_ ⇒ false))
+    assertEquals(List.fill(1000)(1), stream.continuallyWhile(1)(_ ⇒ true).take(1000).toList)
 
     val ints = M.Stack[Int](1, 2, 3)
     assertEquals(List(1, 2), stream.continuallyWhile(ints.pop())(_ < 3).toList)
   }
 
   @Test def uncons(): Unit = {
-    assertEquals("empty", Stream.empty[Int].uncons("empty", s => "size: " + s.size))
-    assertEquals("size: 3", Stream(1, 2, 3).uncons("empty", s => "size: " + s.size))
+    assertEquals("empty", Stream.empty[Int].uncons("empty", s ⇒ "size: " + s.size))
+    assertEquals("size: 3", Stream(1, 2, 3).uncons("empty", s ⇒ "size: " + s.size))
   }
 
   @Test def tailOption(): Unit = {
@@ -32,4 +32,3 @@ class StreamTest {
     assertEquals(Some(Stream(1)),          Stream(0, 1).tailOption)
   }
 }
-

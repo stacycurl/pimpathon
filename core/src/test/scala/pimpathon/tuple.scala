@@ -10,7 +10,7 @@ import pimpathon.util._
 
 class TupleTest {
   @Test def tap(): Unit = {
-    assertEquals(List("foo1"), strings.run(ss => (1, "foo").tap(i => s => ss += (s + i))))
+    assertEquals(List("foo1"), strings.run(ss ⇒ (1, "foo").tap(i ⇒ s ⇒ ss += (s + i))))
   }
 
   @Test def calc(): Unit = {
@@ -18,7 +18,7 @@ class TupleTest {
   }
 
   @Test def calcC(): Unit = {
-    assertEquals("123abc", ("123", "abc").calcC(a => b => a + b))
+    assertEquals("123abc", ("123", "abc").calcC(a ⇒ b ⇒ a + b))
   }
 
   @Test def to(): Unit = {

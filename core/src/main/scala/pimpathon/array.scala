@@ -13,7 +13,7 @@ object array {
 
   class ArrayOps[A](array: Array[A]) {
     def copyTo(srcPos: Int, dest: Array[A], destPos: Int, length: Int): Array[A] =
-      dest.tap(_ => System.arraycopy(array, srcPos, dest, destPos, length))
+      dest.tap(_ ⇒ System.arraycopy(array, srcPos, dest, destPos, length))
   }
 
   class ByteArrayOps(array: Array[Byte]) {
@@ -27,4 +27,3 @@ object array {
       if (n == 0) -1 else is.read(array, 0, math.min(n, array.length).toInt)
   }
 }
-

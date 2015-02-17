@@ -9,6 +9,6 @@ object option {
   implicit def optionOps[A](option: Option[A]): OptionOps[A] = new OptionOps[A](option)
 
   class OptionOps[A](option: Option[A]) {
-    def toSuccessNel[E](e: => E): ValidationNel[E, A] = option.toSuccess(e).toValidationNel
+    def toSuccessNel[E](e: ⇒ E): ValidationNel[E, A] = option.toSuccess(e).toValidationNel
   }
 }

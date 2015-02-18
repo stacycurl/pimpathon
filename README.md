@@ -32,6 +32,8 @@ libraryDependencies ++= Seq(
 )
 ```
 
+[Documentation][doc]
+
 Release notes [1.3.0][r1.3.0], [1.2.0][r1.2.0], [1.1.0][r1.1.0], [1.0.0][r1.0.0]
 
 ### Contributors
@@ -48,3 +50,4 @@ Release notes [1.3.0][r1.3.0], [1.2.0][r1.2.0], [1.1.0][r1.1.0], [1.0.0][r1.0.0]
 [r1.2.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.2.0.md
 [r1.3.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.3.0.md
 [r1.4.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.4.0.md
+[doc]: https://github.com/stacycurl/pimpathon/blob/master/Documentation.md

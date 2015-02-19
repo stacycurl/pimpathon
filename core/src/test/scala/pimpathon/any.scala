@@ -20,6 +20,11 @@ class AnyTest {
     List(2, 3, 4).map(_.calcIf(_ % 2 == 0)(_ + 3))
   )
 
+  @Test def calcUnless(): Unit = assertEquals(
+    List(Some(5), None, Some(7)),
+    List(2, 3, 4).map(_.calcUnless(_ % 2 != 0)(_ + 3))
+  )
+
   @Test def calcPF(): Unit = assertEquals(
     List(None, Some("two"), None, Some("four")),
     List(1, 2, 3, 4).map(_.calcPF(util.partial(2 → "two", 4 → "four")))

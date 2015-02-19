@@ -14,6 +14,7 @@
 ### Additions
 + frills sub-project
 + [A].calcIf(Predicate[A])(A => B): Option[B]
++ [A].calcUnless(Predicate[A])(A => B): Option[B]
 + [A].calcPF(PartialFunction[A, B]): Option[B]
 + [A].passes.one(Predicate[A]*): Option[A]
 + [A].passes.all(Predicate[A]*): Option[A]

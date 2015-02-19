@@ -6,6 +6,7 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 
 + [A].calc(f: A => B): B (aka |>)
 + [A].calcIf(Predicate[A])(A => B): Option[B]
++ [A].calcUnless(Predicate[A])(A => B): Option[B]
 + [A].calcPF(PartialFunction[A, B]): Option[B]
 + [A].transform(PartialFunction[A, A]): A
 + [A].unfold(A => Option[(B, A)]): Stream[B]

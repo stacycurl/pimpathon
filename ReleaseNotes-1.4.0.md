@@ -13,6 +13,7 @@
 
 ### Additions
 + frills sub-project
++ [A].addTo(Growable[A]): A
 + [A].calcIf(Predicate[A])(A => B): Option[B]
 + [A].calcUnless(Predicate[A])(A => B): Option[B]
 + [A].calcPF(PartialFunction[A, B]): Option[B]

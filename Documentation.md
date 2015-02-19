@@ -17,7 +17,7 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 + [A].rpair(A => B): (A, B)
 + [A].partialMatch(PartialFunction[A, B]): Option[B]
 + [A].withFinally(A => Unit)(A => B): B
-+ [A].addTo(M.Builder[A, To]): A
++ [A].addTo(Growable[A]): A
 + [A].filterSelf(Predicate[A]): Option[A]
 + [A].filterNotSelf(Predicate[A]): Option[A]
 + [A].ifSelf(Predicate[A]): Option[A]

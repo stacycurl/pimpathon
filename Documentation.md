@@ -40,6 +40,7 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 + (A, B).to[C]: (C, C)
 + (A, B).tmap(A => C, B => D): (C, D)
 + (A, B).tap((A => B => Discarded)*): (A, B)
++ (A, B).addTo(Growable[A], Growable[B]): (A, B)
 
 + Boolean.asInt: Int
 + Boolean.either(R).or(L): Either[L, R] -- as in scalaz

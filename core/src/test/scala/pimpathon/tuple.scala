@@ -33,4 +33,8 @@ class TupleTest {
   @Test def tmap(): Unit = {
     assertEquals((6, "cba"), (2, "abc").tmap(_ * 3, _.reverse))
   }
+
+  @Test def addTo(): Unit = assertEquals(
+    (List(1), List("foo")), (ints, strings).tap(is ⇒ ss ⇒ (1, "foo").addTo(is, ss)).tmap(_.result(), _.result())
+  )
 }

@@ -1,5 +1,6 @@
 package pimpathon
 
+import scala.collection.generic.Growable
 import scala.language.implicitConversions
 
 import scala.util.{Failure, Success, Try}
@@ -26,6 +27,7 @@ object either {
     def leftFlatMap(f: L ⇒ Either[L, R]): Either[L, R]  = either.fold(f, Right(_))
     def rightFlatMap(f: R ⇒ Either[L, R]): Either[L, R] = either.fold(Left(_), f)
 
+    def addTo(ls: Growable[L], rs: Growable[R]): Either[L, R] = tap(ls += _, rs += _)
     def tap(l: L ⇒ Unit, r: R ⇒ Unit): Either[L, R] = { either.fold(l, r); either }
 
     def toTry(implicit ev: L <:< Throwable): Try[R] = either.fold(Failure(_), Success(_))

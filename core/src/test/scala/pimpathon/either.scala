@@ -75,6 +75,14 @@ class EitherTest {
       (ints, strings).tap(is ⇒ ss ⇒ Right[Int, String]("foo").tap(is += _, ss += _)).tmap(_.reset(), _.reset()))
   }
 
+  @Test def addTo(): Unit = {
+    assertEquals((List(1), Nil),
+      (ints, strings).tap(is ⇒ ss ⇒ Left[Int, String](1).addTo(is, ss)).tmap(_.result(), _.result()))
+
+    assertEquals((Nil, List("foo")),
+      (ints, strings).tap(is ⇒ ss ⇒ Right[Int, String]("foo").addTo(is, ss)).tmap(_.result(), _.result()))
+  }
+
   @Test def toTry(): Unit = {
     assertEquals(Success[String]("foo"), Right[Throwable, String]("foo").toTry)
     assertEquals(Failure[String](boom),    Left[Throwable, String](boom).toTry)

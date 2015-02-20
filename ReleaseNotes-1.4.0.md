@@ -72,6 +72,7 @@
 + InputStream.gunzip: GZIPInputStream
 + OutputStream.gzip: GZIPOutputStream
 + callable.create(=> A): Callable[A]
++ runnable.create(=> Unit): Runnable
 + classTag.className[A]: String
 + classTag.simpleClassName[A]: String
 + classTag.klassOf[A]: String

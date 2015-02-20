@@ -259,6 +259,8 @@ MultiMap[GTL, K, V]
 
 + callable.create(=> A): Callable[A]
 
++ runnable.create(=> Unit): Runnable
+
 + pimpathon.java.io forwarding package object
 
 + InputStream.closeAfter(InputStream => A): A

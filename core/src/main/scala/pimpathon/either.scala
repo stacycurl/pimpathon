@@ -28,6 +28,8 @@ object either {
     def rightFlatMap(f: R ⇒ Either[L, R]): Either[L, R] = either.fold(Left(_), f)
 
     def addTo(ls: Growable[L], rs: Growable[R]): Either[L, R] = tap(ls += _, rs += _)
+
+    def tapLeft(l: L ⇒ Unit): Either[L, R] = tap(l, _ ⇒ {})
     def tap(l: L ⇒ Unit, r: R ⇒ Unit): Either[L, R] = { either.fold(l, r); either }
 
     def toTry(implicit ev: L <:< Throwable): Try[R] = either.fold(Failure(_), Success(_))

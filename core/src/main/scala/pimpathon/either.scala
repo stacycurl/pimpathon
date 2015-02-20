@@ -29,7 +29,8 @@ object either {
 
     def addTo(ls: Growable[L], rs: Growable[R]): Either[L, R] = tap(ls += _, rs += _)
 
-    def tapLeft(l: L ⇒ Unit): Either[L, R] = tap(l, _ ⇒ {})
+    def tapLeft(l: L ⇒ Unit):  Either[L, R] = tap(l, _ ⇒ {})
+    def tapRight(r: R ⇒ Unit): Either[L, R] = tap(_ ⇒ {}, r)
     def tap(l: L ⇒ Unit, r: R ⇒ Unit): Either[L, R] = { either.fold(l, r); either }
 
     def toTry(implicit ev: L <:< Throwable): Try[R] = either.fold(Failure(_), Success(_))

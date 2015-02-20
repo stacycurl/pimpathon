@@ -56,6 +56,7 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 + implicit conversion of Either to RightProjection (and back again)
 + Either[L, R].tap(L => Unit, R => Unit): Either[L, R]
 + Either[L, R].tapLeft(L => Unit): Either[L, R]
++ Either[L, R].tapRight(R => Unit): Either[L, R]
 + Either[L, R].addTo(Growable[L], Growable[R]): Either[L, R]
 + Either[L, R].rightOr(L => R): R (aka rescue, aka valueOr)
 + Either[L, R].leftOr(R => L): L

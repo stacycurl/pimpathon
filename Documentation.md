@@ -6,6 +6,7 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 
 + [A].calc(f: A => B): B (aka |>)
 + [A].calcIf(Predicate[A])(A => B): Option[B]
++ [A].calcUnless(Predicate[A])(A => B): Option[B]
 + [A].calcPF(PartialFunction[A, B]): Option[B]
 + [A].transform(PartialFunction[A, A]): A
 + [A].unfold(A => Option[(B, A)]): Stream[B]
@@ -16,7 +17,9 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 + [A].rpair(A => B): (A, B)
 + [A].partialMatch(PartialFunction[A, B]): Option[B]
 + [A].withFinally(A => Unit)(A => B): B
-+ [A].addTo(M.Builder[A, To]): A
++ [A].tryFinally(A => B)(A => Unit): B
++ [A].addTo(Growable[A]): A
++ [A].removeFrom(Shrinkable[A]): A
 + [A].filterSelf(Predicate[A]): Option[A]
 + [A].filterNotSelf(Predicate[A]): Option[A]
 + [A].ifSelf(Predicate[A]): Option[A]
@@ -39,9 +42,12 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 + (A, B).to[C]: (C, C)
 + (A, B).tmap(A => C, B => D): (C, D)
 + (A, B).tap((A => B => Discarded)*): (A, B)
++ (A, B).addTo(Growable[A], Growable[B]): (A, B)
++ (A, B).removeFrom(Shrinkable[A], Shrinkable[B]): (A, B)
 
 + Boolean.asInt: Int
-+ Boolean.either(R).or(L): Either[L, R] -- as in scalaz
++ Boolean.either(R).or(L): Either[L, R]
++ Boolean.option(A): Option[A]
 
 + Option[A].getOrThrow(String): A
 + Option[A].getOrThrow(=> Exception): A
@@ -53,6 +59,10 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 
 + implicit conversion of Either to RightProjection (and back again)
 + Either[L, R].tap(L => Unit, R => Unit): Either[L, R]
++ Either[L, R].tapLeft(L => Unit): Either[L, R]
++ Either[L, R].tapRight(R => Unit): Either[L, R]
++ Either[L, R].addTo(Growable[L], Growable[R]): Either[L, R]
++ Either[L, R].removeFrom(Shrinkable[L], Shrinkable[R]): Either[L, R]
 + Either[L, R].rightOr(L => R): R (aka rescue, aka valueOr)
 + Either[L, R].leftOr(R => L): L
 + Either[L, R].bimap(L => M, R => S): Either[M, S]
@@ -253,6 +263,10 @@ MultiMap[GTL, K, V]
 + threadLocal.create(A): ThreadLocal[A]
 
 + callable.create(=> A): Callable[A]
++ implicit conversion from () => A to Callable[A]
+
++ runnable.create(=> Unit): Runnable
++ implicit conversion from () => Discarded to Runnable
 
 + pimpathon.java.io forwarding package object
 

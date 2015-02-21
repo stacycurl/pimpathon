@@ -5,6 +5,8 @@ import scala.collection.{breakOut, mutable ⇒ M, GenTraversable, GenTraversable
 import scala.collection.generic.CanBuildFrom
 
 import pimpathon.any._
+import pimpathon.boolean._
+import pimpathon.either._
 import pimpathon.function._
 import pimpathon.map._
 import pimpathon.multiMap._
@@ -65,7 +67,7 @@ abstract class genTraversableLike[CC[A]] {
 
   class GenTraversableLikeOfEitherOps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr]) {
     def partitionEithers[That[_]](implicit lcbf: CCBF[L, That], rcbf: CCBF[R, That]): (That[L], That[R]) =
-      (lcbf.apply(), rcbf.apply()).tap(l ⇒ r ⇒ gtl.foreach(_.fold(l += _, r += _))).tmap(_.result(), _.result())
+      (lcbf.apply(), rcbf.apply()).tap(l ⇒ r ⇒ gtl.foreach(_.addTo(l, r))).tmap(_.result(), _.result())
   }
 
   class GenTraversableLikeOfTuple2[K, V, Repr](gtl: GenTraversableLike[(K, V), Repr]) {
@@ -101,8 +103,8 @@ class GenTraversableLikeCapturer[A, F[_, _]](gtl: GenTraversableLike[A, GenTrave
 
   def withUniqueKeys[K](f: A ⇒ K)(implicit cbf: CBF[K, A]): Option[F[K, A]] = {
     gtl.seqFold[(Set[K], M.Builder[(K, A), F[K, A]])](Set.empty[K], cbf()) {
-      case ((ks, builder), a) ⇒ f(a).calc(k ⇒ if (ks.contains(k)) None else Some(ks + k, builder += ((k, a))))
-    }.map(_._2.result())
+      case ((ks, builder), a) ⇒ f(a).calc(k ⇒ (!ks.contains(k)).option(ks + k, builder += ((k, a))))
+    }.map { case (_, builder) ⇒ builder.result() }
   }
 }
 

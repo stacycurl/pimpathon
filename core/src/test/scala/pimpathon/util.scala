@@ -1,6 +1,7 @@
 package pimpathon
 
 import _root_.java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import scala.collection.mutable.ListBuffer
 import scala.collection.{mutable ⇒ M}
 import scala.reflect.ClassManifest
 import scala.util.DynamicVariable
@@ -8,9 +9,10 @@ import scalaz.syntax.std.ToBooleanOps
 import scalaz.std.ListFunctions
 
 import org.junit.Assert._
+import pimpathon.manifest._
 
 
-object util extends ToBooleanOps with ListFunctions {
+object util extends ListFunctions {
   def assertException[E <: Throwable](expectedMessage: String)(f: ⇒ Unit)
     (implicit expected: ClassManifest[E]): Unit = assertEquals(expectedMessage, intercept[E](f).getMessage)
 
@@ -66,8 +68,8 @@ object util extends ToBooleanOps with ListFunctions {
 
   def partial[A, B](entries: (A, B)*): PartialFunction[A, B] = entries.toMap
 
-  def ints    = new M.ListBuffer[Int]
-  def strings = new M.ListBuffer[String]
+  def ints(is: Int*): ListBuffer[Int] = new M.ListBuffer[Int] ++= is
+  def strings(ss: String*): ListBuffer[String] = new M.ListBuffer[String] ++= ss
 
   private val dynamicTime = new DynamicVariable[Long](0)
 }

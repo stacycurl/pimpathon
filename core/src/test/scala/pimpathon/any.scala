@@ -4,6 +4,7 @@ import org.junit.Test
 
 import org.junit.Assert._
 import pimpathon.any._
+import pimpathon.boolean._
 import pimpathon.builder._
 import pimpathon.util._
 
@@ -19,6 +20,11 @@ class AnyTest {
     List(2, 3, 4).map(_.calcIf(_ % 2 == 0)(_ + 3))
   )
 
+  @Test def calcUnless(): Unit = assertEquals(
+    List(Some(5), None, Some(7)),
+    List(2, 3, 4).map(_.calcUnless(_ % 2 != 0)(_ + 3))
+  )
+
   @Test def calcPF(): Unit = assertEquals(
     List(None, Some("two"), None, Some("four")),
     List(1, 2, 3, 4).map(_.calcPF(util.partial(2 → "two", 4 → "four")))
@@ -29,20 +35,20 @@ class AnyTest {
     List(1, 2, 3, 4).map(_.transform(util.partial(2 → 4, 4 → 8)))
   )
 
-  @Test def tap(): Unit            = assertEquals(List(1, 1), ints.run(is ⇒ 1.tap(is += _, is += _)))
-  @Test def update(): Unit         = assertEquals(List(1, 1), ints.run(is ⇒ 1.update(is += _, is += _)))
-  @Test def withSideEffect(): Unit = assertEquals(List(1, 1), ints.run(is ⇒ 1.withSideEffect(is += _, is += _)))
+  @Test def tap(): Unit            = assertEquals(List(1, 1), ints().run(is ⇒ 1.tap(is += _, is += _)))
+  @Test def update(): Unit         = assertEquals(List(1, 1), ints().run(is ⇒ 1.update(is += _, is += _)))
+  @Test def withSideEffect(): Unit = assertEquals(List(1, 1), ints().run(is ⇒ 1.withSideEffect(is += _, is += _)))
 
   @Test def tapIf(): Unit = assertEquals(
-    List(1, 3), ints.tap(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapIf(_ % 2 != 0)(is += _)))
+    List(1, 3), ints().tap(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapIf(_ % 2 != 0)(is += _)))
   )
 
   @Test def tapUnless(): Unit = assertEquals(
-    List(2), ints.run(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapUnless(_ % 2 != 0)(is += _)))
+    List(2), ints().run(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapUnless(_ % 2 != 0)(is += _)))
   )
 
   @Test def tapPF(): Unit = assertEquals(
-    List(1, 3), ints.tap(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapPF { case j if j % 2 != 0 ⇒ is += j }))
+    List(1, 3), ints().tap(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapPF { case j if j % 2 != 0 ⇒ is += j }))
   )
 
   @Test def cond(): Unit = assertEquals(
@@ -120,8 +126,14 @@ class AnyTest {
   }
 
   @Test def withFinally(): Unit = assertEquals(
-    List("body: input", "finally: input", "done"), strings.run(ss ⇒ {
+    List("body: input", "finally: input", "done"), strings().run(ss ⇒ {
       ss += "input".withFinally(s ⇒ ss += "finally: " + s)(s ⇒ {ss += "body: " + s; "done"})
+    })
+  )
+
+  @Test def tryFinally(): Unit = assertEquals(
+    List("body: input", "finally: input", "done"), strings().run(ss ⇒ {
+      ss += "input".tryFinally(s ⇒ {ss += "body: " + s; "done"})(s ⇒ ss += "finally: " + s)
     })
   )
 
@@ -130,9 +142,10 @@ class AnyTest {
     assertEquals(Left(boom), 1.attempt(_ ⇒ throw boom))
   }
 
-  @Test def addTo(): Unit = assertEquals(List(1), ints.run(is ⇒ 1.addTo(is)))
+  @Test def addTo(): Unit      = assertEquals(List(1), ints().run(is ⇒ 1.addTo(is)))
+  @Test def removeFrom(): Unit = assertEquals(Nil,     ints(1).tap(is ⇒ 1.removeFrom(is)).toList)
 
   @Test def unfold(): Unit = assertEquals(
-    List('f', 'o', 'o'), "foo".unfold(s ⇒ if (s.nonEmpty) Some(s.head, s.tail) else None).toList
+    List('f', 'o', 'o'), "foo".unfold(s ⇒ s.nonEmpty.option(s.head, s.tail)).toList
   )
 }

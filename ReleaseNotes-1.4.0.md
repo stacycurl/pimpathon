@@ -13,8 +13,11 @@
 
 ### Additions
 + frills sub-project
++ [A].addTo(Growable[A]): A
 + [A].calcIf(Predicate[A])(A => B): Option[B]
++ [A].calcUnless(Predicate[A])(A => B): Option[B]
 + [A].calcPF(PartialFunction[A, B]): Option[B]
++ [A].tryFinally(A => B)(A => Unit): B
 + [A].passes.one(Predicate[A]*): Option[A]
 + [A].passes.all(Predicate[A]*): Option[A]
 + [A].passes.none(Predicate[A]*): Option[A]
@@ -23,13 +26,21 @@
 + [A].fails.all(Predicate[A]*): Option[A]
 + [A].fails.none(Predicate[A]*): Option[A]
 + [A].fails.some(Predicate[A]*): Option[A]
++ [A].removeFrom(Shrinkable[A]): A
 + (A, B).calcC(A => B => C): C
 + (A, B).tap((A => B => Discarded)*): (A, B)
++ (A, B).addTo(Growable[A], Growable[B]): (A, B)
++ (A, B).removeFrom(Shrinkable[A], Shrinkable[B]): (A, B)
++ Boolean.option(A): Option[A]
 + Option[A].toSuccessNel(E): ValidationNel[E, A]
 + Option[A].tap(none: => Unit, some: A => Unit): Option[A]
 + Option[A].tapNone(=> Unit): Option[A]
 + Option[A].tapSome(A => Unit): Option[A]
 + Option[A].invert(A): Option[A]
++ Either[L, R].addTo(Growable[L], Growable[R]): Either[L, R]
++ Either[L, R].removeFrom(Shrinkable[L], Shrinkable[R]): Either[L, R]
++ Either[L, R].tapLeft(L => Unit): Either[L, R]
++ Either[L, R].tapRight(R => Unit): Either[L, R]
 + GTL[A].seqFold(B)((B, A) => Option[B]): Option[B]
 + GTL[A].seqMap[To](A => Option[B]): Option[To]
 + GTL[A].asMap.withUniqueKeys(A => K): Option[Map[K, A]]
@@ -65,7 +76,10 @@
 + pimpathon.java.io forwarding package object
 + InputStream.gunzip: GZIPInputStream
 + OutputStream.gzip: GZIPOutputStream
++ implicit conversion from () => A to Callable[A]
 + callable.create(=> A): Callable[A]
++ implicit conversion from () => Discarded to Runnable
++ runnable.create(=> Unit): Runnable
 + classTag.className[A]: String
 + classTag.simpleClassName[A]: String
 + classTag.klassOf[A]: String

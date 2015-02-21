@@ -1,5 +1,7 @@
 package pimpathon
 
+import scala.collection.generic.{Growable, Shrinkable}
+
 import pimpathon.function._
 
 
@@ -24,6 +26,11 @@ object either {
     def leftFlatMap(f: L ⇒ Either[L, R]): Either[L, R]  = either.fold(f, Right(_))
     def rightFlatMap(f: R ⇒ Either[L, R]): Either[L, R] = either.fold(Left(_), f)
 
+    def addTo(ls: Growable[L], rs: Growable[R]): Either[L, R] = tap(ls += _, rs += _)
+    def removeFrom(ls: Shrinkable[L], rs: Shrinkable[R]): Either[L, R] = tap(ls -= _, rs -= _)
+
+    def tapLeft(l: L ⇒ Unit):  Either[L, R] = tap(l, _ ⇒ {})
+    def tapRight(r: R ⇒ Unit): Either[L, R] = tap(_ ⇒ {}, r)
     def tap(l: L ⇒ Unit, r: R ⇒ Unit): Either[L, R] = { either.fold(l, r); either }
   }
 

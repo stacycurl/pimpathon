@@ -26,6 +26,7 @@
 + [A].fails.all(Predicate[A]*): Option[A]
 + [A].fails.none(Predicate[A]*): Option[A]
 + [A].fails.some(Predicate[A]*): Option[A]
++ [A].removeFrom(Shrinkable[A]): A
 + (A, B).calcC(A => B => C): C
 + (A, B).tap((A => B => Discarded)*): (A, B)
 + (A, B).addTo(Growable[A], Growable[B]): (A, B)

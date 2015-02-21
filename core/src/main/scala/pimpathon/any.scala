@@ -1,6 +1,6 @@
 package pimpathon
 
-import scala.collection.generic.Growable
+import scala.collection.generic.{Shrinkable, Growable}
 import scala.util.Try
 
 import pimpathon.function._
@@ -42,6 +42,7 @@ object any {
     def cond[B](p: Predicate[A], ifTrue: A ⇒ B, ifFalse: A ⇒ B): B = if (p(a)) ifTrue(a) else ifFalse(a)
 
     def addTo(as: Growable[A]): A = tap(as += _)
+    def removeFrom(as: Shrinkable[A]): A = tap(as -= _)
 
     def unfold[B](f: A ⇒ Option[(B, A)]): Stream[B] =
       f(a).fold(Stream.empty[B])(ba ⇒ Stream.cons(ba._1, ba._2.unfold(f)))

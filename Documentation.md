@@ -19,6 +19,7 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 + [A].withFinally(A => Unit)(A => B): B
 + [A].tryFinally(A => B)(A => Unit): B
 + [A].addTo(Growable[A]): A
++ [A].removeFrom(Shrinkable[A]): A
 + [A].filterSelf(Predicate[A]): Option[A]
 + [A].filterNotSelf(Predicate[A]): Option[A]
 + [A].ifSelf(Predicate[A]): Option[A]

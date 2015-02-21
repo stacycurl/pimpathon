@@ -2,6 +2,7 @@ package pimpathon
 
 import org.junit.Test
 import scala.util.{Failure, Success}
+import scala.collection.{mutable ⇒ M}
 
 import org.junit.Assert._
 import pimpathon.any._
@@ -142,7 +143,8 @@ class AnyTest {
     List(1.attempt(_ * 2), 1.attempt(_ ⇒ throw boom))
   )
 
-  @Test def addTo(): Unit = assertEquals(List(1), ints.run(is ⇒ 1.addTo(is)))
+  @Test def addTo(): Unit      = assertEquals(List(1), ints.run(is ⇒ 1.addTo(is)))
+  @Test def removeFrom(): Unit = assertEquals(Nil, M.ListBuffer(1).tap(is ⇒ 1.removeFrom(is)).toList)
 
   @Test def unfold(): Unit = assertEquals(
     List('f', 'o', 'o'), "foo".unfold(s ⇒ if (s.nonEmpty) Some(s.head, s.tail) else None).toList

@@ -1,4 +1,4 @@
-## Release Notes 1.4.0-Snapshot
+## Release Notes 1.4.0
 
 ### Breaking changes & bug fixes
 + File.write        overwrites by default (i.e. append = false, was true before)

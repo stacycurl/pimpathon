@@ -2,10 +2,10 @@ package pimpathon
 
 import org.junit.Test
 import scala.util.{Failure, Success}
-import scala.collection.{mutable ⇒ M}
 
 import org.junit.Assert._
 import pimpathon.any._
+import pimpathon.boolean._
 import pimpathon.builder._
 import pimpathon.util._
 
@@ -147,6 +147,6 @@ class AnyTest {
   @Test def removeFrom(): Unit = assertEquals(Nil,     ints(1).tap(is ⇒ 1.removeFrom(is)).toList)
 
   @Test def unfold(): Unit = assertEquals(
-    List('f', 'o', 'o'), "foo".unfold(s ⇒ if (s.nonEmpty) Some(s.head, s.tail) else None).toList
+    List('f', 'o', 'o'), "foo".unfold(s ⇒ s.nonEmpty.option(s.head, s.tail)).toList
   )
 }

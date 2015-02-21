@@ -6,6 +6,7 @@ import scala.collection.{breakOut, mutable ⇒ M, GenTraversable}
 import scala.collection.generic.CanBuildFrom
 
 import pimpathon.any._
+import pimpathon.boolean._
 import pimpathon.builder._
 import pimpathon.function._
 import pimpathon.map._
@@ -33,7 +34,7 @@ object multiMap {
     def pop(key: K)(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValue(key, crf.pop)
 
     def onlyOption(implicit gtl: F[V] <:< GenTraversable[V], crf: CanRebuildFrom[F, V]): Option[Map[K, V]] =
-      headTailOption.flatMap(_.calcC(head ⇒ tail ⇒ if (tail.isEmpty) Some(head) else None))
+      headTailOption.flatMap(_.calcC(head ⇒ tail ⇒ tail.isEmpty.option(head)))
 
     def sequence(implicit bf: CCBF[Map[K, V], F], gtl: F[V] <:< GenTraversable[V],
       crf: CanRebuildFrom[F, V], crsm: CanRebuildFrom[F, Map[K, V]]

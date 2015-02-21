@@ -10,9 +10,10 @@ import scalaz.std.ListFunctions
 
 import org.junit.Assert._
 
+import pimpathon.classTag._
 
 
-object util extends ToBooleanOps with ListFunctions {
+object util extends ListFunctions {
   def assertException[E <: Throwable](expectedMessage: String)(f: ⇒ Unit)
     (implicit expected: ClassTag[E]): Unit = assertEquals(expectedMessage, intercept[E](f).getMessage)
 

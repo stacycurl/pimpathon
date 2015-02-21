@@ -31,6 +31,7 @@
 + (A, B).tap((A => B => Discarded)*): (A, B)
 + (A, B).addTo(Growable[A], Growable[B]): (A, B)
 + (A, B).removeFrom(Shrinkable[A], Shrinkable[B]): (A, B)
++ Boolean.option(A): Option[A]
 + Option[A].toSuccessNel(E): ValidationNel[E, A]
 + Option[A].tap(none: => Unit, some: A => Unit): Option[A]
 + Option[A].tapNone(=> Unit): Option[A]

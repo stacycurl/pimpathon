@@ -3,6 +3,7 @@ package pimpathon
 import scala.collection.generic.{Growable, Shrinkable}
 import scala.util.Try
 
+import pimpathon.boolean._
 import pimpathon.function._
 
 
@@ -10,8 +11,8 @@ object any {
   implicit class AnyOps[A](val a: A) extends AnyVal {
     def calc[B](f: A ⇒ B): B = f(a)
     def |>[B](f: A ⇒ B): B = f(a)
-    def calcIf[B](p: Predicate[A])(f: A ⇒ B): Option[B] = if (p(a)) Some(f(a)) else None
-    def calcUnless[B](p: Predicate[A])(f: A ⇒ B): Option[B] = if (p(a)) None else Some(f(a))
+    def calcIf[B](p: Predicate[A])(f: A ⇒ B): Option[B] = p(a).option(f(a))
+    def calcUnless[B](p: Predicate[A])(f: A ⇒ B): Option[B] = (!p(a)).option(f(a))
     def calcPF[B](pf: PartialFunction[A, B]): Option[B] = pf.lift(a)
     def transform(pf: PartialFunction[A, A]): A = pf.unify(a)
 
@@ -27,14 +28,14 @@ object any {
     def lpair[B](f: A ⇒ B): (B, A) = (f(a), a)
     def rpair[B](f: A ⇒ B): (A, B) = (a, f(a))
 
-    def filterSelf(p: Predicate[A]): Option[A] = if (p(a)) Some(a) else None
-    def ifSelf(p: Predicate[A]): Option[A] = if (p(a)) Some(a) else None
+    def filterSelf(p: Predicate[A]): Option[A] = p(a).option(a)
+    def ifSelf(p: Predicate[A]): Option[A] = p(a).option(a)
 
-    def filterNotSelf(p: Predicate[A]): Option[A] = if (p(a)) None else Some(a)
-    def unlessSelf(p: Predicate[A]): Option[A] = if (p(a)) None else Some(a)
+    def filterNotSelf(p: Predicate[A]): Option[A] = (!p(a)).option(a)
+    def unlessSelf(p: Predicate[A]): Option[A] = (!p(a)).option(a)
 
-    def passes: AnyCapturer[A] = new AnyCapturer[A](a, b ⇒ if (b) Some(a) else None)
-    def fails: AnyCapturer[A]  = new AnyCapturer[A](a, b ⇒ if (b) None else Some(a))
+    def passes: AnyCapturer[A] = new AnyCapturer[A](a, b ⇒ b.option(a))
+    def fails: AnyCapturer[A]  = new AnyCapturer[A](a, b ⇒ (!b).option(a))
 
     def withFinally[B](f: A ⇒ Unit)(t: A ⇒ B): B = try t(a) finally f(a)
     def tryFinally[B](t: A ⇒ B)(f: A ⇒ Unit): B = try t(a) finally f(a)

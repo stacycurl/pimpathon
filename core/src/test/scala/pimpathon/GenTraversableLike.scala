@@ -4,6 +4,7 @@ import org.junit.Test
 import scala.collection.immutable.SortedMap
 
 import org.junit.Assert._
+import pimpathon.boolean._
 import pimpathon.genTraversableLike._
 import pimpathon.multiMap._
 import pimpathon.util._

@@ -46,7 +46,8 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 + (A, B).removeFrom(Shrinkable[A], Shrinkable[B]): (A, B)
 
 + Boolean.asInt: Int
-+ Boolean.either(R).or(L): Either[L, R] -- as in scalaz
++ Boolean.either(R).or(L): Either[L, R]
++ Boolean.option(A): Option[A]
 
 + Option[A].getOrThrow(String): A
 + Option[A].getOrThrow(=> Exception): A

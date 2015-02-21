@@ -7,6 +7,7 @@ import scala.collection.{breakOut, mutable ⇒ M, GenTraversable, GenTraversable
 import scala.collection.generic.CanBuildFrom
 
 import pimpathon.any._
+import pimpathon.boolean._
 import pimpathon.either._
 import pimpathon.function._
 import pimpathon.map._
@@ -104,8 +105,8 @@ class GenTraversableLikeCapturer[A, F[_, _]](gtl: GenTraversableLike[A, GenTrave
 
   def withUniqueKeys[K](f: A ⇒ K)(implicit cbf: CBF[K, A]): Option[F[K, A]] = {
     gtl.seqFold[(Set[K], M.Builder[(K, A), F[K, A]])](Set.empty[K], cbf()) {
-      case ((ks, builder), a) ⇒ f(a).calc(k ⇒ if (ks.contains(k)) None else Some(ks + k, builder += ((k, a))))
-    }.map(_._2.result())
+      case ((ks, builder), a) ⇒ f(a).calc(k ⇒ (!ks.contains(k)).option(ks + k, builder += ((k, a))))
+    }.map { case (_, builder) ⇒ builder.result() }
   }
 }
 

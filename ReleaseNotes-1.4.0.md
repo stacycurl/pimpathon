@@ -71,6 +71,7 @@
 + pimpathon.java.io forwarding package object
 + InputStream.gunzip: GZIPInputStream
 + OutputStream.gzip: GZIPOutputStream
++ implicit conversion from () => A to Callable[A]
 + callable.create(=> A): Callable[A]
 + runnable.create(=> Unit): Runnable
 + classTag.className[A]: String

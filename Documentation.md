@@ -258,6 +258,7 @@ MultiMap[GTL, K, V]
 + threadLocal.create(A): ThreadLocal[A]
 
 + callable.create(=> A): Callable[A]
++ implicit conversion from () => A to Callable[A]
 
 + runnable.create(=> Unit): Runnable
 

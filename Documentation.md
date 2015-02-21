@@ -261,6 +261,7 @@ MultiMap[GTL, K, V]
 + implicit conversion from () => A to Callable[A]
 
 + runnable.create(=> Unit): Runnable
++ implicit conversion from () => Discarded to Runnable
 
 + pimpathon.java.io forwarding package object
 

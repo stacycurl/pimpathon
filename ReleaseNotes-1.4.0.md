@@ -73,6 +73,7 @@
 + OutputStream.gzip: GZIPOutputStream
 + implicit conversion from () => A to Callable[A]
 + callable.create(=> A): Callable[A]
++ implicit conversion from () => Discarded to Runnable
 + runnable.create(=> Unit): Runnable
 + classTag.className[A]: String
 + classTag.simpleClassName[A]: String

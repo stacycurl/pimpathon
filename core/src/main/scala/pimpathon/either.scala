@@ -1,6 +1,6 @@
 package pimpathon
 
-import scala.collection.generic.Growable
+import scala.collection.generic.{Shrinkable, Growable}
 import scala.language.implicitConversions
 
 import scala.util.{Failure, Success, Try}
@@ -28,6 +28,7 @@ object either {
     def rightFlatMap(f: R ⇒ Either[L, R]): Either[L, R] = either.fold(Left(_), f)
 
     def addTo(ls: Growable[L], rs: Growable[R]): Either[L, R] = tap(ls += _, rs += _)
+    def removeFrom(ls: Shrinkable[L], rs: Shrinkable[R]): Either[L, R] = tap(ls -= _, rs -= _)
 
     def tapLeft(l: L ⇒ Unit):  Either[L, R] = tap(l, _ ⇒ {})
     def tapRight(r: R ⇒ Unit): Either[L, R] = tap(_ ⇒ {}, r)

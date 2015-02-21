@@ -60,6 +60,7 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 + Either[L, R].tapLeft(L => Unit): Either[L, R]
 + Either[L, R].tapRight(R => Unit): Either[L, R]
 + Either[L, R].addTo(Growable[L], Growable[R]): Either[L, R]
++ Either[L, R].removeFrom(Shrinkable[L], Shrinkable[R]): Either[L, R]
 + Either[L, R].rightOr(L => R): R (aka rescue, aka valueOr)
 + Either[L, R].leftOr(R => L): L
 + Either[L, R].bimap(L => M, R => S): Either[M, S]

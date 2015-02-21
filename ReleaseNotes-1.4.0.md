@@ -36,6 +36,7 @@
 + Option[A].tapSome(A => Unit): Option[A]
 + Option[A].invert(A): Option[A]
 + Either[L, R].addTo(Growable[L], Growable[R]): Either[L, R]
++ Either[L, R].removeFrom(Shrinkable[L], Shrinkable[R]): Either[L, R]
 + Either[L, R].tapLeft(L => Unit): Either[L, R]
 + Either[L, R].tapRight(R => Unit): Either[L, R]
 + GTL[A].seqFold(B)((B, A) => Option[B]): Option[B]

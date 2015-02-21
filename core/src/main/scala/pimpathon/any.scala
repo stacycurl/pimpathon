@@ -37,6 +37,7 @@ object any {
     def fails: AnyCapturer[A]  = new AnyCapturer[A](a, b ⇒ if (b) None else Some(a))
 
     def withFinally[B](f: A ⇒ Unit)(t: A ⇒ B): B = try t(a) finally f(a)
+    def tryFinally[B](t: A ⇒ B)(f: A ⇒ Unit): B = try t(a) finally f(a)
 
     def cond[B](p: Predicate[A], ifTrue: A ⇒ B, ifFalse: A ⇒ B): B = if (p(a)) ifTrue(a) else ifFalse(a)
 

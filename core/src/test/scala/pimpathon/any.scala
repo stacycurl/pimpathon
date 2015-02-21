@@ -131,6 +131,12 @@ class AnyTest {
     })
   )
 
+  @Test def tryFinally(): Unit = assertEquals(
+    List("body: input", "finally: input", "done"), strings.run(ss ⇒ {
+      ss += "input".tryFinally(s ⇒ {ss += "body: " + s; "done"})(s ⇒ ss += "finally: " + s)
+    })
+  )
+
   @Test def attempt(): Unit = assertEquals(
     List(Success(2), Failure(boom)),
     List(1.attempt(_ * 2), 1.attempt(_ ⇒ throw boom))

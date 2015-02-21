@@ -24,17 +24,28 @@ resolvers ++= Seq(
 
 ### pimpathon-core
 
+The pimps in core depend only on the core scala & java libraries. You can use it by including the following:
+
 Builds are available for Scala 2.9.2, 2.9.3, 2.10.4 & 2.11.2
 
 ```scala
-libraryDependencies ++= Seq(
-  "com.github.stacycurl" %% "pimpathon-core" % "1.3.0"
-)
+libraryDependencies += "com.github.stacycurl" %% "pimpathon-core" % "1.4.0"
 ```
+
+### pimpathon-frills
+
+The aim of frills is to pimp everything else. You can use it by including the following:
+
+```scala
+libraryDependencies += "com.github.stacycurl" %% "pimpathon-frills" % "1.4.0" intransitive()
+```
+
+'intransitive' means that frills won't force you to depend on everything that's pimped, you'll only get pimps for types in libraries you already depend on.
 
 [Documentation][doc]
 
-Release notes [1.3.0][r1.3.0], [1.2.0][r1.2.0], [1.1.0][r1.1.0], [1.0.0][r1.0.0]
+Release notes: [1.4.0][r1.4.0] [1.3.0][r1.3.0], [1.2.0][r1.2.0], [1.1.0][r1.1.0], [1.0.0][r1.0.0]
+Next release: [1.5.0[r.1.5.0]
 
 ### Contributors
 
@@ -50,4 +61,5 @@ Release notes [1.3.0][r1.3.0], [1.2.0][r1.2.0], [1.1.0][r1.1.0], [1.0.0][r1.0.0]
 [r1.2.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.2.0.md
 [r1.3.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.3.0.md
 [r1.4.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.4.0.md
+[r1.5.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.5.0.md
 [doc]: https://github.com/stacycurl/pimpathon/blob/master/Documentation.md

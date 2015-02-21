@@ -1,6 +1,6 @@
 ## Core
 
-The pimp in core depend only on the core scala & java libraries. You can use it by including the following:
+The pimps in core depend only on the core scala & java libraries. You can use it by including the following:
 
 ```libraryDependencies += "com.github.stacycurl" %% "pimpathon-core" % "1.3.0"```
 
@@ -108,7 +108,6 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 + List[A].tap(empty: => Unit, nonEmpty: List[A] => Unit): List[A]
 + List[List[A]].cartesianProduct: List[List[A]]
 
-
 + GTL[A].collectAttributeCounts(PartialFunction[A, B]): Map[B, Int]
 + GTL[A].optAttributeCounts(A => Option[B]): Map[B, Int]
 + GTL[A].attributeCounts(A => B): Map[B, Int]
@@ -124,7 +123,6 @@ The pimp in core depend only on the core scala & java libraries. You can use it 
 + GTL[A].asMap.withEntries(A => (K, V)): Map[K, V]
 + GTL[V].asMultiMap.withKeys(V => K): MultiMap[GTL, K, V]
 + GTL[V].asMultiMap.withSomeKeys(V => Option[K]): MultiMap[GTL, K, V]
-MultiMap[GTL, K, V]
 + GTL[V].asMultiMap.withManyKeys(V => List[K]): MultiMap[GTL, K, V]
 + GTL[A].asMultiMap.withUniqueKeys(A => K): Option[MultiMap[GTL, K, A]]
 + GTL[V].asMultiMap.withPFKeys(PartialFunction[V, K]): MultiMap[GTL, K, V]
@@ -134,7 +132,7 @@ MultiMap[GTL, K, V]
 + GTL[K].asMultiMap.withConstValue[V]: MultiMap[GTL, K, V]
 + GTL[K].as[F[_. _]].with\*(K => V): F[K, V]
 + GTL[A].ungroupBy(A => B): GTL[GTL[A]]
-+ GTL[A].partitionByPF(PartialFunction[A, B]): (GTL[A], GTL[B]) -- wrong ?
++ GTL[A].partitionByPF(PartialFunction[A, B]): (GTL[A], GTL[B])
 + GTL[A].seqFold(B)((B, A) => Option[B]): Option[B]
 + GTL[A].seqMap[To](A => Option[B]): Option[To]
 + GTL[(K, V)].toMultiMap[F[_]]: MultiMap[F, K, V]
@@ -153,7 +151,6 @@ MultiMap[GTL, K, V]
 + Array[Byte].toHex(Int): String
 + Array[Byte].copyUpToN(Long, InputStream, OutputStream): Int
 + Array[Byte].readUpToN(Long, InputStream): Int
-
 
 + Map[K, V].getOrThrow(K, String): V
 + Map[K, V].getOrThrow(K, => Exception): V
@@ -277,7 +274,7 @@ MultiMap[GTL, K, V]
 + InputStream.drain(OutputStream, closeIn?, closeOut): InputStream
 + InputStream.>>(OutputStream): InputStream
 + InputStream.buffered: BufferedInputStream
-+ InputStreamUtils.copy(InputStream, OutputStream, closeIn?, closeOut?): Unit -- no longer has an Array[Byte] buffer parameter, instead the InputStreamUtils constructor has a bufferSize parameter.
++ InputStreamUtils.copy(InputStream, OutputStream, closeIn?, closeOut?): Unit
 + InputStream.readN(OutputStream, Long): InputStream
 + InputStream.readUpToN(OutputStream, Long): Long
 + InputStream.gunzip: GZIPInputStream
@@ -351,7 +348,7 @@ MultiMap[GTL, K, V]
 
 ## Frills
 
-The aim of frills is to pimp everything else. You can use it (when it has been published) by including the following:
+The aim of frills is to pimp everything else. You can use it by including the following:
 
 ```libraryDependencies += "com.github.stacycurl" %% "pimpathon-frills" % "1.4.0" intransitive()```
 

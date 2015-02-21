@@ -1,6 +1,6 @@
 package pimpathon
 
-import scala.collection.generic.{Shrinkable, Growable}
+import scala.collection.generic.{Growable, Shrinkable}
 import scala.util.Try
 
 import pimpathon.function._

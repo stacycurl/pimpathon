@@ -158,18 +158,18 @@ class ListTest {
   }
 
   @Test def tap(): Unit = {
-    assertEquals(List("empty"),     strings.run(ss ⇒ nil[Int].tap(ss += "empty", _ ⇒ ss += "non-empty")))
-    assertEquals(List("non-empty"), strings.run(ss ⇒  List(1).tap(ss += "empty", _ ⇒ ss += "non-empty")))
+    assertEquals(List("empty"),     strings().run(ss ⇒ nil[Int].tap(ss += "empty", _ ⇒ ss += "non-empty")))
+    assertEquals(List("non-empty"), strings().run(ss ⇒  List(1).tap(ss += "empty", _ ⇒ ss += "non-empty")))
   }
 
   @Test def tapEmpty(): Unit = {
-    assertEquals(List("empty"), strings.run(ss ⇒ nil[Int].tapEmpty(ss += "empty")))
-    assertEquals(Nil,           strings.run(ss ⇒  List(1).tapEmpty(ss += "empty")))
+    assertEquals(List("empty"), strings().run(ss ⇒ nil[Int].tapEmpty(ss += "empty")))
+    assertEquals(Nil,           strings().run(ss ⇒  List(1).tapEmpty(ss += "empty")))
   }
 
   @Test def tapNonEmpty(): Unit = {
-    assertEquals(Nil,               strings.run(ss ⇒ nil[Int].tapNonEmpty(_ ⇒ ss += "non-empty")))
-    assertEquals(List("non-empty"), strings.run(ss ⇒  List(1).tapNonEmpty(_ ⇒ ss += "non-empty")))
+    assertEquals(Nil,               strings().run(ss ⇒ nil[Int].tapNonEmpty(_ ⇒ ss += "non-empty")))
+    assertEquals(List("non-empty"), strings().run(ss ⇒  List(1).tapNonEmpty(_ ⇒ ss += "non-empty")))
   }
 
   @Test def amass(): Unit = assertEquals(

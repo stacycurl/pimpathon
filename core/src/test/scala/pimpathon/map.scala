@@ -118,7 +118,7 @@ class MapTest {
   }
 
   @Test def mapKeysEagerly(): Unit = {
-    val originalKeysSeen = ints
+    val originalKeysSeen = ints()
     def update(v: Int) = { originalKeysSeen += v; v * 10 }
 
     val result = Map(1 → 1, 2 → 2).mapKeysEagerly(update)
@@ -129,7 +129,7 @@ class MapTest {
   }
 
   @Test def mapValuesEagerly(): Unit = {
-    val originalValuesSeen = ints
+    val originalValuesSeen = ints()
     def update(v: Int) = { originalValuesSeen += v; v * 10 }
 
     val result = Map(1 → 1, 2 → 2).mapValuesEagerly(update)

@@ -1,9 +1,9 @@
 package pimpathon
 
-import scala.collection.generic.{Shrinkable, Growable}
 import scala.language.implicitConversions
 
 import scala.util.{Failure, Success, Try}
+import scala.collection.generic.{Growable, Shrinkable}
 
 import pimpathon.function._
 

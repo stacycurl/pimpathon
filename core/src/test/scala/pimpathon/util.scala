@@ -1,6 +1,7 @@
 package pimpathon
 
 import _root_.java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import scala.collection.mutable.ListBuffer
 import scala.collection.{mutable ⇒ M}
 import scala.reflect.ClassTag
 import scala.util.{DynamicVariable, Try}
@@ -65,8 +66,8 @@ object util extends ToBooleanOps with ListFunctions {
 
   def partial[A, B](entries: (A, B)*): PartialFunction[A, B] = entries.toMap
 
-  def ints    = new M.ListBuffer[Int]
-  def strings = new M.ListBuffer[String]
+  def ints(is: Int*): ListBuffer[Int] = new M.ListBuffer[Int] ++= is
+  def strings(ss: String*): ListBuffer[String] = new M.ListBuffer[String] ++= ss
 
   private val dynamicTime = new DynamicVariable[Long](0)
 }

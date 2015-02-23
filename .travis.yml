@@ -24,9 +24,13 @@ after_success:
 #- sbt ++$TRAVIS_SCALA_VERSION scalastyleGenerateConfig scalastyle
 - sbt ++$TRAVIS_SCALA_VERSION clean coveralls
 
+before_script: ./project/bintray.sh
+
 env:
   global:
   # travis encrypt -r stacycurl/pimpathon SONATYPE_USERNAME=<USERNAME>
   - secure: "GtMoVDw4EdbHc1TKyinx4BbtvtiyZWp0DS5fi6tUNzrqajihpj0d6sxPLMupYyKJnQtBZBpLmxtrfRmyeIyuS3Oz1OkapHy06grLJl4Eb1fHmi5OwcDY/Q96E2mFdR2a4NH0WZ596gxUvmT26DXVsDyvbJFhgCGqhYDV8BKD9l8="
   # travis encrypt -r stacycurl/pimpathon SONATYPE_PASSWORD=<PASSWORD>
   - secure: "OaekiCfTPKOCzTvxj9dbKDelmwIScYmuATNZ+2qJ/ilJTkBvsPdJJFoeMpDDC6/Z+43UZfVreU23Gkh8NidLaGO9KbqmD8si64nPrO8UVyUv9vn36tviseDAN8HAzxM8Mt9YC+sx5Z5v1ZhYLmXg6c1PoQgWrURG2uNsZe+BGJw="
+  # travis encrypt -r stacycurl/pimpathon BINTRAY_API_KEY=<BINTRAY_API_KEY>
+  - secure: "DJgJAni45R4OajAkcVN7dz0DCLCseT6iKnrQiYym3csRAmQ9i/A0zXeM7EcJeESQZMXN3ZuQPxhB8Vy3qHdPaKGuw9M0zmPCZJxpxYDMtNyQmiw+ThQAEJxK/TseTGcON9Zty8CMc76ycBVn/daZXHfO2AyFH/Y5W9KIMp6B6p8="

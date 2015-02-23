@@ -9,26 +9,25 @@ import scoverage.ScoverageSbtPlugin.ScoverageKeys._
 
 
 object PimpathonBuild extends Build {
-  lazy val pimpathon = Project(
-    id = "pimpathon-parent",
-    base = file("."),
-    settings = commonSettings,
-    aggregate = Seq(pimpathonCore, pimpathonFrills)
+  lazy val pimpathon = (project in file(".")
+    aggregate(core, frills)
+    settings(commonSettings: _*)
+    settings(publish := (), publishLocal := ())
   )
 
-  lazy val pimpathonCore = Project(
-    id = "pimpathon-core",
-    base = file("core"),
-    settings = commonSettings ++ Publishing.settings
+  lazy val core = (project in file("core")
+    settings(commonSettings: _*)
+    settings(Publishing.settings: _*)
   )
 
-  lazy val pimpathonFrills = Project(
-    id = "pimpathon-frills",
-    base = file("frills"),
-    dependencies = Seq(pimpathonCore),
-    settings = commonSettings ++ Publishing.settings ++ Seq(
-      libraryDependencies += "io.argonaut" %% "argonaut" % "6.1-M4" % "provided"
-    )
+  lazy val frills = (project in file("frills")
+    dependsOn core
+    settings(commonSettings: _*)
+    settings(Publishing.settings: _*)
+    settings(libraryDependencies ++= Seq(
+      "io.argonaut" %% "argonaut"    % "6.1-M4" % "provided",
+      "org.scalaz"  %% "scalaz-core" % "7.1.0"  % "provided"
+    ))
   )
 
   lazy val runAll = TaskKey[Unit]("run-all")

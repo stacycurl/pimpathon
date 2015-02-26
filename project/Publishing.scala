@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import bintray.Plugin.bintrayPublishSettings
+import scala.util.Properties
 
+import bintray.Keys._
 import sbt._
 import Keys._
 
@@ -75,13 +78,25 @@ abstract class Sonatype(build: Build) {
     </developers>
   }
 
-  def settings: Seq[Setting[_]] = Seq(
-    credentialsSetting,
+  // travis ⇒ bintray, local ⇒ sonatype
+  def settings: Seq[Setting[_]] = commonSettings ++ (Properties.envOrNone("BINTRAY_API_KEY") match {
+    case Some(apiKey) ⇒ bintrayPublishSettings ++ Seq(
+      repository in bintray := "repo",
+      bintrayOrganization in bintray := None
+    )
+    case None ⇒ Seq(
+      credentialsSetting,
+      publishTo <<= version((v: String) ⇒ Some(if (v.trim endsWith "SNAPSHOT") ossSnapshots else ossStaging)),
+      pomIncludeRepository := (_ ⇒ false),
+      pomExtra <<= scalaVersion(generatePomExtra)
+    )
+  })
+
+  private def commonSettings: Seq[Setting[_]] = Seq(
+    moduleName <<= name("pimpathon-" + _),
     publishMavenStyle := true,
-    publishTo <<= version((v: String) ⇒ Some( if (v.trim endsWith "SNAPSHOT") ossSnapshots else ossStaging)),
     publishArtifact in Test := false,
-    pomIncludeRepository := (_ ⇒ false),
-    pomExtra <<= scalaVersion(generatePomExtra)
+    licenses +=("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html"))
   )
 
   lazy val credentialsSetting = credentials += {

@@ -1,6 +1,6 @@
 package pimpathon
 
-import _root_.java.io.{File, FileOutputStream}
+import _root_.java.io.{RandomAccessFile, File, FileOutputStream}
 import scala.io.{BufferedSource, Source}
 import scala.util.Properties
 
@@ -60,7 +60,10 @@ case class FileUtils (
 
     def md5(): String = readLines().mkString("\n").md5
 
-    def readBytes(): Array[Byte] = source().withFinally(_.close())(_.map(_.toByte).toArray)
+    def readBytes(): Array[Byte] = new RandomAccessFile(file, "r").withFinally(_.close())(raf ⇒ {
+      new Array[Byte](raf.length().asInstanceOf[Int]).tap(raf.read)
+    })
+
     def readLines(): List[String] = source().withFinally(_.close())(_.getLines().toList)
 
     def write(contents: String, append: Boolean = append): File =

@@ -52,12 +52,15 @@ abstract class genTraversableLike[CC[A]] {
     def seqMap[B, To](f: A ⇒ Option[B])(implicit cbf: CanBuildFrom[Nothing, B, To]): Option[To] =
       seqFold[M.Builder[B, To]](cbf())((builder, a) ⇒ f(a).map(builder += _)).map(_.result())
 
-    def seqFold[B](z: B)(op: (B, A) ⇒ Option[B]): Option[B] = { // similar to scalaz' GTL.foldLeftM[Option, B, A]
-      @tailrec def recurse(cur: GenTraversableLike[A, GenTraversable[A]], acc: B): Option[B] = cur.isEmpty match {
-        case true ⇒ Some(acc)
+    def seqFold[B](z: B)(op: (B, A) ⇒ Option[B]): Option[B] = // similar to scalaz' GTL.foldLeftM[Option, B, A]
+      apoFold[B, B](z)((b, a) ⇒ op(b, a).toRight(b)).right.toOption
+
+    def apoFold[B, C](z: B)(op: (B, A) ⇒ Either[C, B]): Either[C, B] = {
+      @tailrec def recurse(cur: GenTraversableLike[A, GenTraversable[A]], acc: B): Either[C, B] = cur.isEmpty match {
+        case true ⇒ Right(acc)
         case false ⇒ op(acc, cur.head) match {
-          case None ⇒ None
-          case Some(b) ⇒ recurse(cur.tail, b)
+          case Right(b) ⇒ recurse(cur.tail, b)
+          case done     ⇒ done
         }
       }
 

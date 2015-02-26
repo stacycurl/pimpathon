@@ -267,12 +267,22 @@ class GenTraversableLikeTests {
   }
 
   @Test def seqFold(): Unit = {
-    assertEquals(None, List(1, 2, 3).seqFold(1) {
-      case (1, j) ⇒ Some(1 + j)
-      case (2, _) ⇒ None
+    assertEquals(None, List(1, 2, 3).seqFold(0) {
+      case (0, j) ⇒ Some(0 + j)
+      case (1, _) ⇒ None
       case _      ⇒ goBoom
     })
 
     assertEquals(Some(6), List(1, 2, 3).seqFold(0) { case (i, j) ⇒ Some(i + j) })
+  }
+
+  @Test def apoFold(): Unit = {
+    assertEquals(Left(3), List(1, 2, 3).apoFold(0) {
+      case (0, j) ⇒ Right(0 + j)
+      case (1, j) ⇒ Left(1 + j)
+      case _      ⇒ goBoom
+    })
+
+    assertEquals(Right(6), List(1, 2, 3).apoFold(0) { case (i, j) ⇒ Right(i + j) })
   }
 }

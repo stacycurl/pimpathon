@@ -320,9 +320,10 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + File.ancestors: Stream[File]
 + File.path: List[String]
 + File.outputStream(append?): FileOutputStream
-+ File.source(): BufferedSource
++ File.source()(implicit Codec): BufferedSource
++ File.readString()(implicit Codec): String
 + File.readBytes(): Array[Byte]
-+ File.readLines(): List[String]
++ File.readLines()(implicit Codec): List[String]
 + File.className(File): String
 + File.md5(): String
 + file.tempFile(String, String): File

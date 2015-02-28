@@ -3,6 +3,7 @@ package pimpathon
 import _root_.java.io.File
 import org.junit.Test
 import pimpathon.function.Predicate
+import scala.io.Codec
 import scala.util.Properties
 
 import org.junit.Assert._
@@ -265,6 +266,12 @@ class FileTest {
   @Test def readLines(): Unit = file.withTempFile(tmp ⇒ {
     createInputStream("line1\nline2").drain(tmp.outputStream())
     assertEquals(List("line1", "line2"), tmp.readLines())
+  })
+
+  @Test def readString(): Unit = file.withTempFile(tmp ⇒ {
+    List("ISO-8859-1", "US-ASCII", "UTF-16", "UTF-16BE", "UTF-16LE", "UTF-8").map(Codec(_)).foreach(codec ⇒ {
+      assertEquals("line1\nline2", tmp.writeBytes("line1\nline2".getBytes(codec.charSet)).readString()(codec))
+    })
   })
 
   @Test def write(): Unit = file.withTempFile(tmp ⇒ {

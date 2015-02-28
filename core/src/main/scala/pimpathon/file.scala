@@ -1,7 +1,8 @@
 package pimpathon
 
-import _root_.java.io.{File, FileOutputStream}
-import scala.io.{BufferedSource, Source}
+import _root_.java.io.{FileInputStream, RandomAccessFile, File, FileOutputStream}
+import _root_.java.nio.charset.Charset
+import scala.io.{Codec, BufferedSource, Source}
 import scala.util.Properties
 
 import pimpathon.any._
@@ -62,8 +63,13 @@ case class FileUtils (
 
     def md5(): String = readLines().mkString("\n").md5
 
-    def readBytes(): Array[Byte] = source().withFinally(_.close())(_.map(_.toByte).toArray)
-    def readLines(): List[String] = source().withFinally(_.close())(_.getLines().toList)
+    def readBytes(): Array[Byte] = new RandomAccessFile(file, "r").withFinally(_.close())(raf ⇒ {
+      new Array[Byte](raf.length().asInstanceOf[Int]).tap(raf.read)
+    })
+
+    def readString()(implicit codec: Codec): String = readLines().mkString(Properties.lineSeparator)
+
+    def readLines()(implicit codec: Codec): List[String] = source().withFinally(_.close())(_.getLines().toList)
 
     def write(contents: String, append: Boolean = append): File =
       writeBytes(contents.getBytes, append)
@@ -75,7 +81,7 @@ case class FileUtils (
       file.tap(_.outputStream(append).closeAfter(_.write(bytes)))
 
     def outputStream(append: Boolean = append): FileOutputStream = new FileOutputStream(file, append)
-    def source(): BufferedSource =  Source.fromFile(file)
+    def source()(implicit codec: Codec): BufferedSource =  Source.fromFile(file)
 
     def className(classDir: File): String = sharedPaths(classDir)._1.mkString(".").stripSuffix(".class")
 

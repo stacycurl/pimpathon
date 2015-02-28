@@ -49,10 +49,7 @@ object PimpathonBuild extends Build {
       "-deprecation",
       "-unchecked"
     ),
-    libraryDependencies ++= Seq(
-      "com.novocode"  % "junit-interface" % "0.11"  % "test",
-      "org.scalaz"   %% "scalaz-core"     % "7.0.6" % "test"
-    ),
+    libraryDependencies += "com.novocode"  % "junit-interface" % "0.11"  % "test",
     initialCommands in console := """import pimpathon._"""
   )
 }

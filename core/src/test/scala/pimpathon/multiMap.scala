@@ -39,9 +39,7 @@ class MultiMapTest {
     assertEquals(Map(1 → Set(1, 2)),  Map(1 → Set(1)).merge(Map(1 → Set(2))))
   }
 
-  @Test def select(): Unit = {
-    assertEquals(Map(1 → 2, 2 → 3), Map(1 → List(2), 2 → List(3, 4)).select(_.head))
-  }
+  @Test def select(): Unit = assertEquals(Map(1 → 2, 2 → 3), Map(1 → List(2), 2 → List(3, 4)).select(_.head))
 
   @Test def append(): Unit = {
     assertEquals(Map(1 → List(2, 3)), MultiMap.empty[List, Int, Int].append(1, List(2, 3)))

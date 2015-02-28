@@ -45,9 +45,7 @@ class ListTest {
     assertEquals(Map(1 → 2), List(1).zipToMap(List(2)))
   }
 
-  @Test def zipWith(): Unit = {
-    assertEquals(List(6), List(2, 0).zipWith[Int, Int](List(3))(lr ⇒ lr._1 * lr._2))
-  }
+  @Test def zipWith(): Unit = assertEquals(List(6), List(2, 0).zipWith[Int, Int](List(3))(lr ⇒ lr._1 * lr._2))
 
 
   @Test def countWithSize(): Unit = {

@@ -1,5 +1,7 @@
 package pimpathon.java.lang
 
+import scala.language.implicitConversions
+
 
 object runnable {
   implicit def runnableFromThunk[Discarded](thunk: () ⇒ Discarded): Runnable = create(thunk())

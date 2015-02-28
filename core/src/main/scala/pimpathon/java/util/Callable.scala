@@ -1,5 +1,7 @@
 package pimpathon.java.util
 
+import scala.language.implicitConversions
+
 import java.util.concurrent.Callable
 
 

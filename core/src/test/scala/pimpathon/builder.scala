@@ -9,8 +9,7 @@ import pimpathon.util._
 
 
 class BuilderTest {
-  @Test def +++=(): Unit =
-    assertEquals(List(1, 2, 3, 4), (ints() +++= List(List(1, 2), List(3, 4))).result())
+  @Test def +++=(): Unit = assertEquals(List(1, 2, 3, 4), (ints() +++= List(List(1, 2), List(3, 4))).result())
 
   @Test def on(): Unit = {
     val (ib, sb) = ints() rpair (_.on[String](_.toInt) ++= List("1", "2"))

@@ -8,9 +8,7 @@ import pimpathon.util._
 
 
 class ArrayTest {
-  @Test def toHex(): Unit = {
-    assertEquals("7e57ab1e", Array[Byte](126, 87, -85, 30).toHex)
-  }
+  @Test def toHex(): Unit = assertEquals("7e57ab1e", Array[Byte](126, 87, -85, 30).toHex)
 
   @Test def readUpToN(): Unit = {
     def read(input: String, n: Int, bufferSize: Int): (String, Int) = {

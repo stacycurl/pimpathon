@@ -8,8 +8,5 @@ import pimpathon.random._
 
 
 class RandomTest {
-  @Test def between(): Unit = {
-    assertTrue(new Random().between(20, 80) >= 20)
-    assertTrue(new Random().between(20, 80) < 80)
-  }
+  @Test def between(): Unit = assertTrue(Random.between(20, 80) >= 20 && Random.between(20, 80) < 80)
 }

@@ -17,49 +17,44 @@ class FileTest {
 
   import file._
 
-  @Test def rejectsNull(): Unit = {
-    assertEquals("requirement failed: FileOps cannot be used with null files",
-      intercept[Exception](file.FileOps(null: File)).getMessage)
-  }
+  @Test def rejectsNull(): Unit = assertEquals("requirement failed: FileOps cannot be used with null files",
+    intercept[Exception](file.FileOps(null: File)).getMessage
+  )
 
-  @Test def create(): Unit = {
-    file.withTempDirectory(dir ⇒ {
-      val child = dir / "child"
-      assertFalse(child.exists)
+  @Test def create(): Unit = file.withTempDirectory(dir ⇒ {
+    val child = dir / "child"
+    assertFalse(child.exists)
 
-      child.create()
-      assertTrue(child.exists)
-      assertTrue(child.isFile)
+    child.create()
+    assertTrue(child.exists)
+    assertTrue(child.isFile)
 
-      val childDir = dir / "childDir"
-      assertFalse(childDir.exists)
+    val childDir = dir / "childDir"
+    assertFalse(childDir.exists)
 
-      childDir.create(directory = true)
-      assertTrue(childDir.exists)
-      assertTrue(childDir.isDirectory)
+    childDir.create(directory = true)
+    assertTrue(childDir.exists)
+    assertTrue(childDir.isDirectory)
 
-      val nested = dir / "parent" / "child"
-      assertFalse(nested.exists)
+    val nested = dir / "parent" / "child"
+    assertFalse(nested.exists)
 
-      nested.create()
-      assertTrue(nested.exists)
-      assertTrue(nested.isFile)
-    })
-  }
+    nested.create()
+    assertTrue(nested.exists)
+    assertTrue(nested.isFile)
+  })
 
-  @Test def deleteRecursively(): Unit = {
-    file.withTempDirectory(tmp ⇒ {
-      assertFalse((tmp / "non-existent-file").deleteRecursively().exists)
-      assertFalse((tmp / "existing-file").create().deleteRecursively().exists)
-      assertFalse((tmp / "existing-dir").create(directory = true).deleteRecursively().exists)
+  @Test def deleteRecursively(): Unit = file.withTempDirectory(tmp ⇒ {
+    assertFalse((tmp / "non-existent-file").deleteRecursively().exists)
+    assertFalse((tmp / "existing-file").create().deleteRecursively().exists)
+    assertFalse((tmp / "existing-dir").create(directory = true).deleteRecursively().exists)
 
-      val parent = (tmp / "parent").create(directory = true)
-      val children = List(parent / "child", parent / "parent" / "child").map(_.create())
+    val parent = (tmp / "parent").create(directory = true)
+    val children = List(parent / "child", parent / "parent" / "child").map(_.create())
 
-      assertFalse(parent.deleteRecursively().exists)
-      assertEquals(Nil, children.filter(_.exists))
-    })
-  }
+    assertFalse(parent.deleteRecursively().exists)
+    assertEquals(Nil, children.filter(_.exists))
+  })
 
   @Test def deleteRecursivelyOnExit(): Unit = {
     // Check that 'deleteRecursivelyOnExit' registers a DeleteRecursively shutdown hook
@@ -83,65 +78,47 @@ class FileTest {
 
   @Test def cwd(): Unit = assertEquals(Properties.userDir, file.cwd.getPath)
 
-  @Test def named(): Unit = {
-    file.withTempFile(tmp ⇒ {
-      assertEquals("name", tmp.named("name").toString)
-    })
-  }
+  @Test def named(): Unit = file.withTempFile(tmp ⇒ assertEquals("name", tmp.named("name").toString))
 
-  @Test def changeToDirectory(): Unit = {
-    file.withTempFile(file ⇒ {
-      assertTrue(file.changeToDirectory().isDirectory)
-    })
-  }
+  @Test def changeToDirectory(): Unit = file.withTempFile(file ⇒ assertTrue(file.changeToDirectory().isDirectory))
 
-  @Test def children(): Unit = {
-    file.withTempDirectory(dir ⇒ {
-      assertEquals(Set.empty[File], dir.children.toSet)
+  @Test def children(): Unit = file.withTempDirectory(dir ⇒ {
+    assertEquals(Set.empty[File], dir.children.toSet)
 
-      val List(child, toddler) = file.files(dir, "child", "toddler").map(_.create()).toList
-      assertEquals(Set(child, toddler), dir.children.map(_.named()).toSet)
-    })
-  }
+    val List(child, toddler) = file.files(dir, "child", "toddler").map(_.create()).toList
+    assertEquals(Set(child, toddler), dir.children.map(_.named()).toSet)
+  })
 
-  @Test def childDirs(): Unit = {
-    file.withTempDirectory(dir ⇒ {
-      assertEquals(Set.empty[File], dir.childDirs.toSet)
+  @Test def childDirs(): Unit = file.withTempDirectory(dir ⇒ {
+    assertEquals(Set.empty[File], dir.childDirs.toSet)
 
-      val List(child, toddler) = file.files(dir, "child", "parent/toddler").map(_.create()).toList
-      assertEquals(Set(toddler.getParentFile), dir.childDirs.map(_.named()).toSet)
-    })
-  }
+    val List(child, toddler) = file.files(dir, "child", "parent/toddler").map(_.create()).toList
+    assertEquals(Set(toddler.getParentFile), dir.childDirs.map(_.named()).toSet)
+  })
 
-  @Test def ancestors(): Unit = {
-    file.withTempDirectory(dir ⇒ {
-      val List(child) = file.files(dir, "parent/child").map(_.create()).toList
+  @Test def ancestors(): Unit = file.withTempDirectory(dir ⇒ {
+    val List(child) = file.files(dir, "parent/child").map(_.create()).toList
 
-      assertTrue(Set(dir, dir / "parent", child).forall(child.ancestors.contains))
-    })
-  }
+    assertTrue(Set(dir, dir / "parent", child).forall(child.ancestors.contains))
+  })
 
-  @Test def isAncestorOf(): Unit = {
-    file.withTempDirectory(dir ⇒ {
-      val List(child) = file.files(dir, "parent/child").map(_.create()).toList
+  @Test def isAncestorOf(): Unit = file.withTempDirectory(dir ⇒ {
+    val List(child) = file.files(dir, "parent/child").map(_.create()).toList
 
-      assertTrue(Set(dir, dir / "parent", child).forall(_.isAncestorOf(child)))
-    })
-  }
+    assertTrue(Set(dir, dir / "parent", child).forall(_.isAncestorOf(child)))
+  })
 
-  @Test def relativeTo(): Unit = {
-    file.withTempDirectory(dir ⇒ {
-      assertEquals("child", (dir / "child").create().relativeTo(dir).getPath)
+  @Test def relativeTo(): Unit = file.withTempDirectory(dir ⇒ {
+    assertEquals("child", (dir / "child").create().relativeTo(dir).getPath)
 
-      assertEquals(dir.getName + "/kid",
-        (dir / "kid").create().relativeTo(dir.getParentFile).getPath)
+    assertEquals(dir.getName + "/kid",
+      (dir / "kid").create().relativeTo(dir.getParentFile).getPath)
 
-      val parent = (dir / "parent").create(directory = true)
-      assertEquals("parent",       parent.relativeTo(dir).getPath)
-      assertEquals("..",           dir.relativeTo(parent).getPath)
-      assertEquals("parent/child", (parent / "child").create().relativeTo(dir).getPath)
-    })
-  }
+    val parent = (dir / "parent").create(directory = true)
+    assertEquals("parent",       parent.relativeTo(dir).getPath)
+    assertEquals("..",           dir.relativeTo(parent).getPath)
+    assertEquals("parent/child", (parent / "child").create().relativeTo(dir).getPath)
+  })
 
   @Test def tree(): Unit = {
     assertEquals(Nil, new File("non-existent").tree)
@@ -273,28 +250,22 @@ class FileTest {
     })
   }
 
-  @Test def files(): Unit = {
-    file.withTempDirectory(dir ⇒ {
-      val List(child, nested) = file.files(dir, "child", "nested/child").toList
+  @Test def files(): Unit = file.withTempDirectory(dir ⇒ {
+    val List(child, nested) = file.files(dir, "child", "nested/child").toList
 
-      assertEquals(dir / "child",            child)
-      assertEquals(dir / "nested" / "child", nested)
-    })
-  }
+    assertEquals(dir / "child",            child)
+    assertEquals(dir / "nested" / "child", nested)
+  })
 
-  @Test def readBytes(): Unit = {
-    file.withTempFile(tmp ⇒ {
-      createInputStream("contents").drain(tmp.outputStream())
-      assertEquals("contents", new String(tmp.readBytes()))
-    })
-  }
+  @Test def readBytes(): Unit = file.withTempFile(tmp ⇒ {
+    createInputStream("contents").drain(tmp.outputStream())
+    assertEquals("contents", new String(tmp.readBytes()))
+  })
 
-  @Test def readLines(): Unit = {
-    file.withTempFile(tmp ⇒ {
-      createInputStream("line1\nline2").drain(tmp.outputStream())
-      assertEquals(List("line1", "line2"), tmp.readLines())
-    })
-  }
+  @Test def readLines(): Unit = file.withTempFile(tmp ⇒ {
+    createInputStream("line1\nline2").drain(tmp.outputStream())
+    assertEquals(List("line1", "line2"), tmp.readLines())
+  })
 
   @Test def write(): Unit = file.withTempFile(tmp ⇒ {
     assertEquals(List("content"),      tmp.write("content", append = false).readLines())
@@ -303,33 +274,25 @@ class FileTest {
     assertEquals(List("new contents"), tmp.write("s", append = true).readLines())
   })
 
-  @Test def writeBytes(): Unit = {
-    file.withTempFile(tmp ⇒ {
-      assertEquals(List("12"),   tmp.writeBytes("12".getBytes).readLines())
-      assertEquals(List("1234"), tmp.writeBytes("34".getBytes, append = true).readLines())
-      assertEquals(List("56"),   tmp.writeBytes("56".getBytes).readLines())
-    })
-  }
+  @Test def writeBytes(): Unit = file.withTempFile(tmp ⇒ {
+    assertEquals(List("12"),   tmp.writeBytes("12".getBytes).readLines())
+    assertEquals(List("1234"), tmp.writeBytes("34".getBytes, append = true).readLines())
+    assertEquals(List("56"),   tmp.writeBytes("56".getBytes).readLines())
+  })
 
-  @Test def writeLines(): Unit = {
-    file.withTempFile(tmp ⇒ {
-      assertEquals(List("1", "2"),           tmp.writeLines(List("1", "2")).readLines())
-      assertEquals(List("1", "2", "3", "4"), tmp.writeLines(List("3", "4"), append = true).readLines())
-      assertEquals(List("5", "6"),           tmp.writeLines(List("5", "6")).readLines())
-    })
-  }
+  @Test def writeLines(): Unit = file.withTempFile(tmp ⇒ {
+    assertEquals(List("1", "2"),           tmp.writeLines(List("1", "2")).readLines())
+    assertEquals(List("1", "2", "3", "4"), tmp.writeLines(List("3", "4"), append = true).readLines())
+    assertEquals(List("5", "6"),           tmp.writeLines(List("5", "6")).readLines())
+  })
 
-  @Test def md5(): Unit = {
-    file.withTempFile(tmp ⇒ {
-      assertEquals("6f1ed002ab5595859014ebf0951522d9", tmp.writeLines(List("blah")).md5())
-    })
-  }
+  @Test def md5(): Unit = file.withTempFile(tmp ⇒ {
+    assertEquals("6f1ed002ab5595859014ebf0951522d9", tmp.writeLines(List("blah")).md5())
+  })
 
-  @Test def missing(): Unit = {
-    assertTrue(file.withTempFile(tmp ⇒ {
-      assertFalse(tmp.missing); tmp
-    }).missing)
-  }
+  @Test def missing(): Unit = assertTrue(file.withTempFile(tmp ⇒ {
+    assertFalse(tmp.missing); tmp
+  }).missing)
 
   @Test def hasExtension(): Unit = assertFileNameProperty(_.hasExtension("txt"), "a.txt",   "b.tmp")
   @Test def isScala(): Unit      = assertFileNameProperty(_.isScala,             "a.scala", "b.java")

@@ -9,8 +9,8 @@ import pimpathon.stream._
 
 class StreamTest {
   @Test def cond(): Unit = {
-    assertEquals(Stream.empty[Int], stream.cond(false, util.goBoom))
-    assertEquals(Stream(1, 2, 3), stream.cond(true, Stream(1, 2, 3)))
+    assertEquals(Stream.empty[Int], stream.cond(cond = false, util.goBoom))
+    assertEquals(Stream(1, 2, 3), stream.cond(cond = true, Stream(1, 2, 3)))
   }
 
   @Test def continuallyWhile(): Unit = {

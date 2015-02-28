@@ -1,6 +1,6 @@
 package pimpathon
 
-import scala.language.{higherKinds, implicitConversions}
+import scala.language.{higherKinds, implicitConversions, reflectiveCalls}
 
 import scala.annotation.tailrec
 import scala.collection.{breakOut, mutable ⇒ M, GenTraversable, GenTraversableLike}

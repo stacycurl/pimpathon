@@ -7,7 +7,6 @@ import org.junit.Assert._
 import pimpathon.builder._
 import pimpathon.option._
 import pimpathon.util._
-import scalaz.std.option._
 
 
 class OptionTest {
@@ -51,4 +50,7 @@ class OptionTest {
     assertEquals(None,      some(0).invert(1))
     assertEquals(Some(1), none[Int].invert(1))
   }
+
+  private def none[A]: Option[A]       = None
+  private def some[A](a: A): Option[A] = Some(a)
 }

@@ -49,17 +49,11 @@ object PimpathonBuild extends Build {
     parallelExecution in ScoverageTest := false,
     scalacOptions := Seq(
       "-feature",
-      "-language:higherKinds",
-      "-language:implicitConversions",
-      "-language:reflectiveCalls",
       "-Xfatal-warnings",
       "-deprecation",
       "-unchecked"
     ),
-    libraryDependencies ++= Seq(
-      "com.novocode"  % "junit-interface" % "0.11"  % "test",
-      "org.scalaz"   %% "scalaz-core"     % "7.1.0" % "test"
-    ),
+    libraryDependencies += "com.novocode"  % "junit-interface" % "0.11"  % "test",
     initialCommands in console := """import pimpathon._""",
     minimumCoverage := 100,
     highlighting := true,

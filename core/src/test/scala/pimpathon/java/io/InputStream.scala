@@ -1,5 +1,7 @@
 package pimpathon.java.io
 
+import scala.language.reflectiveCalls
+
 import java.io._
 import java.util.zip.GZIPOutputStream
 import org.junit.Test
@@ -13,31 +15,24 @@ import pimpathon.any._
 class InputStreamTest {
   @Test def attemptClose(): Unit = {
     assertEquals(Success(()), createInputStream().attemptClose())
-    assertEquals(Failure(boom), createInputStream(onClose = () ⇒ throw boom).attemptClose())
+    assertEquals(Failure(boom), new ByteArrayInputStream(Array()) { override def close() = goBoom }.attemptClose())
   }
 
   @Test def closeAfter(): Unit = {
     val is = createInputStream()
 
-    assertInputStreamClosed(false, is.closed)
     assertEquals("result", is.closeAfter(_ ⇒ "result"))
-    assertInputStreamClosed(true, is.closed)
+    is.assertClosed
   }
 
   @Test def closeIf(): Unit = {
-    val is = createInputStream()
-
-    assertInputStreamClosed(false, is.closed)
-    assertInputStreamClosed(false, is.closeIf(false).closed)
-    assertInputStreamClosed(true,  is.closeIf(true).closed)
+    createInputStream().closeIf(condition = false).assertOpen
+    createInputStream().closeIf(condition = true).assertClosed
   }
 
   @Test def closeUnless(): Unit = {
-    val is = createInputStream()
-
-    assertInputStreamClosed(false, is.closed)
-    assertInputStreamClosed(false, is.closeUnless(true).closed)
-    assertInputStreamClosed(true,  is.closeUnless(false).closed)
+    createInputStream().closeUnless(condition = true).assertOpen
+    createInputStream().closeUnless(condition = false).assertClosed
   }
 
   @Test def drain(): Unit = {
@@ -51,8 +46,8 @@ class InputStreamTest {
       is.drain(os, expectedCloseIn, expectedCloseOut)
 
       assertEquals(input, os.toString)
-      assertInputStreamClosed(expectedCloseIn, is.closed)
-      assertOutputStreamClosed(expectedCloseOut, os.closed)
+      if (expectedCloseIn)  is.assertClosed else is.assertOpen
+      if (expectedCloseOut) os.assertClosed else os.assertOpen
     }
 
     ignoreExceptions {
@@ -71,8 +66,8 @@ class InputStreamTest {
     is >> os
 
     assertEquals("content", os.toString)
-    assertInputStreamClosed(false, is.closed)
-    assertOutputStreamClosed(false, os.closed)
+    is.assertOpen
+    os.assertOpen
   }
 
   @Test def buffered(): Unit = {
@@ -86,7 +81,7 @@ class InputStreamTest {
     import pimpathon.java.io.outputStream._
 
     val os     = createOutputStream().tap(os ⇒ new GZIPOutputStream(os).closeAfter(_.write("content".getBytes)))
-    val result = createOutputStream().tap(rs ⇒ inputStreamFor(os.toByteArray).gunzip.drain(rs))
+    val result = createOutputStream().tap(rs ⇒ createInputStream(os.toByteArray).gunzip.drain(rs))
 
     assertEquals("content", result.toString)
   }

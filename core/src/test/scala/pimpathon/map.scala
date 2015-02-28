@@ -208,17 +208,11 @@ class MapTest {
     assertEquals(M.Map(1 → 2), Map(1 → 2).toMutable)
   }
 
-  @Test def reverseToMultiMap(): Unit = {
-    assertEquals(Map(2 → Set(1, 2)), Map(1 → 2, 2 → 2).reverseToMultiMap)
-  }
+  @Test def reverseToMultiMap(): Unit = assertEquals(Map(2 → Set(1, 2)), Map(1 → 2, 2 → 2).reverseToMultiMap)
 
-  @Test def reverse(): Unit = {
-    assertEquals(Map(2 → 1), Map(1 → 2, 2 → 2).reverse(_.min))
-  }
+  @Test def reverse(): Unit = assertEquals(Map(2 → 1), Map(1 → 2, 2 → 2).reverse(_.min))
 
-  @Test def sorted(): Unit = {
-    assertEquals(List(3 → 4, 1 → 2), Map(1 → 2, 3 → 4).sorted(Ordering.Int.reverse).toList)
-  }
+  @Test def sorted(): Unit = assertEquals(List(3 → 4, 1 → 2), Map(1 → 2, 3 → 4).sorted(Ordering.Int.reverse).toList)
 
   @Test def andThenM(): Unit = assertEquals(
     Map(1 → 100, 2 → 200),

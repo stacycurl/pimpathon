@@ -1,5 +1,6 @@
 package pimpathon
 
+
 object numeric {
   implicit class NumericOps[A](val na: Numeric[A]) extends AnyVal {
     def xmap[B](aToB: A ⇒ B, bToA: B ⇒ A): Numeric[B] = na match {

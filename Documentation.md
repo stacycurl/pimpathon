@@ -36,6 +36,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + [A].fails.all(Predicate[A]*): Option[A]
 + [A].fails.none(Predicate[A]*): Option[A]
 + [A].fails.some(Predicate[A]*): Option[A]
++ [A: Numeric].bounded(A, A): A
 
 + (A, B).calc((A, B) => C): C
 + (A, B).calcC(A => B => C): C

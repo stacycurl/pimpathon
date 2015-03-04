@@ -52,6 +52,8 @@ object any {
     def update[Discarded](actions: (A ⇒ Discarded)*): A         = tap(actions: _*)
     def withSideEffect[Discarded](actions: (A ⇒ Discarded)*): A = tap(actions: _*)
     def tap[Discarded](actions: (A ⇒ Discarded)*): A            = { actions.foreach(action ⇒ action(a)); a }
+
+    def bounded(lower: A, upper: A)(implicit na: Numeric[A]): A = na.min(na.max(lower, a), upper)
   }
 
   class AnyCapturer[A](a: A, andThen: Boolean ⇒ Option[A]) {

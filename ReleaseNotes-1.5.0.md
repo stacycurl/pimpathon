@@ -5,6 +5,7 @@
 ### Removals
 
 ### Additions
++ [A: Numeric].bounded(A, A): A
 + GTL[A].apoFold(B)((B, A) ⇒ Either[C, B]): Either[C, B]
 + File.readString()(implicit Codec): String
 + File.source()(implicit Codec): BufferedSource  -- Added implicit Codec argument

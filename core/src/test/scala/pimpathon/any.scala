@@ -1,7 +1,7 @@
 package pimpathon
 
 import org.junit.Test
-import scala.util.{Failure, Success}
+import scala.util.{Random, Failure, Success}
 
 import org.junit.Assert._
 import pimpathon.any._
@@ -149,4 +149,14 @@ class AnyTest {
   @Test def unfold(): Unit = assertEquals(
     List('f', 'o', 'o'), "foo".unfold(s ⇒ s.nonEmpty.option(s.head, s.tail)).toList
   )
+
+  @Test def bounded(): Unit = {
+    Stream.fill(10)(Random.nextInt()).foreach(num ⇒ {
+      assertEquals((10 max num) min 100, num.bounded(10, 100))
+    })
+
+    Stream.fill(10)(Random.nextDouble()).foreach(num ⇒ {
+      assertEquals((10.0 max num) min 100.0, num.bounded(10.0, 100.0), 0.01)
+    })
+  }
 }

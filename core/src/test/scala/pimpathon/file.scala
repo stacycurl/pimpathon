@@ -270,7 +270,7 @@ class FileTest {
 
   @Test def readString(): Unit = file.withTempFile(tmp ⇒ {
     List("ISO-8859-1", "US-ASCII", "UTF-16", "UTF-16BE", "UTF-16LE", "UTF-8").map(Codec(_)).foreach(codec ⇒ {
-      assertEquals("line1\nline2", tmp.writeBytes("line1\nline2".getBytes(codec.charSet)).readString()(codec))
+      assertEquals("line1\r\nline2", tmp.writeBytes("line1\r\nline2".getBytes(codec.charSet)).readString()(codec))
     })
   })
 

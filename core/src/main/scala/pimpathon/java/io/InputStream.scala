@@ -14,8 +14,8 @@ import pimpathon.array._
 object inputStream extends InputStreamUtils()
 
 case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, bufferSize: Int = 8192) {
-  implicit def inputStreamOps[IS <: InputStream](is: IS): InputStreamOps[IS] =
-    new InputStreamOps[IS](is, this)
+  implicit def inputStreamPimps[IS <: InputStream](is: IS): InputStreamPimps[IS] =
+    new InputStreamPimps[IS](is, this)
 
   def copy(is: InputStream, os: OutputStream, closeIn: Boolean = closeIn, closeOut: Boolean = closeOut): Unit = {
     withBuffer(buffer ⇒ {
@@ -30,7 +30,7 @@ case class InputStreamUtils(closeIn: Boolean = true, closeOut: Boolean = true, b
   private[io] def withBuffer[A](f: Array[Byte] ⇒ A): A = f(new Array[Byte](bufferSize))
 }
 
-class InputStreamOps[IS <: InputStream](is: IS, utils: InputStreamUtils) {
+class InputStreamPimps[IS <: InputStream](is: IS, utils: InputStreamUtils) {
   import utils._
 
   def >>(os: OutputStream): IS = drain(os, closeIn = false, closeOut = false)

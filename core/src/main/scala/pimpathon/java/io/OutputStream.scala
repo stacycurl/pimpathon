@@ -12,11 +12,11 @@ import pimpathon.any._
 object outputStream extends OutputStreamUtils(closeOut = true, closeIn = true, bufferSize = 8192)
 
 case class OutputStreamUtils(closeOut: Boolean, closeIn: Boolean, bufferSize: Int) {
-  implicit def outputStreamOps[OS <: OutputStream](os: OS): OutputStreamOps[OS] =
-    new OutputStreamOps[OS](os, this)
+  implicit def outputStreamPimps[OS <: OutputStream](os: OS): OutputStreamPimps[OS] =
+    new OutputStreamPimps[OS](os, this)
 }
 
-class OutputStreamOps[OS <: OutputStream](os: OS, utils: OutputStreamUtils) {
+class OutputStreamPimps[OS <: OutputStream](os: OS, utils: OutputStreamUtils) {
   import utils._
 
   def <<(is: InputStream): OS = drain(is, closeOut = false, closeIn = false)

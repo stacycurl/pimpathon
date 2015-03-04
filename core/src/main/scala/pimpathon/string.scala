@@ -7,7 +7,7 @@ import pimpathon.list._
 
 
 object string {
-  implicit class StringOps(val string: String) extends AnyVal {
+  implicit class StringPimps(val string: String) extends AnyVal {
     def emptyTo(alternative: ⇒ String): String = if (string.isEmpty) alternative else string
 
     def prefixWith(prefix: String): String = if (string.startsWith(prefix)) string else prefix + string

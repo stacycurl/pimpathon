@@ -2,7 +2,7 @@ package pimpathon
 
 
 object boolean {
-  implicit class BooleanOps(val value: Boolean) extends AnyVal {
+  implicit class BooleanPimps(val value: Boolean) extends AnyVal {
     def asInt: Int = if (value) 1 else 0
     def either[R](right: R): EitherCapturer[R] = new EitherCapturer[R](value, right)
     def option[A](a: ⇒ A): Option[A] = if (value) Some(a) else None

@@ -8,7 +8,7 @@ import scalaz.std.iterable._
 
 
 object json {
-  implicit class JsonOps(json: Json) {
+  implicit class JsonFrills(json: Json) {
     def filterNulls: Json = filter(_ != Json.jNull)
 
     private[argonaut] def filter(p: Predicate[Json]): Json =

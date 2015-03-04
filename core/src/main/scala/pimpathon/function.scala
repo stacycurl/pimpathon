@@ -10,15 +10,15 @@ import pimpathon.list._
 object function {
   type Predicate[-A] = A ⇒ Boolean
 
-  implicit class FunctionOps[A, B](val f: A ⇒ B) extends AnyVal {
+  implicit class FunctionPimps[A, B](val f: A ⇒ B) extends AnyVal {
     def guardWith(p: Predicate[A]): PartialFunction[A, B] = p guard f
   }
 
-  implicit class CurriedFunction2Ops[A, B, C](val f: A ⇒ B ⇒ C) extends AnyVal {
+  implicit class CurriedFunction2Pimps[A, B, C](val f: A ⇒ B ⇒ C) extends AnyVal {
     def tupled: ((A, B)) ⇒ C = Function.uncurried(f).tupled
   }
 
-  implicit class PredicateOps[A](val p: Predicate[A]) extends AnyVal {
+  implicit class PredicatePimps[A](val p: Predicate[A]) extends AnyVal {
     def and(q: Predicate[A]): Predicate[A] = (a: A) ⇒ p(a) && q(a)
     def or(q: Predicate[A]):  Predicate[A] = (a: A) ⇒ p(a) || q(a)
     def not:                  Predicate[A] = (a: A) ⇒ !p(a)
@@ -31,7 +31,7 @@ object function {
     def guard[B](f: A ⇒ B): PartialFunction[A, B] = new GuardedPartialFunction[A, B](p, f)
   }
 
-  implicit class PartialFunctionOps[In, Out](pf: PartialFunction[In, Out]) {
+  implicit class PartialFunctionPimps[In, Out](pf: PartialFunction[In, Out]) {
     def isUndefinedAt(in: In): Boolean = !pf.isDefinedAt(in)
 
     def partition[CC[A]](ins: GenTraversableLike[In, GenTraversable[In]])
@@ -52,7 +52,7 @@ object function {
       }
   }
 
-  implicit class PartialEndoFunctionOps[A](val pf: PartialFunction[A, A]) extends AnyVal {
+  implicit class PartialEndoFunctionPimps[A](val pf: PartialFunction[A, A]) extends AnyVal {
     def unify: A ⇒ A = (a: A) ⇒ pf.lift(a).getOrElse(a)
   }
 

@@ -2,7 +2,7 @@ package pimpathon
 
 
 object numeric {
-  implicit class NumericOps[A](val na: Numeric[A]) extends AnyVal {
+  implicit class NumericPimps[A](val na: Numeric[A]) extends AnyVal {
     def xmap[B](aToB: A ⇒ B, bToA: B ⇒ A): Numeric[B] = na match {
       case xna: XMappedNumeric[_, _] ⇒ xna.xmap(aToB, bToA)
       case other                     ⇒ new XMappedNumeric[A, B](other, aToB, bToA)

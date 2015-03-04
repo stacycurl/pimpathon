@@ -4,7 +4,7 @@ import scala.util.{Failure, Success, Try}
 
 
 object pimpTry {
-  implicit class TryOps[A](val value: Try[A]) extends AnyVal {
+  implicit class TryPimps[A](val value: Try[A]) extends AnyVal {
     def toEither: Either[Throwable, A] = value match {
       case Success(a) ⇒ Right[Throwable, A](a)
       case Failure(t) ⇒ Left[Throwable, A](t)

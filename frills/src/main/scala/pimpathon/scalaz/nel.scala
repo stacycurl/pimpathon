@@ -14,7 +14,7 @@ object nel extends genTraversableLike[NonEmptyList] {
     def builder(head: A): M.Builder[A, NonEmptyList[A]] = List.newBuilder[A].mapResult(NonEmptyList.nel(head, _))
   }
 
-  implicit class NelOps[A](val nel: NonEmptyList[A]) extends AnyVal {
+  implicit class NelFrills[A](val nel: NonEmptyList[A]) extends AnyVal {
     def distinct: NonEmptyList[A] = lift(_.distinct)
     def distinctBy[B](f: A ⇒ B): NonEmptyList[A] = lift(_.distinctBy(f))
     def max(implicit o: Order[A]): A = nel.list.max(o.toScalaOrdering)

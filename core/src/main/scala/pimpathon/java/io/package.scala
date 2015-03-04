@@ -6,9 +6,9 @@ import java.io.{InputStream, OutputStream}
 
 
 package object io {
-  implicit def inputStreamOps[IS <: InputStream](is: IS): InputStreamOps[IS] =
-    new InputStreamOps[IS](is, inputStream)
+  implicit def inputStreamPimps[IS <: InputStream](is: IS): InputStreamPimps[IS] =
+    new InputStreamPimps[IS](is, inputStream)
 
-  implicit def outputStreamOps[OS <: OutputStream](os: OS): OutputStreamOps[OS] =
-    new OutputStreamOps[OS](os, outputStream)
+  implicit def outputStreamPimps[OS <: OutputStream](os: OS): OutputStreamPimps[OS] =
+    new OutputStreamPimps[OS](os, outputStream)
 }

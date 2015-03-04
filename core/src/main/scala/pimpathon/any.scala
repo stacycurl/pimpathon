@@ -8,7 +8,7 @@ import pimpathon.function._
 
 
 object any {
-  implicit class AnyOps[A](val a: A) extends AnyVal {
+  implicit class AnyPimps[A](val a: A) extends AnyVal {
     def calc[B](f: A ⇒ B): B = f(a)
     def |>[B](f: A ⇒ B): B = f(a)
     def calcIf[B](p: Predicate[A])(f: A ⇒ B): Option[B] = p(a).option(f(a))

@@ -9,7 +9,7 @@ import pimpathon.function._
 
 
 object either {
-  implicit class EitherOps[L, R](val either: Either[L, R]) extends AnyVal {
+  implicit class EitherPimps[L, R](val either: Either[L, R]) extends AnyVal {
     def leftMap[M](f: L ⇒ M): Either[M, R]  = bimap[M, R](f, identity[R])
     def rightMap[S](f: R ⇒ S): Either[L, S] = bimap[L, S](identity[L], f)
 

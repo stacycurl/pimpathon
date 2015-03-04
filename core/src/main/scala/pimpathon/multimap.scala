@@ -20,7 +20,7 @@ object multiMap {
 
   implicit def build[F[_], K, V](implicit fcbne: CanBuildNonEmpty[V, F[V]]): MMCBF[F, K, V] = MultiMap.build
 
-  implicit class MultiMapOps[F[_], K, V](val value: MultiMap[F, K, V]) extends AnyVal {
+  implicit class MultiMapPimps[F[_], K, V](val value: MultiMap[F, K, V]) extends AnyVal {
     def select[W](f: F[V] ⇒ W): Map[K, W] = value.mapValuesEagerly(f) // just an alias for mapValuesEagerly
 
     def merge(other: MultiMap[F, K, V])(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] =
@@ -51,11 +51,11 @@ object multiMap {
 
     def getOrEmpty(k: K)(implicit fcbf: CCBF[V, F]): F[V] = value.getOrElse(k, fcbf.apply().result())
 
-    def multiMap: MultiMapConflictingOps[F, K, V] = new MultiMapConflictingOps[F, K, V](value)
+    def multiMap: MultiMapConflictingPimps[F, K, V] = new MultiMapConflictingPimps[F, K, V](value)
   }
 
 
-  class MultiMapConflictingOps[F[_], K, V](value: MultiMap[F, K, V]) {
+  class MultiMapConflictingPimps[F[_], K, V](value: MultiMap[F, K, V]) {
     // These operations cannot be defined on MultiMapOps because non-implicit methods of the same name exist on Map
     def head(implicit gtl: F[V] <:< GenTraversable[V]): Map[K, V] =
       value.flatMap { case (k, fv) ⇒ fv.headOption.map(k → _) }

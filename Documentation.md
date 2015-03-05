@@ -359,6 +359,8 @@ The aim of frills is to pimp everything else. You can use it by including the fo
 
 + Option[A].toSuccessNel(E): ValidationNel[E, A]
 
++ List[A].toNel: Option[NonEmptyList[A]]
+
 + argonaut.Json.filterNulls: Json
 
 + NonEmptyList[A].distinct: NonEmptyList[A]

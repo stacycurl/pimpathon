@@ -21,7 +21,7 @@ object PimpathonBuild extends Build {
   )
 
   lazy val frills = (project in file("frills")
-    dependsOn core
+    dependsOn core % "compile -> compile; test -> test"
     settings(commonSettings: _*)
     settings(Publishing.settings: _*)
     settings(libraryDependencies ++= Seq(

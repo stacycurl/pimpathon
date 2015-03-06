@@ -18,9 +18,8 @@ class FileTest {
 
   import file._
 
-  @Test def rejectsNull(): Unit = assertEquals("requirement failed: FileOps cannot be used with null files",
-    intercept[Exception](file.FilePimps(null: File)).getMessage
-  )
+  @Test def rejectsNull(): Unit =
+    assertThrows[Exception]("requirement failed: FileOps cannot be used with null files")(file.FilePimps(null: File))
 
   @Test def create(): Unit = file.withTempDirectory(dir ⇒ {
     val child = dir / "child"

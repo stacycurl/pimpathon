@@ -99,7 +99,10 @@ class InputStreamTest {
     assertEquals("content", read("content", 8, 2))
     assertEquals("contents", read("contents", 9))
     assertEquals("", read("contents", 0))
-    intercept[IllegalArgumentException](read("contents", -1))
+
+    assertThrows[IllegalArgumentException]("requirement failed: You can't read a negative number of bytes!") {
+      read("contents", -1)
+    }
   }
 
   @Test def readN(): Unit = {
@@ -111,7 +114,11 @@ class InputStreamTest {
     assertEquals("cont", read("contents", 4))
     assertEquals("contents", read("contents", 8))
     assertEquals("", read("contents", 0))
-    intercept[IllegalArgumentException](read("contents", -1))
-    intercept[IOException](read("contents", 9))
+
+    assertThrows[IllegalArgumentException]("requirement failed: You can't read a negative number of bytes!") {
+      read("contents", -1)
+    }
+
+    assertThrows[IOException]("Failed to read 9 bytes, only 8 were available")(read("contents", 9))
   }
 }

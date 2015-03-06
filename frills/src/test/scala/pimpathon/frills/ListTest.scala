@@ -3,12 +3,10 @@ package pimpathon.frills
 import org.junit.Test
 import scalaz.NonEmptyList
 
-import org.junit.Assert._
 import pimpathon.frills.list._
+import pimpathon.util._
 
 
 class ListTest {
-  @Test def toNel(): Unit = assertEquals(
-    List(None, Some(NonEmptyList(1))), List(Nil, List(1)).map(_.toNel)
-  )
+  @Test def toNel(): Unit = on(Nil, List(1)).calling(_.toNel).produces(None, Some(NonEmptyList(1)))
 }

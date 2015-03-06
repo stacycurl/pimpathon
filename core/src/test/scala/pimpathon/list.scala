@@ -9,36 +9,22 @@ import pimpathon.util._
 
 
 class ListTest {
-  @Test def uncons(): Unit = {
-    assertEquals("empty", nil[Int].uncons("empty", l ⇒ s"size: ${l.size}"))
-    assertEquals("size: 3", List(1, 2, 3).uncons("empty", l ⇒ s"size: ${l.size}"))
-  }
+  @Test def uncons(): Unit = on(nil[Int], List(1, 2, 3))
+    .calling(_.uncons("empty", l ⇒ s"size: ${l.size}")).produces("empty", "size: 3")
 
-  @Test def unconsC(): Unit = {
-    assertEquals("empty",                          nil[Int].unconsC("empty", h ⇒ t ⇒ s"head: $h, tail: $t"))
-    assertEquals("head: 1, tail: List(2, 3)", List(1, 2, 3).unconsC("empty", h ⇒ t ⇒ s"head: $h, tail: $t"))
-  }
+  @Test def unconsC(): Unit = on(nil[Int], List(1, 2, 3))
+    .calling(_.unconsC("empty", h ⇒ t ⇒ s"head: $h, tail: $t")).produces("empty", "head: 1, tail: List(2, 3)")
 
-  @Test def unsnocC(): Unit = {
-    assertEquals("empty",                          nil[Int].unsnocC("empty", i ⇒ l ⇒ s"init: $i, last: $l"))
-    assertEquals("init: List(1, 2), last: 3", List(1, 2, 3).unsnocC("empty", i ⇒ l ⇒ s"init: $i, last: $l"))
-  }
+  @Test def unsnocC(): Unit = on(nil[Int], List(1, 2, 3))
+    .calling(_.unsnocC("empty", i ⇒ l ⇒ s"init: $i, last: $l")).produces("empty", "init: List(1, 2), last: 3")
 
-  @Test def emptyTo(): Unit = {
-    assertEquals(List(1), nil[Int].emptyTo(List(1)))
-    assertEquals(List(1, 2, 3), List(1, 2, 3).emptyTo(List(1)))
-  }
+  @Test def emptyTo(): Unit = on(nil[Int], List(1, 2, 3)).calling(_.emptyTo(List(1))).produces(List(1), List(1, 2, 3))
 
-  @Test def calcIfNonEmpty(): Unit = {
-    assertEquals(None, nil[Int].calcIfNonEmpty(_.reverse))
-    assertEquals(Some(List(3, 2, 1)), List(1, 2, 3).calcIfNonEmpty(_.reverse))
-  }
+  @Test def calcIfNonEmpty(): Unit = on(nil[Int], List(1, 2, 3))
+    .calling(_.calcIfNonEmpty(_.reverse)).produces(None, Some(List(3, 2, 1)))
 
-  @Test def mapIfNonEmpty(): Unit = {
-    assertEquals(None, nil[Int].mapIfNonEmpty(_ * 2))
-    assertEquals(Some(List(2, 4, 6)), List(1, 2, 3).mapIfNonEmpty(_ * 2))
-  }
-
+  @Test def mapIfNonEmpty(): Unit = on(nil[Int], List(1, 2, 3))
+    .calling(_.mapIfNonEmpty(_ * 2)).produces(None, Some(List(2, 4, 6)))
 
   @Test def zipToMap(): Unit = {
     assertEquals(Map.empty[Int, Int], nil[Int].zipToMap(nil[Int]))
@@ -87,7 +73,7 @@ class ListTest {
   }
 
   @Test def headTail(): Unit = {
-    assertException[NoSuchElementException]("headTail of empty list") {
+    assertThrows[NoSuchElementException]("headTail of empty list") {
       Nil.headTail
     }
 
@@ -97,7 +83,7 @@ class ListTest {
   }
 
   @Test def initLast(): Unit = {
-    assertException[NoSuchElementException]("initLast of empty list") {
+    assertThrows[NoSuchElementException]("initLast of empty list") {
       Nil.initLast
     }
 

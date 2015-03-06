@@ -3,6 +3,7 @@ package pimpathon.java.util
 import scala.language.implicitConversions
 
 import java.util.concurrent.Callable
+import scala.util.Try
 
 
 object callable {
@@ -10,5 +11,9 @@ object callable {
 
   def create[A](action: ⇒ A): Callable[A] = new Callable[A] {
     override def call(): A = action
+  }
+
+  implicit class CallablePimps[A](val value: Callable[A]) extends AnyVal {
+    def attempt: Callable[Try[A]] = create(Try(value.call()))
   }
 }

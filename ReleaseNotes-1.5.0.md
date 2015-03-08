@@ -6,6 +6,7 @@
 
 ### Additions
 + [A: Numeric].bounded(A, A): A
++ Option[E].toFailureNel(A): ValidationNel[E, A]
 + GTL[A].apoFold(B)((B, A) ⇒ Either[C, B]): Either[C, B]
 + List[A].toNel: Option[NonEmptyList[A]]
 + Callable[A].attempt: Callable[Try[A]]

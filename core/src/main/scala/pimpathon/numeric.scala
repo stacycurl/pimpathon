@@ -1,9 +1,10 @@
 package pimpathon
 
-object numeric {
-  implicit def numericOps[A](na: Numeric[A]): NumericOps[A] = new NumericOps[A](na)
 
-  class NumericOps[A](na: Numeric[A]) {
+object numeric {
+  implicit def numericPimps[A](na: Numeric[A]): NumericPimps[A] = new NumericPimps[A](na)
+
+  class NumericPimps[A](na: Numeric[A]) {
     def xmap[B](aToB: A ⇒ B, bToA: B ⇒ A): Numeric[B] = na match {
       case xna: XMappedNumeric[_, _] ⇒ xna.xmap(aToB, bToA)
       case other                     ⇒ new XMappedNumeric[A, B](other, aToB, bToA)

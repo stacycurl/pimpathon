@@ -36,6 +36,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + [A].fails.all(Predicate[A]*): Option[A]
 + [A].fails.none(Predicate[A]*): Option[A]
 + [A].fails.some(Predicate[A]*): Option[A]
++ [A: Numeric].bounded(A, A): A
 
 + (A, B).calc((A, B) => C): C
 + (A, B).calcC(A => B => C): C
@@ -262,6 +263,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 
 + callable.create(=> A): Callable[A]
 + implicit conversion from () => A to Callable[A]
++ Callable[A].attempt: Callable[Try[A]]
 
 + runnable.create(=> Unit): Runnable
 + implicit conversion from () => Discarded to Runnable
@@ -357,6 +359,9 @@ The aim of frills is to pimp everything else. You can use it by including the fo
 'intransitive' means that frills won't force you to depend on everything that's pimped, you'll only get pimps for types in libraries you already depend on.
 
 + Option[A].toSuccessNel(E): ValidationNel[E, A]
++ Option[E].toFailureNel(A): ValidationNel[E, A]
+
++ List[A].toNel: Option[NonEmptyList[A]]
 
 + argonaut.Json.filterNulls: Json
 

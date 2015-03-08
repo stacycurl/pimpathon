@@ -6,10 +6,10 @@ import pimpathon.function._
 
 
 object either {
-  implicit def eitherOps[L, R](either: Either[L, R]): EitherOps[L, R] = new EitherOps[L, R](either)
+  implicit def eitherPimps[L, R](either: Either[L, R]): EitherPimps[L, R] = new EitherPimps[L, R](either)
 
-  class EitherOps[L, R](either: Either[L, R]) {
-    def leftMap[M](f: L ⇒ M): Either[M, R] = bimap[M, R](f, identity[R])
+  class EitherPimps[L, R](either: Either[L, R]) {
+    def leftMap[M](f: L ⇒ M): Either[M, R]  = bimap[M, R](f, identity[R])
     def rightMap[S](f: R ⇒ S): Either[L, S] = bimap[L, S](identity[L], f)
 
     def valueOr(lr: L ⇒ R): R = rightOr(lr)

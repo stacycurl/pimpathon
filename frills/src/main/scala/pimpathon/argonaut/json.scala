@@ -6,9 +6,9 @@ import pimpathon.function.Predicate
 
 
 object json {
-  implicit def jsonOps(json: Json): JsonOps = new JsonOps(json)
+  implicit def jsonFrills(json: Json): JsonFrills = new JsonFrills(json)
 
-  class JsonOps(json: Json) {
+  class JsonFrills(json: Json) {
     def filterNulls: Json = filter(_ != Json.jNull)
 
     private[argonaut] def filter(p: Predicate[Json]): Json =

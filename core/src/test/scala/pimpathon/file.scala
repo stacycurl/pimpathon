@@ -18,8 +18,8 @@ class FileTest {
 
   import file._
 
-  @Test def rejectsNull(): Unit = assertEquals("requirement failed: FileOps cannot be used with null files",
-    intercept[Exception](file.fileOps(null: File)).getMessage)
+  @Test def rejectsNull(): Unit =
+    assertThrows[Exception]("requirement failed: FileOps cannot be used with null files")(file.filePimps(null: File))
 
   @Test def create(): Unit = file.withTempDirectory(dir ⇒ {
     val child = dir / "child"
@@ -269,7 +269,7 @@ class FileTest {
 
   @Test def readString(): Unit = file.withTempFile(tmp ⇒ {
     List("ISO-8859-1", "US-ASCII", "UTF-16", "UTF-16BE", "UTF-16LE", "UTF-8").map(Codec(_)).foreach(codec ⇒ {
-      assertEquals("line1\nline2", tmp.writeBytes("line1\nline2".getBytes(codec.charSet)).readString()(codec))
+      assertEquals("line1\r\nline2", tmp.writeBytes("line1\r\nline2".getBytes(codec.charSet)).readString()(codec))
     })
   })
 

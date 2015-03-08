@@ -8,15 +8,15 @@ import pimpathon.string._
 
 
 object array {
-  implicit def arrayOps[A](array: Array[A]): ArrayOps[A] = new ArrayOps[A](array)
-  implicit def byteArrayOps(array: Array[Byte]): ByteArrayOps = new ByteArrayOps(array)
+  implicit def arrayPimps[A](array: Array[A]): ArrayPimps[A] = new ArrayPimps[A](array)
+  implicit def byteArrayPimps(array: Array[Byte]): ByteArrayPimps = new ByteArrayPimps(array)
 
-  class ArrayOps[A](array: Array[A]) {
+  class ArrayPimps[A](array: Array[A]) {
     def copyTo(srcPos: Int, dest: Array[A], destPos: Int, length: Int): Array[A] =
       dest.tap(_ ⇒ System.arraycopy(array, srcPos, dest, destPos, length))
   }
 
-  class ByteArrayOps(array: Array[Byte]) {
+  class ByteArrayPimps(array: Array[Byte]) {
     def toHex(length: Int): String = toHex.prefixPadTo(length, '0')
     def toHex: String = new BigInteger(1, array).toString(16)
 

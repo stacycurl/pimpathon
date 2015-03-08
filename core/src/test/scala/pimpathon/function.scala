@@ -5,6 +5,7 @@ import scala.util.Random
 
 import org.junit.Assert._
 import pimpathon.function._
+import pimpathon.util._
 
 
 class FunctionTest {
@@ -41,11 +42,10 @@ class FunctionTest {
   @Test def ifSome(): Unit = assertEquals(List(Some(4), Some(6)),
     List(None, Some(3), Some(4), None, Some(6)).filter(isEven.ifSome))
 
-  @Test def guard(): Unit = assertEquals(List(None, Some(4), None, Some(8)),
-    List(1, 2, 3, 4).map((isEven guard double).lift))
+  @Test def guard(): Unit = on(1, 2, 3, 4).calling((isEven guard double).lift).produces(None, Some(4), None, Some(8))
 
-  @Test def guardWith(): Unit = assertEquals(List(None, Some(4), None, Some(8)),
-    List(1, 2, 3, 4).map((double guardWith isEven).lift))
+  @Test def guardWith(): Unit =
+    on(1, 2, 3, 4).calling((double guardWith isEven).lift).produces(None, Some(4), None, Some(8))
 
   @Test def tupled(): Unit = assertEquals(3, ((i: Int) ⇒ (j: Int) ⇒ i + j).tupled((1, 2)))
 
@@ -54,19 +54,19 @@ class FunctionTest {
 }
 
 class PartialFunctionTest {
-  @Test def either(): Unit  = assertEquals(List(Right("2"), Left(2)), List(1, 2).map(util.partial(1 → "2").either))
-  @Test def toRight(): Unit = assertEquals(List(Right("2"), Left(2)), List(1, 2).map(util.partial(1 → "2").toRight))
-  @Test def toLeft(): Unit  = assertEquals(List(Left("2"), Right(2)), List(1, 2).map(util.partial(1 → "2").toLeft))
-  @Test def unify(): Unit   = assertEquals(List(1, 4),                List(1, 2).map(util.partial(2 → 4).unify))
+  @Test def either(): Unit  = on(1, 2).calling(util.partial(1 → "2").either).produces(Right("2"), Left(2))
+  @Test def toRight(): Unit = on(1, 2).calling(util.partial(1 → "2").toRight).produces(Right("2"), Left(2))
+  @Test def toLeft(): Unit  = on(1, 2).calling(util.partial(1 → "2").toLeft).produces(Left("2"), Right(2))
+  @Test def unify(): Unit   = on(1, 2).calling(util.partial(2 → 4).unify).produces(1, 4)
 
   @Test def isUndefinedAt(): Unit =
-    assertEquals(List(true, false), List("gibberish", "foo").map(util.partial("foo" → "bar").isUndefinedAt))
+    on("oof", "foo").calling(util.partial("foo" → "bar").isUndefinedAt).produces(true, false)
 
   @Test def first(): Unit =
-    assertEquals(List(Some(2 → "foo"), None), List(1 → "foo", 2 → "bar").map(util.partial(1 → 2).first[String].lift))
+    on(1 → "foo", 2 → "bar").calling(util.partial(1 → 2).first[String].lift).produces(Some(2 → "foo"), None)
 
   @Test def second(): Unit =
-    assertEquals(List(Some("foo" → 2), None), List("foo" → 1, "bar" → 2).map(util.partial(1 → 2).second[String].lift))
+    on("foo" → 1, "bar" → 2).calling(util.partial(1 → 2).second[String].lift).produces(Some("foo" → 2), None)
 
   @Test def partition(): Unit =
     assertEquals((List(2, 4), List("one", "three")), util.partial(1 → "one", 3 → "three").partition(List(1, 2, 3, 4)))

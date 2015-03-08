@@ -53,13 +53,8 @@ class MapTest {
     assertEquals("present", Map(0 → "present").getOrThrow(0, new Exception("missing")))
     assertEquals("present", Map(0 → "present").getOrThrow(0, util.goBoom: Exception))
 
-    assertEquals("missing", util.intercept[IllegalArgumentException] {
-      nonEmpty.getOrThrow(0, "missing")
-    }.getMessage)
-
-    assertEquals("missing", util.intercept[RuntimeException] {
-      nonEmpty.getOrThrow(0, new RuntimeException("missing"))
-    }.getMessage)
+    assertThrows[IllegalArgumentException]("missing")(nonEmpty.getOrThrow(0, "missing"))
+    assertThrows[RuntimeException]("missing")(nonEmpty.getOrThrow(0, new RuntimeException("missing")))
   }
 
   @Test def uncons(): Unit = {

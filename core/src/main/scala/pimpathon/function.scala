@@ -8,28 +8,28 @@ import pimpathon.list._
 object function {
   type Predicate[-A] = A ⇒ Boolean
 
-  implicit def functionOps[A, B](f: A ⇒ B): FunctionOps[A, B] = new FunctionOps[A, B](f)
+  implicit def functionPimps[A, B](f: A ⇒ B): FunctionPimps[A, B] = new FunctionPimps[A, B](f)
 
-  implicit def curriedFunction2Ops[A, B, C](f: A ⇒ B ⇒ C): CurriedFunction2Ops[A, B, C] =
-    new CurriedFunction2Ops[A, B, C](f)
+  implicit def curriedFunction2Pimps[A, B, C](f: A ⇒ B ⇒ C): CurriedFunction2Pimps[A, B, C] =
+    new CurriedFunction2Pimps[A, B, C](f)
 
-  implicit def predicateOps[A](p: Predicate[A]): PredicateOps[A] = new PredicateOps[A](p)
+  implicit def predicatePimps[A](p: Predicate[A]): PredicatePimps[A] = new PredicatePimps[A](p)
 
-  implicit def partialFunctionOps[In, Out](pf: PartialFunction[In, Out]): PartialFunctionOps[In, Out] =
-    new PartialFunctionOps[In, Out](pf)
+  implicit def partialFunctionPimps[In, Out](pf: PartialFunction[In, Out]): PartialFunctionPimps[In, Out] =
+    new PartialFunctionPimps[In, Out](pf)
 
-  implicit def partialFunctionEndoOps[A](pf: PartialFunction[A, A]): PartialEndoFunctionOps[A] =
-    new PartialEndoFunctionOps[A](pf)
+  implicit def partialEndoFunctionPimps[A](pf: PartialFunction[A, A]): PartialEndoFunctionPimps[A] =
+    new PartialEndoFunctionPimps[A](pf)
 
-  class FunctionOps[A, B](f: A ⇒ B) {
+  class FunctionPimps[A, B](f: A ⇒ B) {
     def guardWith(p: Predicate[A]): PartialFunction[A, B] = p guard f
   }
 
-  class CurriedFunction2Ops[A, B, C](f: A ⇒ B ⇒ C) {
+  class CurriedFunction2Pimps[A, B, C](f: A ⇒ B ⇒ C) {
     def tupled: ((A, B)) ⇒ C = Function.uncurried(f).tupled
   }
 
-  class PredicateOps[A](p: Predicate[A]) {
+  class PredicatePimps[A](p: Predicate[A]) {
     def and(q: Predicate[A]): Predicate[A] = (a: A) ⇒ p(a) && q(a)
     def or(q: Predicate[A]):  Predicate[A] = (a: A) ⇒ p(a) || q(a)
     def not:                  Predicate[A] = (a: A) ⇒ !p(a)
@@ -42,7 +42,7 @@ object function {
     def guard[B](f: A ⇒ B): PartialFunction[A, B] = new GuardedPartialFunction[A, B](p, f)
   }
 
-  class PartialFunctionOps[In, Out](pf: PartialFunction[In, Out]) {
+  class PartialFunctionPimps[In, Out](pf: PartialFunction[In, Out]) {
     def isUndefinedAt(in: In): Boolean = !pf.isDefinedAt(in)
 
     def partition[CC[A]](ins: GenTraversableLike[In, GenTraversable[In]])
@@ -63,7 +63,7 @@ object function {
       }
   }
 
-  class PartialEndoFunctionOps[A](pf: PartialFunction[A, A]) {
+  class PartialEndoFunctionPimps[A](pf: PartialFunction[A, A]) {
     def unify: A ⇒ A = (a: A) ⇒ pf.lift(a).getOrElse(a)
   }
 

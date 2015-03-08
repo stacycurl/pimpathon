@@ -1,7 +1,6 @@
 package pimpathon
 
-import _root_.java.io.{FileInputStream, RandomAccessFile, File, FileOutputStream}
-import _root_.java.nio.charset.Charset
+import _root_.java.io.{RandomAccessFile, File, FileOutputStream}
 import scala.io.{Codec, BufferedSource, Source}
 import scala.util.Properties
 
@@ -18,9 +17,9 @@ case class FileUtils (
   private val currentTime: () ⇒ Long = () ⇒ System.currentTimeMillis()
 ) {
 
-  implicit def fileOps(file: File): FileOps = new FileOps(file)
+  implicit def filePimps(file: File): FilePimps = new FilePimps(file)
 
-  class FileOps(file: File) {
+  class FilePimps(file: File) {
     require(Option(file).isDefined, "FileOps cannot be used with null files")
 
     def missing: Boolean = !file.exists
@@ -63,11 +62,11 @@ case class FileUtils (
 
     def md5(): String = readLines().mkString("\n").md5
 
-    def readBytes(): Array[Byte] = new RandomAccessFile(file, "r").withFinally(_.close())(raf ⇒ {
-      new Array[Byte](raf.length().asInstanceOf[Int]).tap(raf.read)
-    })
+    def readString()(implicit codec: Codec): String = new String(readBytes(), codec.charSet)
 
-    def readString()(implicit codec: Codec): String = readLines().mkString(Properties.lineSeparator)
+    def readBytes(): Array[Byte] = new RandomAccessFile(file, "r").withFinally(_.close())(raf ⇒ {
+      new Array[Byte](raf.length().toInt).tap(raf.read)
+    })
 
     def readLines()(implicit codec: Codec): List[String] = source().withFinally(_.close())(_.getLines().toList)
 

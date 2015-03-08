@@ -7,9 +7,9 @@ import pimpathon.function._
 
 
 object any {
-  implicit def anyOps[A](a: A): AnyOps[A] = new AnyOps[A](a)
+  implicit def anyPimps[A](a: A): AnyPimps[A] = new AnyPimps[A](a)
 
-  class AnyOps[A](a: A) {
+  class AnyPimps[A](a: A) {
     def calc[B](f: A ⇒ B): B = f(a)
     def |>[B](f: A ⇒ B): B = f(a)
     def calcIf[B](p: Predicate[A])(f: A ⇒ B): Option[B] = p(a).option(f(a))
@@ -55,6 +55,8 @@ object any {
     def update[Discarded](actions: (A ⇒ Discarded)*): A         = tap(actions: _*)
     def withSideEffect[Discarded](actions: (A ⇒ Discarded)*): A = tap(actions: _*)
     def tap[Discarded](actions: (A ⇒ Discarded)*): A            = { actions.foreach(action ⇒ action(a)); a }
+
+    def bounded(lower: A, upper: A)(implicit na: Numeric[A]): A = na.min(na.max(lower, a), upper)
   }
 
   class AnyCapturer[A](a: A, andThen: Boolean ⇒ Option[A]) {

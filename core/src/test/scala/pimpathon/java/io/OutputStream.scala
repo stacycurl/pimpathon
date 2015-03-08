@@ -90,7 +90,10 @@ class OutputStreamTest {
     assertEquals("contents", write("contents", 8))
     assertEquals("contents", write("contents", 9))
     assertEquals("", write("contents", 0))
-    intercept[IllegalArgumentException](write("contents", -1))
+
+    assertThrows[IllegalArgumentException]("requirement failed: You can't read a negative number of bytes!") {
+      write("contents", -1)
+    }
   }
 
   @Test def writeN(): Unit = {
@@ -102,7 +105,11 @@ class OutputStreamTest {
     assertEquals("cont", write("contents", 4))
     assertEquals("contents", write("contents", 8))
     assertEquals("", write("contents", 0))
-    intercept[IllegalArgumentException](write("contents", -1))
-    intercept[IOException](write("contents", 9))
+
+    assertThrows[IllegalArgumentException]("requirement failed: You can't read a negative number of bytes!") {
+      write("contents", -1)
+    }
+
+    assertThrows[IOException]("Failed to write 9 only 8 were available")(write("contents", 9))
   }
 }

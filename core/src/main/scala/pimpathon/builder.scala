@@ -6,13 +6,13 @@ import pimpathon.any._
 
 
 object builder {
-  implicit def builderOps[A, B](builder: M.Builder[A, B]): BuilderOps[A, B] = new BuilderOps[A, B](builder)
+  implicit def builderPimps[A, B](builder: M.Builder[A, B]): BuilderPimps[A, B] = new BuilderPimps[A, B](builder)
 
-  class BuilderOps[A, B](builder: M.Builder[A, B]) {
+  class BuilderPimps[A, B](builder: M.Builder[A, B]) {
     def +++=(xss: TraversableOnce[TraversableOnce[A]]): M.Builder[A, B] = builder.tap(b ⇒ xss.foreach(b ++= _))
     def on[C](f: C ⇒ A): M.Builder[C, B] = new ContramappedBuilder(builder, f)
-    def reset(): B = builder.result().tap(_ ⇒ builder.clear())
     def run[Discarded](actions: (M.Builder[A, B] ⇒ Discarded)*): B = builder.tap(actions: _*).reset()
+    def reset(): B = builder.result().tap(_ ⇒ builder.clear())
   }
 
   private class ContramappedBuilder[A, B, C](builder: M.Builder[A, B], f: C ⇒ A) extends M.Builder[C, B] {

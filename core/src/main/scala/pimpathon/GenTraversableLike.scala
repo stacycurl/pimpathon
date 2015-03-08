@@ -18,15 +18,16 @@ object genTraversableLike extends genTraversableLike[({ type CC[A] = GenTraversa
 }
 
 abstract class genTraversableLike[CC[A]] {
-  implicit def genTraversableLikeOps[A](cc: CC[A]): GenTraversableLikeOps[A] = new GenTraversableLikeOps[A](toGTL(cc))
+  implicit def genTraversableLikePimps[A](cc: CC[A]): GenTraversableLikePimps[A] =
+    new GenTraversableLikePimps[A](toGTL(cc))
 
-  implicit def genTraversableLikeOfEitherOps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr])
-    : GenTraversableLikeOfEitherOps[L, R, Repr] = new GenTraversableLikeOfEitherOps[L, R, Repr](gtl)
+  implicit def genTraversableLikeOfEitherPimps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr])
+    : GenTraversableLikeOfEitherPimps[L, R, Repr] = new GenTraversableLikeOfEitherPimps[L, R, Repr](gtl)
 
   implicit def genTraversableLikeOfTuple2[K, V, Repr](gtl: GenTraversableLike[(K, V), Repr])
     : GenTraversableLikeOfTuple2[K, V, Repr] = new GenTraversableLikeOfTuple2[K, V, Repr](gtl)
 
-  class GenTraversableLikeOps[A](gtl: GenTraversableLike[A, GenTraversable[A]]) {
+  class GenTraversableLikePimps[A](gtl: GenTraversableLike[A, GenTraversable[A]]) {
     def asMap: GenTraversableLikeCapturer[A, Map] = as[Map]
 
     def attributeCounts[B](f: A ⇒ B): Map[B, Int] =
@@ -68,7 +69,7 @@ abstract class genTraversableLike[CC[A]] {
     }
   }
 
-  class GenTraversableLikeOfEitherOps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr]) {
+  class GenTraversableLikeOfEitherPimps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr]) {
     def partitionEithers[That[_]](implicit lcbf: CCBF[L, That], rcbf: CCBF[R, That]): (That[L], That[R]) =
       (lcbf.apply(), rcbf.apply()).tap(l ⇒ r ⇒ gtl.foreach(_.addTo(l, r))).tmap(_.result(), _.result())
   }

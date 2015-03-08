@@ -13,13 +13,13 @@ import pimpathon.tuple._
 
 
 object list extends genTraversableLike[List] {
-  implicit def listOps[A](list: List[A]): ListOps[A] = new ListOps[A](list)
-  implicit def matrixOps[A](matrix: List[List[A]]): MatrixOps[A] = new MatrixOps[A](matrix)
+  implicit def listPimps[A](list: List[A]): ListPimps[A] = new ListPimps[A](list)
+  implicit def matrixPimps[A](matrix: List[List[A]]): MatrixPimps[A] = new MatrixPimps[A](matrix)
 
-  class ListOps[A](list: List[A]) {
+  class ListPimps[A](list: List[A]) {
     def tapEmpty(empty: ⇒ Unit): List[A] = tap(empty, _ ⇒ {})
     def tapNonEmpty(nonEmpty: List[A] ⇒ Unit): List[A] = tap({}, nonEmpty)
-    def tap(empty: ⇒ Unit, nonEmpty: List[A] ⇒ Unit): List[A] = new AnyOps(list).tap(_.uncons(empty, nonEmpty))
+    def tap(empty: ⇒ Unit, nonEmpty: List[A] ⇒ Unit): List[A] = new AnyPimps(list).tap(_.uncons(empty, nonEmpty))
 
     def emptyTo(alternative: ⇒ List[A]): List[A] = uncons(alternative, _ ⇒ list)
 
@@ -98,7 +98,7 @@ object list extends genTraversableLike[List] {
     private def zip[B](other: List[B]): Iterator[(A, B)] = list.iterator.zip(other.iterator)
   }
 
-  class MatrixOps[A](value: List[List[A]]) {
+  class MatrixPimps[A](value: List[List[A]]) {
     def cartesianProduct: List[List[A]] = value.foldRight(List(Nil): List[List[A]]) {
       case (item, acc) ⇒ for { a ← item; b ← acc } yield a :: b
     }

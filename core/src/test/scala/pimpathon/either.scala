@@ -11,60 +11,32 @@ import pimpathon.util._
 
 
 class EitherTest {
-  @Test def leftOr(): Unit = assertEquals(
-    List("left", "right !"),
-    List(Left("left"), Right("right")).map(_.leftOr(_ + " !"))
-  )
+  @Test def leftOr(): Unit  = on(Left("left"), Right("right")).calling(_.leftOr(_ + " !")).produces("left", "right !")
+  @Test def rightOr(): Unit = on(Left("left"), Right("right")).calling(_.rightOr(_ + " !")).produces("left !", "right")
 
-  @Test def rightOr(): Unit = assertEquals(
-    List("left !", "right"),
-    List(Left("left"), Right("right")).map(_.rightOr(_ + " !"))
-  )
+  @Test def rescue(): Unit  = on(Right(123), Left("456")).calling(_.rescue(_.toInt)).produces(123, 456)
+  @Test def valueOr(): Unit = on(Right(123), Left("456")).calling(_.valueOr(_.toInt)).produces(123, 456)
 
-  @Test def rescue(): Unit = assertEquals(
-    List(123, 456),
-    List(Right(123), Left("456")).map(_ rescue(_.toInt))
-  )
+  @Test def rescuePF(): Unit = on(Right(123), Left("456"), Left("123"))
+    .calling(_.rescue(util.partial("123" → 123))).produces(Right(123), Left("456"), Right(123))
 
-  @Test def valueOr(): Unit = assertEquals(
-    List(123, 456),
-    List(Right(123), Left("456")).map(_ valueOr(_.toInt))
-  )
+  @Test def valueOrPF(): Unit = on(Right(123), Left("456"), Left("123"))
+    .calling(_.valueOr(util.partial("123" → 123))).produces(Right(123), Left("456"), Right(123))
 
-  @Test def rescuePF(): Unit = assertEquals(
-    List(Right(123), Left("456"), Right(123)),
-    List(Right(123), Left("456"), Left("123")).map(_.rescue(util.partial("123" → 123)))
-  )
+  @Test def bimap(): Unit = on(left(1), right("foo"))
+    .calling(_.bimap(_.toString, _.length)).produces(Left[String, Int]("1"), Right[String, Int](3))
 
-  @Test def valueOrPF(): Unit = assertEquals(
-    List(Right(123), Left("456"), Right(123)),
-    List(Right(123), Left("456"), Left("123")).map(_.valueOr(util.partial("123" → 123)))
-  )
+  @Test def leftMap(): Unit = on(left(1), right("foo"))
+    .calling(_.leftMap(_.toString)).produces(Left[String, String]("1"), Right[String, String]("foo"))
 
-  @Test def bimap(): Unit = {
-    assertEquals(Left[String, Int]("1"),     left(1).bimap(_.toString, _.length))
-    assertEquals(Right[String, Int](3), right("foo").bimap(_.toString, _.length))
-  }
+  @Test def rightMap(): Unit = on(left(1), right("foo"))
+    .calling(_.rightMap(_.length)).produces(Left[Int, Int](1), Right[Int, Int](3))
 
-  @Test def leftMap(): Unit = {
-    assertEquals(Left[String, String]("1"),         left(1).leftMap(_.toString))
-    assertEquals(Right[String, String]("foo"), right("foo").leftMap(_.toString))
-  }
+  @Test def leftFlatMap(): Unit = on(Right(123), Left("456"), Left("123"))
+    .calling(_.leftFlatMap(partial("123" → 123).toRight)).produces(Right(123), Left("456"), Right(123))
 
-  @Test def rightMap(): Unit = {
-    assertEquals(Left[Int, Int](1),       left(1).rightMap(_.length))
-    assertEquals(Right[Int, Int](3), right("foo").rightMap(_.length))
-  }
-
-  @Test def leftFlatMap(): Unit = assertEquals(
-    List(Right(123), Left("456"), Right(123)),
-    List(Right(123), Left("456"), Left("123")).map(_.leftFlatMap(partial("123" → 123).toRight))
-  )
-
-  @Test def rightFlatMap(): Unit = assertEquals(
-    List(Left(123), Right("456"), Left(123)),
-    List(Left(123), Right("456"), Right("123")).map(_.rightFlatMap(partial("123" → 123).toLeft))
-  )
+  @Test def rightFlatMap(): Unit = on(Left(123), Right("456"), Right("123"))
+    .calling(_.rightFlatMap(partial("123" → 123).toLeft)).produces(Left(123), Right("456"), Left(123))
 
   @Test def tap(): Unit = {
     assertEquals((List(1), Nil),

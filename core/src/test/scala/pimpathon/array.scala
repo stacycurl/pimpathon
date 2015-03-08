@@ -18,9 +18,7 @@ class ArrayTest {
       (new String(buffer).substring(0, count), count)
     }
 
-    assertEquals(("contents", 8), read("contents", 9, 8))
-    assertEquals(("contents", 8), read("contents", 8, 8))
-    assertEquals(("content",  7), read("contents", 7, 8))
+    on(9, 8, 7).calling(read("contents", _, 8)).produces(("contents", 8), ("contents", 8), ("content", 7))
   }
 
   @Test def copyUpToN(): Unit = {
@@ -32,9 +30,7 @@ class ArrayTest {
       (os.toString, count)
     }
 
-    assertEquals(("contents", 8), copy("contents", 9, 8))
-    assertEquals(("contents", 8), copy("contents", 8, 8))
-    assertEquals(("content",  7), copy("contents", 7, 8))
+    on(9, 8, 7).calling(copy("contents", _, 8)).produces(("contents", 8), ("contents", 8), ("content", 7))
   }
 
   @Test def copyTo(): Unit = assertEquals(

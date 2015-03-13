@@ -1,10 +1,9 @@
-package pimpathon.java.lang
-
-import org.junit.Test
+package pimpathon
 
 import org.junit.Assert._
+import org.junit.Test
 import pimpathon.builder._
-import pimpathon.java.lang.runnable._
+import pimpathon.runnable._
 import pimpathon.util._
 
 

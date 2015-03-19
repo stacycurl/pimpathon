@@ -51,6 +51,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Boolean.option(A): Option[A]
 + Boolean.implies(Boolean): Boolean
 + Boolean.nor(Boolean): Boolean
++ Boolean.nand(Boolean): Boolean
 
 + Option[A].getOrThrow(String): A
 + Option[A].getOrThrow(=> Exception): A

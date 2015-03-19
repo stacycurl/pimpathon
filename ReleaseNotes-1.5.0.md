@@ -9,6 +9,7 @@
 + [A: Numeric].bounded(A, A): A
 + Boolean.implies(Boolean): Boolean
 + Boolean.nor(Boolean): Boolean
++ Boolean.nand(Boolean): Boolean
 + Option[E].toFailureNel(A): ValidationNel[E, A]
 + GTL[A].apoFold(B)((B, A) ⇒ Either[C, B]): Either[C, B]
 + List[A].toNel: Option[NonEmptyList[A]]

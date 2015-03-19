@@ -73,23 +73,19 @@ class ListTest {
   }
 
   @Test def headTail(): Unit = {
-    assertThrows[NoSuchElementException]("headTail of empty list") {
-      Nil.headTail
-    }
-
     assertEquals((1, Nil),        List(1).headTail)
     assertEquals((1, List(2)),    List(1, 2).headTail)
     assertEquals((1, List(2, 3)), List(1, 2, 3).headTail)
+
+    assertThrows[NoSuchElementException]("headTail of empty list")(Nil.headTail)
   }
 
   @Test def initLast(): Unit = {
-    assertThrows[NoSuchElementException]("initLast of empty list") {
-      Nil.initLast
-    }
-
     assertEquals((Nil, 1),        List(1).initLast)
     assertEquals((List(1), 2),    List(1, 2).initLast)
     assertEquals((List(1, 2), 3), List(1, 2, 3).initLast)
+
+    assertThrows[NoSuchElementException]("initLast of empty list")(Nil.initLast)
   }
 
   @Test def headTailOption(): Unit = {

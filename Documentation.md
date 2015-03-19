@@ -49,6 +49,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Boolean.asInt: Int
 + Boolean.either(R).or(L): Either[L, R]
 + Boolean.option(A): Option[A]
++ Boolean.implies(Boolean): Boolean
 
 + Option[A].getOrThrow(String): A
 + Option[A].getOrThrow(=> Exception): A

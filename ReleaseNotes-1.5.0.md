@@ -13,6 +13,8 @@
 + Option[E].toFailureNel(A): ValidationNel[E, A]
 + GTL[A].apoFold(B)((B, A) ⇒ Either[C, B]): Either[C, B]
 + List[A].toNel: Option[NonEmptyList[A]]
++ Map[K, V].containsEntry(K, V): Boolean
++ Map[K, V].containsEntry((K, V)): Boolean
 + Callable[A].attempt: Callable[Try[A]]
 + File.readString()(implicit Codec): String
 + File.source()(implicit Codec): BufferedSource  -- Added implicit Codec argument

@@ -15,6 +15,8 @@ object map extends genTraversableLike[GenTraversable] {
     def containsAll(ok: Option[K]): Boolean = ok.forall(map.contains)
     def containsAny[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.exists(map.contains)
     def containsAll[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.forall(map.contains)
+    def containsEntry(kv: (K, V)): Boolean = containsEntry(kv._1, kv._2)
+    def containsEntry(k: K, v: V): Boolean = map.get(k) == Some(v)
 
     def get(ok: Option[K]): Option[V]               = ok.flatMap(map.get)
     def getOrThrow(k: K, message: String): V        = getOrThrow(k, new IllegalArgumentException(message))

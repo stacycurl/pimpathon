@@ -198,6 +198,17 @@ class MapTest {
     assertTrue(nonEmpty.valueExists(_ == 2))
   }
 
+  @Test def containsEntry(): Unit = {
+    assertFalse(empty.containsEntry(1, 2))
+    assertFalse(empty.containsEntry((1, 2)))
+    assertTrue(nonEmpty.containsEntry(1, 2))
+    assertTrue(nonEmpty.containsEntry((1, 2)))
+    assertFalse(nonEmpty.containsEntry(1, 1))
+    assertFalse(nonEmpty.containsEntry((1, 1)))
+    assertFalse(nonEmpty.containsEntry(2, 2))
+    assertFalse(nonEmpty.containsEntry((2, 2)))
+  }
+
   @Test def mutable(): Unit = {
     assertEquals(M.Map(1 → 2), Map(1 → 2).mutable)
     assertEquals(M.Map(1 → 2), Map(1 → 2).toMutable)

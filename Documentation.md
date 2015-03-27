@@ -181,6 +181,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Map[K, V].containsAll(GTL[K]): Boolean
 + Map[K, V].containsAny(Option[K]): Boolean
 + Map[K, V].containsAny(GTL[K]): Boolean
++ Map[K, V].containsEntry(K, V): Boolean
++ Map[K, V].containsEntry((K, V)): Boolean
 + Map[K, V].get(Option[K]): Option[V]
 + Map[K, V].emptyTo(Map[K, V]): Map[K, V]
 + Map[K, V].uncons(A, Map[K, V] => A): A

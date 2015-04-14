@@ -90,15 +90,16 @@ class InputStreamTest {
     def read(text: String, n: Int, bufferSize: Int = inputStream.bufferSize): String = {
       val withBufferSize = new InputStreamUtils(bufferSize = bufferSize); import withBufferSize._
       val (is, os) = (createInputStream(text), createOutputStream())
+
       os.tap(is.readUpToN(_, n), _.close()).toString
     }
 
-    assertEquals("cont", read("contents", 4))
+    assertEquals("",         read("contents", 0))
+    assertEquals("cont",     read("contents", 4))
     assertEquals("contents", read("contents", 8))
-    assertEquals("content", read("contents", 7, 2))
-    assertEquals("content", read("content", 8, 2))
     assertEquals("contents", read("contents", 9))
-    assertEquals("", read("contents", 0))
+    assertEquals("content",  read("contents", 7, 2))
+    assertEquals("content",  read("content",  8, 2))
 
     assertThrows[IllegalArgumentException]("requirement failed: You can't read a negative number of bytes!") {
       read("contents", -1)
@@ -111,14 +112,18 @@ class InputStreamTest {
       os.tap(is.readN(_, n), _.close()).toString
     }
 
-    assertEquals("cont", read("contents", 4))
+    assertEquals("",         read("contents", 0))
+    assertEquals("cont",     read("contents", 4))
     assertEquals("contents", read("contents", 8))
-    assertEquals("", read("contents", 0))
 
     assertThrows[IllegalArgumentException]("requirement failed: You can't read a negative number of bytes!") {
       read("contents", -1)
     }
 
     assertThrows[IOException]("Failed to read 9 bytes, only 8 were available")(read("contents", 9))
+  }
+
+  @Test def toByteArray(): Unit = {
+    assertEquals("contents", new String(createInputStream("contents").toByteArray))
   }
 }

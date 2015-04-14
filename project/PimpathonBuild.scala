@@ -1,7 +1,7 @@
 import sbt._
 
 import net.virtualvoid.sbt.graph.{Plugin ⇒ GraphPlugin}
-import org.scalastyle.sbt.ScalastylePlugin
+import org.scalastyle.sbt.ScalastylePlugin.{ Settings => scalaStyleSettings }
 
 import sbt.Keys._
 import scoverage.ScoverageSbtPlugin._
@@ -38,10 +38,7 @@ object PimpathonBuild extends Build {
     }
   }
 
-  def commonSettings = GraphPlugin.graphSettings ++ CoverallsPlugin.coverallsSettings ++
-  // uncomment when you want to reset the formatting of the project
-  // SbtScalariform.scalariformSettings ++
-  ScalastylePlugin.Settings ++ instrumentSettings ++ Seq(
+  def commonSettings = GraphPlugin.graphSettings ++ scalaStyleSettings ++ instrumentSettings ++ Seq(
     organization := "com.github.stacycurl",
     scalaVersion := "2.11.2",
     maxErrors := 1,

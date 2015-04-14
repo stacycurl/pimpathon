@@ -16,6 +16,7 @@
 + Map[K, V].containsEntry(K, V): Boolean
 + Map[K, V].containsEntry((K, V)): Boolean
 + Callable[A].attempt: Callable[Try[A]]
++ InputStream.toByteArray: Array[Byte]
 + File.readString()(implicit Codec): String
 + File.source()(implicit Codec): BufferedSource  -- Added implicit Codec argument
 + File.readLines()(implicit Codec): List[String] -- Added implicit Codec argument

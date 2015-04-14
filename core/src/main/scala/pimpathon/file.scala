@@ -70,6 +70,9 @@ case class FileUtils (
     def readLines()(implicit codec: Codec): List[String] = source().withFinally(_.close())(_.getLines().toList)
 
     def write(contents: String, append: Boolean = append): File =
+      writeString(contents, append)
+
+    def writeString(contents: String, append: Boolean = append): File =
       writeBytes(contents.getBytes, append)
 
     def writeLines(lines: List[String], append: Boolean = append): File =

@@ -1,8 +1,9 @@
 package pimpathon.java.io
 
+import scala.io.Codec
 import scala.language.implicitConversions
 
-import java.io.{BufferedInputStream, IOException, InputStream, OutputStream}
+import java.io._
 import java.util.zip.GZIPInputStream
 import scala.annotation.tailrec
 import scala.util.Try
@@ -48,7 +49,7 @@ class InputStreamPimps[IS <: InputStream](is: IS, utils: InputStreamUtils) {
 
   def readN(os: OutputStream, n: Long): IS = is.tap(_.readUpToN(os, n) |> (count ⇒ if (count != n)
     throw new IOException(s"Failed to read $n bytes, only $count were available")
-    ))
+  ))
 
   def readUpToN(os: OutputStream, n: Long): Long = withBuffer(buffer ⇒ {
     require(n >= 0, "You can't read a negative number of bytes!")
@@ -61,4 +62,6 @@ class InputStreamPimps[IS <: InputStream](is: IS, utils: InputStreamUtils) {
 
     recurse(0)
   })
+
+  def toByteArray: Array[Byte] = new ByteArrayOutputStream().drain(is).toByteArray
 }

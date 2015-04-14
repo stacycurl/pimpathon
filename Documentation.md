@@ -288,6 +288,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + InputStream.readN(OutputStream, Long): InputStream
 + InputStream.readUpToN(OutputStream, Long): Long
 + InputStream.gunzip: GZIPInputStream
++ InputStream.toByteArray: Array[Byte]
 
 + OutputStream.closeAfter(OutputStream => A): A
 + OutputStream.attemptClose: Try[Unit]

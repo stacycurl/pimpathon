@@ -91,6 +91,20 @@ object list extends genTraversableLike[List] {
       recurse(list, other, Nil)
     }
 
+    def zipExact[B](other: List[B]): (List[(A, B)], Option[Either[List[A], List[B]]]) = {
+      @tailrec
+      def recurse(lhs: List[A], rhs: List[B], acc: List[(A, B)]): (List[(A, B)], Option[Either[List[A], List[B]]]) = {
+        (lhs, rhs) match {
+          case (l :: left, r :: right) ⇒ recurse(left, right, (l, r) :: acc)
+          case (Nil, Nil)              ⇒ (acc.reverse, None)
+          case (left, Nil)             ⇒ (acc.reverse, Some(Left(left)))
+          case (Nil, right)            ⇒ (acc.reverse, Some(Right(right)))
+        }
+      }
+
+      recurse(list, other, Nil)
+    }
+
     private def equalBy[B](f: A ⇒ B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
     private def zip[B](other: List[B]): Iterator[(A, B)] = list.iterator.zip(other.iterator)
   }

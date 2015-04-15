@@ -177,4 +177,13 @@ class ListTest {
     assertEquals(None, List(1, 2).onlyOption)
     assertEquals(Some(1), List(1).onlyOption)
   }
+
+  @Test def zipExact(): Unit = {
+    assertEquals((Nil, None),                             Nil.zipExact(Nil))
+    assertEquals((List((1, 4), (2, 5), (3, 6)), None),    List(1, 2, 3).zipExact(List(4, 5, 6)))
+    assertEquals((Nil, Some(Left(List(1, 2, 3)))),        List(1, 2, 3).zipExact(Nil))
+    assertEquals((Nil, Some(Right(List(4, 5, 6)))),       Nil.zipExact(List(4, 5, 6)))
+    assertEquals((List((1, 4)), Some(Left(List(2, 3)))),  List(1, 2, 3).zipExact(List(4)))
+    assertEquals((List((1, 4)), Some(Right(List(5, 6)))), List(1).zipExact(List(4, 5, 6)))
+  }
 }

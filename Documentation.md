@@ -239,6 +239,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Predicate[A].exists: Predicate[List[A]]
 + Predicate[A].forall: Predicate[List[A]]
 + Predicate[A].guard(A => B): PartialFunction[A, B]
++ Predicate[A].cond(=> B, => B): A => B
 + function.and(Predicate[A]*): Predicate[A]
 + function.or(Predicate[A]*): Predicate[A]
 + function.nand(Predicate[A]*): Predicate[A]

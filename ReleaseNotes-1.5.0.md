@@ -19,6 +19,7 @@
 + Map[K, V].collectValues(PartialFunction[V, W]): Map[K, W]
 + Map[K, V].containsEntry(K, V): Boolean
 + Map[K, V].containsEntry((K, V)): Boolean
++ Predicate[A].cond(=> B, => B): A => B
 + Callable[A].attempt: Callable[Try[A]]
 + InputStream.toByteArray: Array[Byte]
 + File.readString()(implicit Codec): String

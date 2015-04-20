@@ -4,6 +4,7 @@ import scala.language.higherKinds
 
 import scala.collection.{GenTraversable, GenTraversableLike}
 
+import pimpathon.boolean._
 import pimpathon.list._
 
 
@@ -19,6 +20,8 @@ object function {
   }
 
   implicit class PredicatePimps[A](val p: Predicate[A]) extends AnyVal {
+    def cond[B](ifTrue: ⇒ B, ifFalse: ⇒ B): A ⇒ B = a ⇒ p(a).cond(ifTrue, ifFalse)
+
     def and(q: Predicate[A]): Predicate[A] = (a: A) ⇒ p(a) && q(a)
     def or(q: Predicate[A]):  Predicate[A] = (a: A) ⇒ p(a) || q(a)
     def not:                  Predicate[A] = (a: A) ⇒ !p(a)

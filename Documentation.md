@@ -200,6 +200,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Map[K, V].andThenM(Map[V, W]): Map[K, W]
 + Map[K, V].composeM(Map[C, K]): Map[C, V]
 + Map[K, V].collectKeys(PartialFunction[K, C]): Map[C, V]
++ Map[K, V].collectValues(PartialFunction[V, W]): Map[K, W]
 + Map[K, V].partitionKeysBy(PartialFunction[K, C]): (Map[K, V], Map[C, V])
 + Map[K, V].partitionValuesBy(PartialFunction[V, W]): (Map[K, V], Map[K, W]))
 + Map[K, V].partitionEntriesBy(PartialFunction[(K, V), (C, W)]): (Map[K, V], Map[C, W])

@@ -63,6 +63,7 @@ object map extends genTraversableLike[GenTraversable] {
     def mapEntries[C, W](f: K ⇒ V ⇒ (C, W)): Map[C, W] = map.map { case (k, v) ⇒ f(k)(v)   }(breakOut)
 
     def collectKeys[C](pf: PartialFunction[K, C]): Map[C, V] = map.collect(pf.first)
+    def collectValues[W](pf: PartialFunction[V, W]): Map[K, W] = map.collect(pf.second)
 
     def updateValue(key: K, f: V ⇒ Option[V]): Map[K, V] =
       map.get(key).flatMap(f).fold(map - key)(newValue ⇒ map + ((key, newValue)))

@@ -7,6 +7,7 @@
 
 ### Additions
 + [A: Numeric].bounded(A, A): A
++ Boolean.cond(=> A, => A): A
 + Boolean.implies(Boolean): Boolean
 + Boolean.nor(Boolean): Boolean
 + Boolean.nand(Boolean): Boolean

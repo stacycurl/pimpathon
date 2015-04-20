@@ -47,6 +47,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + (A, B).removeFrom(Shrinkable[A], Shrinkable[B]): (A, B)
 
 + Boolean.asInt: Int
++ Boolean.cond(=> A, => A): A
 + Boolean.either(R).or(L): Either[L, R]
 + Boolean.option(A): Option[A]
 + Boolean.implies(Boolean): Boolean

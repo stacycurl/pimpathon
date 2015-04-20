@@ -9,6 +9,7 @@ object boolean {
     def implies(rhs: Boolean): Boolean = !value || rhs
     def nor(rhs: Boolean): Boolean = !(value || rhs)
     def nand(rhs: Boolean): Boolean = !(value && rhs)
+    def cond[A](ifTrue: ⇒ A, ifFalse: ⇒ A): A = if (value) ifTrue else ifFalse
   }
 
   class EitherCapturer[R](value: Boolean, right: R) {

@@ -15,6 +15,7 @@
 + GTL[A].apoFold(B)((B, A) ⇒ Either[C, B]): Either[C, B]
 + List[A].toNel: Option[NonEmptyList[A]]
 + List[A].zipExact(List[B]): (List[(A, B)], Option[Either[List[A], List[B]]])
++ List[A].zipExactWith(List[B])((A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]])
 + Map[K, V].collectKeys(PartialFunction[K, C]): Map[C, V]
 + Map[K, V].collectValues(PartialFunction[V, W]): Map[K, W]
 + Map[K, V].containsEntry(K, V): Boolean

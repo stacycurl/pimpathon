@@ -91,15 +91,15 @@ object list extends genTraversableLike[List] {
       recurse(list, other, Nil)
     }
 
-    def zipExact[B](other: List[B]): (List[(A, B)], Option[Either[List[A], List[B]]]) = {
+    def zipExact[B](bs: List[B]): (List[(A, B)], Option[Either[List[A], List[B]]]) = zipExactWith(bs)((a, b) ⇒ (a, b))
+
+    def zipExactWith[B, C](other: List[B])(f: (A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]]) = {
       @tailrec
-      def recurse(lhs: List[A], rhs: List[B], acc: List[(A, B)]): (List[(A, B)], Option[Either[List[A], List[B]]]) = {
-        (lhs, rhs) match {
-          case (l :: left, r :: right) ⇒ recurse(left, right, (l, r) :: acc)
-          case (Nil, Nil)              ⇒ (acc.reverse, None)
-          case (left, Nil)             ⇒ (acc.reverse, Some(Left(left)))
-          case (Nil, right)            ⇒ (acc.reverse, Some(Right(right)))
-        }
+      def recurse(la: List[A], lb: List[B], cs: List[C]): (List[C], Option[Either[List[A], List[B]]]) = (la, lb) match {
+        case (a :: as, b :: bs) ⇒ recurse(as, bs, f(a, b) :: cs)
+        case (Nil, Nil)         ⇒ (cs.reverse, None)
+        case (as, Nil)          ⇒ (cs.reverse, Some(Left(as)))
+        case (Nil, bs)          ⇒ (cs.reverse, Some(Right(bs)))
       }
 
       recurse(list, other, Nil)

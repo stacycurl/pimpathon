@@ -112,6 +112,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + List[A].tapEmpty(=> Unit): Lis[A]
 + List[A].tap(empty: => Unit, nonEmpty: List[A] => Unit): List[A]
 + List[A].zipExact(List[B]): (List[(A, B)], Option[Either[List[A], List[B]]])
++ List[A].zipExactWith(List[B])((A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]])
 + List[List[A]].cartesianProduct: List[List[A]]
 
 + GTL[A].collectAttributeCounts(PartialFunction[A, B]): Map[B, Int]

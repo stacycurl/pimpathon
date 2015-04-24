@@ -1,8 +1,7 @@
-package pimpathon.java.lang
-
-import org.junit.Test
+package pimpathon
 
 import org.junit.Assert._
+import org.junit.Test
 
 
 class ThreadLocalTest {

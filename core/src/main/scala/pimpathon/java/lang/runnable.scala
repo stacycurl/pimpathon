@@ -1,10 +1,5 @@
 package pimpathon.java.lang
 
 
-object runnable {
-  implicit def runnableFromThunk[Discarded](thunk: () ⇒ Discarded): Runnable = create(thunk())
-
-  def create(action: ⇒ Unit): Runnable = new Runnable {
-    override def run(): Unit = action
-  }
-}
+@deprecated("Please use pimpathon.runnable instead, will delete for 1.5.0", "1.4.4")
+object runnable extends pimpathon.runnable

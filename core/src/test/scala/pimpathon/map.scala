@@ -198,6 +198,17 @@ class MapTest {
     assertTrue(nonEmpty.valueExists(_ == 2))
   }
 
+  @Test def containsEntry(): Unit = {
+    assertFalse(empty.containsEntry(1, 2))
+    assertFalse(empty.containsEntry((1, 2)))
+    assertTrue(nonEmpty.containsEntry(1, 2))
+    assertTrue(nonEmpty.containsEntry((1, 2)))
+    assertFalse(nonEmpty.containsEntry(1, 1))
+    assertFalse(nonEmpty.containsEntry((1, 1)))
+    assertFalse(nonEmpty.containsEntry(2, 2))
+    assertFalse(nonEmpty.containsEntry((2, 2)))
+  }
+
   @Test def mutable(): Unit = {
     assertEquals(M.Map(1 → 2), Map(1 → 2).mutable)
     assertEquals(M.Map(1 → 2), Map(1 → 2).toMutable)
@@ -232,6 +243,16 @@ class MapTest {
   @Test def partitionEntriesBy(): Unit = assertEquals(
     (Map(1 → 2), Map("foo" → "oof")),
     Map(1 → 2, 2 → 3).partitionEntriesBy { case (2, 3) ⇒ "foo" → "oof" }
+  )
+
+  @Test def collectKeys(): Unit = assertEquals(
+    Map("foo" → 3),
+    Map(1 → 2, 2 → 3).collectKeys { case 2 ⇒ "foo" }
+  )
+
+  @Test def collectValues(): Unit = assertEquals(
+    Map(1 → "foo"),
+    Map(1 → 2, 2 → 3).collectValues { case 2 ⇒ "foo" }
   )
 
   @Test def updateValue(): Unit = {

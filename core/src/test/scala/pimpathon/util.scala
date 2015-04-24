@@ -19,9 +19,8 @@ object util {
     missing ⇒ extra ⇒ assertTrue("Extra: %s, Missing: %s".format(extra, missing), extra.isEmpty && missing.isEmpty)
   )
 
-  def on[A](as: A*) = On(as: _*)
-  case class On[A](as: A*) { def calling[B](f: A ⇒ B) = Calling(f, as: _*) }
-  case class Calling[A, B](f: A ⇒ B, as: A*) { def produces(bs: B*) = assertEquals(bs.toList, as.map(f).toList) }
+  case class on[A](as: A*) { def calling[B](f: A ⇒ B): Calling[A, B] = Calling(f, as: _*) }
+  case class Calling[A, B](f: A ⇒ B, as: A*) { def produces(bs: B*): Unit = assertEquals(bs.toList, as.map(f).toList) }
 
   def createInputStream(content: String = ""): ByteArrayInputStream with Closeable =
     new ByteArrayInputStream(content.getBytes) with Closeable
@@ -35,9 +34,9 @@ object util {
   def ignoreExceptions(f: ⇒ Unit): Unit = try f catch { case t: Throwable ⇒ }
 
   private def getMessage[E <: Throwable: Manifest](f: ⇒ Unit): Option[String] = try { f; None } catch {
-    case u: Throwable ⇒ if (manifest.klassOf[E].isAssignableFrom(u.getClass)) Some(u.getMessage) else {
-      sys.error("Invalid exception, expected %s, got: ".format(manifest.className[E]) + u)
-    }
+    case u: Throwable ⇒ if (manifest.klassOf[E].isAssignableFrom(u.getClass)) Some(u.getMessage) else sys.error(
+      "Invalid exception, expected %s, got: ".format(manifest.className[E]) + u
+    )
   }
 
   def goBoom: Nothing = throw boom

@@ -15,6 +15,10 @@ class FunctionTest {
   @Test def exists(): Unit = assertEquals(List(List(2), List(2, 4), List(2, 4, 3)),
     List(Nil, List(2), List(3), List(2, 4), List(2, 4, 3)).filter(isEven.exists))
 
+  @Test def cond(): Unit = {
+    assertEquals(List("even", "odd", "even", "even"), List(2, 3, 4, 6).map(isEven.cond("even", "odd")))
+  }
+
   @Test def and(): Unit = {
     assertEquals(List(4, 6), List(2, 3, 4, 6).filter(isEven and (_ > 2)))
     assertEquals(List(4, 6), List(2, 3, 4, 6).filter(function.and(isEven, _ > 2)))

@@ -47,8 +47,12 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + (A, B).removeFrom(Shrinkable[A], Shrinkable[B]): (A, B)
 
 + Boolean.asInt: Int
++ Boolean.cond(=> A, => A): A
 + Boolean.either(R).or(L): Either[L, R]
 + Boolean.option(A): Option[A]
++ Boolean.implies(Boolean): Boolean
++ Boolean.nor(Boolean): Boolean
++ Boolean.nand(Boolean): Boolean
 
 + Option[A].getOrThrow(String): A
 + Option[A].getOrThrow(=> Exception): A
@@ -107,6 +111,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + List[A].tapNonEmpty(List[A] => Unit): List[A]
 + List[A].tapEmpty(=> Unit): Lis[A]
 + List[A].tap(empty: => Unit, nonEmpty: List[A] => Unit): List[A]
++ List[A].zipExact(List[B]): (List[(A, B)], Option[Either[List[A], List[B]]])
++ List[A].zipExactWith(List[B])((A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]])
 + List[List[A]].cartesianProduct: List[List[A]]
 
 + GTL[A].collectAttributeCounts(PartialFunction[A, B]): Map[B, Int]
@@ -178,6 +184,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Map[K, V].containsAll(GTL[K]): Boolean
 + Map[K, V].containsAny(Option[K]): Boolean
 + Map[K, V].containsAny(GTL[K]): Boolean
++ Map[K, V].containsEntry(K, V): Boolean
++ Map[K, V].containsEntry((K, V)): Boolean
 + Map[K, V].get(Option[K]): Option[V]
 + Map[K, V].emptyTo(Map[K, V]): Map[K, V]
 + Map[K, V].uncons(A, Map[K, V] => A): A
@@ -193,6 +201,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Map[K, V].valueFor.maxKey(Ordering[K]): Option[V]
 + Map[K, V].andThenM(Map[V, W]): Map[K, W]
 + Map[K, V].composeM(Map[C, K]): Map[C, V]
++ Map[K, V].collectKeys(PartialFunction[K, C]): Map[C, V]
++ Map[K, V].collectValues(PartialFunction[V, W]): Map[K, W]
 + Map[K, V].partitionKeysBy(PartialFunction[K, C]): (Map[K, V], Map[C, V])
 + Map[K, V].partitionValuesBy(PartialFunction[V, W]): (Map[K, V], Map[K, W]))
 + Map[K, V].partitionEntriesBy(PartialFunction[(K, V), (C, W)]): (Map[K, V], Map[C, W])
@@ -230,6 +240,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Predicate[A].exists: Predicate[List[A]]
 + Predicate[A].forall: Predicate[List[A]]
 + Predicate[A].guard(A => B): PartialFunction[A, B]
++ Predicate[A].cond(=> B, => B): A => B
 + function.and(Predicate[A]*): Predicate[A]
 + function.or(Predicate[A]*): Predicate[A]
 + function.nand(Predicate[A]*): Predicate[A]
@@ -268,6 +279,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + runnable.create(=> Unit): Runnable
 + implicit conversion from () => Discarded to Runnable
 
++ Throwable.stackTraceAsString: String
+
 + pimpathon.java.io forwarding package object
 
 + InputStream.closeAfter(InputStream => A): A
@@ -281,6 +294,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + InputStream.readN(OutputStream, Long): InputStream
 + InputStream.readUpToN(OutputStream, Long): Long
 + InputStream.gunzip: GZIPInputStream
++ InputStream.toByteArray: Array[Byte]
 
 + OutputStream.closeAfter(OutputStream => A): A
 + OutputStream.attemptClose: Try[Unit]

@@ -17,6 +17,8 @@ object map extends genTraversableLike[GenTraversable] {
     def containsAll(ok: Option[K]): Boolean = ok.forall(map.contains)
     def containsAny[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.exists(map.contains)
     def containsAll[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.forall(map.contains)
+    def containsEntry(kv: (K, V)): Boolean = containsEntry(kv._1, kv._2)
+    def containsEntry(k: K, v: V): Boolean = map.get(k) == Some(v)
 
     def get(ok: Option[K]): Option[V]               = ok.flatMap(map.get)
     def getOrThrow(k: K, message: String): V        = getOrThrow(k, new IllegalArgumentException(message))
@@ -61,6 +63,9 @@ object map extends genTraversableLike[GenTraversable] {
     def mapKeysEagerly[C](f: K ⇒ C): Map[C, V]         = map.map { case (k, v) ⇒ (f(k), v) }(breakOut)
     def mapValuesEagerly[W](f: V ⇒ W): Map[K, W]       = map.map { case (k, v) ⇒ (k, f(v)) }(breakOut)
     def mapEntries[C, W](f: K ⇒ V ⇒ (C, W)): Map[C, W] = map.map { case (k, v) ⇒ f(k)(v)   }(breakOut)
+
+    def collectKeys[C](pf: PartialFunction[K, C]): Map[C, V] = map.collect(pf.first)
+    def collectValues[W](pf: PartialFunction[V, W]): Map[K, W] = map.collect(pf.second)
 
     def updateValue(key: K, f: V ⇒ Option[V]): Map[K, V] =
       map.get(key).flatMap(f).map(newValue ⇒ map + ((key, newValue))).getOrElse(map - key)

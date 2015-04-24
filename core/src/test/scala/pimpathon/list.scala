@@ -34,12 +34,8 @@ class ListTest {
   @Test def zipWith(): Unit = assertEquals(List(6), List(2, 0).zipWith[Int, Int](List(3))(lr ⇒ lr._1 * lr._2))
 
 
-  @Test def countWithSize(): Unit = {
-    assertEquals(None, nil[Int].countWithSize(_ < 1))
-    assertEquals(Some((1, 1)), List(0).countWithSize(_ < 1))
-    assertEquals(Some((0, 1)), List(1).countWithSize(_ < 1))
-    assertEquals(Some((1, 2)), List(0, 1).countWithSize(_ < 1))
-  }
+  @Test def countWithSize(): Unit = on(nil[Int], List(0), List(1), List(0, 1))
+    .calling(_.countWithSize(_ < 1)).produces(None, Some((1, 1)), Some((0, 1)), Some((1, 2)))
 
   @Test def sizeGT(): Unit = {
     assertTrue(nil[Int].sizeGT(-1))
@@ -66,50 +62,26 @@ class ListTest {
     List("foo", "bard", "food", "barb", "foody", "barby").countBy(_.length)
   )
 
-  @Test def tailOption(): Unit = {
-    assertEquals(None,          Nil.tailOption)
-    assertEquals(Some(Nil),     List(0).tailOption)
-    assertEquals(Some(List(1)), List(0, 1).tailOption)
-  }
+  @Test def tailOption(): Unit =
+    on(nil[Int], List(0), List(0, 1)).calling(_.tailOption).produces(None, Some(Nil), Some(List(1)))
 
   @Test def headTail(): Unit = {
-    assertThrows[NoSuchElementException]("headTail of empty list") {
-      Nil.headTail
-    }
-
-    assertEquals((1, Nil),        List(1).headTail)
-    assertEquals((1, List(2)),    List(1, 2).headTail)
-    assertEquals((1, List(2, 3)), List(1, 2, 3).headTail)
+    on(List(1), List(1, 2), List(1, 2, 3)).calling(_.headTail).produces((1, Nil), (1, List(2)), (1, List(2, 3)))
+    assertThrows[NoSuchElementException]("headTail of empty list")(Nil.headTail)
   }
 
   @Test def initLast(): Unit = {
-    assertThrows[NoSuchElementException]("initLast of empty list") {
-      Nil.initLast
-    }
-
-    assertEquals((Nil, 1),        List(1).initLast)
-    assertEquals((List(1), 2),    List(1, 2).initLast)
-    assertEquals((List(1, 2), 3), List(1, 2, 3).initLast)
+    on(List(1), List(1, 2), List(1, 2, 3)).calling(_.initLast).produces((Nil, 1), (List(1), 2), (List(1, 2), 3))
+    assertThrows[NoSuchElementException]("initLast of empty list")(Nil.initLast)
   }
 
-  @Test def headTailOption(): Unit = {
-    assertEquals(None,                  Nil.headTailOption)
-    assertEquals(Some((1, Nil)),        List(1).headTailOption)
-    assertEquals(Some((1, List(2))),    List(1, 2).headTailOption)
-    assertEquals(Some((1, List(2, 3))), List(1, 2, 3).headTailOption)
-  }
+  @Test def headTailOption(): Unit = on(nil[Int], List(1), List(1, 2), List(1, 2, 3))
+    .calling(_.headTailOption).produces(None, Some((1, Nil)), Some((1, List(2))), Some((1, List(2, 3))))
 
-  @Test def initLastOption(): Unit = {
-    assertEquals(None,                   Nil.initLastOption)
-    assertEquals(Some((Nil, 1)),        List(1).initLastOption)
-    assertEquals(Some((List(1), 2)),    List(1, 2).initLastOption)
-    assertEquals(Some((List(1, 2), 3)), List(1, 2, 3).initLastOption)
-  }
+  @Test def initLastOption(): Unit = on(nil[Int], List(1), List(1, 2), List(1, 2, 3))
+    .calling(_.initLastOption).produces(None, Some((Nil, 1)), Some((List(1), 2)), Some((List(1, 2), 3)))
 
-  @Test def const(): Unit = {
-    assertEquals(nil[Int], nil[String].const(1))
-    assertEquals(List(1, 1, 1), List('a', 'b', 'c').const(1))
-  }
+  @Test def const(): Unit = on(nil[Int], List('a', 'b', 'c')).calling(_.const(1)).produces(nil[Int], List(1, 1, 1))
 
   @Test def sharedPrefix(): Unit = {
     assertEquals((Nil, Nil, Nil), nil[Int].sharedPrefix(Nil))
@@ -127,19 +99,21 @@ class ListTest {
 
   @Test def batchBy(): Unit = {
     assertEquals(Nil, nil[Int].batchBy(_ ⇒ true))
-    assertEquals(List(List(1, 2, 3)), List(1, 2, 3).batchBy(_ ⇒ true))
+
+    assertEquals(
+      List(List(1 → 1, 1 → 2), List(2 → 1), List(1 → 3), List(2 → 2, 2 → 3)),
+      List(     1 → 1, 1 → 2,       2 → 1,       1 → 3,       2 → 2, 2 → 3).batchBy(_._1)
+    )
   }
 
   @Test def prefixPadTo(): Unit = {
     assertEquals(List(0, 0, 0, 1, 2, 3), List(1, 2, 3).prefixPadTo(6, 0))
   }
 
-  @Test def ungroupBy(): Unit = {
-    assertEquals(List(
-      List('a' → 1, 'b' → 1, 'c' → 1),
-      List('a' → 2, 'b' → 2)
-    ), List('a' → 1, 'a' → 2, 'b' → 1, 'c' → 1, 'b' → 2).ungroupBy(_._1))
-  }
+  @Test def ungroupBy(): Unit = assertEquals(
+    List(List('a' → 1, 'b' → 1, 'c' → 1), List('a' → 2, 'b' → 2)),
+    List('a' → 1, 'a' → 2, 'b' → 1, 'c' → 1, 'b' → 2).ungroupBy(_._1)
+  )
 
   @Test def tap(): Unit = {
     assertEquals(List("empty"),     strings().run(ss ⇒ nil[Int].tap(ss += "empty", _ ⇒ ss += "non-empty")))
@@ -180,5 +154,23 @@ class ListTest {
     assertEquals(None, List.empty[Int].onlyOption)
     assertEquals(None, List(1, 2).onlyOption)
     assertEquals(Some(1), List(1).onlyOption)
+  }
+
+  @Test def zipExact(): Unit = {
+    assertEquals((Nil, None),                             Nil.zipExact(Nil))
+    assertEquals((List((1, 4), (2, 5), (3, 6)), None),    List(1, 2, 3).zipExact(List(4, 5, 6)))
+    assertEquals((Nil, Some(Left(List(1, 2, 3)))),        List(1, 2, 3).zipExact(Nil))
+    assertEquals((Nil, Some(Right(List(4, 5, 6)))),       Nil.zipExact(List(4, 5, 6)))
+    assertEquals((List((1, 4)), Some(Left(List(2, 3)))),  List(1, 2, 3).zipExact(List(4)))
+    assertEquals((List((1, 4)), Some(Right(List(5, 6)))), List(1).zipExact(List(4, 5, 6)))
+  }
+
+  @Test def zipExactWith(): Unit = {
+    assertEquals((nil[Int], None),                       nil[Int].zipExactWith(nil[Int])(_ + _))
+    assertEquals((List(5, 7, 9), None),                  List(1, 2, 3).zipExactWith(List(4, 5, 6))(_ + _))
+    assertEquals((nil[Int], Some(Left(List(1, 2, 3)))),  List(1, 2, 3).zipExactWith(nil[Int])(_ + _))
+    assertEquals((nil[Int], Some(Right(List(4, 5, 6)))), nil[Int].zipExactWith(List(4, 5, 6))(_ + _))
+    assertEquals((List(5), Some(Left(List(2, 3)))),      List(1, 2, 3).zipExactWith(List(4))(_ + _))
+    assertEquals((List(5), Some(Right(List(5, 6)))),     List(1).zipExactWith(List(4, 5, 6))(_ + _))
   }
 }

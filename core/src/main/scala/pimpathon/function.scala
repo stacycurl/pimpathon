@@ -2,6 +2,7 @@ package pimpathon
 
 import scala.collection.{GenTraversable, GenTraversableLike}
 
+import pimpathon.boolean._
 import pimpathon.list._
 
 
@@ -30,6 +31,7 @@ object function {
   }
 
   class PredicatePimps[A](p: Predicate[A]) {
+    def cond[B](ifTrue: ⇒ B, ifFalse: ⇒ B): A ⇒ B = a ⇒ p(a).cond(ifTrue, ifFalse)
     def and(q: Predicate[A]): Predicate[A] = (a: A) ⇒ p(a) && q(a)
     def or(q: Predicate[A]):  Predicate[A] = (a: A) ⇒ p(a) || q(a)
     def not:                  Predicate[A] = (a: A) ⇒ !p(a)

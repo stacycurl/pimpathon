@@ -1,6 +1,6 @@
 package pimpathon.java.io
 
-import java.io.{BufferedInputStream, IOException, InputStream, OutputStream}
+import java.io.{ByteArrayOutputStream, BufferedInputStream, IOException, InputStream, OutputStream}
 import java.util.zip.GZIPInputStream
 import scala.annotation.tailrec
 
@@ -58,4 +58,6 @@ class InputStreamPimps[IS <: InputStream](is: IS, utils: InputStreamUtils) {
 
     recurse(0)
   })
+
+  def toByteArray: Array[Byte] = new ByteArrayOutputStream().drain(is).toByteArray
 }

@@ -23,6 +23,7 @@
 + Map[K, V].containsEntry((K, V)): Boolean
 + Predicate[A].cond(=> B, => B): A => B
 + Callable[A].attempt: Callable[Try[A]]
++ Date.addDay(Int): Date
 + InputStream.toByteArray: Array[Byte]
 + File.canon: File
 + File.readString()(implicit Codec): String

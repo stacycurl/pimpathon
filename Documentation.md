@@ -280,6 +280,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + runnable.create(=> Unit): Runnable
 + implicit conversion from () => Discarded to Runnable
 
++ Date.addDay(Int): Date
+
 + Throwable.stackTraceAsString: String
 
 + pimpathon.java.io forwarding package object

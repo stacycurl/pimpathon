@@ -1,7 +1,6 @@
 package pimpathon
 
-import _root_.java.io.{FileInputStream, RandomAccessFile, File, FileOutputStream}
-import _root_.java.nio.charset.Charset
+import _root_.java.io.{RandomAccessFile, File, FileOutputStream}
 import scala.io.{Codec, BufferedSource, Source}
 import scala.util.Properties
 
@@ -36,6 +35,7 @@ case class FileUtils (
     // http://rapture.io does this much better
     def /(name: String): File = new File(file, name)
     def named(name: String = file.getName): File = new NamedFile(file, name)
+    def canon: File = file.attempt(_.getCanonicalFile).getOrElse(file.getAbsoluteFile)
 
     def relativeTo(dir: File): File = sharedPaths(dir) |> { case (relativeFile, relativeDir) ⇒
       new File((relativeDir.const("..") ++ relativeFile).mkString(File.separator))

@@ -23,6 +23,7 @@
 + Predicate[A].cond(=> B, => B): A => B
 + Callable[A].attempt: Callable[Try[A]]
 + InputStream.toByteArray: Array[Byte]
++ File.canon: File
 + File.readString()(implicit Codec): String
 + File.source()(implicit Codec): BufferedSource  -- Added implicit Codec argument
 + File.readLines()(implicit Codec): List[String] -- Added implicit Codec argument

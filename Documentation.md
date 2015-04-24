@@ -320,6 +320,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + File.hasExtension(String): Boolean
 + (File / String): File
 + File.named(String): File
++ File.canon: File
 + File.relativeTo(File): File
 + File.file(String, String): File
 + File.writeLines(List[String], append?): File

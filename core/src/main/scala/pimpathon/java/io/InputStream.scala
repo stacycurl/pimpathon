@@ -1,6 +1,5 @@
 package pimpathon.java.io
 
-import scala.io.Codec
 import scala.language.implicitConversions
 
 import java.io._

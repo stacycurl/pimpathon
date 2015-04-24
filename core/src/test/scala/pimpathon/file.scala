@@ -80,6 +80,11 @@ class FileTest {
 
   @Test def named(): Unit = file.withTempFile(tmp ⇒ assertEquals("name", tmp.named("name").toString))
 
+  @Test def canon(): Unit = file.withTempDirectory(dir ⇒ {
+    assertEquals((dir / "file").getCanonicalFile,       (dir / "file").canon)
+    assertEquals((dir / "file\u0000").getAbsoluteFile,  (dir / "file\u0000").canon)
+  })
+
   @Test def changeToDirectory(): Unit = file.withTempFile(file ⇒ assertTrue(file.changeToDirectory().isDirectory))
 
   @Test def children(): Unit = file.withTempDirectory(dir ⇒ {
@@ -92,7 +97,7 @@ class FileTest {
   @Test def childDirs(): Unit = file.withTempDirectory(dir ⇒ {
     assertEquals(Set.empty[File], dir.childDirs.toSet)
 
-    val List(child, toddler) = file.files(dir, "child", "parent/toddler").map(_.create()).toList
+    val List(toddler) = file.files(dir, "parent/toddler").map(_.create()).toList
     assertEquals(Set(toddler.getParentFile), dir.childDirs.map(_.named()).toSet)
   })
 

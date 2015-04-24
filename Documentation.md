@@ -146,6 +146,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + GTL[(K, V)].toMultiMap[F[_]]: MultiMap[F, K, V]
 + GTL[Either[L, R]].partitionEithers: (GTL[L], GTL[R])
 
++ Set[A].notContains(A): Boolean
 + Set[A].mutable: mutable.Set[A] (aka toMutable)
 + Set[A].powerSet: Set[Set[A]]
 

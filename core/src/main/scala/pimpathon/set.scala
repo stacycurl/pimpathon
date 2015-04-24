@@ -8,6 +8,8 @@ import pimpathon.list._
 
 object set extends genTraversableLike[Set] {
   implicit class SetPimps[A](val set: Set[A]) extends AnyVal {
+    def notContains(elem: A): Boolean = !set.contains(elem)
+
     def powerSet: Set[Set[A]] = {
       def recurse(list: List[A]): List[List[A]] =
         list.unconsC(List(Nil), head ⇒ tail ⇒ recurse(tail) |> (ps ⇒ ps ++ ps.map(head :: _)))

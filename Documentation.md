@@ -78,6 +78,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Either[L, R].leftFlatMap(L => Either[L, R]): Either[L, R]
 + Either[Throwable, R].toTry: Try[R]
 
++ Try[A].getMessage: Option[String]
 + Try[A].toEither: Either[Throwable, A]
 
 + FilterMonadic[(K, V)].toMultiMap: MultiMap[List, K, V]

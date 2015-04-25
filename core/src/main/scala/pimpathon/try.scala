@@ -5,9 +5,12 @@ import scala.util.{Failure, Success, Try}
 
 object pimpTry {
   implicit class TryPimps[A](val value: Try[A]) extends AnyVal {
-    def toEither: Either[Throwable, A] = value match {
-      case Success(a) ⇒ Right[Throwable, A](a)
-      case Failure(t) ⇒ Left[Throwable, A](t)
+    def getMessage: Option[String] = fold(_ ⇒ None, t ⇒ Some(t.getMessage))
+    def toEither: Either[Throwable, A] = fold(Right(_), Left(_))
+
+    private def fold[B](success: A ⇒ B, failure: Throwable ⇒ B): B = value match {
+      case Success(a) ⇒ success(a)
+      case Failure(t) ⇒ failure(t)
     }
   }
 

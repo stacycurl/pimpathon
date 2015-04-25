@@ -102,6 +102,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + List[A].amass(PartialFunction[A, List[B]]): List[B]
 + List[A].calcIfNonEmpty(List[A] => B): Option[B]
 + List[A].mapIfNonEmpty(A => B): Option[List[B]]
++ List[A].onlyEither: Either[List[A], A]
 + List[A].onlyOption: Option[A]
 + List[A].uncons(=> B, List[A] => B): B
 + List[A].unconsC(=> B, A => List[A] => B): B

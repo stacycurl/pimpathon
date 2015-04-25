@@ -150,11 +150,10 @@ class ListTest {
     List(List(1, 2), List(10, 20), List(100, 200)).cartesianProduct
   )
 
-  @Test def onlyOption(): Unit = {
-    assertEquals(None, List.empty[Int].onlyOption)
-    assertEquals(None, List(1, 2).onlyOption)
-    assertEquals(Some(1), List(1).onlyOption)
-  }
+  @Test def onlyEither(): Unit =
+    on(nil[Int], List(1, 2), List(1)).calling(_.onlyEither).produces(Left(Nil), Left(List(1, 2)), Right(1))
+
+  @Test def onlyOption(): Unit = on(nil[Int], List(1, 2), List(1)).calling(_.onlyOption).produces(None, None, Some(1))
 
   @Test def zipExact(): Unit = {
     assertEquals((Nil, None),                             Nil.zipExact(Nil))

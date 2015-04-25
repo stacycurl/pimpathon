@@ -13,6 +13,7 @@
 + Boolean.nand(Boolean): Boolean
 + Option[E].toFailureNel(A): ValidationNel[E, A]
 + GTL[A].apoFold(B)((B, A) ⇒ Either[C, B]): Either[C, B]
++ List[A].onlyEither: Either[List[A], A]
 + List[A].toNel: Option[NonEmptyList[A]]
 + List[A].zipExact(List[B]): (List[(A, B)], Option[Either[List[A], List[B]]])
 + List[A].zipExactWith(List[B])((A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]])

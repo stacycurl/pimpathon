@@ -9,12 +9,18 @@ import pimpathon.util._
 
 
 class FunctionTest {
-  @Test def forall(): Unit = assertEquals(List(Nil, List(2), List(2, 4)),
-    List(Nil, List(2), List(3), List(2, 4), List(2, 4, 3)).filter(isEven.forall))
+  @Test def guardWith(): Unit =
+    on(1, 2, 3, 4).calling((double guardWith isEven).lift).produces(None, Some(4), None, Some(8))
 
-  @Test def exists(): Unit = assertEquals(List(List(2), List(2, 4), List(2, 4, 3)),
-    List(Nil, List(2), List(3), List(2, 4), List(2, 4, 3)).filter(isEven.exists))
+  private val isEven: Predicate[Int] = _ % 2 == 0
+  private val double: (Int ⇒ Int)   = _ * 2
+}
 
+class CurriedFunction2Test {
+  @Test def tupled(): Unit = assertEquals(3, ((i: Int) ⇒ (j: Int) ⇒ i + j).tupled((1, 2)))
+}
+
+class PredicateTest {
   @Test def cond(): Unit = {
     assertEquals(List("even", "odd", "even", "even"), List(2, 3, 4, 6).map(isEven.cond("even", "odd")))
   }
@@ -31,6 +37,19 @@ class FunctionTest {
     assertFalse(function.or[Int]().apply(Random.nextInt()))
   }
 
+  @Test def not(): Unit = assertEquals(List(1, 3, 5), List(2, 1, 4, 3, 5).filter(isEven.not))
+
+  @Test def exists(): Unit = assertEquals(List(List(2), List(2, 4), List(2, 4, 3)),
+    List(Nil, List(2), List(3), List(2, 4), List(2, 4, 3)).filter(isEven.exists))
+
+  @Test def forall(): Unit = assertEquals(List(Nil, List(2), List(2, 4)),
+    List(Nil, List(2), List(3), List(2, 4), List(2, 4, 3)).filter(isEven.forall))
+
+  @Test def ifSome(): Unit = assertEquals(List(Some(4), Some(6)),
+    List(None, Some(3), Some(4), None, Some(6)).filter(isEven.ifSome))
+
+  @Test def guard(): Unit = on(1, 2, 3, 4).calling((isEven guard double).lift).produces(None, Some(4), None, Some(8))
+
   @Test def nand(): Unit = {
     assertEquals(List(2, 3), List(2, 3, 4, 6).filter(function.nand(isEven, _ > 2)))
     assertFalse(function.nand[Int]().apply(Random.nextInt()))
@@ -40,18 +59,6 @@ class FunctionTest {
     assertEquals(List(1, 5), List(2, 1, 4, 3, 5).filter(function.nor(isEven, _ == 3)))
     assertTrue(function.nor[Int]().apply(Random.nextInt()))
   }
-
-  @Test def not(): Unit = assertEquals(List(1, 3, 5), List(2, 1, 4, 3, 5).filter(isEven.not))
-
-  @Test def ifSome(): Unit = assertEquals(List(Some(4), Some(6)),
-    List(None, Some(3), Some(4), None, Some(6)).filter(isEven.ifSome))
-
-  @Test def guard(): Unit = on(1, 2, 3, 4).calling((isEven guard double).lift).produces(None, Some(4), None, Some(8))
-
-  @Test def guardWith(): Unit =
-    on(1, 2, 3, 4).calling((double guardWith isEven).lift).produces(None, Some(4), None, Some(8))
-
-  @Test def tupled(): Unit = assertEquals(3, ((i: Int) ⇒ (j: Int) ⇒ i + j).tupled((1, 2)))
 
   private val isEven: Predicate[Int] = _ % 2 == 0
   private val double: (Int ⇒ Int)   = _ * 2

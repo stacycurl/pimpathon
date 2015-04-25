@@ -49,6 +49,7 @@ object list extends genTraversableLike[List] {
       (allBatches += lastBatch.toList).toList
     })
 
+    def onlyOrThrow(f: List[A] ⇒ Exception): A = onlyOption.getOrThrow(f(list))
     def onlyEither: Either[List[A], A] = onlyOption.toRight(list)
     def onlyOption: Option[A] = unconsC(None, head ⇒ tail ⇒ tail.headOption.invert(head))
 

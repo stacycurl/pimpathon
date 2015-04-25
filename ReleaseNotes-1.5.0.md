@@ -14,6 +14,7 @@
 + Option[E].toFailureNel(A): ValidationNel[E, A]
 + Try[A].getMessage: Option[String]
 + GTL[A].apoFold(B)((B, A) ⇒ Either[C, B]): Either[C, B]
++ List[A].onlyOrThrow(List[A] => Exception): A
 + List[A].onlyEither: Either[List[A], A]
 + List[A].toNel: Option[NonEmptyList[A]]
 + List[A].zipExact(List[B]): (List[(A, B)], Option[Either[List[A], List[B]]])

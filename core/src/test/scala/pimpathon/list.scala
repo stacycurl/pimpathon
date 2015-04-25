@@ -150,6 +150,11 @@ class ListTest {
     List(List(1, 2), List(10, 20), List(100, 200)).cartesianProduct
   )
 
+  @Test def onlyOrThrow(): Unit = {
+    on(nil[Int], List(1, 2)).calling(_.onlyOrThrow(exception)).throws("List()", "List(1, 2)")
+    assertEquals(1, List(1).onlyOrThrow(_ ⇒ new Exception()))
+  }
+
   @Test def onlyEither(): Unit =
     on(nil[Int], List(1, 2), List(1)).calling(_.onlyEither).produces(Left(Nil), Left(List(1, 2)), Right(1))
 

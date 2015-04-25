@@ -9,6 +9,8 @@ import scala.util.{DynamicVariable, Try}
 
 import org.junit.Assert._
 import pimpathon.tuple._
+import pimpathon.function._
+import pimpathon.pimpTry._
 
 
 object util {
@@ -20,7 +22,11 @@ object util {
   )
 
   case class on[A](as: A*) { def calling[B](f: A ⇒ B): Calling[A, B] = Calling(f, as: _*) }
-  case class Calling[A, B](f: A ⇒ B, as: A*) { def produces(bs: B*): Unit = assertEquals(bs.toList, as.map(f).toList) }
+
+  case class Calling[A, B](f: A ⇒ B, as: A*) {
+    def produces(bs: B*): Unit = assertEquals(bs.toList, as.map(f).toList)
+    def throws(es: String*): Unit = assertEquals(es.toList, as.map(a ⇒ f.attempt(a).getMessage).toList.flatten)
+  }
 
   def createInputStream(content: String = ""): ByteArrayInputStream with Closeable =
     new ByteArrayInputStream(content.getBytes) with Closeable
@@ -41,6 +47,7 @@ object util {
 
   def goBoom: Nothing = throw boom
   val boom = new Throwable("Boom !")
+  def exception[A](message: A): Exception = new Exception(message.toString)
 
   def currentTime(): Long = dynamicTime.value
   def withTime[A](millis: Long)(f: ⇒ A): A = dynamicTime.withValue(millis)(f)

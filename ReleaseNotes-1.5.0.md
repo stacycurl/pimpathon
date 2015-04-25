@@ -14,13 +14,14 @@
 + Boolean.nor(Boolean): Boolean
 + Boolean.nand(Boolean): Boolean
 + Option[E].toFailureNel(A): ValidationNel[E, A]
++ Either[Throwable, R].getMessage: Option[String]
 + Try[A].getMessage: Option[String]
-+ GTL[A].apoFold(B)((B, A) ⇒ Either[C, B]): Either[C, B]
 + List[A].onlyOrThrow(List[A] => Exception): A
 + List[A].onlyEither: Either[List[A], A]
 + List[A].toNel: Option[NonEmptyList[A]]
 + List[A].zipExact(List[B]): (List[(A, B)], Option[Either[List[A], List[B]]])
 + List[A].zipExactWith(List[B])((A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]])
++ GTL[A].apoFold(B)((B, A) ⇒ Either[C, B]): Either[C, B]
 + Set[A].notContains(A): Boolean
 + Map[K, V].collectKeys(PartialFunction[K, C]): Map[C, V]
 + Map[K, V].collectValues(PartialFunction[V, W]): Map[K, W]

@@ -73,8 +73,11 @@ class EitherTest {
       (ints(1), strings("foo")).tap(is ⇒ ss ⇒ right("foo").removeFrom(is, ss)).tmap(_.toList, _.toList))
   }
 
-  @Test def toTry(): Unit = on(Right[Throwable, String]("foo"), Left[Throwable, String](boom))
-    .calling(_.toTry).produces(Success[String]("foo"), Failure[String](boom))
+  @Test def getMessage(): Unit =
+    on(Left(boom), Right("foo")).calling(_.getMessage).produces(Some(boom.getMessage), None)
+
+  @Test def toTry(): Unit = on(Left[Throwable, String](boom), Right[Throwable, String]("foo"))
+    .calling(_.toTry).produces(Failure[String](boom), Success[String]("foo"))
 
   @Test def rightBias(): Unit = {
     assertEquals(right("foo").right, right("foo"): Either.RightProjection[Int, String])

@@ -34,6 +34,7 @@ object either {
     def tapRight[Discarded](r: R ⇒ Discarded): Either[L, R] = tap(_ ⇒ {}, r)
     def tap[Discarded](l: L ⇒ Discarded, r: R ⇒ Discarded): Either[L, R] = { either.fold(l, r); either }
 
+    def getMessage(implicit ev: L <:< Throwable): Option[String] = either.fold(t ⇒ Some(t.getMessage), _ ⇒ None)
     def toTry(implicit ev: L <:< Throwable): Try[R] = either.fold(Failure(_), Success(_))
   }
 

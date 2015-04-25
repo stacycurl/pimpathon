@@ -76,6 +76,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Either[L, R].valueOr(PartialFunction[L, R]): Either[L, R] (aka rescue)
 + Either[L, R].rightFlatMap(R => Either[L, R]): Either[L, R]
 + Either[L, R].leftFlatMap(L => Either[L, R]): Either[L, R]
++ Either[Throwable, R].getMessage: Option[String]
 + Either[Throwable, R].toTry: Try[R]
 
 + Try[A].getMessage: Option[String]

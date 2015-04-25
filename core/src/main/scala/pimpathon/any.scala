@@ -16,8 +16,8 @@ object any {
     def calcPF[B](pf: PartialFunction[A, B]): Option[B] = pf.lift(a)
     def transform(pf: PartialFunction[A, A]): A = pf.unify(a)
 
-    def tapIf(p: Predicate[A])(actions: (A ⇒ Unit)*): A     = if (p(a)) tap(actions: _*) else a
-    def tapUnless(p: Predicate[A])(actions: (A ⇒ Unit)*): A = if (p(a)) a else tap(actions: _*)
+    def tapIf[Discarded](p: Predicate[A])(actions: (A ⇒ Discarded)*): A     = if (p(a)) tap(actions: _*) else a
+    def tapUnless[Discarded](p: Predicate[A])(actions: (A ⇒ Discarded)*): A = if (p(a)) a else tap(actions: _*)
 
     def tapPF[Discarded](action: PartialFunction[A, Discarded]): A = { action.lift(a); a }
 

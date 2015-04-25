@@ -14,9 +14,9 @@ import pimpathon.tuple._
 
 object list extends genTraversableLike[List] {
   implicit class ListPimps[A](val list: List[A]) extends AnyVal {
-    def tapEmpty(empty: ⇒ Unit): List[A] = tap(empty, _ ⇒ {})
-    def tapNonEmpty(nonEmpty: List[A] ⇒ Unit): List[A] = tap({}, nonEmpty)
-    def tap(empty: ⇒ Unit, nonEmpty: List[A] ⇒ Unit): List[A] = new AnyPimps(list).tap(_.uncons(empty, nonEmpty))
+    def tapEmpty[Discarded](empty: ⇒ Discarded): List[A] = tap(empty, _ ⇒ {})
+    def tapNonEmpty[Discarded](nonEmpty: List[A] ⇒ Discarded): List[A] = tap({}, nonEmpty)
+    def tap[Discarded](empty: ⇒ Discarded, nonEmpty: List[A] ⇒ Discarded): List[A] = { uncons(empty, nonEmpty); list }
 
     def emptyTo(alternative: ⇒ List[A]): List[A] = uncons(alternative, _ ⇒ list)
 

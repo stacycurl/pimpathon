@@ -2,6 +2,7 @@ package pimpathon
 
 import scala.collection.{GenTraversable, GenTraversableLike}
 
+import pimpathon.any._
 import pimpathon.boolean._
 import pimpathon.list._
 
@@ -23,6 +24,7 @@ object function {
     new PartialEndoFunctionPimps[A](pf)
 
   class FunctionPimps[A, B](f: A ⇒ B) {
+    def attempt: A ⇒ Either[Throwable, B] = _.attempt(f)
     def guardWith(p: Predicate[A]): PartialFunction[A, B] = p guard f
   }
 

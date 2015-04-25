@@ -10,6 +10,8 @@ object set extends genTraversableLike[Set] {
   implicit def setPimps[A](set: Set[A]): SetPimps[A] = new SetPimps[A](set)
 
   class SetPimps[A](val set: Set[A]) {
+    def notContains(elem: A): Boolean = !set.contains(elem)
+
     def powerSet: Set[Set[A]] = {
       def recurse(list: List[A]): List[List[A]] =
         list.unconsC(List(Nil), head ⇒ tail ⇒ recurse(tail) |> (ps ⇒ ps ++ ps.map(head :: _)))

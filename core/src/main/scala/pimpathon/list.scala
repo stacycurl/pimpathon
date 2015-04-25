@@ -17,9 +17,9 @@ object list extends genTraversableLike[List] {
   implicit def matrixPimps[A](matrix: List[List[A]]): MatrixPimps[A] = new MatrixPimps[A](matrix)
 
   class ListPimps[A](list: List[A]) {
-    def tapEmpty(empty: ⇒ Unit): List[A] = tap(empty, _ ⇒ {})
-    def tapNonEmpty(nonEmpty: List[A] ⇒ Unit): List[A] = tap({}, nonEmpty)
-    def tap(empty: ⇒ Unit, nonEmpty: List[A] ⇒ Unit): List[A] = new AnyPimps(list).tap(_.uncons(empty, nonEmpty))
+    def tapEmpty[Discarded](empty: ⇒ Discarded): List[A] = tap(empty, _ ⇒ {})
+    def tapNonEmpty[Discarded](nonEmpty: List[A] ⇒ Discarded): List[A] = tap({}, nonEmpty)
+    def tap[Discarded](empty: ⇒ Discarded, nonEmpty: List[A] ⇒ Discarded): List[A] = { uncons(empty, nonEmpty); list }
 
     def emptyTo(alternative: ⇒ List[A]): List[A] = uncons(alternative, _ ⇒ list)
 
@@ -52,6 +52,8 @@ object list extends genTraversableLike[List] {
       (allBatches += lastBatch.toList).toList
     })
 
+    def onlyOrThrow(f: List[A] ⇒ Exception): A = onlyOption.getOrThrow(f(list))
+    def onlyEither: Either[List[A], A] = onlyOption.toRight(list)
     def onlyOption: Option[A] = unconsC(None, head ⇒ tail ⇒ tail.headOption.invert(head))
 
     def headTail: (A, List[A]) = headTailOption.getOrThrow("headTail of empty list")

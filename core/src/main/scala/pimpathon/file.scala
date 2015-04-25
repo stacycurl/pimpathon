@@ -5,6 +5,7 @@ import scala.io.{Codec, BufferedSource, Source}
 import scala.util.Properties
 
 import pimpathon.any._
+import pimpathon.either._
 import pimpathon.java.io.outputStream._
 import pimpathon.list._
 import pimpathon.string._
@@ -37,6 +38,7 @@ case class FileUtils (
     // http://rapture.io does this much better
     def /(name: String): File = new File(file, name)
     def named(name: String = file.getName): File = new NamedFile(file, name)
+    def canon: File = file.attempt(_.getCanonicalFile).valueOr(_ ⇒ file.getAbsoluteFile)
 
     def relativeTo(dir: File): File = sharedPaths(dir) |> { case (relativeFile, relativeDir) ⇒
       new File((relativeDir.const("..") ++ relativeFile).mkString(File.separator))

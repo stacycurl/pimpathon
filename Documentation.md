@@ -76,8 +76,10 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Either[L, R].valueOr(PartialFunction[L, R]): Either[L, R] (aka rescue)
 + Either[L, R].rightFlatMap(R => Either[L, R]): Either[L, R]
 + Either[L, R].leftFlatMap(L => Either[L, R]): Either[L, R]
++ Either[Throwable, R].getMessage: Option[String]
 + Either[Throwable, R].toTry: Try[R]
 
++ Try[A].getMessage: Option[String]
 + Try[A].toEither: Either[Throwable, A]
 
 + FilterMonadic[(K, V)].toMultiMap: MultiMap[List, K, V]
@@ -102,6 +104,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + List[A].amass(PartialFunction[A, List[B]]): List[B]
 + List[A].calcIfNonEmpty(List[A] => B): Option[B]
 + List[A].mapIfNonEmpty(A => B): Option[List[B]]
++ List[A].onlyOrThrow(List[A] => Exception): A
++ List[A].onlyEither: Either[List[A], A]
 + List[A].onlyOption: Option[A]
 + List[A].uncons(=> B, List[A] => B): B
 + List[A].unconsC(=> B, A => List[A] => B): B
@@ -146,6 +150,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + GTL[(K, V)].toMultiMap[F[_]]: MultiMap[F, K, V]
 + GTL[Either[L, R]].partitionEithers: (GTL[L], GTL[R])
 
++ Set[A].notContains(A): Boolean
 + Set[A].mutable: mutable.Set[A] (aka toMutable)
 + Set[A].powerSet: Set[Set[A]]
 
@@ -247,6 +252,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + function.nor(Predicate[A]*): Predicate[A]
 
 + (A => B => C).tupled: ((A, B)) => C
++ (A => B).attempt: A => Try[B]
 + (A => B).guardWith(Predicate[A]): PartialFunction[A, B]
 
 + PartialFunction[A, B].toLeft: A => Either[B, A]
@@ -278,6 +284,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 
 + runnable.create(=> Unit): Runnable
 + implicit conversion from () => Discarded to Runnable
+
++ Date.addDay(Int): Date
 
 + Throwable.stackTraceAsString: String
 
@@ -320,6 +328,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + File.hasExtension(String): Boolean
 + (File / String): File
 + File.named(String): File
++ File.canon: File
 + File.relativeTo(File): File
 + File.file(String, String): File
 + File.writeLines(List[String], append?): File
@@ -371,6 +380,9 @@ The aim of frills is to pimp everything else. You can use it by including the fo
 ```libraryDependencies += "com.github.stacycurl" %% "pimpathon-frills" % "1.4.0" intransitive()```
 
 'intransitive' means that frills won't force you to depend on everything that's pimped, you'll only get pimps for types in libraries you already depend on.
+
++ [A].ensure(=> E)(Predicate[A]): Validation[E, A]
++ [A].ensureNel(=> E)(Predicate[A]): ValidationNel[E, A]
 
 + Option[A].toSuccessNel(E): ValidationNel[E, A]
 + Option[E].toFailureNel(A): ValidationNel[E, A]

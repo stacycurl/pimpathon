@@ -8,6 +8,11 @@ import pimpathon.set._
 
 
 class SetTest {
+  @Test def notContains(): Unit = {
+    assertTrue(Set.empty[Int].notContains(3))
+    assertFalse(Set(3).notContains(3))
+  }
+
   @Test def powerSet(): Unit = {
     assertEquals(Set(Set.empty[Int]), Set.empty[Int].powerSet)
     assertEquals(Set(Set.empty[Int], Set(1)), Set(1).powerSet)

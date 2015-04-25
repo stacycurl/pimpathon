@@ -380,6 +380,8 @@ The aim of frills is to pimp everything else. You can use it by including the fo
 
 'intransitive' means that frills won't force you to depend on everything that's pimped, you'll only get pimps for types in libraries you already depend on.
 
++ [A].ensure(=> E)(Predicate[A]): Validation[E, A]
+
 + Option[A].toSuccessNel(E): ValidationNel[E, A]
 + Option[E].toFailureNel(A): ValidationNel[E, A]
 

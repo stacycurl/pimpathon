@@ -6,6 +6,7 @@
 ### Removals
 
 ### Additions
++ [A].ensure(=> E)(Predicate[A]): Validation[E, A]
 + [A: Numeric].bounded(A, A): A
 + Boolean.cond(=> A, => A): A
 + Boolean.implies(Boolean): Boolean

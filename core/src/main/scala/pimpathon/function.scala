@@ -7,11 +7,14 @@ import scala.collection.{GenTraversable, GenTraversableLike}
 import pimpathon.boolean._
 import pimpathon.list._
 
+import scala.util.Try
+
 
 object function {
   type Predicate[-A] = A ⇒ Boolean
 
   implicit class FunctionPimps[A, B](val f: A ⇒ B) extends AnyVal {
+    def attempt: A ⇒ Try[B] = a ⇒ Try(f(a))
     def guardWith(p: Predicate[A]): PartialFunction[A, B] = p guard f
   }
 

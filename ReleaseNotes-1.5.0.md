@@ -23,6 +23,7 @@
 + Map[K, V].containsEntry(K, V): Boolean
 + Map[K, V].containsEntry((K, V)): Boolean
 + Predicate[A].cond(=> B, => B): A => B
++ (A => B).attempt: A => Try[B]
 + Callable[A].attempt: Callable[Try[A]]
 + Date.addDay(Int): Date
 + InputStream.toByteArray: Array[Byte]

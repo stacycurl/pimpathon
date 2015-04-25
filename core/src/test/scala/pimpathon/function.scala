@@ -1,7 +1,7 @@
 package pimpathon
 
 import org.junit.Test
-import scala.util.Random
+import scala.util.{Failure, Success, Random}
 
 import org.junit.Assert._
 import pimpathon.function._
@@ -9,6 +9,11 @@ import pimpathon.util._
 
 
 class FunctionTest {
+  @Test def attempt(): Unit = {
+    assertEquals(Success(3),    ((i: Int) ⇒ i).attempt(3))
+    assertEquals(Failure(boom), ((i: Int) ⇒ goBoom).attempt(3))
+  }
+
   @Test def guardWith(): Unit =
     on(1, 2, 3, 4).calling((double guardWith isEven).lift).produces(None, Some(4), None, Some(8))
 

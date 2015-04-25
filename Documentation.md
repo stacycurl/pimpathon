@@ -249,6 +249,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + function.nor(Predicate[A]*): Predicate[A]
 
 + (A => B => C).tupled: ((A, B)) => C
++ (A => B).attempt: A => Try[B]
 + (A => B).guardWith(Predicate[A]): PartialFunction[A, B]
 
 + PartialFunction[A, B].toLeft: A => Either[B, A]

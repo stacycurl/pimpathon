@@ -17,10 +17,11 @@ Central. (1.n.m) release artefacts are built using [Travis CI][ci] and automatic
 to Bintray. To include the repositories in your SBT build you should add,
 
 ```scala
-resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases"),
-  "Stacy Curl's repo" at "http://dl.bintray.com/stacycurl/repo/"
-)
+resolvers += "jcenter" at "http://jcenter.bintray.com"
+// or
+resolvers += "Stacy Curl's repo" at "http://dl.bintray.com/stacycurl/repo/"
+// or
+resolvers += Resolver.sonatypeRepo("releases")
 ```
 
 Builds are available for Scala 2.9.2, 2.9.3, 2.10.4 & 2.11.2
@@ -30,7 +31,7 @@ Builds are available for Scala 2.9.2, 2.9.3, 2.10.4 & 2.11.2
 The pimps in core depend only on the core scala & java libraries. You can use it by including the following:
 
 ```scala
-libraryDependencies += "com.github.stacycurl" %% "pimpathon-core" % "1.4.0"
+libraryDependencies += "com.github.stacycurl" %% "pimpathon-core" % "1.4.6"
 ```
 
 ### pimpathon-frills
@@ -38,7 +39,7 @@ libraryDependencies += "com.github.stacycurl" %% "pimpathon-core" % "1.4.0"
 The aim of frills is to pimp everything else. You can use it by including the following:
 
 ```scala
-libraryDependencies += "com.github.stacycurl" %% "pimpathon-frills" % "1.4.0" intransitive()
+libraryDependencies += "com.github.stacycurl" %% "pimpathon-frills" % "1.4.6" intransitive()
 ```
 
 'intransitive' means that frills won't force you to depend on everything that's pimped, you'll only get pimps for types in libraries you already depend on.

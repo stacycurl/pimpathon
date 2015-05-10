@@ -24,8 +24,6 @@ object Publishing extends Sonatype(PimpathonBuild) {
   def projectUrl    = "https://github.com/stacycurl"
   def developerId   = "stacycurl"
   def developerName = "Stacy Curl"
-  def licenseName   = "Apache License"
-  def licenseUrl    = "http://www.apache.org/licenses/LICENSE-2.0.txt"
 }
 
 /* Sonatype Publishing */
@@ -51,21 +49,11 @@ abstract class Sonatype(build: Build) {
   def developerId: String
   def developerName: String
 
-  def licenseName: String
-  def licenseUrl: String
-  def licenseDistribution = "repo"
   def scmUrl              = projectUrl
   def scmConnection       = "scm:git:" + scmUrl
 
   def generatePomExtra(scalaVersion: String): xml.NodeSeq = {
     <url>{ projectUrl }</url>
-      <licenses>
-        <license>
-          <name>{ licenseName }</name>
-          <url>{ licenseUrl }</url>
-          <distribution>{ licenseDistribution }</distribution>
-        </license>
-      </licenses>
     <scm>
       <url>{ scmUrl }</url>
       <connection>{ scmConnection }</connection>

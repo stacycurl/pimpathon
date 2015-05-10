@@ -37,7 +37,7 @@ object PimpathonBuild extends Build {
 
   def commonSettings = GraphPlugin.graphSettings ++ Seq(
     organization := "com.github.stacycurl",
-    scalaVersion := "2.9.2",
+    crossScalaVersions := Seq("2.9.2", "2.9.3"),
     maxErrors := 1,
     parallelExecution in Test := true,
     scalacOptions := Seq(

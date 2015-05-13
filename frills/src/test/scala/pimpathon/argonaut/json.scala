@@ -1,6 +1,6 @@
 package pimpathon.argonaut
 
-import argonaut.{EncodeJson, Json, Parse}
+import argonaut.{DecodeJson, EncodeJson, Json, Parse}
 import org.junit.Test
 
 import org.junit.Assert._
@@ -30,6 +30,17 @@ class EncodeJsonTest {
     val (encodeList, list) = (implicitly[EncodeJson[List[String]]], List("food", "foo", "bard", "bar"))
 
     assertEquals(reverse(encodeList.encode(list)), encodeList.andThen(reverse).encode(list))
+  }
+
+  private def reverse(json: Json): Json = json.withArray(_.reverse)
+}
+
+class DecodeJsonTest {
+  @Test def compose(): Unit = {
+    val decodeList = implicitly[DecodeJson[List[String]]]
+    val jarray = Json.jArray(List("food", "foo", "bard", "bar").map(Json.jString))
+
+    assertEquals(decodeList.decodeJson(reverse(jarray)), decodeList.compose(reverse).decodeJson(jarray))
   }
 
   private def reverse(json: Json): Json = json.withArray(_.reverse)

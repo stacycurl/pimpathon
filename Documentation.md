@@ -389,6 +389,7 @@ The aim of frills is to pimp everything else. You can use it by including the fo
 
 + List[A].toNel: Option[NonEmptyList[A]]
 
++ argonaut.DecodeJson[A].compose(Json => Json): DecodeJson[A]
 + argonaut.EncodeJson[A].andThen(Json => Json): EncodeJson[A]
 + argonaut.Json.filterNulls: Json
 

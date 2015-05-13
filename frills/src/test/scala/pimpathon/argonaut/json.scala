@@ -1,9 +1,10 @@
 package pimpathon.argonaut
 
-import argonaut.{Json, Parse}
+import argonaut.{EncodeJson, Json, Parse}
 import org.junit.Test
 
 import org.junit.Assert._
+import pimpathon.any._
 import pimpathon.option._
 import pimpathon.argonaut.json._
 
@@ -22,4 +23,14 @@ class JsonTest {
   }
 
   private def parse(content: String): Json = Parse.parseOption(content).getOrThrow("Invalid json in test\n" + content)
+}
+
+class EncodeJsonTest {
+  @Test def andThen(): Unit = {
+    val (encodeList, list) = (implicitly[EncodeJson[List[String]]], List("food", "foo", "bard", "bar"))
+
+    assertEquals(reverse(encodeList.encode(list)), encodeList.andThen(reverse).encode(list))
+  }
+
+  private def reverse(json: Json): Json = json.withArray(_.reverse)
 }

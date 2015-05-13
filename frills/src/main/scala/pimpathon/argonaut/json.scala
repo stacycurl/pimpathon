@@ -17,6 +17,10 @@ object json {
       p.cond(value.withObject(_.filterR(p)).withArray(_.filterR(p)), jNull)(value)
   }
 
+  implicit class EncodeJsonFrills[A](val value: EncodeJson[A]) extends AnyVal {
+    def andThen(f: Json ⇒ Json): EncodeJson[A] = EncodeJson[A](a ⇒ f(value.encode(a)))
+  }
+
   private implicit class JsonObjectFrills(val o: JsonObject) extends AnyVal {
     private[argonaut] def filterR(p: Predicate[Json]): JsonObject =
       JsonObject.from(o.toMap.collectValues { case j if p(j) ⇒ j.filterR(p) })

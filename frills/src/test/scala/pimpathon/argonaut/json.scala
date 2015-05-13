@@ -26,31 +26,23 @@ class JsonTest {
 }
 
 class CodecJsonTest extends JsonUtil {
-  @Test def compose(): Unit = {
-    val listCodec = CodecJson.derived[List[String]]
-    val jarray = Json.jArray(List("food", "foo", "bard", "bar").map(Json.jString))
-
-    assertEquals(listCodec.decodeJson(reverse(jarray)), listCodec.compose(reverse).decodeJson(jarray))
-  }
+  @Test def andThen(): Unit = assertEquals(reverse(codec.encode(list)),     codec.andThen(reverse).encode(list))
+  @Test def compose(): Unit = assertEquals(codec.decodeJson(reverse(json)), codec.compose(reverse).decodeJson(json))
 }
 
-class EncodeJsonTest extends JsonUtil{
-  @Test def andThen(): Unit = {
-    val (encodeList, list) = (implicitly[EncodeJson[List[String]]], List("food", "foo", "bard", "bar"))
-
-    assertEquals(reverse(encodeList.encode(list)), encodeList.andThen(reverse).encode(list))
-  }
+class EncodeJsonTest extends JsonUtil {
+  @Test def andThen(): Unit = assertEquals(reverse(encoder.encode(list)), encoder.andThen(reverse).encode(list))
 }
 
-class DecodeJsonTest extends JsonUtil{
-  @Test def compose(): Unit = {
-    val decodeList = implicitly[DecodeJson[List[String]]]
-    val jarray = Json.jArray(List("food", "foo", "bard", "bar").map(Json.jString))
-
-    assertEquals(decodeList.decodeJson(reverse(jarray)), decodeList.compose(reverse).decodeJson(jarray))
-  }
+class DecodeJsonTest extends JsonUtil {
+  @Test def compose(): Unit = assertEquals(decoder.decodeJson(reverse(json)), decoder.compose(reverse).decodeJson(json))
 }
 
 trait JsonUtil {
   def reverse(json: Json): Json = json.withArray(_.reverse)
+
+  val codec: CodecJson[List[String]] = CodecJson.derived[List[String]]
+  val (encoder, decoder) = (codec.Encoder, codec.Decoder)
+  val list = List("food", "foo", "bard", "bar")
+  val json = Json.jArray(list.map(Json.jString))
 }

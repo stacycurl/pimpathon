@@ -18,7 +18,8 @@ object json {
   }
 
   implicit class CodecJsonFrills[A](val value: CodecJson[A]) extends AnyVal {
-    def compose(f: Json ⇒ Json): CodecJson[A] = CodecJson.derived[A](value.Encoder, value.Decoder.compose(f))
+    def andThen(f: Json ⇒ Json): CodecJson[A] = CodecJson.derived[A](value.Encoder andThen f, value.Decoder)
+    def compose(f: Json ⇒ Json): CodecJson[A] = CodecJson.derived[A](value.Encoder, value.Decoder compose f)
   }
 
   implicit class DecodeJsonFrills[A](val value: DecodeJson[A]) extends AnyVal {

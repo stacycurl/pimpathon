@@ -17,6 +17,10 @@ object json {
       p.cond(value.withObject(_.filterR(p)).withArray(_.filterR(p)), jNull)(value)
   }
 
+  implicit class CodecJsonFrills[A](val value: CodecJson[A]) extends AnyVal {
+    def compose(f: Json ⇒ Json): CodecJson[A] = CodecJson.derived[A](value.Encoder, value.Decoder.compose(f))
+  }
+
   implicit class DecodeJsonFrills[A](val value: DecodeJson[A]) extends AnyVal {
     def compose(f: Json ⇒ Json): DecodeJson[A] = DecodeJson[A](hc ⇒ value.decode(hc >-> f))
   }

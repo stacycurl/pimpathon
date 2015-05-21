@@ -53,6 +53,7 @@ Next minor release: [1.6.0][r1.6.0]
 ### Contributors
 
 + Howard Branch <purestgreen@gmail.com> [@purestgreen](https://twitter.com/purestgreen)
++ Raymond Barlow <rbarlow@raymanoz.com> [@raymanoz](https://twitter.com/raymanoz)
 + Sam Halliday <sam.halliday@gmail.com> [@fommil](https://twitter.com/fommil)
 + Stacy Curl <stacy.curl@gmail.com> [@stacycurl](https://twitter.com/stacycurl)
 

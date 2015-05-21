@@ -1,5 +1,7 @@
 package pimpathon
 
+import _root_.java.nio.charset.Charset
+
 import org.junit.Test
 
 import org.junit.Assert._
@@ -35,5 +37,10 @@ class StringTest {
   @Test def emptyTo(): Unit = {
     assertEquals("abc",    "".emptyTo("abc"))
     assertEquals("def", "def".emptyTo("abc"))
+  }
+
+  @Test def toByteArray(): Unit = {
+    assertArrayEquals(Array('a'.toByte, 'b'.toByte, 'c'.toByte), "abc".toByteArray(Charset.forName("UTF-8")))
+    assertArrayEquals(Array('d'.toByte, 'e'.toByte, 'f'.toByte), "def".toByteArray)
   }
 }

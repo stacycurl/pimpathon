@@ -2,6 +2,8 @@ package pimpathon
 
 import _root_.java.io.{InputStream, OutputStream}
 import _root_.java.math.BigInteger
+import _root_.java.nio.charset.StandardCharsets.UTF_8
+import _root_.java.nio.charset.{StandardCharsets, Charset}
 
 import pimpathon.any._
 import pimpathon.string._
@@ -22,5 +24,8 @@ object array {
 
     def readUpToN(n: Long, is: InputStream): Int =
       if (n == 0) -1 else is.read(array, 0, math.min(n, array.length).toInt)
+
+    def asString(): String = new String(array, UTF_8)
+    def asString(charset: Charset): String = new String(array, charset)
   }
 }

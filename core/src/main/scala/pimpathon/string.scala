@@ -1,5 +1,7 @@
 package pimpathon
 
+import _root_.java.nio.charset.StandardCharsets.UTF_8
+import _root_.java.nio.charset.Charset
 import _root_.java.security.MessageDigest
 
 import pimpathon.array._
@@ -21,8 +23,10 @@ object string {
 
     def prefixPadTo(len: Int, elem: Char): String = (elem.toString * (len - string.length)) + string
 
-
     def md5: String = MessageDigest.getInstance("MD5").digest(string.getBytes).toHex(length = 32)
+
+    def toByteArray: Array[Byte] = string.getBytes(UTF_8)
+    def toByteArray(charset: Charset): Array[Byte] = string.getBytes(charset)
   }
 
   def fromChars(chars: List[Char]): String =

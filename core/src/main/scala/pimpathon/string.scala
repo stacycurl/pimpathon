@@ -1,6 +1,5 @@
 package pimpathon
 
-import _root_.java.nio.charset.StandardCharsets.UTF_8
 import _root_.java.nio.charset.Charset
 import _root_.java.security.MessageDigest
 
@@ -25,7 +24,7 @@ object string {
 
     def md5: String = MessageDigest.getInstance("MD5").digest(string.getBytes).toHex(length = 32)
 
-    def toByteArray: Array[Byte] = string.getBytes(UTF_8)
+    def toByteArray: Array[Byte] = string.getBytes(Charset.forName("UTF-8"))
     def toByteArray(charset: Charset): Array[Byte] = string.getBytes(charset)
   }
 

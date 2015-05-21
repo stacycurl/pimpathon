@@ -1,6 +1,6 @@
 package pimpathon
 
-import _root_.java.nio.charset.StandardCharsets.UTF_8
+import _root_.java.nio.charset.Charset
 
 import org.junit.Test
 
@@ -40,7 +40,7 @@ class StringTest {
   }
 
   @Test def toByteArray(): Unit = {
-    assertArrayEquals(Array('a'.toByte, 'b'.toByte, 'c'.toByte), "abc".toByteArray(UTF_8))
+    assertArrayEquals(Array('a'.toByte, 'b'.toByte, 'c'.toByte), "abc".toByteArray(Charset.forName("UTF-8")))
     assertArrayEquals(Array('d'.toByte, 'e'.toByte, 'f'.toByte), "def".toByteArray)
   }
 }

@@ -279,6 +279,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + String.prefixWith(String): String
 + String.sharedPrefix(String): (String, String, String)
 + String.md5: String
++ String.toByteArray: Array[Byte]
++ String.toByteArray(Charset): Array[Byte]
 
 + Random.between(Int, Int): Int
 

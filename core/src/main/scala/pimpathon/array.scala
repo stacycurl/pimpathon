@@ -24,7 +24,7 @@ object array {
     def readUpToN(n: Long, is: InputStream): Int =
       if (n == 0) -1 else is.read(array, 0, math.min(n, array.length).toInt)
 
-    def asString(): String = new String(array, Charset.forName("UTF-8"))
+    def asString: String = new String(array, Charset.forName("UTF-8"))
     def asString(charset: Charset): String = new String(array, charset)
   }
 }

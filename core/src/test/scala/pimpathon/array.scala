@@ -41,6 +41,6 @@ class ArrayTest {
 
   @Test def asString(): Unit = {
     assertEquals("abc", Array('a'.toByte, 'b'.toByte, 'c'.toByte).asString(Charset.forName("UTF-8")))
-    assertEquals("abc", Array('a'.toByte, 'b'.toByte, 'c'.toByte).asString())
+    assertEquals("abc", Array('a'.toByte, 'b'.toByte, 'c'.toByte).asString)
   }
 }

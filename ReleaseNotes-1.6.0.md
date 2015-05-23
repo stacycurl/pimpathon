@@ -19,6 +19,7 @@
 + (PartialFunction[A, B] &&& PartialFunction[A, C]): PartialFunction[A, (B, C)]
 + String.toByteArray: Array[Byte]
 + String.toByteArray(Charset): Array[Byte]
++ ThreadFactory.naming(Int => String): ThreadFactory
 + argonaut.CodecJson[A].andThen(Json => Json): CodecJson[A]
 + argonaut.CodecJson[A].compose(Json => Json): CodecJson[A]
 + argonaut.DecodeJson[A].compose(Json => Json): DecodeJson[A]

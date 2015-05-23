@@ -284,14 +284,17 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 
 + Random.between(Int, Int): Int
 
++ runnable.create(=> Unit): Runnable
++ implicit conversion from () => Discarded to Runnable
+
 + threadLocal.create(A): ThreadLocal[A]
+
++ ThreadFactory.naming(Int => String): ThreadFactory
 
 + callable.create(=> A): Callable[A]
 + implicit conversion from () => A to Callable[A]
 + Callable[A].attempt: Callable[Try[A]]
 
-+ runnable.create(=> Unit): Runnable
-+ implicit conversion from () => Discarded to Runnable
 
 + Date.addDay(Int): Date
 

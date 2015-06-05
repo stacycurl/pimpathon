@@ -5,6 +5,7 @@
 ### Removals
 
 ### Additions
++ List[A].onlyDisjunction: List[A] \/ A
 + argonaut.CodecJson[A].andThen(Json => Json): CodecJson[A]
 + argonaut.CodecJson[A].compose(Json => Json): CodecJson[A]
 + argonaut.DecodeJson[A].compose(Json => Json): DecodeJson[A]

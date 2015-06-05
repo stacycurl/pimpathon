@@ -387,6 +387,7 @@ The aim of frills is to pimp everything else. You can use it by including the fo
 + Option[A].toSuccessNel(E): ValidationNel[E, A]
 + Option[E].toFailureNel(A): ValidationNel[E, A]
 
++ List[A].onlyDisjunction: List[A] \/ A
 + List[A].toNel: Option[NonEmptyList[A]]
 
 + argonaut.CodecJson[A].andThen(Json => Json): CodecJson[A]

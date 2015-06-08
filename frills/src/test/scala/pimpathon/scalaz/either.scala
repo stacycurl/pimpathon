@@ -30,6 +30,14 @@ class DisjunctionTest {
     assertEquals(List("foo"), strings().run(ss ⇒ right("foo").tapRight(ss += _)))
   }
 
+  @Test def addTo(): Unit = {
+    assertEquals((List(1), Nil),
+      (ints(), strings()).tap(is ⇒ ss ⇒ left(1).addTo(is, ss)).tmap(_.result(), _.result()))
+
+    assertEquals((Nil, List("foo")),
+      (ints(), strings()).tap(is ⇒ ss ⇒ right("foo").addTo(is, ss)).tmap(_.result(), _.result()))
+  }
+
   private def left(i: Int): Int \/ String = -\/(i)
   private def right(s: String): Int \/ String = \/-(s)
 }

@@ -397,6 +397,7 @@ The aim of frills is to pimp everything else. You can use it by including the fo
 + argonaut.Json.filterNulls: Json
 
 + (L \/ R).tap(L => Discarded, R => Discarded): L \/ R
++ (L \/ R).tapLeft(L => Discarded): L \/ R
 
 + NonEmptyList[A].distinct: NonEmptyList[A]
 + NonEmptyList[A].distinctBy(A => B): NonEmptyList[A]

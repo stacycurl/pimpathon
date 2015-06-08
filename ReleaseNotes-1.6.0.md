@@ -1,4 +1,4 @@
-## Release Notes 1.5.0-Snapshot
+## Release Notes 1.6.0
 
 ### Breaking changes & bug fixes
 
@@ -6,6 +6,7 @@
 
 ### Additions
 + List[A].onlyDisjunction: List[A] \/ A
++ (L \/ R).tap(L => Discarded, R => Discarded): L \/ R
 + argonaut.CodecJson[A].andThen(Json => Json): CodecJson[A]
 + argonaut.CodecJson[A].compose(Json => Json): CodecJson[A]
 + argonaut.DecodeJson[A].compose(Json => Json): DecodeJson[A]

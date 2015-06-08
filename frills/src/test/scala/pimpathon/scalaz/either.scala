@@ -38,6 +38,14 @@ class DisjunctionTest {
       (ints(), strings()).tap(is ⇒ ss ⇒ right("foo").addTo(is, ss)).tmap(_.result(), _.result()))
   }
 
+  @Test def removeFrom(): Unit = {
+    assertEquals((Nil, List("foo")),
+      (ints(1), strings("foo")).tap(is ⇒ ss ⇒ left(1).removeFrom(is, ss)).tmap(_.toList, _.toList))
+
+    assertEquals((List(1), Nil),
+      (ints(1), strings("foo")).tap(is ⇒ ss ⇒ right("foo").removeFrom(is, ss)).tmap(_.toList, _.toList))
+  }
+
   private def left(i: Int): Int \/ String = -\/(i)
   private def right(s: String): Int \/ String = \/-(s)
 }

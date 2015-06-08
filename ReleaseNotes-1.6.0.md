@@ -8,6 +8,7 @@
 + List[A].onlyDisjunction: List[A] \/ A
 + (L \/ R).tap(L => Discarded, R => Discarded): L \/ R
 + (L \/ R).tapLeft(L => Discarded): L \/ R
++ (L \/ R).tapRight(R => Discarded): L \/ R
 + argonaut.CodecJson[A].andThen(Json => Json): CodecJson[A]
 + argonaut.CodecJson[A].compose(Json => Json): CodecJson[A]
 + argonaut.DecodeJson[A].compose(Json => Json): DecodeJson[A]

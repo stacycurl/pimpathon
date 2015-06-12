@@ -133,6 +133,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + GTL[K].asMap.withConstValue[V]: Map[K, V]
 + GTL[A].asMap.withEntries(A => (K, V)): Map[K, V]
 + GTL[A].asMap.withSomeEntries(A => Option[(K, V)]): Map[K, V]
++ GTL[A].asMap.withPFEntries(PartialFunction[A, (K, V)]): Map[K, V]
 + GTL[V].asMultiMap.withKeys(V => K): MultiMap[GTL, K, V]
 + GTL[V].asMultiMap.withSomeKeys(V => Option[K]): MultiMap[GTL, K, V]
 + GTL[V].asMultiMap.withManyKeys(V => List[K]): MultiMap[GTL, K, V]
@@ -144,6 +145,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + GTL[K].asMultiMap.withConstValue[V]: MultiMap[GTL, K, V]
 + GTL[A].asMultiMap.withEntries(A => (K, V)): MultiMap[GTL, K, V]
 + GTL[A].asMultiMap.withSomeEntries(A => Option[(K, V)]): MultiMap[GTL, K, V]
++ GTL[A].asMultiMap.withPFEntries(PartialFunction[A, (K, V)]): MultiMap[GTL, K, V]
 + GTL[K].as[F[_. _]].with\*(K => V): F[K, V]
 + GTL[A].ungroupBy(A => B): GTL[GTL[A]]
 + GTL[A].partitionByPF(PartialFunction[A, B]): (GTL[A], GTL[B])

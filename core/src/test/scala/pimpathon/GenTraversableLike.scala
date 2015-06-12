@@ -4,7 +4,6 @@ import org.junit.Test
 import scala.collection.immutable.SortedMap
 
 import org.junit.Assert._
-import pimpathon.any._
 import pimpathon.boolean._
 import pimpathon.genTraversableLike._
 import pimpathon.multiMap._
@@ -157,21 +156,21 @@ class GenTraversableLikeTests {
     assertEquals(Map(1 → 2), Set(1, 2).asMap.withSomeValues(i ⇒ (i % 2 == 1).option(i * 2)))
   }
 
-  @Test def asMap_withEntries(): Unit = ((i: Int) ⇒ (i/2, i*2)).tap(f ⇒ {
-    assertEquals(Map(), List.empty[Int].asMap.withEntries(f))
-    assertEquals(Map(1 → 4, 2 → 8), List(2, 4).asMap.withEntries(f))
+  @Test def asMap_withEntries(): Unit = {
+    assertEquals(Map(), List.empty[Int].asMap.withEntries(entriesFn))
+    assertEquals(Map(1 → 4, 2 → 8), List(2, 4).asMap.withEntries(entriesFn))
 
-    assertEquals(Map(), Set.empty[Int].asMap.withEntries(f))
-    assertEquals(Map(1 → 4, 2 → 8), Set(2, 4).asMap.withEntries(f))
-  })
+    assertEquals(Map(), Set.empty[Int].asMap.withEntries(entriesFn))
+    assertEquals(Map(1 → 4, 2 → 8), Set(2, 4).asMap.withEntries(entriesFn))
+  }
 
-  @Test def asMap_withSomeEntries(): Unit = ((i: Int) ⇒ (i % 2 == 1).option((i/2, i*2))).tap(f ⇒ {
-    assertEquals(Map(), List.empty[Int].asMap.withSomeEntries(f))
-    assertEquals(Map(0 → 2, 1 → 6), List(1, 2, 3).asMap.withSomeEntries(i ⇒ (i % 2 == 1).option((i/2, i*2))))
+  @Test def asMap_withSomeEntries(): Unit = {
+    assertEquals(Map(), List.empty[Int].asMap.withSomeEntries(entriesPF.lift))
+    assertEquals(Map(0 → 2, 1 → 6), List(1, 2, 3).asMap.withSomeEntries(entriesPF.lift))
 
-    assertEquals(Map(), Set.empty[Int].asMap.withSomeEntries(f))
-    assertEquals(Map(0 → 2, 1 → 6), Set(1, 2, 3).asMap.withSomeEntries(i ⇒ (i % 2 == 1).option((i/2, i*2))))
-  })
+    assertEquals(Map(), Set.empty[Int].asMap.withSomeEntries(entriesPF.lift))
+    assertEquals(Map(0 → 2, 1 → 6), List(1, 2, 3).asMap.withSomeEntries(entriesPF.lift))
+  }
 
   @Test def asMap_withPFKeys(): Unit = {
     assertEquals(Map(), List.empty[Int].asMap.withPFKeys { case i ⇒ i * 2 })
@@ -187,6 +186,14 @@ class GenTraversableLikeTests {
 
     assertEquals(Map(), Set.empty[Int].asMap.withPFValues { case i ⇒ i * 2 })
     assertEquals(Map(1 → 2), Set(1, 2).asMap.withPFValues { case i if i % 2 == 1 ⇒ i * 2 })
+  }
+
+  @Test def asMap_withPFEntries(): Unit = {
+    assertEquals(Map(), List.empty[Int].asMap.withPFEntries(entriesPF))
+    assertEquals(Map(0 → 2, 1 → 6), List(1, 2, 3).asMap.withPFEntries(entriesPF))
+
+    assertEquals(Map(), Set.empty[Int].asMap.withPFEntries(entriesPF))
+    assertEquals(Map(0 → 2, 1 → 6), List(1, 2, 3).asMap.withPFEntries(entriesPF))
   }
 
   @Test def as_SortedMap_withValues(): Unit = {
@@ -302,4 +309,7 @@ class GenTraversableLikeTests {
 
     assertEquals(Right(6), List(1, 2, 3).apoFold(0) { case (i, j) ⇒ Right(i + j) })
   }
+
+  private val entriesPF: PartialFunction[Int, (Int, Int)] = { case i if i % 2 == 1 ⇒ (i/2, i*2) }
+  private val entriesFn: Int ⇒ (Int, Int) = (i: Int) ⇒ (i/2, i*2)
 }

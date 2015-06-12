@@ -96,12 +96,9 @@ class GenTraversableLikeCapturer[A, F[_, _]](gtl: GenTraversableLike[A, GenTrave
   def withSomeValues[V](f: A ⇒ Option[V])(implicit cbf: CBF[A, V]): F[A, V] = withSomeEntries(a ⇒ f(a).map(a → _))
   def withSomeEntries[K, V](f: A ⇒ Option[(K, V)])(implicit cbf: CBF[K, V]): F[K, V] = gtl.flatMap(a ⇒ f(a))(breakOut)
 
-
-  def withPFKeys[K](pf: PartialFunction[A, K])(implicit cbf: CBF[K, A]): F[K, A] =
-    gtl.collect { case a if pf.isDefinedAt(a) ⇒ (pf(a), a) }(breakOut)
-
-  def withPFValues[V](pf: PartialFunction[A, V])(implicit cbf: CBF[A, V]): F[A, V] =
-    gtl.collect { case a if pf.isDefinedAt(a) ⇒ (a, pf(a)) }(breakOut)
+  def withPFKeys[K](pf: PartialFunction[A, K])(implicit cbf: CBF[K, A]): F[K, A]   = withPFEntries(pf &&& identityPF[A])
+  def withPFValues[V](pf: PartialFunction[A, V])(implicit cbf: CBF[A, V]): F[A, V] = withPFEntries(identityPF[A] &&& pf)
+  def withPFEntries[K, V](pf: PartialFunction[A, (K, V)])(implicit cbf: CBF[K, V]): F[K, V] = gtl.collect(pf)(breakOut)
 
   def withManyKeys[K](f: A ⇒ List[K])(implicit cbf: CBF[K, A]): F[K, A] =
     gtl.flatMap(a ⇒ f(a).map(_ → a))(breakOut)

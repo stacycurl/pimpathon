@@ -95,4 +95,13 @@ class PartialFunctionTest {
     assertFalse(composed.isDefinedAt((1, 0)))
     assertEquals((2, 3), composed.apply((1, 2)))
   }
+
+  @Test def ampAmpAmp(): Unit = {
+    val composed = util.partial(1 → 2, 2 → 3) &&& util.partial(1 → 3, 3 → 4)
+
+    assertTrue(composed.isDefinedAt(1))
+    assertFalse(composed.isDefinedAt(2))
+    assertFalse(composed.isDefinedAt(3))
+    assertEquals((2, 3), composed.apply(1))
+  }
 }

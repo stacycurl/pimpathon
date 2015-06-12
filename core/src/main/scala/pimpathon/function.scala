@@ -51,6 +51,11 @@ object function {
     def first[C]:  PartialFunction[(In, C), (Out, C)] = ***(identityPF[C])
     def second[C]: PartialFunction[(C, In), (C, Out)] = identityPF[C] *** pf
 
+    def &&&[Out2](rhs: PartialFunction[In, Out2]): PartialFunction[In, (Out, Out2)] = new PartialFunction[In, (Out, Out2)] {
+      def isDefinedAt(in: In): Boolean = pf.isDefinedAt(in) && rhs.isDefinedAt(in)
+      def apply(in: In): (Out, Out2) = (pf(in), rhs(in))
+    }
+
     def ***[In2, Out2](rhs: PartialFunction[In2, Out2]): PartialFunction[(In, In2), (Out, Out2)] =
       new PartialFunction[(In, In2), (Out, Out2)] {
         def isDefinedAt(in: (In, In2)): Boolean = pf.isDefinedAt(in._1) && rhs.isDefinedAt(in._2)

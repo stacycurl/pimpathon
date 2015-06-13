@@ -57,9 +57,10 @@ object list extends genTraversableLike[List] {
     def initLast: (List[A], A) = initLastOption.getOrThrow("initLast of empty list")
 
     def headTailOption: Option[(A, List[A])] = unconsC(None, head ⇒ tail ⇒ Some((head, tail)))
-    def initLastOption: Option[(List[A], A)] = uncons(None, _ ⇒ Some(list.init, list.last))
+    def initLastOption: Option[(List[A], A)] = uncons(None, nonEmpty ⇒ Some(nonEmpty.init, nonEmpty.last))
 
     def tailOption: Option[List[A]] = uncons(None, nonEmpty ⇒ Some(nonEmpty.tail))
+    def initOption: Option[List[A]] = uncons(None, nonEmpty ⇒ Some(nonEmpty.init))
 
     def calcIfNonEmpty[B](f: List[A] ⇒ B): Option[B] = list.calcIf(_.nonEmpty)(f)
     def mapIfNonEmpty[B](f: A ⇒ B): Option[List[B]] = list.calcIf(_.nonEmpty)(_.map(f))

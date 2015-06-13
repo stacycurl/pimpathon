@@ -96,6 +96,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + List[A].emptyTo(List[A]): List[A]
 + List[A].headTail: (A, List[A])
 + List[A].headTailOption: Option[(A, List[A])]
++ List[A].initOption: Option[List[A]]
 + List[A].tailOption: Option[List[A]]
 + List[A].initLast: (List[A], A)
 + List[A].initLastOption: Option[(List[A], A)]

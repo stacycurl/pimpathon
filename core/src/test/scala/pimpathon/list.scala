@@ -81,6 +81,9 @@ class ListTest {
   @Test def initLastOption(): Unit = on(nil[Int], List(1), List(1, 2), List(1, 2, 3))
     .calling(_.initLastOption).produces(None, Some((Nil, 1)), Some((List(1), 2)), Some((List(1, 2), 3)))
 
+  @Test def initOption(): Unit = on(nil[Int], List(1), List(1, 2), List(1, 2, 3))
+    .calling(_.initOption).produces(None, Some(Nil), Some(List(1)), Some(List(1, 2)))
+
   @Test def const(): Unit = on(nil[Int], List('a', 'b', 'c')).calling(_.const(1)).produces(nil[Int], List(1, 1, 1))
 
   @Test def sharedPrefix(): Unit = {

@@ -96,6 +96,9 @@ case class FileUtils (
   def file(parent: File, name: String): File = new File(parent, name)
   def files(parent: File, names: String*): Stream[File] = names.toStream.map(parent / _)
 
+  def resource(name: String): Option[File] =
+    Option(Thread.currentThread().getContextClassLoader.getResource(name)).map(url ⇒ file(url.getPath))
+
   def tempFile(suffix: String = suffix, prefix: String = prefix): File =
     File.createTempFile(prefix, suffix).tap(_.deleteOnExit())
 

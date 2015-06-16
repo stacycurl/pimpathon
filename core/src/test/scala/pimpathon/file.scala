@@ -9,6 +9,7 @@ import scala.util.Properties
 import org.junit.Assert._
 import pimpathon.any._
 import pimpathon.java.io.inputStream._
+import pimpathon.map._
 import pimpathon.util._
 import scala.collection.JavaConversions._
 
@@ -261,6 +262,9 @@ class FileTest {
     assertEquals(dir / "child",            child)
     assertEquals(dir / "nested" / "child", nested)
   })
+
+  @Test def resource(): Unit =
+    on("file", "phile").calling(name ⇒ file.resource(s"./pimpathon/$name.class").isDefined).produces(true, false)
 
   @Test def readBytes(): Unit = file.withTempFile(tmp ⇒ {
     createInputStream("contents").drain(tmp.outputStream())

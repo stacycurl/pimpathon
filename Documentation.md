@@ -365,6 +365,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + file.withTempFile(File => A): A
 + file.withTempFile(String, String)(File => A): A
 + file.files(File, String\*): Stream[File]
++ file.resource(String): Option[File]
 + file.cwd: File
 
 + mutable.Builder[A, B] +++= TraversableOnce[TraversableOnce[A]]

@@ -52,6 +52,8 @@ abstract class genTraversableLike[CC[A]] {
     def partitionByPF[B](pf: PartialFunction[A, B])
       (implicit eab: CCBF[Either[A, B], CC], a: CCBF[A, CC], b: CCBF[B, CC]): (CC[A], CC[B]) = pf.partition[CC](gtl)
 
+    def all(a: A): Boolean = gtl.forall(_ == a)
+
     def seqMap[B, To](f: A ⇒ Option[B])(implicit cbf: CanBuildFrom[Nothing, B, To]): Option[To] =
       seqFold[M.Builder[B, To]](cbf())((builder, a) ⇒ f(a).map(builder += _)).map(_.result())
 

@@ -267,6 +267,14 @@ class GenTraversableLikeTests {
       List((1, 10), (1, 11), (2, 20), (2, 21)).toMultiMap[Set])
   }
 
+  @Test def all(): Unit = {
+    on(Nil, List(true), List(false), List(true, true), List(false, true))
+      .calling(_.all(true)).produces(true, true, false, true, false)
+
+    on(Set.empty[Int], List(1), List(2), List(1, 1), List(2, 1))
+      .calling(_.all(1)).produces(true, true, false, true, false)
+  }
+
   @Test def seqMap(): Unit = {
     assertEquals(Some(Nil),      nil[Int].seqMap(_ ⇒ Some(1)))
     assertEquals(None,           List(1).seqMap(_ ⇒ None))

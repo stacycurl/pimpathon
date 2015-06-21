@@ -275,6 +275,14 @@ class GenTraversableLikeTests {
       .calling(_.all(1)).produces(true, true, false, true, false)
   }
 
+  @Test def none(): Unit = {
+    on(Nil, List(true), List(false), List(true, true), List(false, true))
+      .calling(_.none(true)).produces(true, false, true, false, false)
+
+    on(Set.empty[Int], Set(1), Set(2), Set(1, 1), Set(2, 1))
+      .calling(_.none(1)).produces(true, false, true, false, false)
+  }
+
   @Test def seqMap(): Unit = {
     assertEquals(Some(Nil),      nil[Int].seqMap(_ ⇒ Some(1)))
     assertEquals(None,           List(1).seqMap(_ ⇒ None))

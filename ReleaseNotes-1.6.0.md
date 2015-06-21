@@ -12,6 +12,7 @@
 + GTL[A].asMultiMap.withSomeEntries(A => Option[(K, V)]): MultiMap[GTL, K, V]
 + GTL[A].asMultiMap.withPFEntries(PartialFunction[A, (K, V)]): MultiMap[GTL, K, V]
 + GTL[A].all(A): Boolean
++ GTL[A].none(A): Boolean
 + file.resource(String): Option[File]
 + (L \/ R).tap(L => Discarded, R => Discarded): L \/ R
 + (L \/ R).tapLeft(L => Discarded): L \/ R

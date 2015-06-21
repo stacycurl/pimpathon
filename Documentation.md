@@ -151,6 +151,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + GTL[A].ungroupBy(A => B): GTL[GTL[A]]
 + GTL[A].partitionByPF(PartialFunction[A, B]): (GTL[A], GTL[B])
 + GTL[A].all(A): Boolean
++ GTL[A].none(A): Boolean
 + GTL[A].seqFold(B)((B, A) => Option[B]): Option[B]
 + GTL[A].seqMap[To](A => Option[B]): Option[To]
 + GTL[A].apoFold(B)((B, A) ⇒ Either[C, B]): Either[C, B]

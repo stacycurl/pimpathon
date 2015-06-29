@@ -24,6 +24,7 @@ object json {
 
   implicit class DecodeJsonFrills[A](val value: DecodeJson[A]) extends AnyVal {
     def compose(f: Json ⇒ Json): DecodeJson[A] = DecodeJson[A](hc ⇒ value.decode(hc >-> f))
+    def upcast[B >: A]: DecodeJson[B] = value.map(a ⇒ a: B)
   }
 
   implicit class EncodeJsonFrills[A](val value: EncodeJson[A]) extends AnyVal {

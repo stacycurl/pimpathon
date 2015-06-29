@@ -1,6 +1,6 @@
 package pimpathon.argonaut
 
-import argonaut.{CodecJson, DecodeJson, EncodeJson, Json, Parse}
+import argonaut.{DecodeResult, CodecJson, DecodeJson, EncodeJson, Json, Parse}
 import org.junit.Test
 
 import org.junit.Assert._
@@ -36,6 +36,9 @@ class EncodeJsonTest extends JsonUtil {
 
 class DecodeJsonTest extends JsonUtil {
   @Test def compose(): Unit = assertEquals(decoder.decodeJson(reverse(json)), decoder.compose(reverse).decodeJson(json))
+
+  @Test def upcast(): Unit =
+    assertEquals(DecodeResult.ok(derived), Derived.codec.upcast[Base].decodeJson(Derived.codec.encode(derived)))
 }
 
 trait JsonUtil {
@@ -45,4 +48,7 @@ trait JsonUtil {
   val (encoder, decoder) = (codec.Encoder, codec.Decoder)
   val list = List("food", "foo", "bard", "bar")
   val json = Json.jArray(list.map(Json.jString))
+  trait Base; case class Derived(i: Int) extends Base
+  object Derived { implicit val codec: CodecJson[Derived] = CodecJson.casecodec1(Derived.apply, Derived.unapply)("i") }
+  val derived = Derived(123)
 }

@@ -412,6 +412,7 @@ The aim of frills is to pimp everything else. You can use it by including the fo
 + argonaut.DecodeJson[A].compose(Json => Json): DecodeJson[A]
 + argonaut.DecodeJson[A].upcast[B >: A]: DecodeJson[B]
 + argonaut.EncodeJson[A].andThen(Json => Json): EncodeJson[A]
++ argonaut.EncodeJson[A].downcast[B <: A]: EncodeJson[B]
 + argonaut.Json.filterNulls: Json
 
 + (L \/ R).tap(L => Discarded, R => Discarded): L \/ R

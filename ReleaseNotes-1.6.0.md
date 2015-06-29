@@ -30,3 +30,4 @@
 + argonaut.DecodeJson[A].compose(Json => Json): DecodeJson[A]
 + argonaut.DecodeJson[A].upcast[B >: A]: DecodeJson[B]
 + argonaut.EncodeJson[A].andThen(Json => Json): EncodeJson[A]
++ argonaut.EncodeJson[A].downcast[B <: A]: EncodeJson[B]

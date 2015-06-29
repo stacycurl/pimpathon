@@ -32,13 +32,12 @@ class CodecJsonTest extends JsonUtil {
 
 class EncodeJsonTest extends JsonUtil {
   @Test def andThen(): Unit = assertEquals(reverse(encoder.encode(list)), encoder.andThen(reverse).encode(list))
+  @Test def downcast(): Unit = assertEquals(derivedEncoded, Base.encoder.downcast[Derived].encode(derived))
 }
 
 class DecodeJsonTest extends JsonUtil {
   @Test def compose(): Unit = assertEquals(decoder.decodeJson(reverse(json)), decoder.compose(reverse).decodeJson(json))
-
-  @Test def upcast(): Unit =
-    assertEquals(DecodeResult.ok(derived), Derived.codec.upcast[Base].decodeJson(Derived.codec.encode(derived)))
+  @Test def upcast(): Unit = assertEquals(DecodeResult.ok(derived), Derived.codec.upcast[Base].decodeJson(derivedEncoded))
 }
 
 trait JsonUtil {
@@ -48,7 +47,13 @@ trait JsonUtil {
   val (encoder, decoder) = (codec.Encoder, codec.Decoder)
   val list = List("food", "foo", "bard", "bar")
   val json = Json.jArray(list.map(Json.jString))
-  trait Base; case class Derived(i: Int) extends Base
+
+  trait Base
+  object Base { val encoder = EncodeJson[Base]({ case d: Derived ⇒ Derived.codec.encode(d) }) }
+
+  case class Derived(i: Int) extends Base
   object Derived { implicit val codec: CodecJson[Derived] = CodecJson.casecodec1(Derived.apply, Derived.unapply)("i") }
+
   val derived = Derived(123)
+  val derivedEncoded = Derived.codec.encode(derived)
 }

@@ -34,6 +34,8 @@ object any {
     def filterNotSelf(p: Predicate[A]): Option[A] = (!p(a)).option(a)
     def unlessSelf(p: Predicate[A]): Option[A] = (!p(a)).option(a)
 
+    def containedIn(s: Set[A]): Boolean = s.contains(a)
+
     def passes: AnyCapturer[A] = new AnyCapturer[A](a, b ⇒ b.option(a))
     def fails: AnyCapturer[A]  = new AnyCapturer[A](a, b ⇒ (!b).option(a))
 

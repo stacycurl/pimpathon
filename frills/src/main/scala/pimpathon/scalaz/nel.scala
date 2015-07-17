@@ -9,7 +9,7 @@ import pimpathon.list._
 import pimpathon.tuple._
 
 
-object nel extends genTraversableLike[NonEmptyList] {
+object nel extends genTraversableLike[NonEmptyList] with pimpathon.frills.genTraversableLike[NonEmptyList] {
   implicit def canBuildNonEmpty[A]: CanBuildNonEmpty[A, NonEmptyList[A]] = new CanBuildNonEmpty[A, NonEmptyList[A]] {
     def builder(head: A): M.Builder[A, NonEmptyList[A]] = List.newBuilder[A].mapResult(NonEmptyList.nel(head, _))
   }

@@ -140,7 +140,7 @@ class ListTest {
 
   @Test def partitionEithers(): Unit = assertEquals(
     (List(1, 2), List("abc", "def")),
-    List(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers
+    List(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[List]
   )
 
   @Test def partitionByPF(): Unit = assertEquals(

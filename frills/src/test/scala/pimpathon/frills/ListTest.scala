@@ -1,5 +1,6 @@
 package pimpathon.frills
 
+import org.junit.Assert._
 import org.junit.Test
 import scalaz.NonEmptyList
 
@@ -13,4 +14,9 @@ class ListTest {
 
   @Test def onlyDisjunction(): Unit =
     on(nil[Int], List(1, 2), List(1)).calling(_.onlyDisjunction).produces(Nil.left, List(1, 2).left, 1.right)
+
+  @Test def partitionDisjunctions(): Unit = assertEquals(
+    (List(1, 2), List("abc", "def")),
+    List(1.left, "abc".right, "def".right, 2.left).partitionDisjunctions[List]
+  )
 }

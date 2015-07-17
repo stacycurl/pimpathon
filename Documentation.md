@@ -161,6 +161,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + GTL[A].apoFold(B)((B, A) ⇒ Either[C, B]): Either[C, B]
 + GTL[(K, V)].toMultiMap[F[_]]: MultiMap[F, K, V]
 + GTL[Either[L, R]].partitionEithers: (GTL[L], GTL[R])
++ GTL[L \/ R].partitionDisjunctions: (GTL[L], GTL[R])
 
 + Set[A].notContains(A): Boolean
 + Set[A].mutable: mutable.Set[A] (aka toMutable)

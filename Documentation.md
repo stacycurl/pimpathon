@@ -84,6 +84,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Try[A].fold(Throwable => B, A => B): Option[String]
 + Try[A].getMessage: Option[String]
 + Try[A].toEither: Either[Throwable, A]
++ Try[A].toDisjunction: Throwable \/ A
 
 + FilterMonadic[(K, V)].toMultiMap: MultiMap[List, K, V]
 

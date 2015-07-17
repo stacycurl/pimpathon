@@ -8,6 +8,7 @@
 + [A].containedIn(Set[A]): Boolean
 + [A].notContainedIn(Set[A]): Boolean
 + Try[A].fold(Throwable => B, A => B): Option[String]
++ Try[A].toDisjunction: Throwable \/ A
 + List[A].initOption: Option[List[A]]
 + List[A].onlyDisjunction: List[A] \/ A
 + GTL[A].asMap.withSomeEntries(A => Option[(K, V)]): Map[K, V]

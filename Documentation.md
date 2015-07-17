@@ -24,6 +24,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + [A].filterNotSelf(Predicate[A]): Option[A]
 + [A].ifSelf(Predicate[A]): Option[A]
 + [A].unlessSelf(Predicate[A]): Option[A] -- (and an alias: filterNotSelf)
++ [A].isOneOf(A*): Boolean
 + [A].containedIn(Set[A]): Boolean
 + [A].notContainedIn(Set[A]): Boolean
 + [A].tap((A => Discarded)\*): A (aka update, aka withSideEffect)

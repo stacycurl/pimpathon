@@ -6,6 +6,7 @@
 
 ### Additions
 + [A].isOneOf(A*): Boolean
++ [A].isNotOneOf(A*): Boolean
 + [A].containedIn(Set[A]): Boolean
 + [A].notContainedIn(Set[A]): Boolean
 + Try[A].fold(Throwable => B, A => B): Option[String]

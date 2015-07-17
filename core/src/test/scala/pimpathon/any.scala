@@ -60,6 +60,7 @@ class AnyTest {
   @Test def notContainedIn(): Unit = on(1, 2, 3, 4).calling(_.notContainedIn(Set(1, 3))).produces(false, true, false, true)
 
   @Test def isOneOf(): Unit = on(1, 2, 3, 4).calling(_.isOneOf(1, 3)).produces(true, false, true, false)
+  @Test def isNotOneOf(): Unit = on(1, 2, 3, 4).calling(_.isNotOneOf(1, 3)).produces(false, true, false, true)
 
   @Test def passes_one(): Unit = {
     on(1, 2, 3, 4).calling(_.passes.one(_ < 2, _ > 3)).produces(Some(1), None, None, Some(4))

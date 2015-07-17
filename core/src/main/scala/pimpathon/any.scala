@@ -35,6 +35,7 @@ object any {
     def unlessSelf(p: Predicate[A]): Option[A] = (!p(a)).option(a)
 
     def isOneOf(as: A*): Boolean = as.contains(a)
+    def isNotOneOf(as: A*): Boolean = !as.contains(a)
 
     def containedIn(s: Set[A]): Boolean = s.contains(a)
     def notContainedIn(s: Set[A]): Boolean = !s.contains(a)

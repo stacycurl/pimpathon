@@ -11,8 +11,10 @@
 + Try[A].toDisjunction: Throwable \/ A
 + List[A].initOption: Option[List[A]]
 + List[A].onlyDisjunction: List[A] \/ A
++ GTL[A].asMap.withEntries(A => K, A => V): Map[K, V]
 + GTL[A].asMap.withSomeEntries(A => Option[(K, V)]): Map[K, V]
 + GTL[A].asMap.withPFEntries(PartialFunction[A, (K, V)]): Map[K, V]
++ GTL[A].asMultiMap.withEntries(A => K, A => V): MultiMap[GTL, K, V]
 + GTL[A].asMultiMap.withSomeEntries(A => Option[(K, V)]): MultiMap[GTL, K, V]
 + GTL[A].asMultiMap.withPFEntries(PartialFunction[A, (K, V)]): MultiMap[GTL, K, V]
 + GTL[A].all(A): Boolean

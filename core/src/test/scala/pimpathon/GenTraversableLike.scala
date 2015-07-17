@@ -66,10 +66,20 @@ class GenTraversableLikeTests {
       Set(0, 1, 2, 3).asMultiMap.withSomeValues(i ⇒ (i % 2 == 1).option(i % 2)))
   }
 
-  @Test def asMultiMap_withEntries(): Unit = assertEquals(
-    Map(1 → List((10, 100), (11, 110)), 2 → List((20, 200))),
-    Map((1, 10) → 100, (1, 11) → 110, (2, 20) → 200).asMultiMap[List].withEntries { case ((a, b), c) ⇒ (a, (b, c)) }
-  )
+  @Test def asMultiMap_withEntries(): Unit = {
+    assertEquals(
+      Map(1 → List((10, 100), (11, 110)), 2 → List((20, 200))),
+      Map((1, 10) → 100, (1, 11) → 110, (2, 20) → 200).asMultiMap[List].withEntries { case ((a, b), c) ⇒ (a, (b, c)) }
+    )
+
+    assertEquals(
+      Map(1 → List((10, 100), (11, 110)), 2 → List((20, 200))),
+      Map((1, 10) → 100, (1, 11) → 110, (2, 20) → 200).asMultiMap[List].withEntries(
+        { case ((a, b), c) ⇒ a      },
+        { case ((a, b), c) ⇒ (b, c) }
+      )
+    )
+  }
 
   @Test def asMultiMap_withPFKeys(): Unit = {
     assertEquals(Map(), List.empty[Int].asMultiMap.withPFKeys { case i if i % 2 == 1 ⇒ i % 2 })

@@ -81,6 +81,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Either[Throwable, R].getMessage: Option[String]
 + Either[Throwable, R].toTry: Try[R]
 
++ Try[A].fold(Throwable => B, A => B): Option[String]
 + Try[A].getMessage: Option[String]
 + Try[A].toEither: Either[Throwable, A]
 

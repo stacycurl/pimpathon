@@ -8,7 +8,7 @@ object pimpTry {
     def getMessage: Option[String] = fold(t ⇒ Some(t.getMessage), _ ⇒ None)
     def toEither: Either[Throwable, A] = fold(Left(_), Right(_))
 
-    private def fold[B](failure: Throwable ⇒ B, success: A ⇒ B): B = value match {
+    def fold[B](failure: Throwable ⇒ B, success: A ⇒ B): B = value match {
       case Success(a) ⇒ success(a)
       case Failure(t) ⇒ failure(t)
     }

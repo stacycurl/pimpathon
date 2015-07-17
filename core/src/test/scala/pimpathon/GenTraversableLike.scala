@@ -179,7 +179,17 @@ class GenTraversableLikeTests {
     assertEquals(Map(0 → 2, 1 → 6), List(1, 2, 3).asMap.withSomeEntries(entriesPF.lift))
 
     assertEquals(Map(), Set.empty[Int].asMap.withSomeEntries(entriesPF.lift))
-    assertEquals(Map(0 → 2, 1 → 6), List(1, 2, 3).asMap.withSomeEntries(entriesPF.lift))
+    assertEquals(Map(0 → 2, 1 → 6), Set(1, 2, 3).asMap.withSomeEntries(entriesPF.lift))
+
+
+    assertEquals(Map(), List.empty[Int].asMap.withSomeEntries(keysPF.lift, valuesPF.lift))
+    assertEquals(Map(0 → 2, 1 → 6), List(1, 2, 3).asMap.withSomeEntries(keysPF.lift, valuesPF.lift))
+
+    assertEquals(Map(), Set.empty[Int].asMap.withSomeEntries(keysPF.lift, valuesPF.lift))
+    assertEquals(Map(0 → 2, 1 → 6), Set(1, 2, 3).asMap.withSomeEntries(keysPF.lift, valuesPF.lift))
+
+    assertEquals(Map(), List(1, 2, 3).asMap.withSomeEntries(emptyPF[Int, Int].lift, valuesPF.lift))
+    assertEquals(Map(), List(1, 2, 3).asMap.withSomeEntries(keysPF.lift, emptyPF[Int, Int].lift))
   }
 
   @Test def asMap_withPFKeys(): Unit = {
@@ -337,5 +347,8 @@ class GenTraversableLikeTests {
   }
 
   private val entriesPF: PartialFunction[Int, (Int, Int)] = { case i if i % 2 == 1 ⇒ (i/2, i*2) }
+  private val keysPF:    PartialFunction[Int, Int]        = { case i if i % 2 == 1 ⇒ i/2 }
+  private val valuesPF:  PartialFunction[Int, Int]        = { case i if i % 2 == 1 ⇒ i*2 }
   private val entriesFn: Int ⇒ (Int, Int) = (i: Int) ⇒ (i/2, i*2)
+  private def emptyPF[A, B] = util.partial[A, B]()
 }

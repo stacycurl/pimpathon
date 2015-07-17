@@ -214,6 +214,16 @@ class GenTraversableLikeTests {
 
     assertEquals(Map(), Set.empty[Int].asMap.withPFEntries(entriesPF))
     assertEquals(Map(0 → 2, 1 → 6), List(1, 2, 3).asMap.withPFEntries(entriesPF))
+
+
+    assertEquals(Map(), List.empty[Int].asMap.withPFEntries(keysPF, valuesPF))
+    assertEquals(Map(0 → 2, 1 → 6), List(1, 2, 3).asMap.withPFEntries(keysPF, valuesPF))
+
+    assertEquals(Map(), Set.empty[Int].asMap.withPFEntries(keysPF, valuesPF))
+    assertEquals(Map(0 → 2, 1 → 6), List(1, 2, 3).asMap.withPFEntries(keysPF, valuesPF))
+
+    assertEquals(Map(), List(1, 2, 3).asMap.withPFEntries(emptyPF[Int, Int], valuesPF))
+    assertEquals(Map(), List(1, 2, 3).asMap.withPFEntries(keysPF, emptyPF[Int, Int]))
   }
 
   @Test def as_SortedMap_withValues(): Unit = {

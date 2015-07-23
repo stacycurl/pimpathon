@@ -1,5 +1,7 @@
 package pimpathon.java.io
 
+import java.nio.charset.Charset
+
 import scala.language.implicitConversions
 
 import java.io._
@@ -63,4 +65,7 @@ class InputStreamPimps[IS <: InputStream](is: IS, utils: InputStreamUtils) {
   })
 
   def toByteArray: Array[Byte] = new ByteArrayOutputStream().drain(is).toByteArray
+
+  def asString(charset: Charset): String = toByteArray.asString(charset)
+  def asString: String = toByteArray.asString
 }

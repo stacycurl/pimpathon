@@ -1,5 +1,7 @@
 package pimpathon.java.io
 
+import java.nio.charset.Charset
+
 import scala.language.reflectiveCalls
 
 import java.io._
@@ -125,5 +127,11 @@ class InputStreamTest {
 
   @Test def toByteArray(): Unit = {
     assertEquals("contents", new String(createInputStream("contents").toByteArray))
+  }
+
+  @Test def asString(): Unit = {
+    assertEquals("contents", new ByteArrayInputStream("contents".getBytes).asString)
+    val UTF8 = Charset.forName("UTF-8")
+    assertEquals("contents", new ByteArrayInputStream("contents".getBytes(UTF8)).asString(UTF8))
   }
 }

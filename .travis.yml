@@ -13,7 +13,9 @@ branches:
   - master
   - 2.9
 
-before_script: ./project/bintray.sh
+before_script:
+- ./project/bintray.sh
+- curl -L -o $HOME/.sbt/launchers/0.13.5/sbt-launch.jar http://dl.bintray.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.5/sbt-launch.jar
 
 script:
 - sbt clean +compile scoverage:test $(if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$JAVA_HOME" == "$(jdk_switcher home openjdk6)" ]]; then echo "+publish"; fi)

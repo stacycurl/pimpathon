@@ -3,8 +3,10 @@ def plugin(moduleID: ModuleID) = // Workaround http://github.com/sbt/sbt/issues/
 
 resolvers ++= Seq("bintray-sbt-plugin-releases" at "http://dl.bintray.com/content/sbt/sbt-plugin-releases")
 
+resolvers += Resolver.url("fix-sbt-plugin-releases", url("http://dl.bintray.com/sbt/sbt-plugin-releases"))(Resolver.ivyStylePatterns)
+
 libraryDependencies ++= Seq(
-  plugin("com.timushev.sbt" %  "sbt-updates"           % "0.1.6"),
+  plugin("com.timushev.sbt" %  "sbt-updates"           % "0.1.7"),
   plugin("net.virtual-void" %  "sbt-dependency-graph"  % "0.7.4"),
   plugin("com.typesafe.sbt" %  "sbt-scalariform"       % "1.3.0"),
   plugin("org.scalastyle"   %% "scalastyle-sbt-plugin" % "0.5.0"),

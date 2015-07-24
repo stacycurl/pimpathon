@@ -97,6 +97,10 @@ case class GenTraversableLikeCapturer[A, F[_, _], G[_, _]](private val gtl: GenT
   def withConstValue[V](v: V)(implicit  cbf: CBF[A, V]): F[A, V] = withEntries(a ⇒ (a, v))
 
 
+  def withEntries[K1, K2, K3, K4, V](fk1: A ⇒ K1, fk2: A ⇒ K2, fk3: A ⇒ K3, fk4: A ⇒ K4, fv: A ⇒ V)(implicit
+    k4: CBF[K4, V], k3: GBF[K3, F[K4, V]], k2: GBF[K2, G[K3, F[K4, V]]], k1: GBF[K1, G[K2, G[K3, F[K4, V]]]]
+  ): G[K1, G[K2, G[K3, F[K4, V]]]] = groupBy(fk1, _.withEntries(fk2, fk3, fk4, fv))
+
   def withEntries[K1, K2, K3, V](fk1: A ⇒ K1, fk2: A ⇒ K2, fk3: A ⇒ K3, fv: A ⇒ V)(implicit
     k3: CBF[K3, V], k2: GBF[K2, F[K3, V]], k1: GBF[K1, G[K2, F[K3, V]]]
   ): G[K1, G[K2, F[K3, V]]] = groupBy(fk1, _.withEntries(fk2, fk3, fv))

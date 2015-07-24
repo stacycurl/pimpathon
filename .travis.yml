@@ -2,6 +2,10 @@ language: scala
 
 sudo: false
 
+cache:
+  directories:
+  - $HOME/.ivy2/cache
+
 scala:
 - 2.11.2
 

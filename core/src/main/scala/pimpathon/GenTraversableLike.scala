@@ -31,7 +31,7 @@ abstract class genTraversableLike[CC[A]] {
     : GenTraversableLikeOfTuple2[K, V, Repr] = new GenTraversableLikeOfTuple2[K, V, Repr](gtl)
 
   class GenTraversableLikePimps[A](gtl: GenTraversableLike[A, GenTraversable[A]]) {
-    def asMap: GenTraversableLikeCapturer[A, Map] = as[Map]
+    def asMap: GenTraversableLikeCapturer[A, Map, Map] = as[Map]
 
     def attributeCounts[B](f: A ⇒ B): Map[B, Int] =
       asMultiMap.withKeys(f).mapValues(_.size)
@@ -42,10 +42,10 @@ abstract class genTraversableLike[CC[A]] {
     def optAttributeCounts[B](f: A ⇒ Option[B]): Map[B, Int] =
       asMultiMap.withSomeKeys(f).mapValues(_.size)
 
-    def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM] =
-      as[({ type MM[K, V] = MultiMap[F, K, V] })#MM]
+    def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Map] =
+      GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Map](gtl)
 
-    def as[F[_, _]]: GenTraversableLikeCapturer[A, F] = new GenTraversableLikeCapturer[A, F](gtl)
+    def as[F[_, _]]: GenTraversableLikeCapturer[A, F, F] = GenTraversableLikeCapturer[A, F, F](gtl)
 
     def ungroupBy[B](f: A ⇒ B)(implicit inner: CCBF[A, CC], outer: CCBF[CC[A], CC]): CC[CC[A]] =
       gtl.foldLeft(UngroupBy[A, B, CC](Map(), Map())) { case (ungroupBy, item) ⇒ ungroupBy.add(item, f(item)) }.values
@@ -87,15 +87,23 @@ abstract class genTraversableLike[CC[A]] {
   protected def toGTL[A](cc: CC[A]): GenTraversableLike[A, GenTraversable[A]]
 }
 
-class GenTraversableLikeCapturer[A, F[_, _]](gtl: GenTraversableLike[A, GenTraversable[A]]) {
+case class GenTraversableLikeCapturer[A, F[_, _], G[_, _]](private val gtl: GenTraversableLike[A, GenTraversable[A]]) {
   import pimpathon.genTraversableLike._
   type CBF[K, V] = CanBuildFrom[Nothing, (K, V), F[K, V]]
+  type GBF[K, V] = CanBuildFrom[Nothing, (K, V), G[K, V]]
 
   def withKeys[K](f: A ⇒ K)(implicit cbf: CBF[K, A]): F[K, A]    = withEntries(a ⇒ (f(a), a))
   def withValues[V](f: A ⇒ V)(implicit cbf: CBF[A, V]): F[A, V]  = withEntries(a ⇒ (a, f(a)))
   def withConstValue[V](v: V)(implicit  cbf: CBF[A, V]): F[A, V] = withEntries(a ⇒ (a, v))
+
+
+  def withEntries[K1, K2, V](fk1: A ⇒ K1, fk2: A ⇒ K2, fv: A ⇒ V)(implicit
+    k2: CBF[K2, V], k1: GBF[K1, F[K2, V]]
+  ): G[K1, F[K2, V]] = groupBy(fk1, _.withEntries(fk2, fv))
+
   def withEntries[K, V](k: A ⇒ K, v: A ⇒ V)(implicit cbf: CBF[K, V]): F[K, V] = gtl.map(a ⇒ (k(a), v(a)))(breakOut)
   def withEntries[K, V](f: A ⇒ ((K, V)))(implicit cbf: CBF[K, V]): F[K, V] = gtl.map(f)(breakOut)
+
 
   def withSomeKeys[K](f: A ⇒ Option[K])(implicit cbf: CBF[K, A]): F[K, A]   = withSomeEntries(a ⇒ f(a).map(_ → a))
   def withSomeValues[V](f: A ⇒ Option[V])(implicit cbf: CBF[A, V]): F[A, V] = withSomeEntries(a ⇒ f(a).map(a → _))
@@ -115,6 +123,10 @@ class GenTraversableLikeCapturer[A, F[_, _]](gtl: GenTraversableLike[A, GenTrave
       case ((ks, builder), a) ⇒ f(a).calc(k ⇒ (!ks.contains(k)).option(ks + k, builder += ((k, a))))
     }.map { case (_, builder) ⇒ builder.result() }
   }
+
+  private def groupBy[K, V](fk: A ⇒ K, f: GenTraversableLikeCapturer[A, F, G] ⇒ V)(
+    implicit cbf: CanBuildFrom[Nothing, (K, V), G[K, V]]
+  ): G[K, V] = gtl.asMultiMap[List].withKeys(fk).map { case (k,as) ⇒ (k, f(copy(as))) }(breakOut)
 
   private def zip[K, V](fk: A ⇒ Option[K], fv: A ⇒ Option[V])(a: A): Option[(K, V)] = for { k ← fk(a); v ← fv(a) } yield (k, v)
 }

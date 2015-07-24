@@ -79,6 +79,17 @@ class GenTraversableLikeTests {
         { case ((a, b), c) ⇒ (b, c) }
       )
     )
+
+    val words@List(foo, food, faff, bar, bare, boom) = List("foo", "food", "faff", "bar", "bare", "boom")
+    val List(a,b,d,e,f,m,o,r) = "abdefmor".toList
+
+    assertEquals(
+      Map(
+        b → Map(a → List(bar, bare), o → List(boom)),
+        f → Map(o → List(foo, food), a → List(faff))
+      ),
+      words.asMultiMap[List].withEntries(letter(0), letter(1), s ⇒ s)
+    )
   }
 
   @Test def asMultiMap_withPFKeys(): Unit = {
@@ -355,6 +366,8 @@ class GenTraversableLikeTests {
 
     assertEquals(Right(6), List(1, 2, 3).apoFold(0) { case (i, j) ⇒ Right(i + j) })
   }
+
+  private def letter(n: Int)(s: String): Char = s.lift(n).getOrElse(' ')
 
   private val entriesPF: PartialFunction[Int, (Int, Int)] = { case i if i % 2 == 1 ⇒ (i/2, i*2) }
   private val keysPF:    PartialFunction[Int, Int]        = { case i if i % 2 == 1 ⇒ i/2 }

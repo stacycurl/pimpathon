@@ -90,6 +90,14 @@ class GenTraversableLikeTests {
       ),
       words.asMultiMap[List].withEntries(letter(0), letter(1), s ⇒ s)
     )
+
+    assertEquals(
+      Map(
+        b → Map(a → Map(r → List(bar, bare)), o → Map(o → List(boom))),
+        f → Map(o → Map(o → List(foo, food)), a → Map(f → List(faff)))
+      ),
+      words.asMultiMap[List].withEntries(letter(0), letter(1), letter(2), s ⇒ s)
+    )
   }
 
   @Test def asMultiMap_withPFKeys(): Unit = {

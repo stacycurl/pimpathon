@@ -34,6 +34,7 @@ object json {
 
   implicit class DecodeJsonMapFrills[K, V](val value: DecodeJson[Map[K, V]]) extends AnyVal {
     def mapKeys[C](f: K ⇒ C): DecodeJson[Map[C, V]] = value.map(_.mapKeysEagerly(f))
+    def mapValues[W](f: V ⇒ W): DecodeJson[Map[K, W]] = value.map(_.mapValuesEagerly(f))
   }
 
   implicit class EncodeJsonFrills[A](val value: EncodeJson[A]) extends AnyVal {

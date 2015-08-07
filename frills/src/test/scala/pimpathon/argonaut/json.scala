@@ -1,12 +1,14 @@
 package pimpathon.argonaut
 
-import argonaut.{DecodeResult, CodecJson, DecodeJson, EncodeJson, Json, Parse}
+import argonaut.{DecodeResult, CodecJson, EncodeJson, Json, Parse}
 import org.junit.Test
 
 import org.junit.Assert._
 import pimpathon.any._
+import pimpathon.map._
 import pimpathon.option._
 import pimpathon.argonaut.json._
+
 
 
 class JsonTest {
@@ -29,12 +31,10 @@ class CodecJsonTest extends JsonUtil {
   @Test def andThen(): Unit = assertEquals(reverse(codec.encode(list)),     codec.andThen(reverse).encode(list))
   @Test def compose(): Unit = assertEquals(codec.decodeJson(reverse(json)), codec.compose(reverse).decodeJson(json))
 
-  @Test def xmapKeys(): Unit = {
-    val reversed = mapCodec.xmapKeys[String](_.reverse)(_.reverse)
-
+  @Test def xmapKeys(): Unit = mapCodec.xmapKeys[String](_.reverse)(_.reverse).calc(reversed ⇒ {
     assertEquals(mapCodec.encode(Map("oof" → "bar")), reversed.encode(Map("foo" → "bar")))
-    assertEquals(mapCodec.decodeJson(reverseJsonMap), reversed.decodeJson(jsonMap))
-  }
+    assertEquals(mapCodec.decodeJson(jsonMap("oof" → "bar")), reversed.decodeJson(jsonMap("foo" → "bar")))
+  })
 }
 
 class EncodeJsonTest extends JsonUtil {
@@ -57,8 +57,13 @@ class DecodeJsonTest extends JsonUtil {
   @Test def upcast(): Unit = assertEquals(DecodeResult.ok(derived), Derived.codec.upcast[Base].decodeJson(derivedEncoded))
 
   @Test def mapKeys(): Unit = assertEquals(
-    mapDecoder.decodeJson(reverseJsonMap),
-    mapDecoder.mapKeys(_.reverse).decodeJson(jsonMap)
+    mapDecoder.decodeJson(jsonMap("oof" → "bar")),
+    mapDecoder.mapKeys(_.reverse).decodeJson(jsonMap("foo" → "bar"))
+  )
+
+  @Test def mapValues(): Unit = assertEquals(
+    mapDecoder.decodeJson(jsonMap("foo" → "rab")),
+    mapDecoder.mapValues(_.reverse).decodeJson(jsonMap("foo" → "bar"))
   )
 }
 
@@ -69,9 +74,8 @@ trait JsonUtil {
   val (encoder, decoder) = (codec.Encoder, codec.Decoder)
   val list = List("food", "foo", "bard", "bar")
   val json = Json.jArray(list.map(Json.jString))
+  def jsonMap(kvs: (String, String)*): Json = Json.jObjectAssocList(kvs.toMap.mapValuesEagerly(Json.jString).toList)
   val mapCodec: CodecJson[Map[String, String]] = CodecJson.derived[Map[String, String]]
-  val jsonMap = ("foo" → Json.jString("bar")) ->: Json.jEmptyObject
-  val reverseJsonMap = ("oof" → Json.jString("bar")) ->: Json.jEmptyObject
   val (mapEncoder, mapDecoder) = (mapCodec.Encoder, mapCodec.Decoder)
 
   trait Base

@@ -18,13 +18,16 @@ object json {
   }
 
   implicit class CodecJsonFrills[A](val value: CodecJson[A]) extends AnyVal {
-    def andThen(f: Json ⇒ Json): CodecJson[A] = CodecJson.derived[A](value.Encoder andThen f, value.Decoder)
-    def compose(f: Json ⇒ Json): CodecJson[A] = CodecJson.derived[A](value.Encoder, value.Decoder compose f)
+    def andThen(f: Json ⇒ Json): CodecJson[A] = value.derived(_ andThen f)(decoder ⇒ decoder)
+    def compose(f: Json ⇒ Json): CodecJson[A] = value.derived(encoder ⇒ encoder)(_ compose f)
+
+    private[argonaut] def derived[B](f: EncodeJson[A] ⇒ EncodeJson[B])(g: DecodeJson[A] ⇒ DecodeJson[B]) =
+      CodecJson.derived[B](f(value.Encoder), g(value.Decoder))
   }
 
   implicit class CodecJsonMapFrills[K, V](val value: CodecJson[Map[K, V]]) extends AnyVal {
-    def xmapKeys[C](kc: K ⇒ C)(ck: C ⇒ K): CodecJson[Map[C, V]] =
-      CodecJson.derived[Map[C, V]](value.Encoder contramapKeys ck, value.Decoder mapKeys kc)
+    def xmapKeys[C](kc: K ⇒ C)(ck: C ⇒ K): CodecJson[Map[C, V]]   = value.derived(_ contramapKeys ck)(_ mapKeys kc)
+    def xmapValues[W](vw: V ⇒ W)(wv: W ⇒ V): CodecJson[Map[K, W]] = value.derived(_ contramapValues wv)(_ mapValues vw)
   }
 
   implicit class DecodeJsonFrills[A](val value: DecodeJson[A]) extends AnyVal {

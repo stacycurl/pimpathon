@@ -5,7 +5,6 @@ import org.junit.Test
 
 import org.junit.Assert._
 import pimpathon.any._
-import pimpathon.map._
 import pimpathon.option._
 import pimpathon.argonaut.json._
 
@@ -34,6 +33,11 @@ class CodecJsonTest extends JsonUtil {
   @Test def xmapKeys(): Unit = mapCodec.xmapKeys[String](_.reverse)(_.reverse).calc(reversed ⇒ {
     assertEquals(mapCodec.encode(Map("oof" → "bar")), reversed.encode(Map("foo" → "bar")))
     assertEquals(mapCodec.decodeJson(jsonMap("oof" → "bar")), reversed.decodeJson(jsonMap("foo" → "bar")))
+  })
+
+  @Test def xmapValues(): Unit = mapCodec.xmapValues[String](_.reverse)(_.reverse).calc(reversed ⇒ {
+    assertEquals(mapCodec.encode(Map("foo" → "rab")), reversed.encode(Map("foo" → "bar")))
+    assertEquals(mapCodec.decodeJson(jsonMap("foo" → "rab")), reversed.decodeJson(jsonMap("foo" → "bar")))
   })
 }
 
@@ -70,13 +74,14 @@ class DecodeJsonTest extends JsonUtil {
 trait JsonUtil {
   def reverse(json: Json): Json = json.withArray(_.reverse)
 
-  val codec: CodecJson[List[String]] = CodecJson.derived[List[String]]
-  val (encoder, decoder) = (codec.Encoder, codec.Decoder)
+  val codec: CodecJson[List[String]]           = CodecJson.derived[List[String]]
+  val mapCodec: CodecJson[Map[String, String]] = CodecJson.derived[Map[String, String]]
+  val (encoder, decoder)       = (codec.Encoder, codec.Decoder)
+  val (mapEncoder, mapDecoder) = (mapCodec.Encoder, mapCodec.Decoder)
+
   val list = List("food", "foo", "bard", "bar")
   val json = Json.jArray(list.map(Json.jString))
-  def jsonMap(kvs: (String, String)*): Json = Json.jObjectAssocList(kvs.toMap.mapValuesEagerly(Json.jString).toList)
-  val mapCodec: CodecJson[Map[String, String]] = CodecJson.derived[Map[String, String]]
-  val (mapEncoder, mapDecoder) = (mapCodec.Encoder, mapCodec.Decoder)
+  def jsonMap(kvs: (String, String)*) = Json.jObjectAssocList(kvs.map { case (k, v) ⇒ (k, Json.jString(v)) }.toList)
 
   trait Base
   object Base { val encoder = EncodeJson[Base]({ case d: Derived ⇒ Derived.codec.encode(d) }) }

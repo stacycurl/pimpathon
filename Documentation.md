@@ -426,6 +426,7 @@ The aim of frills is to pimp everything else. You can use it by including the fo
 
 + argonaut.CodecJson[A].andThen(Json => Json): CodecJson[A]
 + argonaut.CodecJson[A].compose(Json => Json): CodecJson[A]
++ argonaut.CodecJson[Map[K, V]].xmapKeys(kc: K ⇒ C)(ck: C ⇒ K): CodecJson[Map[C, V]]
 + argonaut.DecodeJson[A].compose(Json => Json): DecodeJson[A]
 + argonaut.DecodeJson[A].upcast[B >: A]: DecodeJson[B]
 + argonaut.DecodeJson[Map[K, V]].mapKeys(K => C): DecodeJson[Map[C, V]]

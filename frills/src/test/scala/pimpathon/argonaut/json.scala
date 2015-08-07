@@ -28,6 +28,13 @@ class JsonTest {
 class CodecJsonTest extends JsonUtil {
   @Test def andThen(): Unit = assertEquals(reverse(codec.encode(list)),     codec.andThen(reverse).encode(list))
   @Test def compose(): Unit = assertEquals(codec.decodeJson(reverse(json)), codec.compose(reverse).decodeJson(json))
+
+  @Test def xmapKeys(): Unit = {
+    val reversed = mapCodec.xmapKeys[String](_.reverse)(_.reverse)
+
+    assertEquals(mapCodec.encode(Map("oof" → "bar")), reversed.encode(Map("foo" → "bar")))
+    assertEquals(mapCodec.decodeJson(reverseJsonMap), reversed.decodeJson(jsonMap))
+  }
 }
 
 class EncodeJsonTest extends JsonUtil {

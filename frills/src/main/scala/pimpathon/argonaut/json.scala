@@ -22,6 +22,11 @@ object json {
     def compose(f: Json ⇒ Json): CodecJson[A] = CodecJson.derived[A](value.Encoder, value.Decoder compose f)
   }
 
+  implicit class CodecJsonMapFrills[K, V](val value: CodecJson[Map[K, V]]) extends AnyVal {
+    def xmapKeys[C](kc: K ⇒ C)(ck: C ⇒ K): CodecJson[Map[C, V]] =
+      CodecJson.derived[Map[C, V]](value.Encoder contramapKeys ck, value.Decoder mapKeys kc)
+  }
+
   implicit class DecodeJsonFrills[A](val value: DecodeJson[A]) extends AnyVal {
     def compose(f: Json ⇒ Json): DecodeJson[A] = DecodeJson[A](hc ⇒ value.decode(hc >-> f))
     def upcast[B >: A]: DecodeJson[B] = value.map[B](a ⇒ a: B)

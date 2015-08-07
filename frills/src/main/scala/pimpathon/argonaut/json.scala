@@ -32,6 +32,10 @@ object json {
     def downcast[B <: A]: EncodeJson[B] = value.contramap[B](b ⇒ b: A)
   }
 
+  implicit class EncodeJsonMapFrills[K, V](val value: EncodeJson[Map[K, V]]) extends AnyVal {
+    def contramapKeys[C](f: C ⇒ K): EncodeJson[Map[C, V]] = value.contramap[Map[C, V]](_.mapKeysEagerly(f))
+  }
+
   private implicit class JsonObjectFrills(val o: JsonObject) extends AnyVal {
     private[argonaut] def filterR(p: Predicate[Json]): JsonObject =
       JsonObject.from(o.toMap.collectValues { case j if p(j) ⇒ j.filterR(p) })

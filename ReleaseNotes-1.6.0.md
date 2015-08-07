@@ -48,3 +48,4 @@
 + argonaut.DecodeJson[A].upcast[B >: A]: DecodeJson[B]
 + argonaut.EncodeJson[A].andThen(Json => Json): EncodeJson[A]
 + argonaut.EncodeJson[A].downcast[B <: A]: EncodeJson[B]
++ argonaut.EncodeJson[Map[K, V]].contramapKeys(C => K): EncodeJson[Map[C, V]]

@@ -43,6 +43,11 @@ class EncodeJsonTest extends JsonUtil {
 class DecodeJsonTest extends JsonUtil {
   @Test def compose(): Unit = assertEquals(decoder.decodeJson(reverse(json)), decoder.compose(reverse).decodeJson(json))
   @Test def upcast(): Unit = assertEquals(DecodeResult.ok(derived), Derived.codec.upcast[Base].decodeJson(derivedEncoded))
+
+  @Test def mapKeys(): Unit = assertEquals(
+    mapDecoder.decodeJson(reverseJsonMap),
+    mapDecoder.mapKeys(_.reverse).decodeJson(jsonMap)
+  )
 }
 
 trait JsonUtil {
@@ -53,6 +58,8 @@ trait JsonUtil {
   val list = List("food", "foo", "bard", "bar")
   val json = Json.jArray(list.map(Json.jString))
   val mapCodec: CodecJson[Map[String, String]] = CodecJson.derived[Map[String, String]]
+  val jsonMap = ("foo" → Json.jString("bar")) ->: Json.jEmptyObject
+  val reverseJsonMap = ("oof" → Json.jString("bar")) ->: Json.jEmptyObject
   val (mapEncoder, mapDecoder) = (mapCodec.Encoder, mapCodec.Decoder)
 
   trait Base

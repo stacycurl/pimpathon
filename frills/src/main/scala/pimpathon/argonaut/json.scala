@@ -27,6 +27,10 @@ object json {
     def upcast[B >: A]: DecodeJson[B] = value.map[B](a ⇒ a: B)
   }
 
+  implicit class DecodeJsonMapFrills[K, V](val value: DecodeJson[Map[K, V]]) extends AnyVal {
+    def mapKeys[C](f: K ⇒ C): DecodeJson[Map[C, V]] = value.map(_.mapKeysEagerly(f))
+  }
+
   implicit class EncodeJsonFrills[A](val value: EncodeJson[A]) extends AnyVal {
     def andThen(f: Json ⇒ Json): EncodeJson[A] = EncodeJson[A](a ⇒ f(value.encode(a)))
     def downcast[B <: A]: EncodeJson[B] = value.contramap[B](b ⇒ b: A)

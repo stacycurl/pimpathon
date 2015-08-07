@@ -45,6 +45,11 @@ class EncodeJsonTest extends JsonUtil {
     mapEncoder.encode(Map("oof" → "bar")),
     mapEncoder.contramapKeys[String](_.reverse).encode(Map("foo" → "bar"))
   )
+
+  @Test def contramapValues(): Unit = assertEquals(
+    mapEncoder.encode(Map("foo" → "rab")),
+    mapEncoder.contramapValues[String](_.reverse).encode(Map("foo" → "bar"))
+  )
 }
 
 class DecodeJsonTest extends JsonUtil {

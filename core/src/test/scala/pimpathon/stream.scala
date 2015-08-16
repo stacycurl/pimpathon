@@ -42,6 +42,11 @@ class StreamTest {
   @Test def lazyScanLeft(): Unit =
     assertEquals(List(0, 1, 3, 6), blockingInts(start = 1, end = 4).lazyScanLeft(0)(_ + _).take(4).toList)
 
+  @Test def reverseInits(): Unit = assertEquals(
+    List(Nil, List(1), List(1, 2), List(1, 2, 3)),
+    blockingInts(start = 1, end = 4).reverseInits.take(4).toList.map(_.toList)
+  )
+
   private def blockingInts(start: Int, end: Int): Stream[Int] = blockWhen(Stream.iterate(start)(_ + 1))(_ == end)
   private def blockWhen[A](in: Stream[A])(p: Predicate[A]): Stream[A] = in.map(_.tapIf(p)(_ ⇒ block()))
   private def block() = this.synchronized(this.wait(0))

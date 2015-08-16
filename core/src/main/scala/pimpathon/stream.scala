@@ -8,6 +8,8 @@ object stream {
   def continuallyWhile[A](elem: ⇒ A)(p: Predicate[A]): Stream[A] = Stream.continually(elem).takeWhile(p)
 
   implicit class StreamPimps[A](val value: Stream[A]) extends AnyVal {
+    def reverseInits: Stream[Stream[A]] = lazyScanLeft(Stream.empty[A])(_ :+ _) // This is how inits _should_ be defined
+
     def lazyScanLeft[B](z: B)(op: (B, A) ⇒ B): Stream[B] = {
       def loop(as: ⇒ Stream[A], acc: B): Stream[B] = acc #:: as.unconsC(Stream.empty[B], h ⇒ t ⇒ loop(t, op(acc, h)))
 

@@ -15,6 +15,7 @@
 + List[A].onlyDisjunction: List[A] \/ A
 + Stream[A].unconsC(=> B, A => (=> Stream[A]) => B): B
 + Stream[A].lazyScanLeft(B)((B, A) => B): Stream[B]
++ Stream[A].reverseInits: Stream[Stream[A]]
 + GTL[A].asMap.withEntries(A => K, A => V): Map[K, V]
 + GTL[A].asMap.withEntries(A => K1, A => K2, A => V): Map[K1, Map[K2, V]]
 + GTL[A].asMap.withEntries(A => K1, A => K2, A => K3, A => V): Map[K1, Map[K2, Map[K3, V]]]

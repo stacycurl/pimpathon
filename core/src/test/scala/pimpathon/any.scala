@@ -122,9 +122,7 @@ class AnyTest {
   @Test def addTo(): Unit      = assertEquals(List(1), ints().run(is ⇒ 1.addTo(is)))
   @Test def removeFrom(): Unit = assertEquals(Nil,     ints(1).tap(is ⇒ 1.removeFrom(is)).toList)
 
-  @Test def unfold(): Unit = assertEquals(
-    List('f', 'o', 'o'), "foo".unfold(s ⇒ s.nonEmpty.option(s.head, s.tail)).toList
-  )
+  @Test def unfold(): Unit = assertEquals(List(64, 32, 16, 8, 4, 2), 64.unfold(i ⇒ (i > 1).option((i, i/2))).toList)
 
   @Test def bounded(): Unit = {
     Stream.fill(10)(Random.nextInt()).foreach(num ⇒ {

@@ -51,8 +51,7 @@ object any {
     def addTo(as: Growable[A]): A = tap(as += _)
     def removeFrom(as: Shrinkable[A]): A = tap(as -= _)
 
-    def unfold[B](f: A ⇒ Option[(B, A)]): Stream[B] =
-      f(a).fold(Stream.empty[B])(ba ⇒ Stream.cons(ba._1, ba._2.unfold(f)))
+    def unfold[B](f: A ⇒ Option[(B, A)]): Stream[B] = f(a).fold(Stream.empty[B])(ba ⇒ ba._1 #:: ba._2.unfold(f))
 
     // These methods are aliased to suit individual preferences
     def update[Discarded](actions: (A ⇒ Discarded)*): A         = tap(actions: _*)

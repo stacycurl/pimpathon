@@ -135,6 +135,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Stream[A].tailOption: Option[Stream[A]]
 + Stream[A].uncons(=> B, Stream[A] => B): B
 + Stream[A].unconsC(=> B, A => (=> Stream[A]) => B): B
++ Stream[A].lazyScanLeft(B)((B, A) => B): Stream[B]
 
 + Array[A].copyTo(srcPos, Array[A], destPos, length): Array[A]
 + Array[Byte].toHex: String

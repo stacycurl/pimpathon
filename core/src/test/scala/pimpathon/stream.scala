@@ -1,9 +1,11 @@
 package pimpathon
 
 import org.junit.Test
+import pimpathon.function.Predicate
 import scala.collection.{mutable ⇒ M}
 
 import org.junit.Assert._
+import pimpathon.any._
 import pimpathon.stream._
 
 
@@ -36,4 +38,11 @@ class StreamTest {
     assertEquals(Some(Stream.empty[Int]),  Stream(0).tailOption)
     assertEquals(Some(Stream(1)),          Stream(0, 1).tailOption)
   }
+
+  @Test def lazyScanLeft(): Unit =
+    assertEquals(List(0, 1, 3, 6), blockingInts(start = 1, end = 4).lazyScanLeft(0)(_ + _).take(4).toList)
+
+  private def blockingInts(start: Int, end: Int): Stream[Int] = blockWhen(Stream.iterate(start)(_ + 1))(_ == end)
+  private def blockWhen[A](in: Stream[A])(p: Predicate[A]): Stream[A] = in.map(_.tapIf(p)(_ ⇒ block()))
+  private def block() = this.synchronized(this.wait(0))
 }

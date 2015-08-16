@@ -126,6 +126,22 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + List[A].zipExactWith(List[B])((A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]])
 + List[List[A]].cartesianProduct: List[List[A]]
 
++ Set[A].notContains(A): Boolean
++ Set[A].mutable: mutable.Set[A] (aka toMutable)
++ Set[A].powerSet: Set[Set[A]]
+
++ stream.cond(Boolean, => Stream[A]): Stream[A]
++ Stream.continuallyWhile(=> A)(Predicate[A]): Stream[A]
++ Stream[A].tailOption: Option[Stream[A]]
++ Stream[A].uncons(=> B, Stream[A] => B): B
++ Stream[A].unconsC(=> B, A => (=> Stream[A]) => B): B
+
++ Array[A].copyTo(srcPos, Array[A], destPos, length): Array[A]
++ Array[Byte].toHex: String
++ Array[Byte].toHex(Int): String
++ Array[Byte].copyUpToN(Long, InputStream, OutputStream): Int
++ Array[Byte].readUpToN(Long, InputStream): Int
+
 + GTL[A].collectAttributeCounts(PartialFunction[A, B]): Map[B, Int]
 + GTL[A].optAttributeCounts(A => Option[B]): Map[B, Int]
 + GTL[A].attributeCounts(A => B): Map[B, Int]
@@ -176,21 +192,6 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + GTL[(K, V)].toMultiMap[F[_]]: MultiMap[F, K, V]
 + GTL[Either[L, R]].partitionEithers: (GTL[L], GTL[R])
 + GTL[L \/ R].partitionDisjunctions: (GTL[L], GTL[R])
-
-+ Set[A].notContains(A): Boolean
-+ Set[A].mutable: mutable.Set[A] (aka toMutable)
-+ Set[A].powerSet: Set[Set[A]]
-
-+ stream.cond(Boolean, => Stream[A]): Stream[A]
-+ Stream.continuallyWhile(=> A)(Predicate[A]): Stream[A]
-+ Stream[A].tailOption: Option[Stream[A]]
-+ Stream[A].uncons(=> B, Stream[A] => B): B
-
-+ Array[A].copyTo(srcPos, Array[A], destPos, length): Array[A]
-+ Array[Byte].toHex: String
-+ Array[Byte].toHex(Int): String
-+ Array[Byte].copyUpToN(Long, InputStream, OutputStream): Int
-+ Array[Byte].readUpToN(Long, InputStream): Int
 
 + Map[K, V].getOrThrow(K, String): V
 + Map[K, V].getOrThrow(K, => Exception): V

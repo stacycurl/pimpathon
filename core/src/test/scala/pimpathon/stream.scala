@@ -26,6 +26,11 @@ class StreamTest {
     assertEquals("size: 3", Stream(1, 2, 3).uncons("empty", s ⇒ s"size: ${s.size}"))
   }
 
+  @Test def unconsC(): Unit = {
+    assertEquals("empty", Stream.empty[Int].unconsC("empty", h ⇒ t ⇒ s"size: ${1 + t.size}"))
+    assertEquals("size: 3", Stream(1, 2, 3).unconsC("empty", h ⇒ t ⇒ s"size: ${1 + t.size}"))
+  }
+
   @Test def tailOption(): Unit = {
     assertEquals(None,                     Stream.empty[Int].tailOption)
     assertEquals(Some(Stream.empty[Int]),  Stream(0).tailOption)

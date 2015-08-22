@@ -36,6 +36,9 @@ class OptionTest {
 
   @Test def invert(): Unit = on(none[Int], some(0)).calling(_.invert(1)).produces(some(1), none[Int])
 
+  @Test def amass(): Unit = on(none[Int], some(1), some(2), some(3))
+    .calling(_.amass(util.partial(2 → none, 3 → some("three")))).produces(none, none, none, some("three"))
+
   private def none[A]: Option[A]       = None
   private def some[A](a: A): Option[A] = Some(a)
 }

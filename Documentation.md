@@ -65,6 +65,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Option[A].tap(none: => Unit, some: A => Unit): Option[A]
 + Option[A].tapNone(=> Unit): Option[A]
 + Option[A].tapSome(A => Unit): Option[A]
++ Option[A].amass(PartialFunction[A, Option[B]]): Option[B]
 
 + implicit conversion of Either to RightProjection (and back again)
 + Either[L, R].tap(L => Unit, R => Unit): Either[L, R]

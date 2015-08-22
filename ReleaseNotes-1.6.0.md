@@ -9,6 +9,7 @@
 + [A].isNotOneOf(A*): Boolean
 + [A].containedIn(Set[A]): Boolean
 + [A].notContainedIn(Set[A]): Boolean
++ Option[A].amass(PartialFunction[A, Option[B]]): Option[B]
 + Try[A].fold(Throwable => B, A => B): Option[String]
 + Try[A].toDisjunction: Throwable \/ A
 + List[A].initOption: Option[List[A]]

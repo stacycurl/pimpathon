@@ -5,6 +5,8 @@ import scala.annotation.tailrec
 import scala.collection.{mutable ⇒ M, GenTraversable, GenTraversableLike}
 import scala.collection.immutable._
 
+import pimpathon.genTraversableLike.{GenTraversableLikeOfTuple2Mixin, GenTraversableLikeOfEitherPimpsMixin, GTLGT}
+
 import pimpathon.any._
 import pimpathon.boolean._
 import pimpathon.function._
@@ -13,8 +15,8 @@ import pimpathon.option._
 import pimpathon.tuple._
 
 
-object list extends genTraversableLike[List] {
-  implicit class ListPimps[A](val list: List[A]) extends AnyVal {
+object list {
+  implicit class ListPimps[A](list: List[A]) extends genTraversableLike.GenTraversableLikePimpsMixin[A, List] {
     def tapEmpty[Discarded](empty: ⇒ Discarded): List[A] = tap(empty, _ ⇒ {})
     def tapNonEmpty[Discarded](nonEmpty: List[A] ⇒ Discarded): List[A] = tap({}, nonEmpty)
     def tap[Discarded](empty: ⇒ Discarded, nonEmpty: List[A] ⇒ Discarded): List[A] = { uncons(empty, nonEmpty); list }
@@ -111,15 +113,25 @@ object list extends genTraversableLike[List] {
 
     private def equalBy[B](f: A ⇒ B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
     private def zip[B](other: List[B]): Iterator[(A, B)] = list.iterator.zip(other.iterator)
+
+    protected def gtl: GenTraversableLike[A, GenTraversable[A]] = list
   }
 
-  implicit class MatrixPimps[A](val value: List[List[A]]) extends AnyVal {
-    def cartesianProduct: List[List[A]] = value.foldRight(List(Nil): List[List[A]]) {
+  implicit class ListOfEithersPimps[L, R](list: List[Either[L, R]])
+    extends GenTraversableLikeOfEitherPimpsMixin[L, R, List] {
+
+    protected def gtl: GTLGT[Either[L, R]] = list
+  }
+
+  implicit class ListOfTuple2Pimps[K, V](list: List[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
+    protected def gtl: GTLGT[(K, V)] = list
+  }
+
+  implicit class MatrixPimps[A](list: List[List[A]]) {
+    def cartesianProduct: List[List[A]] = list.foldRight(List(Nil): List[List[A]]) {
       case (item, acc) ⇒ for { a ← item; b ← acc } yield a :: b
     }
   }
-
-  protected def toGTL[A](l: List[A]): GenTraversableLike[A, GenTraversable[A]] = l
 }
 
 case class EqualBy[A, B](b: B)(val a: A)

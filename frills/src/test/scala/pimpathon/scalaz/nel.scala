@@ -6,6 +6,7 @@ import scalaz.{Order, NonEmptyList}
 import org.junit.Assert._
 import pimpathon.multiMap._
 import pimpathon.scalaz.nel._
+import scalaz.syntax.either._
 
 
 class NelTest {
@@ -44,5 +45,23 @@ class NelTest {
     implicit val intOrder: Order[Int] = scalaz.std.anyVal.intInstance
 
     assertEquals(1, NonEmptyList(3, 1, 2).min)
+  }
+
+  @Test def partitionDisjunctions(): Unit = assertEquals(
+    (List(1, 2), List("abc", "def")),
+    NonEmptyList(1.left, "abc".right, "def".right, 2.left).partitionDisjunctions[List]
+  )
+
+  @Test def partitionEithers(): Unit = assertEquals(
+    (List(1, 2), List("abc", "def")),
+    NonEmptyList(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[List]
+  )
+
+  @Test def toMultiMap(): Unit = {
+    assertEquals(Map(1 → List(10, 11), 2 → List(20, 21)),
+      NonEmptyList((1, 10), (1, 11), (2, 20), (2, 21)).toMultiMap[List])
+
+    assertEquals(Map(1 → NonEmptyList(10, 11), 2 → NonEmptyList(20, 21)),
+      NonEmptyList((1, 10), (1, 11), (2, 20), (2, 21)).toMultiMap[NonEmptyList])
   }
 }

@@ -194,7 +194,6 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + GTL[A].apoFold(B)((B, A) ⇒ Either[C, B]): Either[C, B]
 + GTL[(K, V)].toMultiMap[F[_]]: MultiMap[F, K, V]
 + GTL[Either[L, R]].partitionEithers: (GTL[L], GTL[R])
-+ GTL[L \/ R].partitionDisjunctions: (GTL[L], GTL[R])
 
 + Map[K, V].getOrThrow(K, String): V
 + Map[K, V].getOrThrow(K, => Exception): V
@@ -429,6 +428,8 @@ The aim of frills is to pimp everything else. You can use it by including the fo
 
 + List[A].onlyDisjunction: List[A] \/ A
 + List[A].toNel: Option[NonEmptyList[A]]
+
++ GTL[L \/ R].partitionDisjunctions: (GTL[L], GTL[R])
 
 + argonaut.CodecJson[A].andThen(Json => Json): CodecJson[A]
 + argonaut.CodecJson[A].compose(Json => Json): CodecJson[A]

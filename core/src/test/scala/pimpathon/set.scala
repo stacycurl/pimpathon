@@ -38,4 +38,19 @@ class SetTest {
     (Set(2, 4), Set("one", "three")),
     Set(1, 2, 3, 4).partitionByPF(util.partial(1 → "one", 3 → "three"))
   )
+
+  @Test def partitionEithers2(): Unit = assertEquals(
+    (Set(1, 2), Set("abc", "def")),
+    Set(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[Set]
+  )
+
+  @Test def toMultiMap(): Unit = {
+    assertEquals(Map(), Set.empty[(Int, Int)].toMultiMap[Set])
+
+    assertEquals(Map(1 → Set(10, 11), 2 → Set(20, 21)),
+      Set((1, 10), (1, 11), (2, 20), (2, 21)).toMultiMap[Set])
+
+    assertEquals(Map(1 → List(10, 11), 2 → List(20, 21)),
+      Set((1, 10), (1, 11), (2, 20), (2, 21)).toMultiMap[List])
+  }
 }

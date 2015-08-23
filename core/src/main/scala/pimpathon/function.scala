@@ -6,7 +6,7 @@ import scala.{PartialFunction ⇒ ~>}
 import scala.collection.{GenTraversable, GenTraversableLike}
 
 import pimpathon.boolean._
-import pimpathon.list._
+import pimpathon.genTraversableLike._
 
 import scala.util.Try
 

@@ -309,7 +309,6 @@ class GenTraversableLikeTests {
   @Test def toMultiMap(): Unit = {
     assertEquals(Map(), Set.empty[(Int, Int)].toMultiMap[List])
     assertEquals(Map(), List.empty[(Int, Int)].toMultiMap[List])
-    assertEquals(Map(), List.empty[(Int, Int)].toMultiMap[List])
 
 
     assertEquals(Map(1 → List(10, 11), 2 → List(20, 21)),

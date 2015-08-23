@@ -4,14 +4,19 @@ import scala.{PartialFunction ⇒ ~>}
 import scala.collection.{breakOut, mutable ⇒ M, GenTraversable, GenTraversableLike, GenTraversableOnce}
 import scala.collection.immutable.{SortedMap, TreeMap}
 
+import pimpathon.genTraversableLike.{GenTraversableLikeOfTuple2Mixin, GenTraversableLikePimpsMixin}
+
 import pimpathon.any._
 import pimpathon.function._
 import pimpathon.multiMap._
 import pimpathon.tuple._
 
 
-object map extends genTraversableLike[GenTraversable] {
-  implicit class MapPimps[K, V](val map: Map[K, V]) extends AnyVal {
+object map {
+  implicit class MapPimps[K, V](map: Map[K, V])
+    extends GenTraversableLikePimpsMixin[(K, V), GenTraversable]
+    with GenTraversableLikeOfTuple2Mixin[K, V] {
+
     def containsAny(ok: Option[K]): Boolean = ok.exists(map.contains)
     def containsAll(ok: Option[K]): Boolean = ok.forall(map.contains)
     def containsAny[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.exists(map.contains)
@@ -74,6 +79,8 @@ object map extends genTraversableLike[GenTraversable] {
 
     def updateKeys[C](f: K ⇒ Option[C]): Map[C, V]   = map.flatMap(kv ⇒ f(kv._1).map(_ → kv._2))
     def updateValues[W](f: V ⇒ Option[W]): Map[K, W] = map.flatMap(kv ⇒ f(kv._2).map(kv._1 → _))
+
+    protected def gtl: GenTraversableLike[(K, V), GenTraversable[(K, V)]] = map
   }
 
   class MapAndThen[K, V, A](map: Map[K, V], andThen: ((K, V)) ⇒ A) {
@@ -85,8 +92,6 @@ object map extends genTraversableLike[GenTraversable] {
     def matchingKey(p: Predicate[K]): Option[A]   = map.find(kv ⇒ p(kv._1)).map(andThen)
     def matchingValue(p: Predicate[V]): Option[A] = map.find(kv ⇒ p(kv._2)).map(andThen)
   }
-
-  protected def toGTL[A](gt: GenTraversable[A]): GenTraversableLike[A, GenTraversable[A]] = gt
 
   @inline private def key[K, V]:   ((K, V)) ⇒ K = (kv: (K, V)) ⇒ kv._1
   @inline private def value[K, V]: ((K, V)) ⇒ V = (kv: (K, V)) ⇒ kv._2

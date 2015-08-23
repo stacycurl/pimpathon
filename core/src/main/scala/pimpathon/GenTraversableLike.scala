@@ -16,21 +16,12 @@ import pimpathon.multiMap._
 import pimpathon.tuple._
 
 
-object genTraversableLike extends genTraversableLike[({ type CC[A] = GenTraversableLike[A, GenTraversable[A]] })#CC] {
-  protected def toGTL[A](gtl: GenTraversableLike[A, GenTraversable[A]]): GenTraversableLike[A, GenTraversable[A]] = gtl
-}
+object genTraversableLike {
+  type GTLGT[+A] = GenTraversableLike[A, GenTraversable[A]]
 
-abstract class genTraversableLike[CC[A]] {
-  implicit def genTraversableLikePimps[A](cc: CC[A]): GenTraversableLikePimps[A] =
-    new GenTraversableLikePimps[A](toGTL(cc))
+  trait GenTraversableLikePimpsMixin[A, CC[_]] {
+    protected def gtl: GTLGT[A]
 
-  implicit def genTraversableLikeOfEitherPimps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr])
-    : GenTraversableLikeOfEitherPimps[L, R, Repr] = new GenTraversableLikeOfEitherPimps[L, R, Repr](gtl)
-
-  implicit def genTraversableLikeOfTuple2[K, V, Repr](gtl: GenTraversableLike[(K, V), Repr])
-    : GenTraversableLikeOfTuple2[K, V, Repr] = new GenTraversableLikeOfTuple2[K, V, Repr](gtl)
-
-  class GenTraversableLikePimps[A](gtl: GenTraversableLike[A, GenTraversable[A]]) {
     def asMap: GenTraversableLikeCapturer[A, Map, Map] = as[Map]
 
     def attributeCounts[B](f: A ⇒ B): Map[B, Int] =
@@ -75,17 +66,29 @@ abstract class genTraversableLike[CC[A]] {
     }
   }
 
-  class GenTraversableLikeOfEitherPimps[L, R, Repr](gtl: GenTraversableLike[Either[L, R], Repr]) {
+  trait GenTraversableLikeOfEitherPimpsMixin[L, R, CC[_]] {
     def partitionEithers[That[_]](implicit lcbf: CCBF[L, That], rcbf: CCBF[R, That]): (That[L], That[R]) =
       (lcbf.apply(), rcbf.apply()).tap(l ⇒ r ⇒ gtl.foreach(_.addTo(l, r))).tmap(_.result(), _.result())
+
+    protected def gtl: GTLGT[Either[L, R]]
   }
 
-  class GenTraversableLikeOfTuple2[K, V, Repr](gtl: GenTraversableLike[(K, V), Repr]) {
-    def toMultiMap[F[_]](implicit fcbf: CCBF[V, F]): MultiMap[F, K, V] = gtl.map(kv ⇒ kv)(breakOut)
+  trait GenTraversableLikeOfTuple2Mixin[K, V] {
+    def toMultiMap[F[_]](implicit fcbf: CanBuildNonEmpty[V, F[V]]): MultiMap[F, K, V] = gtl.map(kv ⇒ kv)(breakOut)
+
+    protected def gtl: GTLGT[(K, V)]
   }
 
-  protected def toGTL[A](cc: CC[A]): GenTraversableLike[A, GenTraversable[A]]
+  implicit class GenTraversableLikePimps[A](protected val gtl: GTLGT[A])
+    extends GenTraversableLikePimpsMixin[A, GTLGT]
+
+  implicit class GenTraversableLikeOfEitherPimps[L, R](protected val gtl: GTLGT[Either[L, R]])
+    extends GenTraversableLikeOfEitherPimpsMixin[L, R, GTLGT]
+
+  implicit class GenTraversableLikeOfTuple2[K, V](protected val gtl: GTLGT[(K, V)])
+    extends GenTraversableLikeOfTuple2Mixin[K, V]
 }
+
 
 case class GenTraversableLikeCapturer[A, F[_, _], G[_, _]](private val gtl: GenTraversableLike[A, GenTraversable[A]]) {
   import pimpathon.genTraversableLike._

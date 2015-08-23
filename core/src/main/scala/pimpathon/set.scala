@@ -1,13 +1,15 @@
 package pimpathon
 
+import pimpathon.genTraversableLike.{GenTraversableLikeOfTuple2Mixin, GenTraversableLikeOfEitherPimpsMixin, GTLGT}
+
 import scala.collection.{mutable ⇒ M, GenTraversable, GenTraversableLike}
 
 import pimpathon.any._
 import pimpathon.list._
 
 
-object set extends genTraversableLike[Set] {
-  implicit class SetPimps[A](val set: Set[A]) extends AnyVal {
+object set  {
+  implicit class SetPimps[A](set: Set[A]) extends genTraversableLike.GenTraversableLikePimpsMixin[A, Set] {
     def notContains(elem: A): Boolean = !set.contains(elem)
 
     def powerSet: Set[Set[A]] = {
@@ -19,7 +21,17 @@ object set extends genTraversableLike[Set] {
 
     def toMutable: M.Set[A] = mutable
     def mutable: M.Set[A] = M.Set.empty[A] ++ set
+
+    protected def gtl: GenTraversableLike[A, GenTraversable[A]] = set
   }
 
-  protected def toGTL[sa](s: Set[sa]): GenTraversableLike[sa, GenTraversable[sa]] = s
+  implicit class SetOfEitherPimps[L, R](set: Set[_ <: Either[L, R]])
+    extends GenTraversableLikeOfEitherPimpsMixin[L, R, Set] {
+
+    protected def gtl: GTLGT[Either[L, R]] = set
+  }
+
+  implicit class SetOfTuple2Pimps[K, V](set: Set[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
+    protected def gtl: GTLGT[(K, V)] = set
+  }
 }

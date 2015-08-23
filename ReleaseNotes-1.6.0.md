@@ -42,6 +42,7 @@
 + (L \/ R).tapRight(R => Discarded): L \/ R
 + (L \/ R).addTo(Growable[L], Growable[R]): L \/ R
 + (L \/ R).removeFrom(Shrinkable[L], Shrinkable[R]): L \/ R
++ PartialFunction[A, B].map(B => C): PartialFunction[A, C]
 + (PartialFunction[A, B] &&& PartialFunction[A, C]): PartialFunction[A, (B, C)]
 + String.toByteArray: Array[Byte]
 + String.toByteArray(Charset): Array[Byte]

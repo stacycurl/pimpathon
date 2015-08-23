@@ -45,6 +45,11 @@ object function {
       (implicit cbf: CCBF[Either[In, Out], CC], icbf: CCBF[In, CC], ocbf: CCBF[Out, CC]): (CC[In], CC[Out]) =
         ins.map(either).partitionEithers[CC](icbf, ocbf)
 
+    def map[Out2](f: Out ⇒ Out2): In ~> Out2 = new (In ~> Out2) {
+      def isDefinedAt(in: In): Boolean = pf.isDefinedAt(in)
+      def apply(in: In): Out2 = f(pf(in))
+    }
+
     def either:  In ⇒ Either[In, Out] = toRight
     def toRight: In ⇒ Either[In, Out] = (in: In) ⇒ pf.lift(in).toRight(in)
     def toLeft:  In ⇒ Either[Out, In] = (in: In) ⇒ pf.lift(in).toLeft(in)

@@ -4,6 +4,7 @@ import org.junit.Test
 import scala.util.{Failure, Success, Random}
 
 import org.junit.Assert._
+import pimpathon.any._
 import pimpathon.function._
 import pimpathon.util._
 
@@ -87,21 +88,12 @@ class PartialFunctionTest {
   @Test def partition(): Unit =
     assertEquals((List(2, 4), List("one", "three")), util.partial(1 → "one", 3 → "three").partition(List(1, 2, 3, 4)))
 
-  @Test def starStarStar(): Unit = {
-    val composed = util.partial(1 → 2) *** util.partial(2 → 3)
+  @Test def starStarStar(): Unit = on((1, 2), (0, 2), (1, 0))
+    .calling((util.partial(1 → 2) *** util.partial(2 → 3)).lift).produces(Some((2, 3)), None, None)
 
-    assertTrue(composed.isDefinedAt((1, 2)))
-    assertFalse(composed.isDefinedAt((0, 2)))
-    assertFalse(composed.isDefinedAt((1, 0)))
-    assertEquals((2, 3), composed.apply((1, 2)))
-  }
+  @Test def ampAmpAmp(): Unit = on(1, 2, 3)
+    .calling((util.partial(1 → 2, 2 → 3) &&& util.partial(1 → 3, 3 → 4)).lift).produces(Some((2, 3)), None, None)
 
-  @Test def ampAmpAmp(): Unit = {
-    val composed = util.partial(1 → 2, 2 → 3) &&& util.partial(1 → 3, 3 → 4)
-
-    assertTrue(composed.isDefinedAt(1))
-    assertFalse(composed.isDefinedAt(2))
-    assertFalse(composed.isDefinedAt(3))
-    assertEquals((2, 3), composed.apply(1))
-  }
+  @Test def map(): Unit = on(1, 2, 3)
+    .calling(util.partial(1 → 2, 2 → 3).map(_.toString).lift).produces(Some("2"), Some("3"), None)
 }

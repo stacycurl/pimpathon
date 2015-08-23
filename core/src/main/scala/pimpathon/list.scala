@@ -1,5 +1,6 @@
 package pimpathon
 
+import scala.{PartialFunction ⇒ ~>}
 import scala.annotation.tailrec
 import scala.collection.{mutable ⇒ M, GenTraversable, GenTraversableLike}
 import scala.collection.immutable._
@@ -65,7 +66,7 @@ object list extends genTraversableLike[List] {
     def calcIfNonEmpty[B](f: List[A] ⇒ B): Option[B] = list.calcIf(_.nonEmpty)(f)
     def mapIfNonEmpty[B](f: A ⇒ B): Option[List[B]] = list.calcIf(_.nonEmpty)(_.map(f))
 
-    def amass[B](pf: PartialFunction[A, List[B]]): List[B] = list.flatMap(a ⇒ pf.lift(a).getOrElse(Nil))
+    def amass[B](pf: A ~> List[B]): List[B] = list.flatMap(a ⇒ pf.lift(a).getOrElse(Nil))
 
     def uncons[B](empty: ⇒ B, nonEmpty: List[A] ⇒ B): B = if (list.isEmpty) empty else nonEmpty(list)
 

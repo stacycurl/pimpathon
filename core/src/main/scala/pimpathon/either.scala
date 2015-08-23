@@ -2,6 +2,7 @@ package pimpathon
 
 import scala.language.implicitConversions
 
+import scala.{PartialFunction ⇒ ~>}
 import scala.util.{Failure, Success, Try}
 import scala.collection.generic.{Growable, Shrinkable}
 
@@ -14,10 +15,10 @@ object either {
     def rightMap[S](f: R ⇒ S): Either[L, S] = bimap[L, S](identity[L], f)
 
     def valueOr(lr: L ⇒ R): R = rightOr(lr)
-    def valueOr(pf: PartialFunction[L, R]): Either[L, R] = rescue(pf)
+    def valueOr(pf: L ~> R): Either[L, R] = rescue(pf)
 
     def rescue(lr: L ⇒ R): R = rightOr(lr)
-    def rescue(pf: PartialFunction[L, R]): Either[L, R] = leftFlatMap(pf.either)
+    def rescue(pf: L ~> R): Either[L, R] = leftFlatMap(pf.either)
 
     def leftOr(rl: R ⇒ L): L  = either.fold(identity, rl)
     def rightOr(lr: L ⇒ R): R = either.fold(lr, identity)

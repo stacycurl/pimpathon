@@ -1,5 +1,6 @@
 package pimpathon
 
+import scala.{PartialFunction ⇒ ~>}
 import scala.collection.generic.{Growable, Shrinkable}
 import scala.util.Try
 
@@ -13,17 +14,17 @@ object any {
     def |>[B](f: A ⇒ B): B = f(a)
     def calcIf[B](p: Predicate[A])(f: A ⇒ B): Option[B] = p(a).option(f(a))
     def calcUnless[B](p: Predicate[A])(f: A ⇒ B): Option[B] = (!p(a)).option(f(a))
-    def calcPF[B](pf: PartialFunction[A, B]): Option[B] = pf.lift(a)
-    def transform(pf: PartialFunction[A, A]): A = pf.unify(a)
+    def calcPF[B](pf: A ~> B): Option[B] = pf.lift(a)
+    def transform(pf: A ~> A): A = pf.unify(a)
 
     def tapIf[Discarded](p: Predicate[A])(actions: (A ⇒ Discarded)*): A     = if (p(a)) tap(actions: _*) else a
     def tapUnless[Discarded](p: Predicate[A])(actions: (A ⇒ Discarded)*): A = if (p(a)) a else tap(actions: _*)
 
-    def tapPF[Discarded](action: PartialFunction[A, Discarded]): A = { action.lift(a); a }
+    def tapPF[Discarded](action: A ~> Discarded): A = { action.lift(a); a }
 
     def attempt[B](f: A ⇒ B): Try[B] = Try(f(a))
 
-    def partialMatch[B](pf: PartialFunction[A, B]): Option[B] = PartialFunction.condOpt(a)(pf)
+    def partialMatch[B](pf: A ~> B): Option[B] = PartialFunction.condOpt(a)(pf)
 
     def lpair[B](f: A ⇒ B): (B, A) = (f(a), a)
     def rpair[B](f: A ⇒ B): (A, B) = (a, f(a))

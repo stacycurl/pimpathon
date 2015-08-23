@@ -1,7 +1,9 @@
 package pimpathon
 
-import org.junit.Test
+import scala.{PartialFunction ⇒ ~>}
 import scala.collection.immutable.SortedMap
+
+import org.junit.Test
 
 import org.junit.Assert._
 import pimpathon.boolean._
@@ -385,9 +387,9 @@ class GenTraversableLikeTests {
 
   private def letter(n: Int)(s: String): Char = s.lift(n).getOrElse(' ')
 
-  private val entriesPF: PartialFunction[Int, (Int, Int)] = { case i if i % 2 == 1 ⇒ (i/2, i*2) }
-  private val keysPF:    PartialFunction[Int, Int]        = { case i if i % 2 == 1 ⇒ i/2 }
-  private val valuesPF:  PartialFunction[Int, Int]        = { case i if i % 2 == 1 ⇒ i*2 }
+  private val entriesPF: Int ~> (Int, Int) = { case i if i % 2 == 1 ⇒ (i/2, i*2) }
+  private val keysPF:    Int ~> Int        = { case i if i % 2 == 1 ⇒ i/2 }
+  private val valuesPF:  Int ~> Int        = { case i if i % 2 == 1 ⇒ i*2 }
   private val entriesFn: Int ⇒ (Int, Int) = (i: Int) ⇒ (i/2, i*2)
   private def emptyPF[A, B] = util.partial[A, B]()
 }

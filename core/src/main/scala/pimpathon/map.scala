@@ -1,5 +1,6 @@
 package pimpathon
 
+import scala.{PartialFunction ⇒ ~>}
 import scala.collection.{breakOut, mutable ⇒ M, GenTraversable, GenTraversableLike, GenTraversableOnce}
 import scala.collection.immutable.{SortedMap, TreeMap}
 
@@ -52,24 +53,24 @@ object map extends genTraversableLike[GenTraversable] {
     def keyFor:   MapAndThen[K, V, K]      = new MapAndThen[K, V, K](map, key)
     def valueFor: MapAndThen[K, V, V]      = new MapAndThen[K, V, V](map, value)
 
-    def partitionKeysBy[C](pf: PartialFunction[K, C]): (Map[K, V], Map[C, V])   = partitionEntriesBy(pf.first[V])
-    def partitionValuesBy[W](pf: PartialFunction[V, W]): (Map[K, V], Map[K, W]) = partitionEntriesBy(pf.second[K])
+    def partitionKeysBy[C](pf: K ~> C): (Map[K, V], Map[C, V])   = partitionEntriesBy(pf.first[V])
+    def partitionValuesBy[W](pf: V ~> W): (Map[K, V], Map[K, W]) = partitionEntriesBy(pf.second[K])
 
-    def partitionEntriesBy[C, W](pf: PartialFunction[(K, V), (C, W)]): (Map[K, V], Map[C, W]) =
+    def partitionEntriesBy[C, W](pf: (K, V) ~> (C, W)): (Map[K, V], Map[C, W]) =
       map.partition(pf.isUndefinedAt).tmap(identity, _.map(pf))
 
     def mapKeysEagerly[C](f: K ⇒ C): Map[C, V]         = map.map { case (k, v) ⇒ (f(k), v) }(breakOut)
     def mapValuesEagerly[W](f: V ⇒ W): Map[K, W]       = map.map { case (k, v) ⇒ (k, f(v)) }(breakOut)
     def mapEntries[C, W](f: K ⇒ V ⇒ (C, W)): Map[C, W] = map.map { case (k, v) ⇒ f(k)(v)   }(breakOut)
 
-    def collectKeys[C](pf: PartialFunction[K, C]): Map[C, V] = map.collect(pf.first)
-    def collectValues[W](pf: PartialFunction[V, W]): Map[K, W] = map.collect(pf.second)
+    def collectKeys[C](pf: K ~> C): Map[C, V] = map.collect(pf.first)
+    def collectValues[W](pf: V ~> W): Map[K, W] = map.collect(pf.second)
 
     def updateValue(key: K, f: V ⇒ Option[V]): Map[K, V] =
       map.get(key).flatMap(f).fold(map - key)(newValue ⇒ map + ((key, newValue)))
 
-    def updateKeys[C](pf: PartialFunction[K, C]): Map[C, V] = updateKeys(pf.lift)
-    def updateValues[W](pf: PartialFunction[V, W]): Map[K, W] = updateValues(pf.lift)
+    def updateKeys[C](pf: K ~> C): Map[C, V] = updateKeys(pf.lift)
+    def updateValues[W](pf: V ~> W): Map[K, W] = updateValues(pf.lift)
 
     def updateKeys[C](f: K ⇒ Option[C]): Map[C, V]   = map.flatMap(kv ⇒ f(kv._1).map(_ → kv._2))
     def updateValues[W](f: V ⇒ Option[W]): Map[K, W] = map.flatMap(kv ⇒ f(kv._2).map(kv._1 → _))

@@ -50,6 +50,11 @@ object function {
       def apply(in: In): Out2 = f(pf(in))
     }
 
+    def contramap[In2](f: In2 ⇒ In): In2 ~> Out = new (In2 ~> Out) {
+      def isDefinedAt(in2: In2): Boolean = pf.isDefinedAt(f(in2))
+      def apply(in2: In2): Out = pf(f(in2))
+    }
+
     def either:  In ⇒ Either[In, Out] = toRight
     def toRight: In ⇒ Either[In, Out] = (in: In) ⇒ pf.lift(in).toRight(in)
     def toLeft:  In ⇒ Either[Out, In] = (in: In) ⇒ pf.lift(in).toLeft(in)

@@ -295,6 +295,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + PartialFunction[A, B].first[C]: PartialFunction[(A, C), (B, C)]
 + PartialFunction[A, A].unify: A => A
 + PartialFunction[A, B].map(B => C): PartialFunction[A, C]
++ PartialFunction[A, B].contramap(C => A): PartialFunction[C, B]
 + (PartialFunction[A, B] *** PartialFunction[C, D]): PartialFunction[(A, C), (B, D)]
 + (PartialFunction[A, B] &&& PartialFunction[A, C]): PartialFunction[A, (B, C)]
 

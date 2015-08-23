@@ -96,4 +96,7 @@ class PartialFunctionTest {
 
   @Test def map(): Unit = on(1, 2, 3)
     .calling(util.partial(1 → 2, 2 → 3).map(_.toString).lift).produces(Some("2"), Some("3"), None)
+
+  @Test def contramap(): Unit = on(10, 20, 30)
+    .calling(util.partial(1 → 2, 2 → 3).contramap[Int](_ / 10).lift).produces(Some(2), Some(3), None)
 }

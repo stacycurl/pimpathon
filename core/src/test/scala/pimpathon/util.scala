@@ -23,11 +23,11 @@ object util {
   )
 
   case class on[A](as: A*) {
-    def calling[B](f: A ⇒ B): Calling[B] = new Calling(f)
+    def calling[B](fs: (A ⇒ B)*): Calling[B] = new Calling(fs.toList)
 
-    class Calling[B](f: A ⇒ B) {
-      def produces(bs: B*): Unit    = assertEquals(bs.toList, as.map(f).toList)
-      def throws(es: String*): Unit = assertEquals(es.toList, as.map(a ⇒ f.attempt(a).getMessage).toList.flatten)
+    class Calling[B](fs: List[A ⇒ B]) {
+      def produces(bs: B*): Unit    = assertEquals(bs.toList, fs.flatMap(f ⇒ as.toList.map(f)))
+      def throws(es: String*): Unit = assertEquals(es.toList, fs.flatMap(f ⇒ as.toList.map(a ⇒ f.attempt(a).getMessage)).flatten)
     }
   }
 

@@ -54,7 +54,7 @@ object genTraversableLike {
       apoFold[B, B](z)((b, a) ⇒ op(b, a).toRight(b)).right.toOption
 
     def apoFold[B, C](z: B)(op: (B, A) ⇒ Either[C, B]): Either[C, B] = {
-      @tailrec def recurse(cur: GenTraversableLike[A, GenTraversable[A]], acc: B): Either[C, B] = cur.headOption match {
+      @tailrec def recurse(cur: GTLGT[A], acc: B): Either[C, B] = cur.headOption match {
         case None ⇒ Right(acc)
         case Some(a) ⇒ op(acc, a) match {
           case Right(b) ⇒ recurse(cur.tail, b)

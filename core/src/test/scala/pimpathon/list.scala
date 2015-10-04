@@ -113,11 +113,6 @@ class ListTest {
     assertEquals(List(0, 0, 0, 1, 2, 3), List(1, 2, 3).prefixPadTo(6, 0))
   }
 
-  @Test def ungroupBy(): Unit = assertEquals(
-    List(List('a' → 1, 'b' → 1, 'c' → 1), List('a' → 2, 'b' → 2)),
-    List('a' → 1, 'a' → 2, 'b' → 1, 'c' → 1, 'b' → 2).ungroupBy(_._1)
-  )
-
   @Test def tap(): Unit = {
     assertEquals(List("empty"),     strings().run(ss ⇒ nil[Int].tap(ss += "empty", _ ⇒ ss += "non-empty")))
     assertEquals(List("non-empty"), strings().run(ss ⇒  List(1).tap(ss += "empty", _ ⇒ ss += "non-empty")))
@@ -136,16 +131,6 @@ class ListTest {
   @Test def amass(): Unit = assertEquals(
     List(2, -2, 4, -4),
     List(1, 2, 3, 4).amass { case i if i % 2 == 0 ⇒ List(i, -i) }
-  )
-
-  @Test def partitionEithers(): Unit = assertEquals(
-    (List(1, 2), List("abc", "def")),
-    List(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[List]
-  )
-
-  @Test def partitionByPF(): Unit = assertEquals(
-    (List(2, 4), List("one", "three")),
-    List(1, 2, 3, 4).partitionByPF(util.partial(1 → "one", 3 → "three"))
   )
 
   @Test def cartesianProduct(): Unit = assertEquals(
@@ -180,15 +165,4 @@ class ListTest {
     assertEquals((List(5), Some(Left(List(2, 3)))),      List(1, 2, 3).zipExactWith(List(4))(_ + _))
     assertEquals((List(5), Some(Right(List(5, 6)))),     List(1).zipExactWith(List(4, 5, 6))(_ + _))
   }
-
-  @Test def toMultiMap(): Unit = {
-    assertEquals(Map(), List.empty[(Int, Int)].toMultiMap[List])
-
-    assertEquals(Map(1 → List(10, 11), 2 → List(20, 21)),
-      List((1, 10), (1, 11), (2, 20), (2, 21)).toMultiMap[List])
-
-    assertEquals(Map(1 → Set(10, 11), 2 → Set(20, 21)),
-      List((1, 10), (1, 11), (2, 20), (2, 21)).toMultiMap[Set])
-  }
-
 }

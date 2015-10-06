@@ -10,7 +10,6 @@ import scala.util.{DynamicVariable, Try}
 
 import org.junit.Assert._
 import pimpathon.tuple._
-import pimpathon.function._
 import pimpathon.pimpTry._
 
 
@@ -26,8 +25,8 @@ object util {
     def calling[B](fs: (A ⇒ B)*): Calling[B] = new Calling(fs.toList)
 
     class Calling[B](fs: List[A ⇒ B]) {
-      def produces(bs: B*): Unit    = assertEquals(bs.toList, fs.flatMap(f ⇒ as.toList.map(f)))
-      def throws(es: String*): Unit = assertEquals(es.toList, fs.flatMap(f ⇒ as.toList.map(a ⇒ f.attempt(a).getMessage)).flatten)
+      def produces(bs: B*): Unit    = assertEquals(bs.toList, for {f ← fs; a ← as} yield f(a))
+      def throws(es: String*): Unit = assertEquals(es.toList, for {f ← fs; a ← as; m ← Try(f(a)).getMessage} yield m)
     }
   }
 

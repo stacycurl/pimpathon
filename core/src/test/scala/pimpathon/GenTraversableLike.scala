@@ -199,7 +199,7 @@ class GenTraversableLikeTests {
 
   @Test def partitionEithers(): Unit = assertEquals(
     (Set(1, 2), Set("abc", "def")),
-    Set(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[Set]
+    gtl(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[Set]
   )
 
   @Test def partitionByPF(): Unit = assertEquals(

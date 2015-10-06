@@ -34,21 +34,17 @@ class OutputStreamTest {
   }
 
   @Test def drain(): Unit = {
-    for {
-      expectedCloseIn  ← List(false, true)
-      expectedCloseOut ← List(false, true)
-      input            ← List("Input", "Repeat" * 100)
-    } {
+    for { closeIn ← List(false, true); closeOut ← List(false, true); input ← List("Input", "Repeat" * 100) } {
       val (is, os) = (createInputStream(input), createOutputStream())
 
-      os.drain(is, expectedCloseOut, expectedCloseIn)
+      os.drain(is, closeOut, closeIn)
 
       assertEquals(input, os.toString)
-      if (expectedCloseOut) os.assertClosed else os.assertOpen
-      if (expectedCloseIn)  is.assertClosed else is.assertOpen
+      if (closeOut) os.assertClosed else os.assertOpen
+      if (closeIn)  is.assertClosed else is.assertOpen
     }
 
-    ignoreExceptions {
+    ignoreExceptions { // Merely verifying (via compilation) that named parameters works, bit redundant.
       val (is, os) = (createInputStream(), createOutputStream())
 
       os.drain(is, closeOut = false)

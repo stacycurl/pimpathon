@@ -60,6 +60,7 @@ class FileTest {
   @Test def deleteRecursivelyOnExit(): Unit = {
     // Check that 'deleteRecursivelyOnExit' registers a DeleteRecursively shutdown hook
     file.withTempFile(tmp ⇒ {
+      assertFalse(shutdownHooks().contains(DeleteRecursively(tmp)))
       tmp.deleteRecursivelyOnExit()
       assertTrue(shutdownHooks().contains(DeleteRecursively(tmp)))
       assertFalse(shutdownHooks().contains(DeleteRecursively(file.tempFile())))
@@ -384,7 +385,7 @@ class FileTest {
       expectedIsFile, tmp.isFile)
 
     assertFalse("Expected ${tmp.getName} to not be deleted recursively on exit",
-        shutdownHooks().contains(DeleteRecursively(tmp)))
+      shutdownHooks().contains(DeleteRecursively(tmp)))
   }
 
   private def shutdownHooks(): Set[Thread] = {

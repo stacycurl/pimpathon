@@ -1,6 +1,7 @@
 package pimpathon.scalaz
 
 import org.junit.Test
+import pimpathon.util.on
 import scalaz.{Order, NonEmptyList}
 
 import org.junit.Assert._
@@ -35,4 +36,17 @@ class NelTest {
     (List(1, 2), List("abc", "def")),
     NonEmptyList(1.left, "abc".right, "def".right, 2.left).partitionDisjunctions[List]
   )
+
+  @Test def partitionEithers(): Unit = assertEquals(
+    (List(1, 2), List("abc", "def")),
+    NonEmptyList(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[List]
+  )
+
+  @Test def toMultiMap(): Unit = on(NonEmptyList((1, 10), (1, 11), (2, 20), (2, 21)))
+    .calling(_.toMultiMap[List], _.toMultiMap[Set])
+    .produces(Map(1 → List(10, 11), 2 → List(20, 21)), Map(1 → Set(10, 11), 2 → Set(20, 21)))
+
+  @Test def asMultiMap_withKeys(): Unit = on(NonEmptyList(0, 1, 2, 3))
+    .calling(_.asMultiMap[List].withKeys(_ % 2), _.asMultiMap[NonEmptyList].withKeys(_ % 2))
+    .produces(Map(0 → List(0, 2), 1 → List(1, 3)), Map(0 → NonEmptyList(0, 2), 1 → NonEmptyList(1, 3)))
 }

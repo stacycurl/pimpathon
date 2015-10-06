@@ -165,4 +165,13 @@ class ListTest {
     assertEquals((List(5), Some(Left(List(2, 3)))),      List(1, 2, 3).zipExactWith(List(4))(_ + _))
     assertEquals((List(5), Some(Right(List(5, 6)))),     List(1).zipExactWith(List(4, 5, 6))(_ + _))
   }
+
+  @Test def partitionEithers(): Unit = assertEquals(
+    (List(1, 2), List("abc", "def")),
+    List(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[List]
+  )
+
+  @Test def toMultiMap(): Unit = on(List((1, 10), (1, 11), (2, 20), (2, 21)))
+    .calling(_.toMultiMap[List], _.toMultiMap[Set])
+    .produces(Map(1 → List(10, 11), 2 → List(20, 21)), Map(1 → Set(10, 11), 2 → Set(20, 21)))
 }

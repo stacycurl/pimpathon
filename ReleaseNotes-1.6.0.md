@@ -45,6 +45,8 @@
 + PartialFunction[A, B].map(B => C): PartialFunction[A, C]
 + PartialFunction[A, B].contramap(C => A): PartialFunction[C, B]
 + (PartialFunction[A, B] &&& PartialFunction[A, C]): PartialFunction[A, (B, C)]
++ Ordering[A].promote(A*): Ordering[A]
++ Ordering[A].demote(A*): Ordering[A]
 + String.toByteArray: Array[Byte]
 + String.toByteArray(Charset): Array[Byte]
 + ThreadFactory.naming(Int => String): ThreadFactory

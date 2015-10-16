@@ -298,6 +298,9 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + (PartialFunction[A, B] *** PartialFunction[C, D]): PartialFunction[(A, C), (B, D)]
 + (PartialFunction[A, B] &&& PartialFunction[A, C]): PartialFunction[A, (B, C)]
 
++ Ordering[A].promote(A*): Ordering[A]
++ Ordering[A].demote(A*): Ordering[A]
+
 + Numeric[A].xmap(A => B, B => A): Numeric[B]
 
 + String.emptyTo(String): String

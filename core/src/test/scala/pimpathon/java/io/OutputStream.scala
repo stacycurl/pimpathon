@@ -5,21 +5,20 @@ import java.util.zip.GZIPInputStream
 import org.junit.Test
 import scala.util.{Failure, Success}
 
-import org.junit.Assert._
 import pimpathon.util._
 import pimpathon.any._
 
 
 class OutputStreamTest {
   @Test def attemptClose(): Unit = {
-    assertEquals(Success(()), createOutputStream().attemptClose())
-    assertEquals(Failure(boom), new ByteArrayOutputStream() { override def close() = goBoom }.attemptClose())
+    createOutputStream().attemptClose() === Success(())
+    new ByteArrayOutputStream() { override def close() = goBoom }.attemptClose() === Failure(boom)
   }
 
   @Test def closeAfter(): Unit = {
     val os = createOutputStream()
 
-    assertEquals("result", os.closeAfter(_ ⇒ "result"))
+    os.closeAfter(_ ⇒ "result") === "result"
     os.assertClosed
   }
 
@@ -39,7 +38,7 @@ class OutputStreamTest {
 
       os.drain(is, closeOut, closeIn)
 
-      assertEquals(input, os.toString)
+      os.toString === input
       if (closeOut) os.assertClosed else os.assertOpen
       if (closeIn)  is.assertClosed else is.assertOpen
     }
@@ -59,7 +58,7 @@ class OutputStreamTest {
 
     os << is
 
-    assertEquals("content", os.toString)
+    os.toString === "content"
     os.assertOpen
     is.assertOpen
   }
@@ -67,14 +66,14 @@ class OutputStreamTest {
   @Test def buffered(): Unit = {
     val (is, os) = (createInputStream("content"), createOutputStream())
 
-    assertEquals("content", os.tap(o ⇒ (o.buffered: BufferedOutputStream).drain(is)).toString)
+    os.tap(o ⇒ (o.buffered: BufferedOutputStream).drain(is)).toString === "content"
   }
 
   @Test def gzip(): Unit = {
     val os     = createOutputStream().tap(_.gzip.closeAfter(_.write("content".getBytes)))
     val result = createOutputStream().tap(rs ⇒ new GZIPInputStream(createInputStream(os.toByteArray)).drain(rs))
 
-    assertEquals("content", result.toString)
+    result.toString === "content"
   }
 
   @Test def writeUpToN(): Unit = {
@@ -83,10 +82,10 @@ class OutputStreamTest {
       os.tap(_.writeUpToN(is, n), _.close()).toString
     }
 
-    assertEquals("cont", write("contents", 4))
-    assertEquals("contents", write("contents", 8))
-    assertEquals("contents", write("contents", 9))
-    assertEquals("", write("contents", 0))
+    write("contents", 4) === "cont"
+    write("contents", 8) === "contents"
+    write("contents", 9) === "contents"
+    write("contents", 0) === ""
 
     assertThrows[IllegalArgumentException]("requirement failed: You can't read a negative number of bytes!") {
       write("contents", -1)
@@ -99,9 +98,9 @@ class OutputStreamTest {
       os.tap(_.writeN(is, n), _.close()).toString
     }
 
-    assertEquals("cont", write("contents", 4))
-    assertEquals("contents", write("contents", 8))
-    assertEquals("", write("contents", 0))
+    write("contents", 4) === "cont"
+    write("contents", 8) === "contents"
+    write("contents", 0) === ""
 
     assertThrows[IllegalArgumentException]("requirement failed: You can't read a negative number of bytes!") {
       write("contents", -1)

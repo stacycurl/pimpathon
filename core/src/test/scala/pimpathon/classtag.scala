@@ -1,13 +1,11 @@
 package pimpathon
 
-import org.junit.Assert._
 import org.junit.Test
+import pimpathon.util._
 
 
 class ClassTagTest {
-  @Test def className(): Unit = assertEquals("pimpathon.ClassTagTest", classTag.className[ClassTagTest])
-
-  @Test def simplecCassName(): Unit = assertEquals("ClassTagTest", classTag.simpleClassName[ClassTagTest])
-
-  @Test def klassOf(): Unit = assertEquals(classOf[ClassTagTest], classTag.klassOf[ClassTagTest])
+  @Test def className(): Unit       = classTag.className[ClassTagTest]       === "pimpathon.ClassTagTest"
+  @Test def simplecCassName(): Unit = classTag.simpleClassName[ClassTagTest] === "ClassTagTest"
+  @Test def klassOf(): Unit         = classTag.klassOf[ClassTagTest]         === classOf[ClassTagTest]
 }

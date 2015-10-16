@@ -27,11 +27,11 @@ class ListTest {
     .calling(_.mapIfNonEmpty(_ * 2)).produces(None, Some(List(2, 4, 6)))
 
   @Test def zipToMap(): Unit = {
-    assertEquals(Map.empty[Int, Int], nil[Int].zipToMap(nil[Int]))
-    assertEquals(Map(1 → 2), List(1).zipToMap(List(2)))
+    nil[Int].zipToMap(nil[Int]) === Map.empty[Int, Int]
+    List(1).zipToMap(List(2))   === Map(1 → 2)
   }
 
-  @Test def zipWith(): Unit = assertEquals(List(6), List(2, 0).zipWith[Int, Int](List(3))(lr ⇒ lr._1 * lr._2))
+  @Test def zipWith(): Unit = List(2, 0).zipWith[Int, Int](List(3))(lr ⇒ lr._1 * lr._2) === List(6)
 
 
   @Test def countWithSize(): Unit = on(nil[Int], List(0), List(1), List(0, 1))
@@ -44,23 +44,17 @@ class ListTest {
     assertFalse(List(1, 2).sizeGT(2))
   }
 
-  @Test def duplicates(): Unit = assertEquals(
-    List("bar", "bar", "foo", "foo", "foo"), List("foo", "bar", "foo", "food", "bar", "foo").duplicates
-  )
+  @Test def duplicates(): Unit =
+    List("foo", "bar", "foo", "food", "bar", "foo").duplicates === List("bar", "bar", "foo", "foo", "foo")
 
-  @Test def duplicatesBy(): Unit = assertEquals(
-    List("bard", "food", "foo", "bar"), List("foo", "bar", "bard", "food", "foody").duplicatesBy(_.length)
-  )
+  @Test def duplicatesBy(): Unit =
+    List("foo", "bar", "bard", "food", "foody").duplicatesBy(_.length) === List("bard", "food", "foo", "bar")
 
-  @Test def distinctBy(): Unit = {
-    assertEquals(List("foo", "bard", "foody"),
-      List("foo", "bar", "bard", "food", "foody", "bardo").distinctBy(_.length))
-  }
+  @Test def distinctBy(): Unit =
+    List("foo", "bar", "bard", "food", "foody", "bardo").distinctBy(_.length) === List("foo", "bard", "foody")
 
-  @Test def countBy(): Unit = assertEquals(
-    Map(1 → List("foo"), 2 → List("foody", "barby"), 3 → List("bard", "food", "barb")),
-    List("foo", "bard", "food", "barb", "foody", "barby").countBy(_.length)
-  )
+  @Test def countBy(): Unit = List("foo", "bard", "food", "barb", "foody", "barby").countBy(_.length) ===
+    Map(1 → List("foo"), 2 → List("foody", "barby"), 3 → List("bard", "food", "barb"))
 
   @Test def tailOption(): Unit =
     on(nil[Int], List(0), List(0, 1)).calling(_.tailOption).produces(None, Some(Nil), Some(List(1)))
@@ -87,10 +81,9 @@ class ListTest {
   @Test def const(): Unit = on(nil[Int], List('a', 'b', 'c')).calling(_.const(1)).produces(nil[Int], List(1, 1, 1))
 
   @Test def sharedPrefix(): Unit = {
-    assertEquals((Nil, Nil, Nil), nil[Int].sharedPrefix(Nil))
-    assertEquals((List(1), Nil, Nil), List(1).sharedPrefix(List(1)))
-
-    assertEquals((List(1, 2), List(3, 4), List(4, 3)), List(1, 2, 3, 4).sharedPrefix(List(1, 2, 4, 3)))
+    nil[Int].sharedPrefix(Nil)                      === (Nil, Nil, Nil)
+    List(1).sharedPrefix(List(1))                   === (List(1), Nil, Nil)
+    List(1, 2, 3, 4).sharedPrefix(List(1, 2, 4, 3)) === (List(1, 2), List(3, 4), List(4, 3))
   }
 
   @Test def fraction(): Unit = {
@@ -101,46 +94,37 @@ class ListTest {
   }
 
   @Test def batchBy(): Unit = {
-    assertEquals(Nil, nil[Int].batchBy(_ ⇒ true))
+    nil[Int].batchBy(_ ⇒ true) === Nil
 
-    assertEquals(
-      List(List(1 → 1, 1 → 2), List(2 → 1), List(1 → 3), List(2 → 2, 2 → 3)),
-      List(     1 → 1, 1 → 2,       2 → 1,       1 → 3,       2 → 2, 2 → 3).batchBy(_._1)
-    )
+         List(1 → 1, 1 → 2,       2 → 1,       1 → 3,       2 → 2, 2 → 3).batchBy(_._1) ===
+    List(List(1 → 1, 1 → 2), List(2 → 1), List(1 → 3), List(2 → 2, 2 → 3))
   }
 
-  @Test def prefixPadTo(): Unit = {
-    assertEquals(List(0, 0, 0, 1, 2, 3), List(1, 2, 3).prefixPadTo(6, 0))
-  }
+  @Test def prefixPadTo(): Unit = List(1, 2, 3).prefixPadTo(6, 0) === List(0, 0, 0, 1, 2, 3)
 
   @Test def tap(): Unit = {
-    assertEquals(List("empty"),     strings().run(ss ⇒ nil[Int].tap(ss += "empty", _ ⇒ ss += "non-empty")))
-    assertEquals(List("non-empty"), strings().run(ss ⇒  List(1).tap(ss += "empty", _ ⇒ ss += "non-empty")))
+    strings().run(ss ⇒ nil[Int].tap(ss += "empty", _ ⇒ ss += "non-empty")) === List("empty")
+    strings().run(ss ⇒  List(1).tap(ss += "empty", _ ⇒ ss += "non-empty")) === List("non-empty")
   }
 
   @Test def tapEmpty(): Unit = {
-    assertEquals(List("empty"), strings().run(ss ⇒ nil[Int].tapEmpty(ss += "empty")))
-    assertEquals(Nil,           strings().run(ss ⇒  List(1).tapEmpty(ss += "empty")))
+    strings().run(ss ⇒ nil[Int].tapEmpty(ss += "empty")) === List("empty")
+    strings().run(ss ⇒  List(1).tapEmpty(ss += "empty")) === Nil
   }
 
   @Test def tapNonEmpty(): Unit = {
-    assertEquals(Nil,               strings().run(ss ⇒ nil[Int].tapNonEmpty(_ ⇒ ss += "non-empty")))
-    assertEquals(List("non-empty"), strings().run(ss ⇒  List(1).tapNonEmpty(_ ⇒ ss += "non-empty")))
+    strings().run(ss ⇒ nil[Int].tapNonEmpty(_ ⇒ ss += "non-empty")) === Nil
+    strings().run(ss ⇒  List(1).tapNonEmpty(_ ⇒ ss += "non-empty")) === List("non-empty")
   }
 
-  @Test def amass(): Unit = assertEquals(
-    List(2, -2, 4, -4),
-    List(1, 2, 3, 4).amass { case i if i % 2 == 0 ⇒ List(i, -i) }
-  )
+  @Test def amass(): Unit = List(1, 2, 3, 4).amass { case i if i % 2 == 0 ⇒ List(i, -i) } === List(2, -2, 4, -4)
 
-  @Test def cartesianProduct(): Unit = assertEquals(
-    for { a ← List(1, 2); b ← List(10, 20); c ← List(100, 200) } yield List(a, b, c),
-    List(List(1, 2), List(10, 20), List(100, 200)).cartesianProduct
-  )
+  @Test def cartesianProduct(): Unit = List(List(1, 2), List(10, 20), List(100, 200)).cartesianProduct ===
+    (for { a ← List(1, 2); b ← List(10, 20); c ← List(100, 200) } yield List(a, b, c))
 
   @Test def onlyOrThrow(): Unit = {
     on(nil[Int], List(1, 2)).calling(_.onlyOrThrow(exception)).throws("List()", "List(1, 2)")
-    assertEquals(1, List(1).onlyOrThrow(_ ⇒ new Exception()))
+    List(1).onlyOrThrow(_ ⇒ new Exception()) === 1
   }
 
   @Test def onlyEither(): Unit =
@@ -149,37 +133,33 @@ class ListTest {
   @Test def onlyOption(): Unit = on(nil[Int], List(1, 2), List(1)).calling(_.onlyOption).produces(None, None, Some(1))
 
   @Test def zipExact(): Unit = {
-    assertEquals((Nil, None),                             Nil.zipExact(Nil))
-    assertEquals((List((1, 4), (2, 5), (3, 6)), None),    List(1, 2, 3).zipExact(List(4, 5, 6)))
-    assertEquals((Nil, Some(Left(List(1, 2, 3)))),        List(1, 2, 3).zipExact(Nil))
-    assertEquals((Nil, Some(Right(List(4, 5, 6)))),       Nil.zipExact(List(4, 5, 6)))
-    assertEquals((List((1, 4)), Some(Left(List(2, 3)))),  List(1, 2, 3).zipExact(List(4)))
-    assertEquals((List((1, 4)), Some(Right(List(5, 6)))), List(1).zipExact(List(4, 5, 6)))
+    Nil.zipExact(Nil)                     === (Nil, None)
+    List(1, 2, 3).zipExact(List(4, 5, 6)) === (List((1, 4), (2, 5), (3, 6)), None)
+    List(1, 2, 3).zipExact(Nil)           === (Nil, Some(Left(List(1, 2, 3))))
+    Nil.zipExact(List(4, 5, 6))           === (Nil, Some(Right(List(4, 5, 6))))
+    List(1, 2, 3).zipExact(List(4))       === (List((1, 4)), Some(Left(List(2, 3))))
+    List(1).zipExact(List(4, 5, 6))       === (List((1, 4)), Some(Right(List(5, 6))))
   }
 
   @Test def zipExactWith(): Unit = {
-    assertEquals((nil[Int], None),                       nil[Int].zipExactWith(nil[Int])(_ + _))
-    assertEquals((List(5, 7, 9), None),                  List(1, 2, 3).zipExactWith(List(4, 5, 6))(_ + _))
-    assertEquals((nil[Int], Some(Left(List(1, 2, 3)))),  List(1, 2, 3).zipExactWith(nil[Int])(_ + _))
-    assertEquals((nil[Int], Some(Right(List(4, 5, 6)))), nil[Int].zipExactWith(List(4, 5, 6))(_ + _))
-    assertEquals((List(5), Some(Left(List(2, 3)))),      List(1, 2, 3).zipExactWith(List(4))(_ + _))
-    assertEquals((List(5), Some(Right(List(5, 6)))),     List(1).zipExactWith(List(4, 5, 6))(_ + _))
+    nil[Int].zipExactWith(nil[Int])(_ + _)           === (nil[Int], None)
+    List(1, 2, 3).zipExactWith(List(4, 5, 6))(_ + _) === (List(5, 7, 9), None)
+    List(1, 2, 3).zipExactWith(nil[Int])(_ + _)      === (nil[Int], Some(Left(List(1, 2, 3))))
+    nil[Int].zipExactWith(List(4, 5, 6))(_ + _)      === (nil[Int], Some(Right(List(4, 5, 6))))
+    List(1, 2, 3).zipExactWith(List(4))(_ + _)       === (List(5), Some(Left(List(2, 3))))
+    List(1).zipExactWith(List(4, 5, 6))(_ + _)       === (List(5), Some(Right(List(5, 6))))
   }
 
-  @Test def partitionEithers(): Unit = assertEquals(
-    (List(1, 2), List("abc", "def")),
-    List(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[List]
-  )
+  @Test def partitionEithers(): Unit =
+    List(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[List] === (List(1, 2), List("abc", "def"))
 
   @Test def toMultiMap(): Unit = on(List((1, 10), (1, 11), (2, 20), (2, 21)))
     .calling(_.toMultiMap[List], _.toMultiMap[Set])
     .produces(Map(1 → List(10, 11), 2 → List(20, 21)), Map(1 → Set(10, 11), 2 → Set(20, 21)))
 
-  @Test def sortPromoting(): Unit = assertEquals(
-    List("purple", "green", "black", "red"), List("red", "green", "black", "purple").sortPromoting("purple", "green")
-  )
+  @Test def sortPromoting(): Unit =
+    List("red", "green", "black", "purple").sortPromoting("purple", "green") === List("purple", "green", "black", "red")
 
-  @Test def sortDemoting(): Unit = assertEquals(
-    List("purple", "red", "green", "black"), List("black", "red", "purple", "green").sortDemoting("green", "black")
-  )
+  @Test def sortDemoting(): Unit =
+    List("black", "red", "purple", "green").sortDemoting("green", "black") === List("purple", "red", "green", "black")
 }

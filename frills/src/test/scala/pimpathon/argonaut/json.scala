@@ -3,11 +3,10 @@ package pimpathon.argonaut
 import argonaut.{DecodeResult, CodecJson, EncodeJson, Json, Parse}
 import org.junit.Test
 
-import org.junit.Assert._
 import pimpathon.any._
 import pimpathon.option._
+import pimpathon.util._
 import pimpathon.argonaut.json._
-
 
 
 class JsonTest {
@@ -20,59 +19,52 @@ class JsonTest {
   )
 
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
-    case (input, expected) ⇒ assertEquals(parse(expected), f(parse(input)))
+    case (input, expected) ⇒ f(parse(input)) === parse(expected)
   }
 
   private def parse(content: String): Json = Parse.parseOption(content).getOrThrow("Invalid json in test\n" + content)
 }
 
 class CodecJsonTest extends JsonUtil {
-  @Test def andThen(): Unit = assertEquals(reverse(codec.encode(list)),     codec.andThen(reverse).encode(list))
-  @Test def compose(): Unit = assertEquals(codec.decodeJson(reverse(json)), codec.compose(reverse).decodeJson(json))
+  @Test def andThen(): Unit     = codec.andThen(reverse).encode(list)           === reverse(codec.encode(list))
+  @Test def compose(): Unit     = codec.compose(reverse).decodeJson(json)       === codec.decodeJson(reverse(json))
 
   @Test def xmapKeys(): Unit = mapCodec.xmapKeys[String](_.reverse)(_.reverse).calc(reversed ⇒ {
-    assertEquals(mapCodec.encode(Map("oof" → "bar")), reversed.encode(Map("foo" → "bar")))
-    assertEquals(mapCodec.decodeJson(jsonMap("oof" → "bar")), reversed.decodeJson(jsonMap("foo" → "bar")))
+    reversed.encode(Map("foo" → "bar"))         === mapCodec.encode(Map("oof" → "bar"))
+    reversed.decodeJson(jsonMap("foo" → "bar")) === mapCodec.decodeJson(jsonMap("oof" → "bar"))
   })
 
   @Test def xmapValues(): Unit = mapCodec.xmapValues[String](_.reverse)(_.reverse).calc(reversed ⇒ {
-    assertEquals(mapCodec.encode(Map("foo" → "rab")), reversed.encode(Map("foo" → "bar")))
-    assertEquals(mapCodec.decodeJson(jsonMap("foo" → "rab")), reversed.decodeJson(jsonMap("foo" → "bar")))
+    reversed.encode(Map("foo" → "bar"))         === mapCodec.encode(Map("foo" → "rab"))
+    reversed.decodeJson(jsonMap("foo" → "bar")) === mapCodec.decodeJson(jsonMap("foo" → "rab"))
   })
 }
 
 class EncodeJsonTest extends JsonUtil {
-  @Test def andThen(): Unit = assertEquals(reverse(encoder.encode(list)), encoder.andThen(reverse).encode(list))
-  @Test def downcast(): Unit = assertEquals(derivedEncoded, Base.encoder.downcast[Derived].encode(derived))
+  @Test def andThen(): Unit = encoder.andThen(reverse).encode(list) === reverse(encoder.encode(list))
+  @Test def downcast(): Unit = Base.encoder.downcast[Derived].encode(derived) === derivedEncoded
 
-  @Test def contramapKeys(): Unit = assertEquals(
-    mapEncoder.encode(Map("oof" → "bar")),
-    mapEncoder.contramapKeys[String](_.reverse).encode(Map("foo" → "bar"))
-  )
+  @Test def contramapKeys(): Unit =
+    mapEncoder.contramapKeys[String](_.reverse).encode(Map("foo" → "bar")) === mapEncoder.encode(Map("oof" → "bar"))
 
-  @Test def contramapValues(): Unit = assertEquals(
-    mapEncoder.encode(Map("foo" → "rab")),
-    mapEncoder.contramapValues[String](_.reverse).encode(Map("foo" → "bar"))
-  )
+  @Test def contramapValues(): Unit =
+    mapEncoder.contramapValues[String](_.reverse).encode(Map("foo" → "bar")) === mapEncoder.encode(Map("foo" → "rab"))
 }
 
 class DecodeJsonTest extends JsonUtil {
-  @Test def compose(): Unit = assertEquals(decoder.decodeJson(reverse(json)), decoder.compose(reverse).decodeJson(json))
-  @Test def upcast(): Unit = assertEquals(DecodeResult.ok(derived), Derived.codec.upcast[Base].decodeJson(derivedEncoded))
+  @Test def compose(): Unit = decoder.compose(reverse).decodeJson(json) === decoder.decodeJson(reverse(json))
+  @Test def upcast(): Unit = Derived.codec.upcast[Base].decodeJson(derivedEncoded) === DecodeResult.ok(derived)
 
-  @Test def mapKeys(): Unit = assertEquals(
-    mapDecoder.decodeJson(jsonMap("oof" → "bar")),
-    mapDecoder.mapKeys(_.reverse).decodeJson(jsonMap("foo" → "bar"))
-  )
+  @Test def mapKeys(): Unit =
+    mapDecoder.mapKeys(_.reverse).decodeJson(jsonMap("foo" → "bar")) === mapDecoder.decodeJson(jsonMap("oof" → "bar"))
 
-  @Test def mapValues(): Unit = assertEquals(
-    mapDecoder.decodeJson(jsonMap("foo" → "rab")),
-    mapDecoder.mapValues(_.reverse).decodeJson(jsonMap("foo" → "bar"))
-  )
+  @Test def mapValues(): Unit =
+    mapDecoder.mapValues(_.reverse).decodeJson(jsonMap("foo" → "bar")) === mapDecoder.decodeJson(jsonMap("foo" → "rab"))
 }
 
 trait JsonUtil {
   def reverse(json: Json): Json = json.withArray(_.reverse)
+  def reverse[A](decodeResult: DecodeResult[List[A]]): DecodeResult[List[A]] = decodeResult.map(_.reverse)
 
   val codec: CodecJson[List[String]]           = CodecJson.derived[List[String]]
   val mapCodec: CodecJson[Map[String, String]] = CodecJson.derived[Map[String, String]]

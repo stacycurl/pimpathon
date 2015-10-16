@@ -54,7 +54,7 @@ class FileTest {
     val children = List(parent / "child", parent / "parent" / "child").map(_.create())
 
     assertFalse(parent.deleteRecursively().exists)
-    assertEquals(Nil, children.filter(_.exists))
+    children.filter(_.exists) === Nil
   })
 
   @Test def deleteRecursivelyOnExit(): Unit = {
@@ -78,29 +78,29 @@ class FileTest {
     })
   }
 
-  @Test def cwd(): Unit = assertEquals(Properties.userDir, file.cwd.getPath)
+  @Test def cwd(): Unit = file.cwd.getPath === Properties.userDir
 
-  @Test def named(): Unit = file.withTempFile(tmp ⇒ assertEquals("name", tmp.named("name").toString))
+  @Test def named(): Unit = file.withTempFile(tmp ⇒ tmp.named("name").toString === "name")
 
   @Test def canon(): Unit = file.withTempDirectory(dir ⇒ {
-    assertEquals((dir / "file").getCanonicalFile,       (dir / "file").canon)
-    assertEquals((dir / "file\u0000").getAbsoluteFile,  (dir / "file\u0000").canon)
+    (dir / "file").canon       === (dir / "file").getCanonicalFile
+    (dir / "file\u0000").canon === (dir / "file\u0000").getAbsoluteFile
   })
 
   @Test def changeToDirectory(): Unit = file.withTempFile(file ⇒ assertTrue(file.changeToDirectory().isDirectory))
 
   @Test def children(): Unit = file.withTempDirectory(dir ⇒ {
-    assertEquals(Set.empty[File], dir.children.toSet)
+    dir.children.toSet === Set.empty[File]
 
     val List(child, toddler) = file.files(dir, "child", "toddler").map(_.create()).toList
-    assertEquals(Set(child, toddler), dir.children.map(_.named()).toSet)
+    dir.children.map(_.named()).toSet === Set(child, toddler)
   })
 
   @Test def childDirs(): Unit = file.withTempDirectory(dir ⇒ {
-    assertEquals(Set.empty[File], dir.childDirs.toSet)
+    dir.childDirs.toSet === Set.empty[File]
 
     val List(toddler) = file.files(dir, "parent/toddler").map(_.create()).toList
-    assertEquals(Set(toddler.getParentFile), dir.childDirs.map(_.named()).toSet)
+    dir.childDirs.map(_.named()).toSet === Set(toddler.getParentFile)
   })
 
   @Test def ancestors(): Unit = file.withTempDirectory(dir ⇒ {
@@ -116,22 +116,20 @@ class FileTest {
   })
 
   @Test def relativeTo(): Unit = file.withTempDirectory(dir ⇒ {
-    assertEquals("child", (dir / "child").create().relativeTo(dir).getPath)
-
-    assertEquals(dir.getName + "/kid",
-      (dir / "kid").create().relativeTo(dir.getParentFile).getPath)
+    (dir / "child").create().relativeTo(dir).getPath             === "child"
+    (dir / "kid").create().relativeTo(dir.getParentFile).getPath === (dir.getName + "/kid")
 
     val parent = (dir / "parent").create(directory = true)
-    assertEquals("parent",       parent.relativeTo(dir).getPath)
-    assertEquals("..",           dir.relativeTo(parent).getPath)
-    assertEquals("parent/child", (parent / "child").create().relativeTo(dir).getPath)
+    parent.relativeTo(dir).getPath                      === "parent"
+    dir.relativeTo(parent).getPath                      === ".."
+    (parent / "child").create().relativeTo(dir).getPath === "parent/child"
   })
 
   @Test def tree(): Unit = {
-    assertEquals(Nil, new File("non-existent").tree)
+    new File("non-existent").tree.toList === Nil
 
-    file.withTempFile(tmp ⇒      assertEquals(List(tmp), tmp.tree))
-    file.withTempDirectory(tmp ⇒ assertEquals(List(tmp), tmp.tree))
+    file.withTempFile(tmp ⇒      tmp.tree.toList === List(tmp))
+    file.withTempDirectory(tmp ⇒ tmp.tree.toList === List(tmp))
 
     file.withTempDirectory(tmp ⇒ {
       val List(child, toddler, brat, unreadableFile, unreadableChild) = file.files(tmp,
@@ -243,25 +241,25 @@ class FileTest {
     assertFalse(dir.exists)
 
     val nested = file.file("parent", "file")
-    assertEquals(file.file("parent"), nested.getParentFile)
+    nested.getParentFile === file.file("parent")
 
     file.withTempDirectory(dir ⇒ {
       val child = dir / "and this file does not exist"
       assertFalse(child.exists)
-      assertEquals(dir, child.getParentFile)
-      assertEquals(child, file.file(dir, "and this file does not exist"))
+      child.getParentFile === dir
+      file.file(dir, "and this file does not exist") === child
 
       val nested = dir / "parent/child"
       assertFalse(nested.exists)
-      assertEquals(dir, nested.getParentFile.getParentFile)
+      nested.getParentFile.getParentFile === dir
     })
   }
 
   @Test def files(): Unit = file.withTempDirectory(dir ⇒ {
     val List(child, nested) = file.files(dir, "child", "nested/child").toList
 
-    assertEquals(dir / "child",            child)
-    assertEquals(dir / "nested" / "child", nested)
+    child  === dir / "child"
+    nested === dir / "nested" / "child"
   })
 
   @Test def resource(): Unit =
@@ -269,41 +267,41 @@ class FileTest {
 
   @Test def readBytes(): Unit = file.withTempFile(tmp ⇒ {
     createInputStream("contents").drain(tmp.outputStream())
-    assertEquals("contents", new String(tmp.readBytes()))
+    new String(tmp.readBytes()) === "contents"
   })
 
   @Test def readLines(): Unit = file.withTempFile(tmp ⇒ {
     createInputStream("line1\nline2").drain(tmp.outputStream())
-    assertEquals(List("line1", "line2"), tmp.readLines())
+    tmp.readLines() === List("line1", "line2")
   })
 
   @Test def readString(): Unit = file.withTempFile(tmp ⇒ {
     List("ISO-8859-1", "US-ASCII", "UTF-16", "UTF-16BE", "UTF-16LE", "UTF-8").map(Codec(_)).foreach(codec ⇒ {
-      assertEquals("line1\r\nline2", tmp.writeBytes("line1\r\nline2".getBytes(codec.charSet)).readString()(codec))
+      tmp.writeBytes("line1\r\nline2".getBytes(codec.charSet)).readString()(codec) === "line1\r\nline2"
     })
   })
 
   @Test def write(): Unit = file.withTempFile(tmp ⇒ {
-    assertEquals(List("content"),      tmp.write("content", append = false).readLines())
-    assertEquals(List("contents"),     tmp.write("s", append = true).readLines())
-    assertEquals(List("new content"),  tmp.write("new content").readLines())
-    assertEquals(List("new contents"), tmp.write("s", append = true).readLines())
+    tmp.write("content", append = false).readLines() === List("content")
+    tmp.write("s", append = true).readLines()        === List("contents")
+    tmp.write("new content").readLines()             === List("new content")
+    tmp.write("s", append = true).readLines()        === List("new contents")
   })
 
   @Test def writeBytes(): Unit = file.withTempFile(tmp ⇒ {
-    assertEquals(List("12"),   tmp.writeBytes("12".getBytes).readLines())
-    assertEquals(List("1234"), tmp.writeBytes("34".getBytes, append = true).readLines())
-    assertEquals(List("56"),   tmp.writeBytes("56".getBytes).readLines())
+    tmp.writeBytes("12".getBytes).readLines()                === List("12")
+    tmp.writeBytes("34".getBytes, append = true).readLines() === List("1234")
+    tmp.writeBytes("56".getBytes).readLines()                === List("56")
   })
 
   @Test def writeLines(): Unit = file.withTempFile(tmp ⇒ {
-    assertEquals(List("1", "2"),           tmp.writeLines(List("1", "2")).readLines())
-    assertEquals(List("1", "2", "3", "4"), tmp.writeLines(List("3", "4"), append = true).readLines())
-    assertEquals(List("5", "6"),           tmp.writeLines(List("5", "6")).readLines())
+    tmp.writeLines(List("1", "2")).readLines()                === List("1", "2")
+    tmp.writeLines(List("3", "4"), append = true).readLines() === List("1", "2", "3", "4")
+    tmp.writeLines(List("5", "6")).readLines()                === List("5", "6")
   })
 
   @Test def md5(): Unit = file.withTempFile(tmp ⇒ {
-    assertEquals("6f1ed002ab5595859014ebf0951522d9", tmp.writeLines(List("blah")).md5())
+    tmp.writeLines(List("blah")).md5() === "6f1ed002ab5595859014ebf0951522d9"
   })
 
   @Test def missing(): Unit = assertTrue(file.withTempFile(tmp ⇒ {
@@ -341,25 +339,25 @@ class FileTest {
   })
 
   @Test def className(): Unit = file.withTempDirectory(dir ⇒ {
-    assertEquals("Foo", (dir / "Foo.class").className(dir))
-    assertEquals("com.example.Foo", (dir / "com" / "example" / "Foo.class").className(dir))
+    (dir / "Foo.class").className(dir) === "Foo"
+    (dir / "com" / "example" / "Foo.class").className(dir) === "com.example.Foo"
   })
 
   @Test def touch(): Unit = file.withTempDirectory(dir ⇒ {
     withTime(123000) {
       assertEquals("Should be able to touch non-existent file", 123000, (dir / "child").touch().lastModified)
-      assertEquals(0, (dir / "child").readBytes().length)
+      (dir / "child").readBytes().length === 0
     }
 
     (dir / "child").writeLines(List("Don't touch this"))
 
     withTime(456000) {
       assertEquals("Should be able to touch existing file", 456000, (dir / "child").touch().lastModified)
-      assertEquals("Don't touch this".length + 1, (dir / "child").readBytes().length)
+      (dir / "child").readBytes().length === "Don't touch this".length + 1
     }
 
     withTime(789000) {
-      assertEquals(789000, dir.touch().lastModified)
+      dir.touch().lastModified === 789000
     }
   })
 

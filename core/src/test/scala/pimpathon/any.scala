@@ -11,11 +11,7 @@ import pimpathon.util._
 
 
 class AnyTest {
-  @Test def calc(): Unit = assertEquals(
-    List("123", "123"),
-    List("12".calc(_ + "3"), "12" |> (_ + "3"))
-  )
-
+  @Test def calc(): Unit =  List("12".calc(_ + "3"), "12" |> (_ + "3")) === List("123", "123")
   @Test def calcIf(): Unit = on(2, 3, 4).calling(_.calcIf(_ % 2 == 0)(_ + 3)).produces(Some(5), None, Some(7))
   @Test def calcUnless(): Unit = on(2, 3, 4).calling(_.calcUnless(_ % 2 != 0)(_ + 3)).produces(Some(5), None, Some(7))
 
@@ -24,29 +20,25 @@ class AnyTest {
 
   @Test def transform(): Unit = on(1, 2, 3, 4).calling(_.transform(util.partial(2 → 4, 4 → 8))).produces(1, 4, 3, 8)
 
-  @Test def tap(): Unit            = assertEquals(List(1, 1), ints().run(is ⇒ 1.tap(is += _, is += _)))
-  @Test def update(): Unit         = assertEquals(List(1, 1), ints().run(is ⇒ 1.update(is += _, is += _)))
-  @Test def withSideEffect(): Unit = assertEquals(List(1, 1), ints().run(is ⇒ 1.withSideEffect(is += _, is += _)))
+  @Test def tap(): Unit            = ints().run(is ⇒ 1.tap(is += _, is += _)) === List(1, 1)
+  @Test def update(): Unit         = ints().run(is ⇒ 1.update(is += _, is += _)) === List(1, 1)
+  @Test def withSideEffect(): Unit = ints().run(is ⇒ 1.withSideEffect(is += _, is += _)) === List(1, 1)
 
-  @Test def tapIf(): Unit = assertEquals(
-    List(2), ints().tap(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapIf(_ % 2 == 0)(is += _)))
-  )
+  @Test def tapIf(): Unit = ints().run(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapIf(_ % 2 == 0)(is += _))) === List(2)
 
-  @Test def tapUnless(): Unit = assertEquals(
-    List(1, 3), ints().run(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapUnless(_ % 2 == 0)(is += _)))
-  )
+  @Test def tapUnless(): Unit =
+    ints().run(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapUnless(_ % 2 == 0)(is += _))) === List(1, 3)
 
-  @Test def tapPF(): Unit = assertEquals(
-    List(1, 3), ints().tap(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapPF { case j if j % 2 != 0 ⇒ is += j }))
-  )
+  @Test def tapPF(): Unit =
+    ints().run(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapPF { case j if j % 2 != 0 ⇒ is += j })) === List(1, 3)
 
   @Test def cond(): Unit = on("true", "false").calling(_.cond(_ == "true", _ ⇒ "T", _ ⇒ "F")).produces("T", "F")
 
   @Test def partialMatch(): Unit =
     on(1, 0).calling(i ⇒ i partialMatch { case 1 ⇒ "Matched" }).produces(Some("Matched"), None)
 
-  @Test def lpair(): Unit = assertEquals((10, 1), 1.lpair(_ * 10))
-  @Test def rpair(): Unit = assertEquals((1, 10), 1.rpair(_ * 10))
+  @Test def lpair(): Unit = 1.lpair(_ * 10) === (10, 1)
+  @Test def rpair(): Unit = 1.rpair(_ * 10) === (1, 10)
 
   @Test def filterSelf(): Unit = on(1, 2, 3, 4).calling(_.filterSelf(_ % 2 == 0)).produces(None, Some(2), None, Some(4))
   @Test def ifSelf(): Unit     = on(1, 2, 3, 4).calling(_.ifSelf(_ % 2 == 0)).produces(None, Some(2), None, Some(4))
@@ -102,32 +94,23 @@ class AnyTest {
     on(1, 2, 3, 4).calling(_.fails.some()).produces(None, None, None, None)
   }
 
-  @Test def withFinally(): Unit = assertEquals(
-    List("body: input", "finally: input", "done"), strings().run(ss ⇒ {
-      ss += "input".withFinally(s ⇒ ss += "finally: " + s)(s ⇒ {ss += "body: " + s; "done"})
-    })
-  )
+  @Test def withFinally(): Unit = strings().run(ss ⇒ {
+    ss += "input".withFinally(s ⇒ ss += "finally: " + s)(s ⇒ {ss += "body: " + s; "done"})
+  }) === List("body: input", "finally: input", "done")
 
-  @Test def tryFinally(): Unit = assertEquals(
-    List("body: input", "finally: input", "done"), strings().run(ss ⇒ {
-      ss += "input".tryFinally(s ⇒ {ss += "body: " + s; "done"})(s ⇒ ss += "finally: " + s)
-    })
-  )
+  @Test def tryFinally(): Unit = strings().run(ss ⇒ {
+    ss += "input".tryFinally(s ⇒ {ss += "body: " + s; "done"})(s ⇒ ss += "finally: " + s)
+  }) === List("body: input", "finally: input", "done")
 
-  @Test def attempt(): Unit = assertEquals(
-    List(Success(2), Failure(boom)),
-    List(1.attempt(_ * 2), 1.attempt(_ ⇒ throw boom))
-  )
+  @Test def attempt(): Unit = List(1.attempt(_ * 2), 1.attempt(_ ⇒ throw boom)) === List(Success(2), Failure(boom))
 
-  @Test def addTo(): Unit      = assertEquals(List(1), ints().run(is ⇒ 1.addTo(is)))
-  @Test def removeFrom(): Unit = assertEquals(Nil,     ints(1).tap(is ⇒ 1.removeFrom(is)).toList)
+  @Test def addTo(): Unit      = ints().run(is ⇒ 1.addTo(is)) === List(1)
+  @Test def removeFrom(): Unit = ints(1).tap(is ⇒ 1.removeFrom(is)).toList === Nil
 
-  @Test def unfold(): Unit = assertEquals(List(64, 32, 16, 8, 4, 2), 64.unfold(i ⇒ (i > 1).option((i, i/2))).toList)
+  @Test def unfold(): Unit = 64.unfold(i ⇒ (i > 1).option((i, i/2))).toList === List(64, 32, 16, 8, 4, 2)
 
   @Test def bounded(): Unit = {
-    Stream.fill(10)(Random.nextInt()).foreach(num ⇒ {
-      assertEquals((10 max num) min 100, num.bounded(10, 100))
-    })
+    Stream.fill(10)(Random.nextInt()).foreach(num ⇒ num.bounded(10, 100) === ((10 max num) min 100))
 
     Stream.fill(10)(Random.nextDouble()).foreach(num ⇒ {
       assertEquals((10.0 max num) min 100.0, num.bounded(10.0, 100.0), 0.01)

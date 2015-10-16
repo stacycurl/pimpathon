@@ -3,7 +3,6 @@ package pimpathon
 import org.junit.Test
 import scala.util.Success
 
-import org.junit.Assert._
 import pimpathon.builder._
 import pimpathon.classTag._
 import pimpathon.option._
@@ -21,17 +20,17 @@ class OptionTest {
     .calling(o ⇒ strings().run(ss ⇒ o.tapSome(ss += _))).produces(Nil, List("some"))
 
   @Test def getOrThrow(): Unit = {
-    assertEquals("present", Some("present").getOrThrow("missing"))
-    assertEquals("present", Some("present").getOrThrow(new Exception("missing")))
-    assertEquals("present", Some("present").getOrThrow(util.goBoom: Exception))
+    Some("present").getOrThrow("missing")                === "present"
+    Some("present").getOrThrow(new Exception("missing")) === "present"
+    Some("present").getOrThrow(util.goBoom: Exception)   === "present"
 
     assertThrows[NoSuchElementException]("missing")(None.getOrThrow("missing"))
     assertThrows[RuntimeException]("missing")(None.getOrThrow(new RuntimeException("missing")))
   }
 
   @Test def toTry(): Unit = {
-    assertEquals(Success[String](className[NoSuchElementException]), none[String].toTry.failed.map(_.getClass.getName))
-    assertEquals(Success[String]("foo"), Some("foo").toTry)
+    none[String].toTry.failed.map(_.getClass.getName) === Success[String](className[NoSuchElementException])
+    Some("foo").toTry                                 === Success[String]("foo")
   }
 
   @Test def invert(): Unit = on(none[Int], some(0)).calling(_.invert(1)).produces(some(1), none[Int])

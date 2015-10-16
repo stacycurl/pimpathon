@@ -3,7 +3,7 @@ package pimpathon
 import org.junit.Test
 import scala.util.{Failure, Success, Random}
 
-import org.junit.Assert._
+import org.junit.Assert.{assertTrue, assertFalse}
 import pimpathon.any._
 import pimpathon.function._
 import pimpathon.util._
@@ -11,8 +11,8 @@ import pimpathon.util._
 
 class FunctionTest {
   @Test def attempt(): Unit = {
-    assertEquals(Success(3),    ((i: Int) ⇒ i).attempt(3))
-    assertEquals(Failure(boom), ((i: Int) ⇒ goBoom).attempt(3))
+    ((i: Int) ⇒ i).attempt(3)      === Success(3)
+    ((i: Int) ⇒ goBoom).attempt(3) === Failure(boom)
   }
 
   @Test def guardWith(): Unit =
@@ -23,46 +23,44 @@ class FunctionTest {
 }
 
 class CurriedFunction2Test {
-  @Test def tupled(): Unit = assertEquals(3, ((i: Int) ⇒ (j: Int) ⇒ i + j).tupled((1, 2)))
+  @Test def tupled(): Unit = ((i: Int) ⇒ (j: Int) ⇒ i + j).tupled((1, 2)) === 3
 }
 
 class PredicateTest {
-  @Test def cond(): Unit = {
-    assertEquals(List("even", "odd", "even", "even"), List(2, 3, 4, 6).map(isEven.cond("even", "odd")))
-  }
+  @Test def cond(): Unit = List(2, 3, 4, 6).map(isEven.cond("even", "odd")) === List("even", "odd", "even", "even")
 
   @Test def and(): Unit = {
-    assertEquals(List(4, 6), List(2, 3, 4, 6).filter(isEven and (_ > 2)))
-    assertEquals(List(4, 6), List(2, 3, 4, 6).filter(function.and(isEven, _ > 2)))
+    List(2, 3, 4, 6).filter(isEven and (_ > 2))          === List(4, 6)
+    List(2, 3, 4, 6).filter(function.and(isEven, _ > 2)) === List(4, 6)
     assertTrue(function.and[Int]().apply(Random.nextInt()))
   }
 
   @Test def or(): Unit = {
-    assertEquals(List(2, 4, 3), List(2, 1, 4, 3, 5).filter(isEven or (_ == 3)))
-    assertEquals(List(2, 4, 3), List(2, 1, 4, 3, 5).filter(function.or(isEven, _ == 3)))
+    List(2, 1, 4, 3, 5).filter(isEven or (_ == 3))          === List(2, 4, 3)
+    List(2, 1, 4, 3, 5).filter(function.or(isEven, _ == 3)) === List(2, 4, 3)
     assertFalse(function.or[Int]().apply(Random.nextInt()))
   }
 
-  @Test def not(): Unit = assertEquals(List(1, 3, 5), List(2, 1, 4, 3, 5).filter(isEven.not))
+  @Test def not(): Unit = List(2, 1, 4, 3, 5).filter(isEven.not) === List(1, 3, 5)
 
-  @Test def exists(): Unit = assertEquals(List(List(2), List(2, 4), List(2, 4, 3)),
-    List(Nil, List(2), List(3), List(2, 4), List(2, 4, 3)).filter(isEven.exists))
+  @Test def exists(): Unit = List(Nil, List(2), List(3), List(2, 4), List(2, 4, 3)).filter(isEven.exists) ===
+    List(List(2), List(2, 4), List(2, 4, 3))
 
-  @Test def forall(): Unit = assertEquals(List(Nil, List(2), List(2, 4)),
-    List(Nil, List(2), List(3), List(2, 4), List(2, 4, 3)).filter(isEven.forall))
+  @Test def forall(): Unit =
+    List(Nil, List(2), List(3), List(2, 4), List(2, 4, 3)).filter(isEven.forall) === List(Nil, List(2), List(2, 4))
 
-  @Test def ifSome(): Unit = assertEquals(List(Some(4), Some(6)),
-    List(None, Some(3), Some(4), None, Some(6)).filter(isEven.ifSome))
+  @Test def ifSome(): Unit = List(None, Some(3), Some(4), None, Some(6)).filter(isEven.ifSome) ===
+    List(Some(4), Some(6))
 
   @Test def guard(): Unit = on(1, 2, 3, 4).calling((isEven guard double).lift).produces(None, Some(4), None, Some(8))
 
   @Test def nand(): Unit = {
-    assertEquals(List(2, 3), List(2, 3, 4, 6).filter(function.nand(isEven, _ > 2)))
+    List(2, 3, 4, 6).filter(function.nand(isEven, _ > 2)) === List(2, 3)
     assertFalse(function.nand[Int]().apply(Random.nextInt()))
   }
 
   @Test def nor(): Unit = {
-    assertEquals(List(1, 5), List(2, 1, 4, 3, 5).filter(function.nor(isEven, _ == 3)))
+    List(2, 1, 4, 3, 5).filter(function.nor(isEven, _ == 3)) === List(1, 5)
     assertTrue(function.nor[Int]().apply(Random.nextInt()))
   }
 
@@ -86,7 +84,7 @@ class PartialFunctionTest {
     on("foo" → 1, "bar" → 2).calling(util.partial(1 → 2).second[String].lift).produces(Some("foo" → 2), None)
 
   @Test def partition(): Unit =
-    assertEquals((List(2, 4), List("one", "three")), util.partial(1 → "one", 3 → "three").partition(List(1, 2, 3, 4)))
+    util.partial(1 → "one", 3 → "three").partition[List](List(1, 2, 3, 4)) === ((List(2, 4), List("one", "three")))
 
   @Test def starStarStar(): Unit = on((1, 2), (0, 2), (1, 0))
     .calling((util.partial(1 → 2) *** util.partial(2 → 3)).lift).produces(Some((2, 3)), None, None)

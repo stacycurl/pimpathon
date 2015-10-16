@@ -7,6 +7,7 @@ import scala.collection.{mutable ⇒ M}
 import org.junit.Assert._
 import pimpathon.multiMap._
 import pimpathon.set._
+import pimpathon.util._
 
 
 class SetTest {
@@ -16,21 +17,15 @@ class SetTest {
   }
 
   @Test def powerSet(): Unit = {
-    assertEquals(Set(Set.empty[Int]), Set.empty[Int].powerSet)
-    assertEquals(Set(Set.empty[Int], Set(1)), Set(1).powerSet)
-
-    assertEquals(Set(Set.empty[Int], Set(1), Set(2), Set(1, 2)), Set(1, 2).powerSet)
+    Set.empty[Int].powerSet === Set(Set.empty[Int])
+    Set(1).powerSet         === Set(Set.empty[Int], Set(1))
+    Set(1, 2).powerSet      === Set(Set.empty[Int], Set(1), Set(2), Set(1, 2))
   }
 
-  @Test def mutable(): Unit = {
-    assertEquals(M.Set(1, 2), Set(1, 2).mutable)
-    assertEquals(M.Set(1, 2), Set(1, 2).toMutable)
-  }
+  @Test def mutable(): Unit = on(Set(1, 2)).calling(_.mutable, _.toMutable).produces(M.Set(1, 2), M.Set(1, 2))
 
-  @Test def partitionEithers(): Unit = assertEquals(
-    (Set(1, 2), Set("abc", "def")),
-    Set(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[Set]
-  )
+  @Test def partitionEithers(): Unit =
+    Set(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[Set] === (Set(1, 2), Set("abc", "def"))
 
   @Test def toMultiMap(): Unit = on(Set((1, 10), (1, 11), (2, 20), (2, 21)))
     .calling(_.toMultiMap[List], _.toMultiMap[Set])

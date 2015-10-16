@@ -14,8 +14,12 @@ import pimpathon.pimpTry._
 
 
 object util {
+  implicit class AnyTestPimp[A](val actual: A) extends AnyVal {
+    def ===(expected: A): Unit = assertEquals(expected, actual)
+  }
+
   def assertThrows[T <: Throwable: ClassTag](expectedMessage: String)(f: ⇒ Unit): Unit =
-    assertEquals(expectedMessage, getMessage[T](f).getOrElse(sys.error("Expected exception: " + classTag.className[T])))
+    getMessage[T](f).getOrElse(sys.error("Expected exception: " + classTag.className[T])) === expectedMessage
 
   def assertEqualsSet[A](expected: Set[A], actual: Set[A]): Unit = (expected -- actual, actual -- expected).calcC(
     missing ⇒ extra ⇒ assertTrue(s"Extra: $extra, Missing: $missing", extra.isEmpty && missing.isEmpty)
@@ -25,8 +29,8 @@ object util {
     def calling[B](fs: (A ⇒ B)*): Calling[B] = new Calling(fs.toList)
 
     class Calling[B](fs: List[A ⇒ B]) {
-      def produces(bs: B*): Unit    = assertEquals(bs.toList, for {f ← fs; a ← as} yield f(a))
-      def throws(es: String*): Unit = assertEquals(es.toList, for {f ← fs; a ← as; m ← Try(f(a)).getMessage} yield m)
+      def produces(bs: B*): Unit    = (for {f ← fs; a ← as} yield f(a)) === bs.toList
+      def throws(es: String*): Unit = (for {f ← fs; a ← as; m ← Try(f(a)).getMessage} yield m) === es.toList
     }
   }
 

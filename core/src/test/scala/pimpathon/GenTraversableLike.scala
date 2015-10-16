@@ -7,7 +7,6 @@ import scala.collection.immutable.SortedMap
 
 import org.junit.Test
 
-import org.junit.Assert._
 import pimpathon.any._
 import pimpathon.boolean._
 import pimpathon.genTraversableLike._
@@ -113,47 +112,47 @@ class GenTraversableLikeTests {
     Some(Map()), Some(Map(0 → List(0), 1 → List(1))), None, Some(Map()), Some(Map(0 → Set(0), 1 → Set(1))), None
   )
 
-  @Test def asMap_withKeys(): Unit       = assertEquals(Map(2→1, 4→2), gtl(1,2).asMap.withKeys(_ * 2))
-  @Test def asMap_withValues(): Unit     = assertEquals(Map(1→2, 2→4), gtl(1,2).asMap.withValues(_ * 2))
-  @Test def asMap_withConstValue(): Unit = assertEquals(Map(1→2, 2→2), gtl(1,2).asMap.withConstValue(2))
-  @Test def asMap_withSomeKeys(): Unit   = assertEquals(Map(2→1, 6→3), gtl(1,2,3,4).asMap.withSomeKeys(mulPF.lift))
-  @Test def asMap_withSomeValues(): Unit = assertEquals(Map(1→2, 3→6), gtl(1,2,3,4).asMap.withSomeValues(mulPF.lift))
-  @Test def asMap_withEntries(): Unit    = assertEquals(Map(1→4, 2→8), gtl(2,4).asMap.withEntries(entriesFn))
+  @Test def asMap_withKeys(): Unit       = gtl(1, 2).asMap.withKeys(_ * 2)                  === Map(2 → 1, 4 → 2)
+  @Test def asMap_withValues(): Unit     = gtl(1, 2).asMap.withValues(_ * 2)                === Map(1 → 2, 2 → 4)
+  @Test def asMap_withConstValue(): Unit = gtl(1, 2).asMap.withConstValue(2)                === Map(1 → 2, 2 → 2)
+  @Test def asMap_withSomeKeys(): Unit   = gtl(1, 2, 3, 4).asMap.withSomeKeys(mulPF.lift)   === Map(2 → 1, 6 → 3)
+  @Test def asMap_withSomeValues(): Unit = gtl(1, 2, 3, 4).asMap.withSomeValues(mulPF.lift) === Map(1 → 2, 3 → 6)
+  @Test def asMap_withEntries(): Unit    = gtl(2, 4).asMap.withEntries(entriesFn)           === Map(1 → 4, 2 → 8)
 
   @Test def asMap_withSomeEntries(): Unit = {
-    assertEquals(Map(0 → 2, 1 → 6), gtl(1, 2, 3).asMap.withSomeEntries(entriesPF.lift))
-    assertEquals(Map(0 → 2, 1 → 6), gtl(1, 2, 3).asMap.withSomeEntries(divPF.lift, mulPF.lift))
+    gtl(1, 2, 3).asMap.withSomeEntries(entriesPF.lift)         === Map(0 → 2, 1 → 6)
+    gtl(1, 2, 3).asMap.withSomeEntries(divPF.lift, mulPF.lift) === Map(0 → 2, 1 → 6)
 
-    assertEquals(Map(), gtl(1, 2, 3).asMap.withSomeEntries(emptyPF[Int, Int].lift, mulPF.lift))
-    assertEquals(Map(), gtl(1, 2, 3).asMap.withSomeEntries(divPF.lift, emptyPF[Int, Int].lift))
+    gtl(1, 2, 3).asMap.withSomeEntries(emptyPF[Int, Int].lift, mulPF.lift) === Map()
+    gtl(1, 2, 3).asMap.withSomeEntries(divPF.lift, emptyPF[Int, Int].lift) === Map()
   }
 
-  @Test def asMap_withPFKeys(): Unit   = assertEquals(Map(2 → 1), gtl(1, 2).asMap.withPFKeys(mulPF))
-  @Test def asMap_withPFValues(): Unit = assertEquals(Map(1 → 2), gtl(1, 2).asMap.withPFValues(mulPF))
+  @Test def asMap_withPFKeys(): Unit   = gtl(1, 2).asMap.withPFKeys(mulPF)   === Map(2 → 1)
+  @Test def asMap_withPFValues(): Unit = gtl(1, 2).asMap.withPFValues(mulPF) === Map(1 → 2)
 
   @Test def asMap_withPFEntries(): Unit = {
-    assertEquals(Map(0 → 2, 1 → 6), gtl(1, 2, 3).asMap.withPFEntries(entriesPF))
-    assertEquals(Map(0 → 2, 1 → 6), gtl(1, 2, 3).asMap.withPFEntries(divPF, mulPF))
-    assertEquals(Map(), gtl(1, 2, 3).asMap.withPFEntries(emptyPF[Int, Int], mulPF))
-    assertEquals(Map(), gtl(1, 2, 3).asMap.withPFEntries(divPF, emptyPF[Int, Int]))
+    gtl(1, 2, 3).asMap.withPFEntries(entriesPF)                === Map(0 → 2, 1 → 6)
+    gtl(1, 2, 3).asMap.withPFEntries(divPF, mulPF)             === Map(0 → 2, 1 → 6)
+    gtl(1, 2, 3).asMap.withPFEntries(emptyPF[Int, Int], mulPF) === Map()
+    gtl(1, 2, 3).asMap.withPFEntries(divPF, emptyPF[Int, Int]) === Map()
   }
 
-  @Test def as_SortedMap_withValues(): Unit = assertEquals(Map(1 → 2), gtl(1).as[SortedMap].withValues(_ * 2))
+  @Test def as_SortedMap_withValues(): Unit = gtl(1).as[SortedMap].withValues(_ * 2) === SortedMap(1 → 2)
 
   @Test def asMap_withManyKeys(): Unit =
-    assertEquals(Map(-2 → 2, -1 → 1, 1 → 1, 2 → 2), gtl(1, 2).asMap.withManyKeys(i ⇒ List(-i, i)))
+    gtl(1, 2).asMap.withManyKeys(i ⇒ List(-i, i)) === Map(-2 → 2, -1 → 1, 1 → 1, 2 → 2)
 
   @Test def asMap_withUniqueKeys(): Unit = on(gtl(), gtl(1, 2), gtl(1, 2, 3))
     .calling(_.asMap.withUniqueKeys(_ % 2)).produces(Some(Map()), Some(Map(0 → 2, 1 → 1)), None)
 
-  @Test def attributeCounts(): Unit = assertEquals(Map(3 → 2, 4 → 1), gtl("foo", "food", "bar").attributeCounts(_.size))
+  @Test def attributeCounts(): Unit = gtl("foo", "food", "bar").attributeCounts(_.size) === Map(3 → 2, 4 → 1)
 
   @Test def optAttributeCounts(): Unit =
-    assertEquals(Map(3 → 2, 4 → 1), gtl("foo", "food", "bar", "oo").optAttributeCounts(_.size.filterSelf(_ > 2)))
+    gtl("foo", "food", "bar", "oo").optAttributeCounts(_.size.filterSelf(_ > 2)) === Map(3 → 2, 4 → 1)
 
-  @Test def collectAttributeCounts(): Unit =assertEquals(
-    Map(3 → 2, 4 → 1), gtl("foo", "food", "bar", "oo").collectAttributeCounts { case word if word.size > 2 ⇒ word.size }
-  )
+  @Test def collectAttributeCounts(): Unit =
+    gtl("foo", "food", "bar", "oo").collectAttributeCounts { case word if word.size > 2 ⇒ word.size } ===
+      Map(3 → 2, 4 → 1)
 
   @Test def toMultiMap(): Unit = on(gtl((1, 10), (1, 11), (2, 20), (2, 21)))
     .calling(_.toMultiMap[List], _.toMultiMap[Set])
@@ -166,51 +165,45 @@ class GenTraversableLikeTests {
     .calling(_.none(true)).produces(true, false, true, false, false)
 
   @Test def seqMap(): Unit = {
-    assertEquals(Some(Nil),      gtl[Int]().seqMap(_ ⇒ Some(1)))
-    assertEquals(None,           gtl(1).seqMap(_ ⇒ None))
-    assertEquals(Some(List(1)),  gtl(1).seqMap(Some(_)))
+    gtl[Int]().seqMap[Int, List[Int]](_ ⇒ Some(1)) === Some(Nil)
+    gtl(1).seqMap(_ ⇒ None)                        === None
+    gtl(1).seqMap[Int, List[Int]](Some(_))          === Some(List(1))
 
-    assertEquals(None, gtl(1, 2, 3).seqMap {
+    gtl(1, 2, 3).seqMap {
       case 1 ⇒ Some(1)
       case 2 ⇒ None
       case 3 ⇒ goBoom
-    })
+    } === None
   }
 
   @Test def seqFold(): Unit = {
-    assertEquals(None, gtl(1, 2, 3).seqFold(0) {
+    gtl(1, 2, 3).seqFold(0) {
       case (0, j) ⇒ Some(0 + j)
       case (1, _) ⇒ None
       case _      ⇒ goBoom
-    })
+    } === None
 
-    assertEquals(Some(6), gtl(1, 2, 3).seqFold(0) { case (i, j) ⇒ Some(i + j) })
+    gtl(1, 2, 3).seqFold(0) { case (i, j) ⇒ Some(i + j) } === Some(6)
   }
 
   @Test def apoFold(): Unit = {
-    assertEquals(Left(3), gtl(1, 2, 3).apoFold(0) {
+    gtl(1, 2, 3).apoFold(0) {
       case (0, j) ⇒ Right(0 + j)
       case (1, j) ⇒ Left(1 + j)
       case _      ⇒ goBoom
-    })
+    } === Left(3)
 
-    assertEquals(Right(6), gtl(1, 2, 3).apoFold(0) { case (i, j) ⇒ Right(i + j) })
+    gtl(1, 2, 3).apoFold(0) { case (i, j) ⇒ Right(i + j) } === Right(6)
   }
 
-  @Test def partitionEithers(): Unit = assertEquals(
-    (Set(1, 2), Set("abc", "def")),
-    gtl(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[Set]
-  )
+  @Test def partitionEithers(): Unit =
+    gtl(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[Set] === (Set(1, 2), Set("abc", "def"))
 
-  @Test def partitionByPF(): Unit = assertEquals(
-    (gtl(2, 4), gtl("one", "three")),
-    gtl(1, 2, 3, 4).partitionByPF(util.partial(1 → "one", 3 → "three"))
-  )
+  @Test def partitionByPF(): Unit =
+    gtl(1, 2, 3, 4).partitionByPF(util.partial(1 → "one", 3 → "three")) === (gtl(2, 4), gtl("one", "three"))
 
-  @Test def ungroupBy(): Unit = assertEquals(
-    gtl(gtl('a' → 1, 'b' → 1, 'c' → 1), gtl('a' → 2, 'b' → 2)),
-    gtl('a' → 1, 'a' → 2, 'b' → 1, 'c' → 1, 'b' → 2).ungroupBy(_._1)
-  )
+  @Test def ungroupBy(): Unit = gtl('a' → 1, 'a' → 2, 'b' → 1, 'c' → 1, 'b' → 2).ungroupBy(_._1) ===
+    gtl(gtl('a' → 1, 'b' → 1, 'c' → 1), gtl('a' → 2, 'b' → 2))
 
   private def letter(n: Int)(s: String): Char = s.lift(n).getOrElse(' ')
   private def gtl[A](as: A*): GTLGT[A] = as.toList

@@ -44,6 +44,8 @@
 + (L \/ R).tapRight(R => Discarded): L \/ R
 + (L \/ R).addTo(Growable[L], Growable[R]): L \/ R
 + (L \/ R).removeFrom(Shrinkable[L], Shrinkable[R]): L \/ R
++ (L \/ (L \/ R)).flatten: L \/ R
++ ((L \/ R) \/ R).flatten: L \/ R
 + PartialFunction[A, B].map(B => C): PartialFunction[A, C]
 + PartialFunction[A, B].contramap(C => A): PartialFunction[C, B]
 + (PartialFunction[A, B] &&& PartialFunction[A, C]): PartialFunction[A, (B, C)]

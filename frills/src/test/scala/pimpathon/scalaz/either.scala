@@ -46,6 +46,11 @@ class DisjunctionTest {
       (ints(1), strings("foo")).tap(is ⇒ ss ⇒ right("foo").removeFrom(is, ss)).tmap(_.toList, _.toList))
   }
 
+  @Test def flatten(): Unit = {
+    on(-\/(1), \/-(-\/(2)), \/-(\/-("s"))).calling(_.flatten).produces(-\/(1), -\/(2), \/-("s"))
+    on(-\/(-\/(1)), -\/(\/-("s")), \/-("s")).calling(_.flatten).produces(-\/(1), \/-("s"), \/-("s"))
+  }
+
   private def left(i: Int): Int \/ String = -\/(i)
   private def right(s: String): Int \/ String = \/-(s)
 }

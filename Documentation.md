@@ -455,6 +455,8 @@ The aim of frills is to pimp everything else. You can use it by including the fo
 + (L \/ R).tapRight(R => Discarded): L \/ R
 + (L \/ R).addTo(Growable[L], Growable[R]): L \/ R
 + (L \/ R).removeFrom(Shrinkable[L], Shrinkable[R]): L \/ R
++ (L \/ (L \/ R)).flatten: L \/ R
++ ((L \/ R) \/ R).flatten: L \/ R
 
 + NonEmptyList[A].distinct: NonEmptyList[A]
 + NonEmptyList[A].distinctBy(A => B): NonEmptyList[A]

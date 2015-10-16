@@ -1,7 +1,7 @@
 package pimpathon.scalaz
 
 import scala.collection.generic.{Shrinkable, Growable}
-import scalaz.\/
+import scalaz.{-\/, \/-, \/}
 
 
 object either {
@@ -12,5 +12,13 @@ object either {
     def tapLeft[Discarded](l: L ⇒ Discarded): L \/ R = tap(l, _ ⇒ {})
     def tapRight[Discarded](r: R ⇒ Discarded): L \/ R = tap(_ ⇒ {}, r)
     def tap[Discarded](l: L ⇒ Discarded, r: R ⇒ Discarded): L \/ R = { disjunction.fold(l, r); disjunction }
+  }
+
+  implicit class DisjunctionFrillsNestedL[L, R](val disjunction: (L \/ R) \/ R) {
+    def flatten: L \/ R = disjunction.fold(identity, \/-(_))
+  }
+
+  implicit class DisjunctionFrillsNestedR[L, R](val disjunction: L \/ (L \/ R)) {
+    def flatten: L \/ R = disjunction.fold(-\/(_), identity)
   }
 }

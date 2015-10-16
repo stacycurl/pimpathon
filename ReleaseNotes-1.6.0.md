@@ -14,6 +14,8 @@
 + Try[A].toDisjunction: Throwable \/ A
 + List[A].initOption: Option[List[A]]
 + List[A].onlyDisjunction: List[A] \/ A
++ List[A].sortPromoting(A*): List[A]
++ List[A].sortDemoting(A*): List[A]
 + Stream[A].unconsC(=> B, A => (=> Stream[A]) => B): B
 + Stream[A].lazyScanLeft(B)((B, A) => B): Stream[B]
 + Stream[A].reverseInits: Stream[Stream[A]]

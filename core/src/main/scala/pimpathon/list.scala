@@ -12,6 +12,7 @@ import pimpathon.boolean._
 import pimpathon.function._
 import pimpathon.multiMap._
 import pimpathon.option._
+import pimpathon.ordering._
 import pimpathon.tuple._
 
 
@@ -110,6 +111,9 @@ object list {
 
       recurse(list, other, Nil)
     }
+
+    def sortPromoting(first: A*)(implicit ordering: Ordering[A]): List[A] = list.sorted(ordering.promote(first: _*))
+    def sortDemoting(last: A*)(implicit ordering: Ordering[A]): List[A]   = list.sorted(ordering.demote(last: _*))
 
     private def equalBy[B](f: A ⇒ B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
     private def zip[B](other: List[B]): Iterator[(A, B)] = list.iterator.zip(other.iterator)

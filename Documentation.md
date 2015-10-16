@@ -125,6 +125,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + List[A].tap(empty: => Unit, nonEmpty: List[A] => Unit): List[A]
 + List[A].zipExact(List[B]): (List[(A, B)], Option[Either[List[A], List[B]]])
 + List[A].zipExactWith(List[B])((A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]])
++ List[A].sortPromoting(A*): List[A]
++ List[A].sortDemoting(A*): List[A]
 + List[List[A]].cartesianProduct: List[List[A]]
 
 + Set[A].notContains(A): Boolean

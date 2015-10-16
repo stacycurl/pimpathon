@@ -174,4 +174,12 @@ class ListTest {
   @Test def toMultiMap(): Unit = on(List((1, 10), (1, 11), (2, 20), (2, 21)))
     .calling(_.toMultiMap[List], _.toMultiMap[Set])
     .produces(Map(1 → List(10, 11), 2 → List(20, 21)), Map(1 → Set(10, 11), 2 → Set(20, 21)))
+
+  @Test def sortPromoting(): Unit = assertEquals(
+    List("purple", "green", "black", "red"), List("red", "green", "black", "purple").sortPromoting("purple", "green")
+  )
+
+  @Test def sortDemoting(): Unit = assertEquals(
+    List("purple", "red", "green", "black"), List("black", "red", "purple", "green").sortDemoting("green", "black")
+  )
 }

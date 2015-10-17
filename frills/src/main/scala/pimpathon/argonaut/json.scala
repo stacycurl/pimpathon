@@ -20,6 +20,7 @@ object json {
   implicit class CodecJsonFrills[A](val value: CodecJson[A]) extends AnyVal {
     def andThen(f: Json ⇒ Json): CodecJson[A] = value.derived(_ andThen f)(decoder ⇒ decoder)
     def compose(f: Json ⇒ Json): CodecJson[A] = value.derived(encoder ⇒ encoder)(_ compose f)
+    def afterDecode(f: A ⇒ A): CodecJson[A] = value.derived(encoder ⇒ encoder)(_ map f)
 
     private[argonaut] def derived[B](f: EncodeJson[A] ⇒ EncodeJson[B])(g: DecodeJson[A] ⇒ DecodeJson[B]) =
       CodecJson.derived[B](f(value.Encoder), g(value.Decoder))

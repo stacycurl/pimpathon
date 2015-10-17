@@ -28,6 +28,7 @@ class JsonTest {
 class CodecJsonTest extends JsonUtil {
   @Test def andThen(): Unit     = codec.andThen(reverse).encode(list)           === reverse(codec.encode(list))
   @Test def compose(): Unit     = codec.compose(reverse).decodeJson(json)       === codec.decodeJson(reverse(json))
+  @Test def afterDecode(): Unit = codec.afterDecode(_.reverse).decodeJson(json) === reverse(codec.decodeJson(json))
 
   @Test def xmapKeys(): Unit = mapCodec.xmapKeys[String](_.reverse)(_.reverse).calc(reversed ⇒ {
     reversed.encode(Map("foo" → "bar"))         === mapCodec.encode(Map("oof" → "bar"))

@@ -26,9 +26,12 @@ class JsonTest {
 }
 
 class CodecJsonTest extends JsonUtil {
-  @Test def andThen(): Unit     = codec.andThen(reverse).encode(list)           === reverse(codec.encode(list))
-  @Test def compose(): Unit     = codec.compose(reverse).decodeJson(json)       === codec.decodeJson(reverse(json))
-  @Test def afterDecode(): Unit = codec.afterDecode(_.reverse).decodeJson(json) === reverse(codec.decodeJson(json))
+  @Test def beforeDecode(): Unit = codec.beforeDecode(reverse).decodeJson(json)  === codec.decodeJson(reverse(json))
+  @Test def afterDecode(): Unit  = codec.afterDecode(_.reverse).decodeJson(json) === reverse(codec.decodeJson(json))
+  @Test def beforeEncode(): Unit = codec.beforeEncode(_.reverse).encode(list)    === codec.encode(list.reverse)
+  @Test def afterEncode(): Unit  = codec.afterEncode(reverse).encode(list)       === reverse(codec.encode(list))
+  @Test def andThen(): Unit      = codec.andThen(reverse).encode(list)           === reverse(codec.encode(list))
+  @Test def compose(): Unit      = codec.compose(reverse).decodeJson(json)       === codec.decodeJson(reverse(json))
 
   @Test def xmapKeys(): Unit = mapCodec.xmapKeys[String](_.reverse)(_.reverse).calc(reversed ⇒ {
     reversed.encode(Map("foo" → "bar"))         === mapCodec.encode(Map("oof" → "bar"))
@@ -42,8 +45,9 @@ class CodecJsonTest extends JsonUtil {
 }
 
 class EncodeJsonTest extends JsonUtil {
-  @Test def andThen(): Unit = encoder.andThen(reverse).encode(list) === reverse(encoder.encode(list))
-  @Test def downcast(): Unit = Base.encoder.downcast[Derived].encode(derived) === derivedEncoded
+  @Test def afterEncode(): Unit = encoder.afterEncode(reverse).encode(list)      === reverse(encoder.encode(list))
+  @Test def andThen(): Unit     = encoder.andThen(reverse).encode(list)          === reverse(encoder.encode(list))
+  @Test def downcast(): Unit    = Base.encoder.downcast[Derived].encode(derived) === derivedEncoded
 
   @Test def contramapKeys(): Unit =
     mapEncoder.contramapKeys[String](_.reverse).encode(Map("foo" → "bar")) === mapEncoder.encode(Map("oof" → "bar"))
@@ -53,8 +57,9 @@ class EncodeJsonTest extends JsonUtil {
 }
 
 class DecodeJsonTest extends JsonUtil {
-  @Test def compose(): Unit = decoder.compose(reverse).decodeJson(json) === decoder.decodeJson(reverse(json))
-  @Test def upcast(): Unit = Derived.codec.upcast[Base].decodeJson(derivedEncoded) === DecodeResult.ok(derived)
+  @Test def beforeDecode(): Unit = decoder.beforeDecode(reverse).decodeJson(json) === decoder.decodeJson(reverse(json))
+  @Test def compose(): Unit      = decoder.compose(reverse).decodeJson(json)      === decoder.decodeJson(reverse(json))
+  @Test def upcast(): Unit       = Derived.codec.upcast[Base].decodeJson(derivedEncoded) === DecodeResult.ok(derived)
 
   @Test def mapKeys(): Unit =
     mapDecoder.mapKeys(_.reverse).decodeJson(jsonMap("foo" → "bar")) === mapDecoder.decodeJson(jsonMap("oof" → "bar"))

@@ -436,15 +436,20 @@ The aim of frills is to pimp everything else. You can use it by including the fo
 
 + GTL[L \/ R].partitionDisjunctions: (GTL[L], GTL[R])
 
++ argonaut.CodecJson[A].beforeDecode(Json => Json): CodecJson[A]
++ argonaut.CodecJson[A].afterDecode(A => A): CodecJson[A]
++ argonaut.CodecJson[A].beforeEncode(A => A): CodecJson[A]
++ argonaut.CodecJson[A].afterEncode(Json => Json): CodecJson[A]
 + argonaut.CodecJson[A].andThen(Json => Json): CodecJson[A]
 + argonaut.CodecJson[A].compose(Json => Json): CodecJson[A]
-+ argonaut.CodecJson[A].afterDecode(A => A): CodecJson[A]
 + argonaut.CodecJson[Map[K, V]].xmapKeys(K ⇒ C)(C ⇒ K): CodecJson[Map[C, V]]
 + argonaut.CodecJson[Map[K, V]].xmapValues(V => W)(W => V): CodecJson[Map[K, W]]
++ argonaut.DecodeJson[A].beforeDecode(Json => Json): DecodeJson[A]
 + argonaut.DecodeJson[A].compose(Json => Json): DecodeJson[A]
 + argonaut.DecodeJson[A].upcast[B >: A]: DecodeJson[B]
 + argonaut.DecodeJson[Map[K, V]].mapKeys(K => C): DecodeJson[Map[C, V]]
 + argonaut.DecodeJson[Map[K, V]].mapValues(V => W): DecodeJson[Map[K, W]]
++ argonaut.EncodeJson[A].afterEncode(Json => Json): EncodeJson[A]
 + argonaut.EncodeJson[A].andThen(Json => Json): EncodeJson[A]
 + argonaut.EncodeJson[A].downcast[B <: A]: EncodeJson[B]
 + argonaut.EncodeJson[Map[K, V]].contramapKeys(C => K): EncodeJson[Map[C, V]]

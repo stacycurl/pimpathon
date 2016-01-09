@@ -16,7 +16,7 @@ object nel {
     def builder(head: A): M.Builder[A, NonEmptyList[A]] = List.newBuilder[A].mapResult(NonEmptyList.nel(head, _))
   }
 
-  implicit class NelFrills[A](val nel: NonEmptyList[A])
+  implicit class NelFrills[A](nel: NonEmptyList[A])
     extends GenTraversableLikePimpsMixin[A, NonEmptyList] {
 
     def distinct: NonEmptyList[A] = lift(_.distinct)
@@ -35,7 +35,9 @@ object nel {
     protected def gtl: GTLGT[Either[L, R]] = nel.list
   }
 
-  implicit class NelOfTuple2Frills[K, V](nel: NonEmptyList[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
+  implicit class NelOfTuple2Frills[K, V](nel: NonEmptyList[(K, V)])
+    extends GenTraversableLikeOfTuple2Mixin[K, V] {
+
     protected def gtl: GTLGT[(K, V)] = nel.list
   }
 

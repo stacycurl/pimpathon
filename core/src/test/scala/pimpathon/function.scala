@@ -92,6 +92,9 @@ class PartialFunctionTest {
   @Test def ampAmpAmp(): Unit = on(1, 2, 3)
     .calling((util.partial(1 → 2, 2 → 3) &&& util.partial(1 → 3, 3 → 4)).lift).produces(Some((2, 3)), None, None)
 
+  @Test def pipePipePipe(): Unit = on(Left(1), Right("two"), Left(3), Right("four"))
+    .calling((util.partial(1 → 11) ||| util.partial("two" → 22)).lift).produces(Some(11), Some(22), None, None)
+
   @Test def map(): Unit = on(1, 2, 3)
     .calling(util.partial(1 → 2, 2 → 3).map(_.toString).lift).produces(Some("2"), Some("3"), None)
 

@@ -163,27 +163,14 @@ class FileTest {
   }
 
   @Test def withTempDirectory(): Unit = {
-    val files = file.withTempDirectory(tmp ⇒ {
-      def relativeName(file: File): File = file.named("tmp/" + file.relativeTo(tmp).getPath)
+    file.withTempDirectory(tmp ⇒                     assertIsTemp("tmp",    "temp",   expectedIsFile = false, tmp))
+    file.withTempDirectory("suffix")(tmp ⇒           assertIsTemp("suffix", "temp",   expectedIsFile = false, tmp))
+    file.withTempDirectory("suffix", "prefix")(tmp ⇒ assertIsTemp("suffix", "prefix", expectedIsFile = false, tmp))
 
-      assertIsTemp(".tmp", "temp", expectedIsFile = false, tmp)
-
-      List(tmp, (tmp / "child").create(), (tmp / "parent" / "child").create()).map(relativeName)
-    })
-
-    assertEquals("Temp directory (and contents) should not exist after 'withTempDirectory'",
-      Nil, files.filter(_.exists()))
-
-    assertFalse("Temp directory should not exist after 'withTempDirectory'",
-      file.withTempDirectory("suffix")(tmp ⇒ {
-        assertIsTemp("suffix", "temp", expectedIsFile = false, tmp); tmp
-      }).exists
-    )
-
-    assertFalse("Temp directory should not exist after 'withTempDirectory'",
-      file.withTempDirectory("suffix", "prefix")(tmp ⇒ {
-        assertIsTemp("suffix", "prefix", expectedIsFile = false, tmp); tmp
-      }).exists
+    assertEquals("Temp directory (and contents) should not exist after 'withTempDirectory'", Nil,
+      file.withTempDirectory(tmp ⇒ {
+        List(tmp, tmp / "child", tmp / "parent" / "child").map(f ⇒ relativeName(tmp, f.create()))
+      }).filter(_.exists())
     )
   }
 
@@ -391,4 +378,7 @@ class FileTest {
       .getDeclaredField("hooks").tap(_.setAccessible(true))
       .get(null).asInstanceOf[_root_.java.util.Map[Thread, Thread]].keySet).toSet
   }
+
+  private def relativeName(relativeTo: File, file: File): File =
+    file.named(relativeTo.getName + "/" + file.relativeTo(relativeTo).getPath)
 }

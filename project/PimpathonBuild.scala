@@ -12,7 +12,7 @@ object PimpathonBuild extends Build {
   lazy val pimpathon = (project in file(".")
     aggregate(core, frills)
     settings(commonSettings: _*)
-    settings(publish := (), publishLocal := ())
+    settings(publish := (), publishLocal := (), doc := Documentation.generate)
   )
 
   lazy val core = (project in file("core")

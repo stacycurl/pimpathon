@@ -62,15 +62,15 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Option[A].getOrThrow(=> Exception): A
 + Option[A].invert(A): Option[A]
 + Option[A].toTry: Try[A]
-+ Option[A].tap(none: => Unit, some: A => Unit): Option[A]
-+ Option[A].tapNone(=> Unit): Option[A]
-+ Option[A].tapSome(A => Unit): Option[A]
++ Option[A].tap(none: => Discarded, some: A => Discarded): Option[A]
++ Option[A].tapNone(=> Discarded): Option[A]
++ Option[A].tapSome(A => Discarded): Option[A]
 + Option[A].amass(PartialFunction[A, Option[B]]): Option[B]
 
 + implicit conversion of Either to RightProjection (and back again)
-+ Either[L, R].tap(L => Unit, R => Unit): Either[L, R]
-+ Either[L, R].tapLeft(L => Unit): Either[L, R]
-+ Either[L, R].tapRight(R => Unit): Either[L, R]
++ Either[L, R].tap(L => Discarded, R => Discarded): Either[L, R]
++ Either[L, R].tapLeft(L => Discarded): Either[L, R]
++ Either[L, R].tapRight(R => Discarded): Either[L, R]
 + Either[L, R].addTo(Growable[L], Growable[R]): Either[L, R]
 + Either[L, R].removeFrom(Shrinkable[L], Shrinkable[R]): Either[L, R]
 + Either[L, R].rightOr(L => R): R (aka rescue, aka valueOr)
@@ -120,9 +120,9 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + List[A].unsnocC(=> B, List[A] => A => B): B
 + List[A].zipWith(List[B])(((A, B)) => C): List[C]
 + List[K].zipToMap(List[V]): Map[K, V]
-+ List[A].tapNonEmpty(List[A] => Unit): List[A]
-+ List[A].tapEmpty(=> Unit): Lis[A]
-+ List[A].tap(empty: => Unit, nonEmpty: List[A] => Unit): List[A]
++ List[A].tapNonEmpty(List[A] => Discarded): List[A]
++ List[A].tapEmpty(=> Discarded): List[A]
++ List[A].tap(empty: => Discarded, nonEmpty: List[A] => Discarded): List[A]
 + List[A].zipExact(List[B]): (List[(A, B)], Option[Either[List[A], List[B]]])
 + List[A].zipExactWith(List[B])((A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]])
 + List[A].sortPromoting(A*): List[A]
@@ -153,7 +153,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + GTL[V].asMap.withKeys(V => K): Map[K, V]
 + GTL[V].asMap.withSomeKeys(V => Option[K]): Map[K, V]
 + GTL[V].asMap.withManyKeys(V => List[K]): Map[K, V]
-+ GTL[A].asMap.withUniqueKeys(A => K): Option[Map[K, A]]
++ GTL[V].asMap.withUniqueKeys(V => K): Option[Map[K, V]]
 + GTL[V].asMap.withPFKeys(PartialFunction[V, K]): Map[K, V]
 + GTL[K].asMap.withValues(K => V): Map[K, V]
 + GTL[K].asMap.withSomeValues(K => Option[V]): Map[K, V]
@@ -216,7 +216,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Map[K, V].findKey(Predicate[K]): Option[K]
 + Map[K, V].sorted(Ordering[K]): SortedMap[K, V]
 + Map[K, V].reverse(Set[K] => K): Map[V, K]
-+ Map[K, V].reverseToMultiMap: MultiMap[Set, K, V]
++ Map[K, V].reverseToMultiMap: MultiMap[Set, V, K]
 + Map[K, V].containsAll(Option[K]): Boolean
 + Map[K, V].containsAll(GTL[K]): Boolean
 + Map[K, V].containsAny(Option[K]): Boolean
@@ -227,8 +227,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Map[K, V].emptyTo(Map[K, V]): Map[K, V]
 + Map[K, V].uncons(A, Map[K, V] => A): A
 + Map[K, V].entryFor.minKey(Ordering[K]): Option[(K, V)]
-+ Map[K, V].entryFor.maxValue(Ordering[V]): Option[(K, V)]
-+ Map[K, V].entryFor.minKey(Ordering[K]): Option[(K, V)]
++ Map[K, V].entryFor.minValue(Ordering[V]): Option[(K, V)]
++ Map[K, V].entryFor.maxKey(Ordering[K]): Option[(K, V)]
 + Map[K, V].entryFor.maxValue(Ordering[V]): Option[(K, V)]
 + Map[K, V].entryFor.matchingValue(Predicate[V]): Option[(K, V)]
 + Map[K, V].entryFor.matchingKey(Predicate[K]): Option[(K, V)]
@@ -278,6 +278,7 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + Predicate[A].forall: Predicate[List[A]]
 + Predicate[A].guard(A => B): PartialFunction[A, B]
 + Predicate[A].cond(=> B, => B): A => B
+
 + function.and(Predicate[A]*): Predicate[A]
 + function.or(Predicate[A]*): Predicate[A]
 + function.nand(Predicate[A]*): Predicate[A]
@@ -292,8 +293,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 + PartialFunction[A, B].either: A => Either[A, B]
 + PartialFunction[A, B].partition(CC[A]): (CC[A], CC[B])
 + PartialFunction[A, B].isUndefinedAt(A): Boolean
-+ PartialFunction[A, B].second[C]: PartialFunction[(C, A), (C, B)]
 + PartialFunction[A, B].first[C]: PartialFunction[(A, C), (B, C)]
++ PartialFunction[A, B].second[C]: PartialFunction[(C, A), (C, B)]
 + PartialFunction[A, A].unify: A => A
 + PartialFunction[A, B].map(B => C): PartialFunction[A, C]
 + PartialFunction[A, B].contramap(C => A): PartialFunction[C, B]
@@ -336,8 +337,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 
 + InputStream.closeAfter(InputStream => A): A
 + InputStream.attemptClose: Try[Unit]
-+ InputStream.closeUnless(Boolean): InputStream
 + InputStream.closeIf(Boolean): InputStream
++ InputStream.closeUnless(Boolean): InputStream
 + InputStream.drain(OutputStream, closeIn?, closeOut): InputStream
 + InputStream.>>(OutputStream): InputStream
 + InputStream.buffered: BufferedInputStream
@@ -349,8 +350,8 @@ The pimps in core depend only on the core scala & java libraries. You can use it
 
 + OutputStream.closeAfter(OutputStream => A): A
 + OutputStream.attemptClose: Try[Unit]
-+ OutputStream.closeUnless(Boolean): OutputStream
 + OutputStream.closeIf(Boolean): OutputStream
++ OutputStream.closeUnless(Boolean): OutputStream
 + OutputStream.drain(InputStream, closeOut?, closeIn?): OutputStream
 + OutputStream.<<(InputStream): OutputStream
 + OutputStream.buffered: BufferedOutputStream

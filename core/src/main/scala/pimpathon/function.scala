@@ -71,6 +71,11 @@ object function {
       def isDefinedAt(in: (In, In2)): Boolean = pf.isDefinedAt(in._1) && rhs.isDefinedAt(in._2)
       def apply(in: (In, In2)): (Out, Out2) = (pf.apply(in._1), rhs.apply(in._2))
     }
+
+    def |||[In2](rhs: In2 ~> Out): Either[In, In2] ~> Out = new (Either[In, In2] ~> Out) {
+      def isDefinedAt(in: Either[In, In2]): Boolean = in.fold(pf.isDefinedAt, rhs.isDefinedAt)
+      def apply(in: Either[In, In2]): Out = in.fold(pf.apply, rhs.apply)
+    }
   }
 
   implicit class PartialEndoFunctionPimps[A](val pf: A ~> A) extends AnyVal {

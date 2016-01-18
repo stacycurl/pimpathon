@@ -67,4 +67,5 @@ Next minor release: [1.6.0][r1.6.0]
 [r1.4.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.4.0.md
 [r1.5.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.5.0.md
 [r1.6.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.6.0.md
-[doc]: https://github.com/stacycurl/pimpathon/blob/master/Documentation.md
+[doc]: https://rawgit.com/stacycurl/pimpathon/master/docs/index.html
+[olddoc]: https://github.com/stacycurl/pimpathon/blob/master/Documentation.md

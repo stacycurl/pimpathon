@@ -1075,6 +1075,9 @@ object Documentation {
       ),
       Partial("onlyOption", "Option[A]", "Head if non-empty list has 1 element, None otherwise",
         "NonEmptyList(1).onlyOption" → "Some(1)", "NonEmptyList(1, 2).onlyOption" → "None"
+      ),
+      Partial("onlyEither", "Either[NonEmptyList[A], A]", "Right if non-empty list has 1 element, Left otherwise",
+        "NonEmptyList(1).onlyEither" → "Right(1)", "NonEmptyList(1, 2).onlyEither" → "Left(NonEmptyList(1, 2))"
       )
     ), "NonEmptyList[A: Order]" → List(
       Partial("max", "A", "Maximum value",

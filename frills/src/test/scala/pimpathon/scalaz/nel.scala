@@ -36,4 +36,7 @@ class NelTest {
     .produces(Map(0 → List(0, 2), 1 → List(1, 3)), Map(0 → NonEmptyList(0, 2), 1 → NonEmptyList(1, 3)))
 
   @Test def onlyOption(): Unit = on(NonEmptyList(1), NonEmptyList(1, 2)).calling(_.onlyOption).produces(Some(1), None)
+
+  @Test def onlyEither(): Unit =
+    on(NonEmptyList(1, 2), NonEmptyList(1)).calling(_.onlyEither).produces(Left(NonEmptyList(1, 2)), Right(1))
 }

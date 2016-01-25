@@ -324,7 +324,7 @@ object Documentation {
         "Nil.onlyEither" → "Left(Nil)", "List(1).onlyEither" → "Right(1)", "List(1, 2).onlyEither" → "Left(List(1, 2))"
       ),
       Partial("onlyDisjunction", "List[A] \\/ A", "\\/- if list has 1 element, -\\/ otherwise",
-        "Nil.onlyEither" → "-\\/(Nil)", "List(1).onlyEither" → "\\/-(1)", "List(1, 2).onlyEither" → "-\\/(List(1, 2))"
+        "Nil.onlyDisjunction" → "-\\/(Nil)", "List(1).onlyDisjunction" → "\\/-(1)", "List(1, 2).onlyDisjunction" → "-\\/(List(1, 2))"
       ),
       Partial("onlyOption", "Option[A]", "Head if list has 1 element, None otherwise",
         "Nil.onlyOption" → "None", "List(1).onlyOption" → "Some(1)", "List(1, 2).onlyOption" → "None"
@@ -1078,6 +1078,9 @@ object Documentation {
       ),
       Partial("onlyEither", "Either[NonEmptyList[A], A]", "Right if non-empty list has 1 element, Left otherwise",
         "NonEmptyList(1).onlyEither" → "Right(1)", "NonEmptyList(1, 2).onlyEither" → "Left(NonEmptyList(1, 2))"
+      ),
+      Partial("onlyDisjunction", "NonEmptyList[A] \\/ A", "\\/- if list has 1 element, -\\/ otherwise",
+        "NonEmptyList(1).onlyDisjunction" → "\\/-(1)", "NonEmptyList(1, 2).onlyDisjunction" → "-\\/(NonEmptyList(1, 2))"
       )
     ), "NonEmptyList[A: Order]" → List(
       Partial("max", "A", "Maximum value",

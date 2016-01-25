@@ -9,6 +9,7 @@ import pimpathon.frills.genTraversableLike.GenTraversableLikeOfDisjunctionFrills
 import pimpathon.genTraversableLike._
 import pimpathon.list._
 import pimpathon.tuple._
+import scalaz.syntax.std.either._
 
 
 object nel {
@@ -24,6 +25,7 @@ object nel {
     def max(implicit o: Order[A]): A = nel.list.max(o.toScalaOrdering)
     def min(implicit o: Order[A]): A = nel.list.min(o.toScalaOrdering)
 
+    def onlyDisjunction: NonEmptyList[A] \/ A  = onlyEither.disjunction
     def onlyEither: Either[NonEmptyList[A], A] = onlyOption.toRight(nel)
     def onlyOption: Option[A]                  = nel.list.onlyOption
 

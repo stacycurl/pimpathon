@@ -39,4 +39,7 @@ class NelTest {
 
   @Test def onlyEither(): Unit =
     on(NonEmptyList(1, 2), NonEmptyList(1)).calling(_.onlyEither).produces(Left(NonEmptyList(1, 2)), Right(1))
+
+  @Test def onlyDisjunction(): Unit =
+    on(NonEmptyList(1, 2), NonEmptyList(1)).calling(_.onlyDisjunction).produces(NonEmptyList(1, 2).left, 1.right)
 }

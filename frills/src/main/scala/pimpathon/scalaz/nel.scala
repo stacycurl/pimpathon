@@ -24,6 +24,8 @@ object nel {
     def max(implicit o: Order[A]): A = nel.list.max(o.toScalaOrdering)
     def min(implicit o: Order[A]): A = nel.list.min(o.toScalaOrdering)
 
+    def onlyOption: Option[A] = nel.list.onlyOption
+
     private def lift(f: List[A] ⇒ List[A]): NonEmptyList[A] = f(nel.list).headTail.calc(NonEmptyList.nel)
 
     protected def gtl: GTLGT[A] = nel.list

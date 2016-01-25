@@ -562,11 +562,11 @@ object Documentation {
     ), "GTL[K]" → List(
       Partial("asMap.withValues", "(K ⇒ V) ⇒ Map[K, V]", ""),
       Partial("asMap.withSomeValues", "(K ⇒ Option[V]) ⇒ Map[K, V]", ""),
-      Partial("asMap.withPFValuesValues", "PartialFunction[K, V] ⇒ Map[K, V]", ""),
+      Partial("asMap.withPFValues", "PartialFunction[K, V] ⇒ Map[K, V]", ""),
       Partial("asMap.withConstValue", "V ⇒ Map[K, V]", ""),
       Partial("asMultiMap.withValues", "(K ⇒ V) ⇒ MultiMap[GTL, K, V]", ""),
       Partial("asMultiMap.withSomeValues", "(K ⇒ Option[V]) ⇒ MultiMap[GTL, K, V]", ""),
-      Partial("asMultiMap.withPFValuesValues", "PartialFunction[K, V] ⇒ MultiMap[GTL, K, V]", ""),
+      Partial("asMultiMap.withPFValues", "PartialFunction[K, V] ⇒ MultiMap[GTL, K, V]", ""),
       Partial("asMultiMap.withConstValue", "V ⇒ MultiMap[GTL, K, V]", "")
       // as[F]
     ), "GTL[(K, V)]" → List(
@@ -1072,6 +1072,9 @@ object Documentation {
       ),
       Partial("distinctBy", "(A ⇒ B) ⇒ NonEmptyList[A]", "Remove items with duplicate properties",
         "NonEmptyList(\"foo\", \"bar\", \"bare\", \"food\").distinctBy(_.length)" → "NonEmptyList(\"foo\", \"bare\")"
+      ),
+      Partial("onlyOption", "Option[A]", "Head if non-empty list has 1 element, None otherwise",
+        "NonEmptyList(1).onlyOption" → "Some(1)", "NonEmptyList(1, 2).onlyOption" → "None"
       )
     ), "NonEmptyList[A: Order]" → List(
       Partial("max", "A", "Maximum value",

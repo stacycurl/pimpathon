@@ -8,10 +8,7 @@ resolvers += Resolver.url("fix-sbt-plugin-releases", url("http://dl.bintray.com/
 libraryDependencies ++= Seq(
   plugin("com.timushev.sbt" %  "sbt-updates"           % "0.1.7"),
   plugin("net.virtual-void" %  "sbt-dependency-graph"  % "0.7.4"),
-  plugin("com.typesafe.sbt" %  "sbt-scalariform"       % "1.3.0"),
-  plugin("org.scalastyle"   %% "scalastyle-sbt-plugin" % "0.5.0"),
-  plugin("org.scoverage"    %% "sbt-scoverage"         % "0.99.7.1"),
-  plugin("org.scoverage"    %% "sbt-coveralls"         % "0.98.0"),
+  plugin("org.scoverage"    %% "sbt-scoverage"         % "1.3.5"),
   plugin("me.lessis"        %  "bintray-sbt"           % "0.1.2")
   // https://github.com/typelevel/wartremover/issues/108
   //plugin("org.brianmckenna" %% "wartremover" % "0.9")

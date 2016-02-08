@@ -121,7 +121,7 @@ object list {
     protected def gtl: GenTraversableLike[A, GenTraversable[A]] = list
   }
 
-  implicit class ListOfEithersPimps[L, R](list: List[Either[L, R]])
+  implicit class ListOfEithersPimps[L, R](list: List[_ <: Either[L, R]])
     extends GenTraversableLikeOfEitherPimpsMixin[L, R, List] {
 
     protected def gtl: GTLGT[Either[L, R]] = list

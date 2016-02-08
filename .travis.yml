@@ -20,7 +20,7 @@ branches:
 before_script: ./project/bintray.sh
 
 script:
-- sbt clean +compile scoverage:test $(if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$JAVA_HOME" == "$(jdk_switcher home openjdk6)" ]]; then echo "+publish"; fi)
+- sbt clean compile coverage test $(if [[ "$TRAVIS_PULL_REQUEST" == "false" && "$JAVA_HOME" == "$(jdk_switcher home openjdk6)" ]]; then echo "+publish"; fi)
 
 env:
   global:

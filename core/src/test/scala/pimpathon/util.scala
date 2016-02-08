@@ -11,12 +11,16 @@ import scala.util.{DynamicVariable, Try}
 import org.junit.Assert._
 import pimpathon.tuple._
 import pimpathon.pimpTry._
+import pimpathon.either._
+import pimpathon.classTag._
 
 
 object util {
   implicit class AnyTestPimp[A](val actual: A) extends AnyVal {
     def ===(expected: A): Unit = assertEquals(expected, actual)
   }
+
+  def ignoreExceptions(f: ⇒ Unit): Unit = Try(f)
 
   def assertThrows[T <: Throwable: ClassTag](expectedMessage: String)(f: ⇒ Unit): Unit =
     getMessage[T](f).getOrElse(sys.error("Expected exception: " + classTag.className[T])) === expectedMessage
@@ -26,9 +30,7 @@ object util {
   )
 
   case class on[A](as: A*) {
-    def calling[B](fs: (A ⇒ B)*): Calling[B] = new Calling(fs.toList)
-
-    class Calling[B](fs: List[A ⇒ B]) {
+    case class calling[B](fs: (A ⇒ B)*) {
       def produces(bs: B*): Unit    = (for {f ← fs; a ← as} yield f(a)) === bs.toList
       def throws(es: String*): Unit = (for {f ← fs; a ← as; m ← Try(f(a)).getMessage} yield m) === es.toList
     }
@@ -42,8 +44,6 @@ object util {
 
   def createOutputStream(): ByteArrayOutputStream with Closeable =
     new ByteArrayOutputStream with Closeable
-
-  def ignoreExceptions(f: ⇒ Unit): Unit = Try(f)
 
   private def getMessage[T <: Throwable: ClassTag](f: ⇒ Unit): Option[String] = try { f; None } catch {
     case t: Throwable ⇒ if (classTag.klassOf[T].isAssignableFrom(t.getClass)) Some(t.getMessage) else sys.error(

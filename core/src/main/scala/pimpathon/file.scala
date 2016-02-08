@@ -32,7 +32,6 @@ case class FileUtils (
     def contains(other: File): Boolean      = isAncestorOf(other)
     def isAncestorOf(other: File): Boolean  = other.ancestors.contains(file)
 
-    // http://rapture.io does this much better
     def /(name: String): File = new File(file, name)
     def named(name: String = file.getName): File = new NamedFile(file, name)
     def canon: File = file.attempt(_.getCanonicalFile).getOrElse(file.getAbsoluteFile)

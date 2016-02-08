@@ -1,11 +1,9 @@
 import sbt._
 
 import net.virtualvoid.sbt.graph.{Plugin ⇒ GraphPlugin}
-import org.scalastyle.sbt.ScalastylePlugin.{ Settings => scalaStyleSettings }
 
 import sbt.Keys._
-import scoverage.ScoverageSbtPlugin._
-import scoverage.ScoverageSbtPlugin.ScoverageKeys._
+import scoverage.ScoverageKeys._
 
 
 object PimpathonBuild extends Build {
@@ -25,8 +23,8 @@ object PimpathonBuild extends Build {
     settings(commonSettings: _*)
     settings(Publishing.settings: _*)
     settings(libraryDependencies ++= Seq(
-      "io.argonaut" %% "argonaut"    % "6.1-M4" % "provided",
-      "org.scalaz"  %% "scalaz-core" % "7.1.0"  % "provided"
+      "io.argonaut" %% "argonaut"    % "6.1" % "provided",
+      "org.scalaz"  %% "scalaz-core" % "7.1.1"  % "provided"
     ))
   )
 
@@ -38,22 +36,16 @@ object PimpathonBuild extends Build {
     }
   }
 
-  def commonSettings = GraphPlugin.graphSettings ++ scalaStyleSettings ++ instrumentSettings ++ Seq(
+  def commonSettings = GraphPlugin.graphSettings ++ Seq(
     organization := "com.github.stacycurl",
-    crossScalaVersions := Seq("2.10.4", "2.11.2"),
+    scalaVersion := "2.11.7",
     maxErrors := 1,
     parallelExecution in Test := true,
-    parallelExecution in ScoverageTest := false,
-    scalacOptions := Seq(
-      "-feature",
-      "-Xfatal-warnings",
-      "-deprecation",
-      "-unchecked"
-    ),
+    scalacOptions := Seq("-feature", "-Xfatal-warnings", "-deprecation", "-unchecked"),
     libraryDependencies += "com.novocode"  % "junit-interface" % "0.11"  % "test",
-    initialCommands in console := """import pimpathon._""",
-    minimumCoverage := 100,
-    highlighting := true,
-    failOnMinimumCoverage := true
+    coverageEnabled := true,
+    coverageMinimum := 100,
+    coverageHighlighting := true,
+    coverageFailOnMinimum := true
   )
 }

@@ -6,6 +6,7 @@ import pimpathon.function.Predicate
 import argonaut.Json._
 import pimpathon.function._
 import pimpathon.map._
+import scalaz.\/
 import scalaz.std.iterable._
 
 
@@ -19,11 +20,12 @@ object json {
 
   implicit class CodecJsonFrills[A](val value: CodecJson[A]) extends AnyVal {
     def beforeDecode(f: Json ⇒ Json): CodecJson[A] = compose(f)
-    def afterDecode(f: A ⇒ A):  CodecJson[A] = value.derived(encoder ⇒ encoder)(_ map f)
-    def beforeEncode(f: A ⇒ A): CodecJson[A] = value.derived(_ contramap f)(decoder ⇒ decoder)
+    def afterDecode(f: A ⇒ A):  CodecJson[A] = derived(encoder ⇒ encoder)(_ map f)
+    def beforeEncode(f: A ⇒ A): CodecJson[A] = derived(_ contramap f)(decoder ⇒ decoder)
     def afterEncode(f: Json ⇒ Json): CodecJson[A] = andThen(f)
-    def andThen(f: Json ⇒ Json): CodecJson[A] = value.derived(_ andThen f)(decoder ⇒ decoder)
-    def compose(f: Json ⇒ Json): CodecJson[A] = value.derived(encoder ⇒ encoder)(_ compose f)
+    def andThen(f: Json ⇒ Json): CodecJson[A] = derived(_ andThen f)(decoder ⇒ decoder)
+    def compose(f: Json ⇒ Json): CodecJson[A] = derived(encoder ⇒ encoder)(_ compose f)
+    def xmapDisjunction[B](f: A => String \/ B)(g: B => A): CodecJson[B] = derived(_ beforeEncode g)(_ afterDecode f)
 
     private[argonaut] def derived[B](f: EncodeJson[A] ⇒ EncodeJson[B])(g: DecodeJson[A] ⇒ DecodeJson[B]) =
       CodecJson.derived[B](f(value.Encoder), g(value.Decoder))
@@ -38,6 +40,9 @@ object json {
     def beforeDecode(f: Json ⇒ Json): DecodeJson[A] = compose(f)
     def compose(f: Json ⇒ Json): DecodeJson[A] = DecodeJson[A](hc ⇒ value.decode(hc >-> f))
     def upcast[B >: A]: DecodeJson[B] = value.map[B](a ⇒ a: B)
+
+    private[argonaut] def afterDecode[B](f: A => String \/ B): DecodeJson[B] = // Probably publish later
+      DecodeJson[B](c => value.decode(c).flatMap(a => DecodeResult[B](f(a).leftMap(_ → c.history))))
   }
 
   implicit class DecodeJsonMapFrills[K, V](val value: DecodeJson[Map[K, V]]) extends AnyVal {
@@ -49,6 +54,8 @@ object json {
     def afterEncode(f: Json ⇒ Json): EncodeJson[A] = andThen(f)
     def andThen(f: Json ⇒ Json): EncodeJson[A] = EncodeJson[A](a ⇒ f(value.encode(a)))
     def downcast[B <: A]: EncodeJson[B] = value.contramap[B](b ⇒ b: A)
+
+    private[argonaut] def beforeEncode[B](f: B => A): EncodeJson[B] = value contramap f // Probably publish later
   }
 
   implicit class EncodeJsonMapFrills[K, V](val value: EncodeJson[Map[K, V]]) extends AnyVal {

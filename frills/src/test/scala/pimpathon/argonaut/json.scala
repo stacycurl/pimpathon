@@ -1,12 +1,18 @@
 package pimpathon.argonaut
 
-import argonaut.{DecodeResult, CodecJson, EncodeJson, Json, Parse}
+import argonaut._
 import org.junit.Test
 
 import pimpathon.any._
+import pimpathon.either._
 import pimpathon.option._
 import pimpathon.util._
 import pimpathon.argonaut.json._
+import pimpathon.pimpTry._
+import pimpathon.frills.any._
+import pimpathon.frills.pimpTry._
+
+import scalaz.{-\/, \/-, \/}
 
 
 class JsonTest {
@@ -42,6 +48,15 @@ class CodecJsonTest extends JsonUtil {
     reversed.encode(Map("foo" → "bar"))         === mapCodec.encode(Map("foo" → "rab"))
     reversed.decodeJson(jsonMap("foo" → "bar")) === mapCodec.decodeJson(jsonMap("foo" → "rab"))
   })
+
+  @Test def xmapDisjunction(): Unit = stringCodec.xmapDisjunction[Int](attempt(_.toInt))(_.toString).calc(intCodec ⇒ {
+    intCodec.encode(3)                     === Json.jString("3")
+    intCodec.decodeJson(Json.jString("3")) === DecodeResult.ok(3)
+    intCodec.decodeJson(Json.jString("a")) === DecodeResult.fail("a", CursorHistory(Nil))
+  })
+
+  // Searching for a better name before making this a pimp (and one producing Either[A, B])
+  private def attempt[A, B](f: A => B)(a: A): A \/ B = a.attempt(f).fold(_ => -\/(a), \/-(_))
 }
 
 class EncodeJsonTest extends JsonUtil {
@@ -74,6 +89,7 @@ trait JsonUtil {
 
   val codec: CodecJson[List[String]]           = CodecJson.derived[List[String]]
   val mapCodec: CodecJson[Map[String, String]] = CodecJson.derived[Map[String, String]]
+  val stringCodec: CodecJson[String]           = CodecJson.derived[String]
   val (encoder, decoder)       = (codec.Encoder, codec.Decoder)
   val (mapEncoder, mapDecoder) = (mapCodec.Encoder, mapCodec.Decoder)
 

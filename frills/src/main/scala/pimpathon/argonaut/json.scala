@@ -64,8 +64,9 @@ object json {
     def contramapValues[W](f: W ⇒ V): EncodeJson[Map[K, W]] = value.contramap[Map[K, W]](_.mapValuesEagerly(f))
   }
 
-  implicit class TraversalJsonJToJsonFrills(val t: Traversal[Json, Json]) {
-    def string: Traversal[Json, String] = t composePrism Json.jStringPrism
+  implicit class TraversalJsonJToJsonFrills(val value: Traversal[Json, Json]) {
+    def string: Traversal[Json, String] = value composePrism Json.jStringPrism
+    def int: Traversal[Json, Int]       = value composePrism Json.jIntPrism
   }
 
   private implicit class JsonObjectFrills(val o: JsonObject) extends AnyVal {

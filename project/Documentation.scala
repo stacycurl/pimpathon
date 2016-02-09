@@ -1041,6 +1041,10 @@ object Documentation {
       Partial("string", "Traversal[Json, String]", "compose with string prism",
         """Traversal.id[Json].string.getAll(Json.jString("foo"))""" → """List("foo")""",
         """Traversal.id[Json].string.getAll(Json.jNumber(3))"""     → """Nil"""
+      ),
+      Partial("int", "Traversal[Json, String]", "compose with int prism",
+        """Traversal.id[Json].int.getAll(Json.jString("foo"))""" → """Nil""",
+        """Traversal.id[Json].int.getAll(Json.jNumber(3))"""     → """List(3)"""
       )
     ), "(L \\/ R)" → List(
       Partial("tap", "(L ⇒ Discarded, R ⇒ Discarded) ⇒ L \\/ R", "Perform one action or another",

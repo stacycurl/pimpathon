@@ -87,6 +87,7 @@ class DecodeJsonTest extends JsonUtil {
 
 class TraversalFrills extends JsonUtil {
   @Test def string(): Unit = on(jString("foo"), jNumber(3)).calling(id.string.getAll).produces(List("foo"), nil)
+  @Test def int(): Unit    = on(jString("foo"), jNumber(3)).calling(id.int.getAll).produces(nil, List(3))
 
   private val id = Traversal.id[Json]
 }

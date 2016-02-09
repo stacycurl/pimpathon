@@ -1,6 +1,8 @@
 package pimpathon.argonaut
 
 import argonaut._
+import argonaut.Json.{jString, jNumber}
+import monocle.Traversal
 import org.junit.Test
 
 import pimpathon.any._
@@ -81,6 +83,12 @@ class DecodeJsonTest extends JsonUtil {
 
   @Test def mapValues(): Unit =
     mapDecoder.mapValues(_.reverse).decodeJson(jsonMap("foo" → "bar")) === mapDecoder.decodeJson(jsonMap("foo" → "rab"))
+}
+
+class TraversalFrills extends JsonUtil {
+  @Test def string(): Unit = on(jString("foo"), jNumber(3)).calling(id.string.getAll).produces(List("foo"), nil)
+
+  private val id = Traversal.id[Json]
 }
 
 trait JsonUtil {

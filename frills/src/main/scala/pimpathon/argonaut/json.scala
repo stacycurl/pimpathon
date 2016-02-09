@@ -1,6 +1,7 @@
 package pimpathon.argonaut
 
 import argonaut._
+import monocle.Traversal
 import pimpathon.function.Predicate
 
 import argonaut.Json._
@@ -61,6 +62,10 @@ object json {
   implicit class EncodeJsonMapFrills[K, V](val value: EncodeJson[Map[K, V]]) extends AnyVal {
     def contramapKeys[C](f: C ⇒ K): EncodeJson[Map[C, V]] = value.contramap[Map[C, V]](_.mapKeysEagerly(f))
     def contramapValues[W](f: W ⇒ V): EncodeJson[Map[K, W]] = value.contramap[Map[K, W]](_.mapValuesEagerly(f))
+  }
+
+  implicit class TraversalJsonJToJsonFrills(val t: Traversal[Json, Json]) {
+    def string: Traversal[Json, String] = t composePrism Json.jStringPrism
   }
 
   private implicit class JsonObjectFrills(val o: JsonObject) extends AnyVal {

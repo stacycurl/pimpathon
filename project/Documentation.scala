@@ -1037,6 +1037,11 @@ object Documentation {
         """{ "o": [ "a", null, "b" ] }""" → """{ "o": [ "a", "b" ] }""",
         """[ { "a": null, "b": 3 } ]"""   → """[ { "b": 3 } ]"""
       )
+    ), "Traversal[Json, Json]" → List(
+      Partial("string", "Traversal[Json, String]", "compose with string prism",
+        """Traversal.id[Json].string.getAll(Json.jString("foo"))""" → """List("foo")""",
+        """Traversal.id[Json].string.getAll(Json.jNumber(3))"""     → """Nil"""
+      )
     ), "(L \\/ R)" → List(
       Partial("tap", "(L ⇒ Discarded, R ⇒ Discarded) ⇒ L \\/ R", "Perform one action or another",
         "   -\\/(1).tap(l ⇒ print(\"left: \" + l), r ⇒ print(\"right: \" + r))" → "Prints \"left: 1\"",

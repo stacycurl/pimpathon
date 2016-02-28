@@ -18,6 +18,14 @@ class FunctionTest {
   @Test def guardWith(): Unit =
     on(1, 2, 3, 4).calling((double guardWith isEven).lift).produces(None, Some(4), None, Some(8))
 
+  @Test def unlift(): Unit = f.unlift.calc(pf ⇒ {
+    on(0, 1, 2, 3).calling(pf.isDefinedAt).produces(true, false, true, false)
+    on(0, 2).calling(pf.apply).produces(0, 2)
+    assertThrows[MatchError](pf(1))
+    pf.lift === f
+  })
+
+  private val f: (Int) ⇒ Option[Int] = (i: Int) ⇒ i.filterSelf(_ % 2 == 0)
   private val isEven: Predicate[Int] = _ % 2 == 0
   private val double: (Int ⇒ Int)   = _ * 2
 }

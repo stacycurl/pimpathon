@@ -1,6 +1,7 @@
 package pimpathon
 
 import scala.language.higherKinds
+import scala.runtime.AbstractPartialFunction
 
 import scala.{PartialFunction ⇒ ~>}
 import scala.collection.{GenTraversable, GenTraversableLike}
@@ -17,6 +18,14 @@ object function {
   implicit class FunctionPimps[A, B](val f: A ⇒ B) extends AnyVal {
     def attempt: A ⇒ Try[B] = a ⇒ Try(f(a))
     def guardWith(p: Predicate[A]): A ~> B = p guard f
+  }
+
+  implicit class FunctionOptionPimps[A, B](val f: A ⇒ Option[B]) extends AnyVal {
+    def unlift: A ~> B = new AbstractPartialFunction[A, B] { // Gee thanks for making PF.Lifted & Unlifted private
+      def isDefinedAt(a: A): Boolean = f(a).isDefined
+      override def applyOrElse[A1 <: A, B1 >: B](a: A1, default: (A1) ⇒ B1): B1 = f(a).getOrElse(default(a))
+      override def lift: (A) ⇒ Option[B] = f
+    }
   }
 
   implicit class CurriedFunction2Pimps[A, B, C](val f: A ⇒ B ⇒ C) extends AnyVal {

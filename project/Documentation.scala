@@ -875,6 +875,9 @@ object Documentation {
     ), "(A ⇒ B ⇒ C)" → List(
       Partial("tupled", "((A, B)) ⇒ C", "Convert curried function to a tupled one")
     ), "PartialFunction[A, B]" → List(
+    ), "(A ⇒ Option[B])" → List(
+      Partial("unlift", "PartialFunction[A, B]", "Create partial function")
+    ), "PartialFunction[A, B]" → List(
       Partial("toLeft", "A ⇒ Either[B, A]", ""),
       Partial("toRight", "A ⇒ Either[A, B]", ""),
       Partial("either", "A ⇒ Either[A, B]", ""),

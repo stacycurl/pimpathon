@@ -266,6 +266,9 @@ object Documentation {
       Partial("const", "B ⇒ List[A]", "Replace all elements with a constant value",
         "List(1, 2, 3).const(\"foo\")" → "List(\"foo\", \"foo\", \"foo\")"
       ),
+      Partial("lpair", "A => B => List[(B, A)]", "Pair up each element with the result of f",
+        "List(1, 2, 3).lpair(_ * 2)" → "List((2,1), (4,2), (6,3)))"
+      ),
       Partial("countWithSize", "Predicate[A] ⇒ Option[(Int, Int)]", "Count number of times a predicate passes, along with the list size",
         "Nil.countWithSize(_ >= 0)" → "None",
         "List(1, 2, -2, 3, -4, 5).countWithSize(_ >= 0)" → "Some((4, 6))"

@@ -85,6 +85,8 @@ object list {
 
     def const[B](elem: B): List[B] = list.map(_ ⇒ elem)
 
+    def lpair[B](f: A ⇒ B): List[(B, A)] = list.map(_.lpair(f))
+
     def prefixPadTo(len: Int, elem: A): List[A] = List.fill(len - list.length)(elem) ++ list
 
     def sharedPrefix(other: List[A])(implicit compare: A ⇒ A ⇒ Boolean = equalC[A]): (List[A], List[A], List[A]) = {

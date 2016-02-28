@@ -83,6 +83,9 @@ class ListTest {
   @Test def mapC(): Unit =
     on(nil[(Int, Int)], List((1, 2), (2, 3))).calling(_.mapC(a ⇒ b ⇒ a * b)).produces(nil[Int], List(2, 6))
 
+  @Test def lpair(): Unit =
+    on(nil[Int], List(1, 2, 3)).calling(_.lpair(_ * 2)).produces(nil[(Int, Int)], List((2,1), (4,2), (6,3)))
+
   @Test def sharedPrefix(): Unit = {
     nil[Int].sharedPrefix(Nil)                      === (Nil, Nil, Nil)
     List(1).sharedPrefix(List(1))                   === (List(1), Nil, Nil)

@@ -923,6 +923,12 @@ object Documentation {
         """"dir/file".affixWith("dir/", ".txt")"""     → """"dir/file.txt"""",
         """"dir/file.txt".affixWith("dir/", ".txt")""" → """"dir/file.txt""""
       ),
+      Partial("stripAffixes", "String => String ⇒ String", "Remove prefix & suffix from string",
+        """"file".stripAffixes("dir/", ".txt")"""         → """"file"""",
+        """"file.txt".stripAffixes("dir/", ".txt")"""     → """"file"""",
+        """"dir/file".stripAffixes("dir/", ".txt")"""     → """"file"""",
+        """"dir/file.txt".stripAffixes("dir/", ".txt")""" → """"file""""
+      ),
       Partial("sharedPrefix", "String ⇒ (String, String, String)",
         "Split string into parts shared with the beginning of another, along with the remainder of each",
           "\"1234\".sharedPrefix(\"1243\")" -> "(\"12\", \"34\", \"43\")"

@@ -9,6 +9,9 @@ import pimpathon.util._
 
 
 class StringTest {
+  @Test def stripAffixes(): Unit =
+    on("(foo)", "(foo", "oof)", "ooo").calling(_.stripAffixes("(", ")")).produces("foo", "foo", "oof", "ooo")
+
   @Test def affixWith(): Unit =
     on("(foo)", "(foo", "oof)", "ooo").calling(_.affixWith("(", ")")).produces("(foo)", "(foo)", "(oof)", "(ooo)")
 

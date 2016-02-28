@@ -1,15 +1,20 @@
 import java.io.{FileOutputStream, File}
 import java.nio.charset.Charset
+import sbt.{Info, Pure, Task}
+import scala.xml.{NodeSeq, Elem}
 
-import scala.xml.{Text, NodeSeq, Elem}
 
 object Documentation {
-  def generate: File = {
+  def generate(version: String): Task[File] =
+    Task[File](Info[File](), Pure[File](() ⇒ generateDoc(version), inline = false))
+
+  private def generateDoc(version: String): File = {
     println("Generating documentation")
 
-    val fos  = new FileOutputStream(new File("docs/index.html"), false)
+    val file: File = new File("docs/index.html")
+    val fos  = new FileOutputStream(file, false)
 
-    fos.write(template(Map("A" → List(
+    fos.write(template(version, Map("A" → List(
       Partial("calc", "(A ⇒ B) ⇒ B", "Applies a function",
         "12.calc(_ + 3)" → "15", " 2.calc(_ * 3)" → "6"
       ),
@@ -549,16 +554,16 @@ object Documentation {
       Partial("seqMap", "(A ⇒ Option[B]) ⇒ (implicit CanBuildFrom[Nothing, B, To]) ⇒ Option[To]", ""),
       Partial("apoFold", "B ⇒ ((B, A) ⇒ Either[C, B]) ⇒ Either[C, B]", "")
     ), "GTL[V]" → List(
-      Partial("asMap.withKeys", "(V ⇒ K) ⇒ Map[K, V]", ""),
-      Partial("asMap.withSomeKeys", "(V ⇒ Option[K]) ⇒ Map[K, V]", ""),
-      Partial("asMap.withManyKeys", "(V ⇒ List[K]) ⇒ Map[K, V]", ""),
-      Partial("asMap.withUniqueKeys", "(V ⇒ K) ⇒ Option[Map[K, V]]", ""),
-      Partial("asMap.withPFKeys", "PartialFunction[V, K] ⇒ Map[K, V]", ""),
-      Partial("asMultiMap.withKeys", "(V ⇒ K) ⇒ MultiMap[GTL, K, V]", ""),
-      Partial("asMultiMap.withSomeKeys", "(V ⇒ Option[K]) ⇒ MultiMap[GTL, K, V]", ""),
-      Partial("asMultiMap.withManyKeys", "(V ⇒ List[K]) ⇒ MultiMap[GTL, K, V]", ""),
+      Partial("asMap.withKeys",            "(V ⇒ K) ⇒ Map[K, V]", ""),
+      Partial("asMap.withSomeKeys",        "(V ⇒ Option[K]) ⇒ Map[K, V]", ""),
+      Partial("asMap.withManyKeys",        "(V ⇒ List[K]) ⇒ Map[K, V]", ""),
+      Partial("asMap.withUniqueKeys",      "(V ⇒ K) ⇒ Option[Map[K, V]]", ""),
+      Partial("asMap.withPFKeys",          "PartialFunction[V, K] ⇒ Map[K, V]", ""),
+      Partial("asMultiMap.withKeys",       "(V ⇒ K) ⇒ MultiMap[GTL, K, V]", ""),
+      Partial("asMultiMap.withSomeKeys",   "(V ⇒ Option[K]) ⇒ MultiMap[GTL, K, V]", ""),
+      Partial("asMultiMap.withManyKeys",   "(V ⇒ List[K]) ⇒ MultiMap[GTL, K, V]", ""),
       Partial("asMultiMap.withUniqueKeys", "(V ⇒ K) ⇒ Option[MultiMap[GTL, K, V]]", ""),
-      Partial("asMultiMap.withPFKeys", "PartialFunction[V, K] ⇒ MultiMap[GTL, K, V]", "")
+      Partial("asMultiMap.withPFKeys",     "PartialFunction[V, K] ⇒ MultiMap[GTL, K, V]", "")
     ), "GTL[K]" → List(
       Partial("asMap.withValues", "(K ⇒ V) ⇒ Map[K, V]", ""),
       Partial("asMap.withSomeValues", "(K ⇒ Option[V]) ⇒ Map[K, V]", ""),
@@ -1108,7 +1113,7 @@ object Documentation {
     fos.flush()
     fos.close()
 
-    null
+    null // returning null => Generate in 1s, return file => 30s !?
   }
 
   object Partial {
@@ -1140,7 +1145,7 @@ object Documentation {
 //      </div>
 
     def examples = if (examples0.isEmpty) NodeSeq.Empty else {
-      val maxExpressionLength = examples0.flatMap(_._1.split("\n").toList).map(_.length).max
+//      val maxExpressionLength = examples0.flatMap(_._1.split("\n").toList).map(_.length).max
 
       examples0.flatMap {
         case (expression, result) => {
@@ -1167,16 +1172,16 @@ object Documentation {
       //<pre><code class="hljs javascript"></code></pre>
   }
 
-  def template(partials0: Map[String, List[Partial]]): Elem = {
+  def template(version: String, partials0: Map[String, List[Partial]]): Elem = {
     val partials = partials0
 //      .filterKeys(_ == "GTL[A]").mapValues(_.filter(p ⇒ p.name == "asMultiMap.withEntries" && p.description.contains("nested")))
 
-    template(partials.flatMap {
+    template(version, partials.flatMap {
       case (category, ps) ⇒ if (ps.isEmpty) List(Pimp(category, "todo", "todo", "todo")) else ps.map(_.pimp(category))
     })
   }
 
-  def template(pimps: Iterable[Pimp]): Elem =
+  def template(version: String, pimps: Iterable[Pimp]): Elem =
     <html class="docs-page">
       <head>
         <meta charset="UTF-8"/>
@@ -1191,7 +1196,7 @@ object Documentation {
             <label class="open-nav" for="open-nav"></label>
             <a class="navbar-brand" href="/">
               <strong>Pimpathon</strong>
-              <span class="version">1.5.20</span>
+              <span class="version">{version}</span>
             </a>
           </div>
           <div class="navbar-left">

@@ -24,7 +24,7 @@ resolvers += "Stacy Curl's repo" at "http://dl.bintray.com/stacycurl/repo/"
 resolvers += Resolver.sonatypeRepo("releases")
 ```
 
-Builds are available for Scala 2.9.2, 2.9.3, 2.10.4 & 2.11.2
+Builds are available for Scala 2.11.7
 
 ### pimpathon-core
 

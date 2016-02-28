@@ -1,16 +1,14 @@
 import sbt._
 
-import net.virtualvoid.sbt.graph.{Plugin ⇒ GraphPlugin}
-
 import sbt.Keys._
-import scoverage.ScoverageKeys._
+//import scoverage.ScoverageKeys._
 
 
 object PimpathonBuild extends Build {
   lazy val pimpathon = (project in file(".")
     aggregate(core, frills)
     settings(commonSettings: _*)
-    settings(publish := (), publishLocal := (), doc := Documentation.generate)
+    settings(publish := (), publishLocal := (), doc <<= version.apply(Documentation.generate))
   )
 
   lazy val core = (project in file("core")
@@ -36,16 +34,19 @@ object PimpathonBuild extends Build {
     }
   }
 
-  def commonSettings = GraphPlugin.graphSettings ++ Seq(
+  def commonSettings = Seq(
     organization := "com.github.stacycurl",
     scalaVersion := "2.11.7",
     maxErrors := 1,
     parallelExecution in Test := true,
     scalacOptions := Seq("-feature", "-Xfatal-warnings", "-deprecation", "-unchecked"),
-    libraryDependencies += "com.novocode"  % "junit-interface" % "0.11"  % "test",
-    coverageEnabled := true,
-    coverageMinimum := 100,
-    coverageHighlighting := true,
-    coverageFailOnMinimum := true
+    libraryDependencies ++= Seq(
+      "com.novocode"   % "junit-interface" % "0.11"  % "test",
+      "org.scala-lang" % "scala-compiler"  % scalaVersion.value
+    )
+//    coverageEnabled := true,
+//    coverageMinimum := 100,
+//    coverageHighlighting := true,
+//    coverageFailOnMinimum := true
   )
 }

@@ -80,6 +80,9 @@ class ListTest {
 
   @Test def const(): Unit = on(nil[Int], List('a', 'b', 'c')).calling(_.const(1)).produces(nil[Int], List(1, 1, 1))
 
+  @Test def mapC(): Unit =
+    on(nil[(Int, Int)], List((1, 2), (2, 3))).calling(_.mapC(a ⇒ b ⇒ a * b)).produces(nil[Int], List(2, 6))
+
   @Test def sharedPrefix(): Unit = {
     nil[Int].sharedPrefix(Nil)                      === (Nil, Nil, Nil)
     List(1).sharedPrefix(List(1))                   === (List(1), Nil, Nil)

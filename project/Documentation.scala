@@ -392,6 +392,10 @@ object Documentation {
       Partial("toNel", "Option[NonEmptyList[A]]", "Convert to non-empty list, if possible",
         "Nil.toNel" → "None", "List(1, 2).toNel" → "Some(NonEmptyList(1, 2))"
       )
+    ), "List[(A, B)" → List(
+      Partial("mapC", "A => B => C => List[C]", "Curried map method",
+        "List((1, 2), (2, 3)).mapC(a ⇒ b ⇒ a * b)" → "List(2, 6)"
+      )
     ), "List[List[A]]" → List(
       Partial("cartesianProduct", "List[List[A]]", "Every permutation of elements choosen from each list",
         "List(List(1,2,3), List(8,9)).cartesianProduct" → "List(List(1,8), List(1,9), List(2,8), List(2,9), List(3,8), List(3,9))"

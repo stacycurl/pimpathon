@@ -86,6 +86,7 @@ object list {
     def const[B](elem: B): List[B] = list.map(_ ⇒ elem)
 
     def lpair[B](f: A ⇒ B): List[(B, A)] = list.map(_.lpair(f))
+    def rpair[B](f: A ⇒ B): List[(A, B)] = list.map(_.rpair(f))
 
     def prefixPadTo(len: Int, elem: A): List[A] = List.fill(len - list.length)(elem) ++ list
 

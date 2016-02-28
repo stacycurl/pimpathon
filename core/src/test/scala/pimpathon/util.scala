@@ -2,6 +2,7 @@ package pimpathon
 
 import _root_.java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import _root_.java.util.concurrent.atomic.AtomicBoolean
+import scala.language.implicitConversions
 import scala.{PartialFunction ⇒ ~>}
 import scala.collection.mutable.ListBuffer
 import scala.collection.{mutable ⇒ M}
@@ -9,10 +10,9 @@ import scala.reflect.ClassTag
 import scala.util.{DynamicVariable, Try}
 
 import org.junit.Assert._
+import pimpathon.list._
 import pimpathon.tuple._
 import pimpathon.pimpTry._
-import pimpathon.either._
-import pimpathon.classTag._
 
 
 object util {
@@ -20,21 +20,49 @@ object util {
     def ===(expected: A): Unit = assertEquals(expected, actual)
   }
 
+  def ignore(f: ⇒ Unit): Unit = {}
   def ignoreExceptions(f: ⇒ Unit): Unit = Try(f)
 
-  def assertThrows[T <: Throwable: ClassTag](expectedMessage: String)(f: ⇒ Unit): Unit =
-    getMessage[T](f).getOrElse(sys.error("Expected exception: " + classTag.className[T])) === expectedMessage
+  def assertThrows[T <: Throwable: ClassTag](expectedMessage: String)(f: ⇒ Any): Unit =
+    assertThrows(f) === expectedMessage
+
+  def assertThrows[T <: Throwable: ClassTag](f: ⇒ Any): String =
+    getMessage[T](f).getOrElse(sys.error("Expected exception: " + classTag.className[T]))
 
   def assertEqualsSet[A](expected: Set[A], actual: Set[A]): Unit = (expected -- actual, actual -- expected).calcC(
     missing ⇒ extra ⇒ assertTrue(s"Extra: $extra, Missing: $missing", extra.isEmpty && missing.isEmpty)
   )
 
-  case class on[A](as: A*) {
-    case class calling[B](fs: (A ⇒ B)*) {
-      def produces(bs: B*): Unit    = (for {f ← fs; a ← as} yield f(a)) === bs.toList
-      def throws(es: String*): Unit = (for {f ← fs; a ← as; m ← Try(f(a)).getMessage} yield m) === es.toList
+  case class calling[A, B](f: A ⇒ B) {
+    case class partitions(as: List[A]) {
+      def into(expectations: (Expectation[A, B])*): Unit = {
+        val (expectedFailbackResults, abs) = expectations.map(_.value).toList.partitionEithers[List]
+
+        expectedFailbackResults.onlyOption match {
+          case None ⇒ pairs(as.rpair(f)) === pairs(abs)
+          case Some(expectedFallback) ⇒ as.partition(a ⇒ abs.exists(_._1 == a)).calcC(positive ⇒ remainder ⇒ {
+            pairs((positive ::: remainder).rpair(f)) === pairs(abs ::: remainder.rpair(_ ⇒ expectedFallback))
+          })
+        }
+      }
     }
   }
+
+  case class on[A](as: A*) {
+    case class calling[B](fs: (A ⇒ B)*) {
+      def produces(bs: B*): Unit    = (for {f ← fs; a ← as} yield f(a)).toList === bs.toList
+      def throws(es: String*): Unit = (for {f ← fs; a ← as; m ← Try(f(a)).getMessage} yield m).toList === es.toList
+    }
+  }
+
+  object Expectation {
+    implicit def tupleAsExpectation[A, B](ab: (A, B)):   Expectation[A, B]       = Expectation(Right(ab))
+    implicit def otherAsExpectation[B](ob: (others, B)): Expectation[Nothing, B] = Expectation(Left(ob._2))
+  }
+
+  case class Expectation[+A, +B](value: Either[B, (A, B)])
+
+  private def pairs[A, B](abs: List[(A, B)]): String = abs.mapC(a ⇒ b ⇒ s"$a → $b").mkString(", ")
 
   def createInputStream(content: String = ""): ByteArrayInputStream with Closeable =
     new ByteArrayInputStream(content.getBytes) with Closeable
@@ -64,6 +92,7 @@ object util {
   def strings(ss: String*): ListBuffer[String] = new M.ListBuffer[String] ++= ss
 
   def nil[A]: List[A] = Nil
+  sealed trait others; case object others extends others
 
   trait Closeable extends _root_.java.io.Closeable {
     abstract override def close(): Unit = { closed.set(true); super.close() }

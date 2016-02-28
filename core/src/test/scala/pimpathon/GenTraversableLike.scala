@@ -2,6 +2,8 @@ package pimpathon
 
 import scala.language.higherKinds
 
+import scala.collection.{mutable ⇒ M}
+
 import scala.{PartialFunction ⇒ ~>}
 import scala.collection.immutable.SortedMap
 
@@ -145,13 +147,13 @@ class GenTraversableLikeTests {
   @Test def asMap_withUniqueKeys(): Unit = on(gtl(), gtl(1, 2), gtl(1, 2, 3))
     .calling(_.asMap.withUniqueKeys(_ % 2)).produces(Some(Map()), Some(Map(0 → 2, 1 → 1)), None)
 
-  @Test def attributeCounts(): Unit = gtl("foo", "food", "bar").attributeCounts(_.size) === Map(3 → 2, 4 → 1)
+  @Test def histogram(): Unit = gtl("foo", "food", "bar").histogram(_.length) === Map(3 → 2, 4 → 1)
 
-  @Test def optAttributeCounts(): Unit =
-    gtl("foo", "food", "bar", "oo").optAttributeCounts(_.size.filterSelf(_ > 2)) === Map(3 → 2, 4 → 1)
+  @Test def optHistogram(): Unit =
+    gtl("foo", "food", "bar", "oo").optHistogram(_.length.filterSelf(_ > 2)) === Map(3 → 2, 4 → 1)
 
-  @Test def collectAttributeCounts(): Unit =
-    gtl("foo", "food", "bar", "oo").collectAttributeCounts { case word if word.size > 2 ⇒ word.size } ===
+  @Test def collectHistogram(): Unit =
+    gtl("foo", "food", "bar", "oo").collectHistogram { case word if word.length > 2 ⇒ word.length } ===
       Map(3 → 2, 4 → 1)
 
   @Test def toMultiMap(): Unit = on(gtl((1, 10), (1, 11), (2, 20), (2, 21)))
@@ -204,6 +206,17 @@ class GenTraversableLikeTests {
 
   @Test def ungroupBy(): Unit = gtl('a' → 1, 'a' → 2, 'b' → 1, 'c' → 1, 'b' → 2).ungroupBy(_._1) ===
     gtl(gtl('a' → 1, 'b' → 1, 'c' → 1), gtl('a' → 2, 'b' → 2))
+
+  @Test def countValues(): Unit = {
+    val builder: M.Builder[Any, Int] = CountCBF.apply()
+
+    builder.result() === 0
+    builder += "foo"
+    builder += "bar"
+    builder.result() === 2
+    builder.clear()
+    builder.result() === 0
+  }
 
   private def letter(n: Int)(s: String): Char = s.lift(n).getOrElse(' ')
   private def gtl[A](as: A*): GTLGT[A] = as.toList

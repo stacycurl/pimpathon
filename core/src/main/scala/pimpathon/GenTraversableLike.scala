@@ -24,14 +24,9 @@ object genTraversableLike {
 
     def asMap: GenTraversableLikeCapturer[A, Map, Map] = as[Map]
 
-    def attributeCounts[B](f: A ⇒ B): Map[B, Int] =
-      asMultiMap.withKeys(f).mapValues(_.size)
-
-    def collectAttributeCounts[B](pf: A ~> B): Map[B, Int] =
-      optAttributeCounts(pf.lift)
-
-    def optAttributeCounts[B](f: A ⇒ Option[B]): Map[B, Int] =
-      asMultiMap.withSomeKeys(f).mapValues(_.size)
+    def histogram[B](f: A ⇒ B): Map[B, Int] = asMultiMap[Count].withKeys(f)(countValues)
+    def collectHistogram[B](f: A ~> B): Map[B, Int] = optHistogram(f.lift)
+    def optHistogram[B](f: A ⇒ Option[B]): Map[B, Int] = asMultiMap[Count].withSomeKeys(f)(countValues)
 
     def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Map] =
       GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Map](gtl)
@@ -64,6 +59,11 @@ object genTraversableLike {
 
       recurse(gtl, z)
     }
+
+    private def countValues[B]: CanBuildFrom[Nothing, (B, A), Map[B, Int]] =
+      multiMap.build[Count, B, A](CanBuildNonEmpty.canBuildFromToCBNE(CountCBF))
+
+    private type Count[_] = Int
   }
 
   trait GenTraversableLikeOfEitherPimpsMixin[L, R, CC[_]] {
@@ -150,4 +150,14 @@ case class UngroupBy[A, B, CC[_]](ungrouped: Map[Int, M.Builder[A, CC[A]]], coun
 
   private def entry(count: Int, a: A) = (count, ungrouped.getOrElse(count, inner.apply()) += a)
   private def count(b: B) = counts.getOrElse(b, 0) + 1
+}
+
+object CountCBF extends CanBuildFrom[Nothing, Any, Int] with IgnoreFromCBF[Nothing, Any, Int] {
+  def apply(): M.Builder[Any, Int] = new M.Builder[Any, Int] {
+    def +=(elem: Any): this.type = { count = count + 1; this }
+    def result(): Int = count
+    def clear(): Unit = { count = 0 }
+
+    private var count = 0
+  }
 }

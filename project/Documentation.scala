@@ -449,21 +449,21 @@ object Documentation {
       ),
       Partial("readUpToN", "(Long, InputStream) ⇒ Int", "Read up to n bytes from an InputStream")
     ), "GTL[A]" → List(
-      Partial("collectAttributeCounts", "PartialFunction[A, B] ⇒ Map[B, Int]",
+      Partial("collectHistogram", "PartialFunction[A, B] ⇒ Map[B, Int]",
         "Calculate how many occurences of a property of each element",
           """|List("foo", "food", "bar", "oo").collectAttributeCounts {
              |  case word if word.size > 2 ⇒ word.size
              |}""" → """|// 2 words of length 3, 1 of length 4
                         |Map(3 → 2, 4 → 1)"""
       ),
-      Partial("optAttributeCounts", "(A ⇒ Option[B]) ⇒ Map[B, Int]",
+      Partial("optHistogram", "(A ⇒ Option[B]) ⇒ Map[B, Int]",
         "Calculate how many occurences of a property of each element",
           """|List("foo", "food", "bar", "oo").optAttributeCounts(
              |  word ⇒ if (word.size <= 2) None else Some(word.size)
              |)""" → """|// 2 words of length 3, 1 of length 4
                         |Map(3 → 2, 4 → 1)"""
       ),
-      Partial("attributeCounts", "(A ⇒ B) ⇒ Map[B, Int]",
+      Partial("histogram", "(A ⇒ B) ⇒ Map[B, Int]",
         "Calculate how many occurences of a property of each element",
           """|List("foo", "food", "bar", "oo").attributeCounts(
              |  word ⇒ word.size

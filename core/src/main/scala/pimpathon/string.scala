@@ -11,6 +11,8 @@ object string {
   implicit class StringPimps(val string: String) extends AnyVal {
     def emptyTo(alternative: ⇒ String): String = if (string.isEmpty) alternative else string
 
+    def affixWith(prefix: String, suffix: String): String = prefixWith(prefix).suffixWith(suffix)
+
     def prefixWith(prefix: String): String = if (string.startsWith(prefix)) string else prefix + string
     def suffixWith(suffix: String): String = if (string.endsWith(suffix))   string else string + suffix
 

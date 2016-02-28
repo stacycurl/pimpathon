@@ -9,6 +9,9 @@ import pimpathon.util._
 
 
 class StringTest {
+  @Test def affixWith(): Unit =
+    on("(foo)", "(foo", "oof)", "ooo").calling(_.affixWith("(", ")")).produces("(foo)", "(foo)", "(oof)", "(ooo)")
+
   @Test def prefixWith(): Unit = {
     "".prefixWith("") === ""
     on("", "-suffix", "prefix").calling(_.prefixWith("prefix")).produces("prefix", "prefix-suffix", "prefix")

@@ -904,10 +904,25 @@ object Documentation {
         "implicitly[Numeric[Int]].xmap[String](_.toString, Integer.parseInt).plus(\"2\", \"3\")" → "\"5\""
       )
     ), "String" → List(
-      Partial("emptyTo", "String ⇒ String", ""),
+      Partial("emptyTo", "String ⇒ String", "Convert empty strings to another",
+        """"".emptyTo("replacement")"""          → """"replacement"""",
+        """"non-empty".emptyTo("replacement")""" → """"non-empty""""
+      ),
       Partial("prefixPadTo", "(Int, Char) ⇒ String", ""),
-      Partial("suffixWith", "String ⇒ String", ""),
-      Partial("prefixWith", "String ⇒ String", ""),
+      Partial("suffixWith", "String ⇒ String", "Add suffix to string if absent",
+        """"file".suffixWith(".txt")"""     → """"file.txt"""",
+        """"file.txt".suffixWith(".txt")""" → """"file.txt""""
+      ),
+      Partial("prefixWith", "String ⇒ String", "Add prefix to string if absent",
+        """"file".prefixWith("dir/")"""     → """"dir/file"""",
+        """"dir/file".prefixWith("dir/")""" → """"dir/file""""
+      ),
+      Partial("affixWith", "String => String ⇒ String", "Add prefix & suffix to string if absent",
+        """"file".affixWith("dir/", ".txt")"""         → """"dir/file.txt"""",
+        """"file.txt".affixWith("dir/", ".txt")"""     → """"dir/file.txt"""",
+        """"dir/file".affixWith("dir/", ".txt")"""     → """"dir/file.txt"""",
+        """"dir/file.txt".affixWith("dir/", ".txt")""" → """"dir/file.txt""""
+      ),
       Partial("sharedPrefix", "String ⇒ (String, String, String)",
         "Split string into parts shared with the beginning of another, along with the remainder of each",
           "\"1234\".sharedPrefix(\"1243\")" -> "(\"12\", \"34\", \"43\")"

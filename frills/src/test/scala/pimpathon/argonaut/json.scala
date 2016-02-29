@@ -1,18 +1,15 @@
 package pimpathon.argonaut
 
 import argonaut._
-import argonaut.Json.{jString, jNumber}
+import argonaut.Json._
 import monocle.Traversal
 import org.junit.Test
 
 import pimpathon.any._
-import pimpathon.either._
 import pimpathon.option._
 import pimpathon.util._
 import pimpathon.argonaut.json._
 import pimpathon.pimpTry._
-import pimpathon.frills.any._
-import pimpathon.frills.pimpTry._
 
 import scalaz.{-\/, \/-, \/}
 
@@ -86,8 +83,12 @@ class DecodeJsonTest extends JsonUtil {
 }
 
 class TraversalFrills extends JsonUtil {
-  @Test def string(): Unit = on(jString("foo"), jNumber(3)).calling(id.string.getAll).produces(List("foo"), nil)
-  @Test def int(): Unit    = on(jString("foo"), jNumber(3)).calling(id.int.getAll).produces(nil, List(3))
+  @Test def bool(): Unit   = calling(id.bool.getAll)  .partitions(fields).into(lying → List(true),   others → nil)
+  @Test def string(): Unit = calling(id.string.getAll).partitions(fields).into(name  → List("Eric"), others → nil)
+  @Test def int(): Unit    = calling(id.int.getAll)   .partitions(fields).into(age   → List(3),      others → nil)
+  private val id: Traversal[Json, Json] = Traversal.id[Json]
+
+  private val fields@List(lying, name, age) = List(jBool(true), jString("Eric"), jNumber(3))
 
   private val id = Traversal.id[Json]
 }

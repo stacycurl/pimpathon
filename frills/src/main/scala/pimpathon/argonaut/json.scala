@@ -65,8 +65,9 @@ object json {
   }
 
   implicit class TraversalFrills[A, B](val traversal: Traversal[A, B]) {
-    def string[That](implicit cpf: CanPrismFrom[B, String, That]): Traversal[A, That] = cpf(traversal)
-    def int[That](implicit cpf: CanPrismFrom[B, Int, That]): Traversal[A, That] = cpf(traversal)
+    def bool[That](  implicit cpf: CanPrismFrom[B, Boolean, That]): Traversal[A, That] = cpf(traversal)
+    def string[That](implicit cpf: CanPrismFrom[B, String,  That]): Traversal[A, That] = cpf(traversal)
+    def int[That](   implicit cpf: CanPrismFrom[B, Int,     That]): Traversal[A, That] = cpf(traversal)
   }
 
   private implicit class JsonObjectFrills(val o: JsonObject) extends AnyVal {
@@ -85,6 +86,7 @@ case class CanPrismFrom[From, Elem, To](prism: Prism[From, To]) {
 }
 
 object CanPrismFrom {
-  implicit val cpfJsonToString: CanPrismFrom[Json, String, String] = apply(jStringPrism)
-  implicit val cpfJsonToInt:    CanPrismFrom[Json, Int,    Int   ] = apply(jIntPrism)
+  implicit val cpfJsonToBoolean: CanPrismFrom[Json, Boolean, Boolean] = apply(jBoolPrism)
+  implicit val cpfJsonToString:  CanPrismFrom[Json, String,  String]  = apply(jStringPrism)
+  implicit val cpfJsonToInt:     CanPrismFrom[Json, Int,     Int   ]  = apply(jIntPrism)
 }

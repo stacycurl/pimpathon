@@ -1,7 +1,7 @@
 package pimpathon.argonaut
 
 import argonaut._
-import monocle.Traversal
+import monocle.{Prism, Traversal}
 import pimpathon.function.Predicate
 
 import argonaut.Json._
@@ -64,9 +64,9 @@ object json {
     def contramapValues[W](f: W ⇒ V): EncodeJson[Map[K, W]] = value.contramap[Map[K, W]](_.mapValuesEagerly(f))
   }
 
-  implicit class TraversalJsonJToJsonFrills(val value: Traversal[Json, Json]) {
-    def string: Traversal[Json, String] = value composePrism Json.jStringPrism
-    def int: Traversal[Json, Int]       = value composePrism Json.jIntPrism
+  implicit class TraversalFrills[A, B](val traversal: Traversal[A, B]) {
+    def string[That](implicit cpf: CanPrismFrom[B, String, That]): Traversal[A, That] = cpf(traversal)
+    def int[That](implicit cpf: CanPrismFrom[B, Int, That]): Traversal[A, That] = cpf(traversal)
   }
 
   private implicit class JsonObjectFrills(val o: JsonObject) extends AnyVal {
@@ -78,4 +78,13 @@ object json {
     private[argonaut] def filterR(p: Predicate[Json]): JsonArray =
       a.collect { case j if p(j) ⇒ j.filterR(p) }
   }
+}
+
+case class CanPrismFrom[From, Elem, To](prism: Prism[From, To]) {
+  def apply[A](traversal: Traversal[A, From]): Traversal[A, To] = traversal composePrism prism
+}
+
+object CanPrismFrom {
+  implicit val cpfJsonToString: CanPrismFrom[Json, String, String] = apply(jStringPrism)
+  implicit val cpfJsonToInt:    CanPrismFrom[Json, Int,    Int   ] = apply(jIntPrism)
 }

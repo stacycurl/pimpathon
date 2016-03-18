@@ -71,6 +71,7 @@ object json {
     def string[That](implicit cpf: CanPrismFrom[B, String,     That]): Traversal[A, That] = cpf(traversal)
     def array[That]( implicit cpf: CanPrismFrom[B, List[Json], That]): Traversal[A, That] = cpf(traversal)
     def obj[That](   implicit cpf: CanPrismFrom[B, JsonObject, That]): Traversal[A, That] = cpf(traversal)
+    def double[That](implicit cpf: CanPrismFrom[B, Double,     That]): Traversal[A, That] = cpf(traversal)
     def int[That](   implicit cpf: CanPrismFrom[B, Int,        That]): Traversal[A, That] = cpf(traversal)
   }
 
@@ -95,5 +96,6 @@ object CanPrismFrom {
   implicit val cpfJsonToString:     CanPrismFrom[Json, String,     String]     = apply(jStringPrism)
   implicit val cpfJsonToJsonArray:  CanPrismFrom[Json, List[Json], List[Json]] = apply(jArrayPrism)
   implicit val cpfJsonToJsonObject: CanPrismFrom[Json, JsonObject, JsonObject] = apply(jObjectPrism)
+  implicit val cpfJsonToDouble:     CanPrismFrom[Json, Double,     Double]     = apply(jDoublePrism)
   implicit val cpfJsonToInt:        CanPrismFrom[Json, Int,        Int]        = apply(jIntPrism)
 }

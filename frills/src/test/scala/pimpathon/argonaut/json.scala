@@ -105,6 +105,13 @@ class TraversalFrills extends JsonUtil {
       .into(preferences → jObjectFields("bananas" → jBool(true)), others → unchanged)
   }
 
+  @Test def double(): Unit = {
+    calling(id.double.getAll).partitions(fields).into(age → List(3.0), width → List(33.5), others → nil)
+
+    calling(id.double.modify(_ * 2.0)).partitions(fields)
+      .into(age → jNumberOrNull(6.0), width → jNumberOrNull(67.0), others → unchanged)
+  }
+
   @Test def int(): Unit = {
     calling(id.int.getAll)       .partitions(fields).into(age → List(3),    others → nil)
     calling(id.int.modify(_ * 2)).partitions(fields).into(age → jNumber(6), others → unchanged)
@@ -115,9 +122,8 @@ class TraversalFrills extends JsonUtil {
   private val acaciaRoad = List(jString("29 Acacia Road"), jString("Nuttytown"))
   private val bananasAndMould = JsonObject.empty + ("bananas", jBool(true)) + ("mould", jBool(false))
 
-  private val fields@List(lying, name, address, age, preferences) = List(
-    jBool(true), jString("Eric"), jArray(acaciaRoad), jNumber(3),
-    jObject(bananasAndMould)
+  private val fields@List(lying, name, address, age, width, preferences) = List(
+    jBool(true), jString("Eric"), jArray(acaciaRoad), jNumber(3), jNumberOrNull(33.5), jObject(bananasAndMould)
   )
 }
 

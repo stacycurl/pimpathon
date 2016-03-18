@@ -34,15 +34,20 @@ object util {
   )
 
   case class calling[A, B](f: A ⇒ B) {
+    def partitions(as: A*): partitions = partitions(as.toList)
     case class partitions(as: List[A]) {
       def into(expectations: (Expectation[A, B])*): Unit = {
-        val (expectedFailbackResults, abs) = expectations.map(_.value).toList.partitionEithers[List]
+        val (expectedFailbackFns, abs) = expectations.map(_.value).toList.partitionEithers[List]
 
-        expectedFailbackResults.onlyOption match {
+        expectedFailbackFns.onlyOption match {
           case None ⇒ pairs(as.rpair(f)) === pairs(abs)
-          case Some(expectedFallback) ⇒ as.partition(a ⇒ abs.exists(_._1 == a)).calcC(positive ⇒ remainder ⇒ {
-            pairs((positive ::: remainder).rpair(f)) === pairs(abs ::: remainder.rpair(_ ⇒ expectedFallback))
-          })
+          case Some(expectedFallbackFn) ⇒ {
+            as.partition(a ⇒ abs.exists(_._1 == a)).calcC(positive ⇒ remainder ⇒ {
+              val fallbacks = remainder.rpair(expectedFallbackFn)
+
+              pairs((positive ::: remainder).rpair(f)) === pairs(abs ::: fallbacks)
+            })
+          }
         }
       }
     }
@@ -57,10 +62,13 @@ object util {
 
   object Expectation {
     implicit def tupleAsExpectation[A, B](ab: (A, B)):   Expectation[A, B]       = Expectation(Right(ab))
-    implicit def otherAsExpectation[B](ob: (others, B)): Expectation[Nothing, B] = Expectation(Left(ob._2))
+    implicit def otherAsExpectation[A, B](ob: (others, B)): Expectation[A, B] = Expectation(Left(_ ⇒ ob._2))
+
+    implicit def othersUnchangedAsExpectation[A](ou: (others, unchanged)): Expectation[A, A] =
+      Expectation[A, A](Left((a: A) ⇒ a))
   }
 
-  case class Expectation[+A, +B](value: Either[B, (A, B)])
+  case class Expectation[A, +B](value: Either[A ⇒ B, (A, B)])
 
   private def pairs[A, B](abs: List[(A, B)]): String = abs.mapC(a ⇒ b ⇒ s"$a → $b").mkString(", ")
 
@@ -92,7 +100,8 @@ object util {
   def strings(ss: String*): ListBuffer[String] = new M.ListBuffer[String] ++= ss
 
   def nil[A]: List[A] = Nil
-  sealed trait others; case object others extends others
+  sealed trait others;    case object others    extends others
+  sealed trait unchanged; case object unchanged extends unchanged
 
   trait Closeable extends _root_.java.io.Closeable {
     abstract override def close(): Unit = { closed.set(true); super.close() }

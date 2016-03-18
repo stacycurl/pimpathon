@@ -1,10 +1,13 @@
 package pimpathon.argonaut
 
+import scala.language.higherKinds
+
 import argonaut._
 import monocle.{Prism, Traversal}
 import pimpathon.function.Predicate
 
 import argonaut.Json._
+import pimpathon.any._
 import pimpathon.function._
 import pimpathon.map._
 import scalaz.\/

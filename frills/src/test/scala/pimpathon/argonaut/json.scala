@@ -83,14 +83,24 @@ class DecodeJsonTest extends JsonUtil {
 }
 
 class TraversalFrills extends JsonUtil {
-  @Test def bool(): Unit   = calling(id.bool.getAll)  .partitions(fields).into(lying → List(true),   others → nil)
-  @Test def string(): Unit = calling(id.string.getAll).partitions(fields).into(name  → List("Eric"), others → nil)
-  @Test def int(): Unit    = calling(id.int.getAll)   .partitions(fields).into(age   → List(3),      others → nil)
+  @Test def bool(): Unit = {
+    calling(id.bool.getAll)           .partitions(fields).into(lying → List(true), others → nil)
+    calling(id.bool.modify(_ ⇒ false)).partitions(fields).into(lying → jBool(false), others → unchanged)
+  }
+
+  @Test def string(): Unit = {
+    calling(id.string.getAll)         .partitions(fields).into(name → List("Eric"),     others → nil)
+    calling(id.string.modify(_ + "!")).partitions(fields).into(name → jString("Eric!"), others → unchanged)
+  }
+
+  @Test def int(): Unit = {
+    calling(id.int.getAll)       .partitions(fields).into(age → List(3),    others → nil)
+    calling(id.int.modify(_ * 2)).partitions(fields).into(age → jNumber(6), others → unchanged)
+  }
+
   private val id: Traversal[Json, Json] = Traversal.id[Json]
 
   private val fields@List(lying, name, age) = List(jBool(true), jString("Eric"), jNumber(3))
-
-  private val id = Traversal.id[Json]
 }
 
 trait JsonUtil {

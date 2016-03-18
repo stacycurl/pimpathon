@@ -15,6 +15,12 @@ class StringTest {
   @Test def affixWith(): Unit =
     on("(foo)", "(foo", "oof)", "ooo").calling(_.affixWith("(", ")")).produces("(foo)", "(foo)", "(oof)", "(ooo)")
 
+  @Test def quote(): Unit =
+    on("foo", "\"foo", "foo\"", "\"foo\"").calling(_.quote).produces("\"foo\"", "\"\"foo\"", "\"foo\"\"", "\"\"foo\"\"")
+
+  @Test def unquote(): Unit =
+    on("foo", "\"foo", "foo\"", "\"foo\"").calling(_.unquote).produces("foo", "foo", "foo", "foo")
+
   @Test def prefixWith(): Unit = {
     "".prefixWith("") === ""
     on("", "-suffix", "prefix").calling(_.prefixWith("prefix")).produces("prefix", "prefix-suffix", "prefix")

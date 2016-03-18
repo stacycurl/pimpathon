@@ -60,12 +60,12 @@ Next minor release: [1.6.0][r1.6.0]
 [ci]: https://travis-ci.org/stacycurl/pimpathon
 [sonatype]: https://oss.sonatype.org/index.html#nexus-search;quick~pimpathon
 [pimp-my-library]:http://www.artima.com/weblogs/viewpost.jsp?thread=179766
-[r1.0.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.0.0.md
-[r1.1.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.1.0.md
-[r1.2.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.2.0.md
-[r1.3.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.3.0.md
-[r1.4.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.4.0.md
-[r1.5.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.5.0.md
-[r1.6.0]: https://github.com/stacycurl/pimpathon/blob/master/ReleaseNotes-1.6.0.md
+[r1.0.0]: https://github.com/stacycurl/pimpathon/blob/master/docs/ReleaseNotes-1.0.0.md
+[r1.1.0]: https://github.com/stacycurl/pimpathon/blob/master/docs/ReleaseNotes-1.1.0.md
+[r1.2.0]: https://github.com/stacycurl/pimpathon/blob/master/docs/ReleaseNotes-1.2.0.md
+[r1.3.0]: https://github.com/stacycurl/pimpathon/blob/master/docs/ReleaseNotes-1.3.0.md
+[r1.4.0]: https://github.com/stacycurl/pimpathon/blob/master/docs/ReleaseNotes-1.4.0.md
+[r1.5.0]: https://github.com/stacycurl/pimpathon/blob/master/docs/ReleaseNotes-1.5.0.md
+[r1.6.0]: https://github.com/stacycurl/pimpathon/blob/master/docs/ReleaseNotes-1.6.0.md
 [doc]: https://rawgit.com/stacycurl/pimpathon/master/docs/index.html
-[olddoc]: https://github.com/stacycurl/pimpathon/blob/master/Documentation.md
+[olddoc]: https://github.com/stacycurl/pimpathon/blob/master/docs/Documentation.md

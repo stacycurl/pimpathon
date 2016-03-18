@@ -93,6 +93,13 @@ class TraversalFrills extends JsonUtil {
     calling(id.string.modify(_ + "!")).partitions(fields).into(name → jString("Eric!"), others → unchanged)
   }
 
+  @Test def array(): Unit = {
+    calling(id.array.getAll)           .partitions(fields).into(address → List(acaciaRoad), others → nil)
+
+    calling(id.array.modify(_.reverse)).partitions(fields)
+      .into(address → jArrayElements(acaciaRoad.reverse: _*), others → unchanged)
+  }
+
   @Test def int(): Unit = {
     calling(id.int.getAll)       .partitions(fields).into(age → List(3),    others → nil)
     calling(id.int.modify(_ * 2)).partitions(fields).into(age → jNumber(6), others → unchanged)
@@ -100,7 +107,11 @@ class TraversalFrills extends JsonUtil {
 
   private val id: Traversal[Json, Json] = Traversal.id[Json]
 
-  private val fields@List(lying, name, age) = List(jBool(true), jString("Eric"), jNumber(3))
+  private val acaciaRoad = List(jString("29 Acacia Road"), jString("Nuttytown"))
+
+  private val fields@List(lying, name, address, age) = List(
+    jBool(true), jString("Eric"), jArrayElements(acaciaRoad: _*), jNumber(3)
+  )
 }
 
 trait JsonUtil {

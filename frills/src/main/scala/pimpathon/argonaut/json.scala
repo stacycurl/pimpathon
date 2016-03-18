@@ -7,7 +7,6 @@ import monocle.{Prism, Traversal}
 import pimpathon.function.Predicate
 
 import argonaut.Json._
-import pimpathon.any._
 import pimpathon.function._
 import pimpathon.map._
 import scalaz.\/
@@ -67,10 +66,11 @@ object json {
     def contramapValues[W](f: W ⇒ V): EncodeJson[Map[K, W]] = value.contramap[Map[K, W]](_.mapValuesEagerly(f))
   }
 
-  implicit class TraversalFrills[A, B](val traversal: Traversal[A, B]) {
-    def bool[That](  implicit cpf: CanPrismFrom[B, Boolean, That]): Traversal[A, That] = cpf(traversal)
-    def string[That](implicit cpf: CanPrismFrom[B, String,  That]): Traversal[A, That] = cpf(traversal)
-    def int[That](   implicit cpf: CanPrismFrom[B, Int,     That]): Traversal[A, That] = cpf(traversal)
+  implicit class TraversalFrills[A, B](val traversal: Traversal[A, B]) extends AnyVal {
+    def bool[That](  implicit cpf: CanPrismFrom[B, Boolean,    That]): Traversal[A, That] = cpf(traversal)
+    def string[That](implicit cpf: CanPrismFrom[B, String,     That]): Traversal[A, That] = cpf(traversal)
+    def array[That]( implicit cpf: CanPrismFrom[B, List[Json], That]): Traversal[A, That] = cpf(traversal)
+    def int[That](   implicit cpf: CanPrismFrom[B, Int,        That]): Traversal[A, That] = cpf(traversal)
   }
 
   private implicit class JsonObjectFrills(val o: JsonObject) extends AnyVal {
@@ -84,12 +84,14 @@ object json {
   }
 }
 
+
 case class CanPrismFrom[From, Elem, To](prism: Prism[From, To]) {
   def apply[A](traversal: Traversal[A, From]): Traversal[A, To] = traversal composePrism prism
 }
 
 object CanPrismFrom {
-  implicit val cpfJsonToBoolean: CanPrismFrom[Json, Boolean, Boolean] = apply(jBoolPrism)
-  implicit val cpfJsonToString:  CanPrismFrom[Json, String,  String]  = apply(jStringPrism)
-  implicit val cpfJsonToInt:     CanPrismFrom[Json, Int,     Int   ]  = apply(jIntPrism)
+  implicit val cpfJsonToBoolean:    CanPrismFrom[Json, Boolean,    Boolean]    = apply(jBoolPrism)
+  implicit val cpfJsonToString:     CanPrismFrom[Json, String,     String]     = apply(jStringPrism)
+  implicit val cpfJsonToJsonArray:  CanPrismFrom[Json, List[Json], List[Json]] = apply(jArrayPrism)
+  implicit val cpfJsonToInt:        CanPrismFrom[Json, Int,        Int]        = apply(jIntPrism)
 }

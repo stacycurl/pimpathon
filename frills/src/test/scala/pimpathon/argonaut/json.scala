@@ -94,10 +94,15 @@ class TraversalFrills extends JsonUtil {
   }
 
   @Test def array(): Unit = {
-    calling(id.array.getAll)           .partitions(fields).into(address → List(acaciaRoad), others → nil)
+    calling(id.array.getAll)           .partitions(fields).into(address → List(acaciaRoad),           others → nil)
+    calling(id.array.modify(_.reverse)).partitions(fields).into(address → jArray(acaciaRoad.reverse), others → unchanged)
+  }
 
-    calling(id.array.modify(_.reverse)).partitions(fields)
-      .into(address → jArrayElements(acaciaRoad.reverse: _*), others → unchanged)
+  @Test def obj(): Unit = {
+    calling(id.obj.getAll).partitions(fields).into(preferences → List(bananasAndMould), others → nil)
+
+    calling(id.obj.modify(_ - "mould")).partitions(fields)
+      .into(preferences → jObjectFields("bananas" → jBool(true)), others → unchanged)
   }
 
   @Test def int(): Unit = {
@@ -108,9 +113,11 @@ class TraversalFrills extends JsonUtil {
   private val id: Traversal[Json, Json] = Traversal.id[Json]
 
   private val acaciaRoad = List(jString("29 Acacia Road"), jString("Nuttytown"))
+  private val bananasAndMould = JsonObject.empty + ("bananas", jBool(true)) + ("mould", jBool(false))
 
-  private val fields@List(lying, name, address, age) = List(
-    jBool(true), jString("Eric"), jArrayElements(acaciaRoad: _*), jNumber(3)
+  private val fields@List(lying, name, address, age, preferences) = List(
+    jBool(true), jString("Eric"), jArray(acaciaRoad), jNumber(3),
+    jObject(bananasAndMould)
   )
 }
 

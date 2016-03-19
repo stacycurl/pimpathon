@@ -28,18 +28,18 @@ class JsonTest extends JsonUtil {
   )
 
   @Test def descendant_values(): Unit = {
-    jobj.descendant("age").getAll === List(age)
-    jobj.descendant("age").modify(_ ⇒ redacted) === ("age" → redacted) ->: jobj
+    jobj.descendant("age").getAll <=> List(age)
+    jobj.descendant("age").modify(_ ⇒ redacted) <=> ("age" → redacted) ->: jobj
 
-    jobj.descendant("{name, age}").getAll === List(name, age)
-    jobj.descendant("{name, age}").modify(_ ⇒ redacted) === ("name" → redacted) ->: ("age" → redacted) ->: jobj
+    jobj.descendant("{name, age}").getAll <=> List(name, age)
+    jobj.descendant("{name, age}").modify(_ ⇒ redacted) <=> ("name" → redacted) ->: ("age" → redacted) ->: jobj
 
-    jobj.descendant("age").int.getAll === List(3)
-    jobj.descendant("age").int.modify(_ * 2) === ("age" → jNumber(6)) ->: jobj
+    jobj.descendant("age").int.getAll <=> List(3)
+    jobj.descendant("age").int.modify(_ * 2) <=> ("age" → jNumber(6)) ->: jobj
   }
 
   @Test def descendant_elements(): Unit = {
-    jArray(fields).descendant("[0, 2]").getAll === List(lying, address)
+    jArray(fields).descendant("[0, 2]").getAll <=> List(lying, address)
 
     jArray(fields).descendant("[0, 2]").modify(_ ⇒ redacted) <=> jArrayElements(
       redacted, name, redacted, age, width, preferences, potatoes, knownUnknowns
@@ -47,7 +47,7 @@ class JsonTest extends JsonUtil {
   }
 
   @Test def descendant_all(): Unit = {
-    jobj.descendant("*").getAll === List(name, age, lying, address, preferences, width, potatoes, knownUnknowns)
+    jobj.descendant("*").getAll <=> List(name, age, lying, address, preferences, width, potatoes, knownUnknowns)
 
     jobj.descendant("*").modify(_ ⇒ jString("redacted")) <=> jObjectFields(
       "name" → redacted, "age" → redacted, "lying" → redacted, "address" → redacted, "preferences" → redacted,
@@ -81,30 +81,30 @@ class JsonTest extends JsonUtil {
   }
 
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
-    case (input, expected) ⇒ f(parse(input)) === parse(expected)
+    case (input, expected) ⇒ f(parse(input)) <=> parse(expected)
   }
 }
 
 class CodecJsonTest extends JsonUtil {
   @Test def beforeDecode(): Unit = codec.beforeDecode(reverse).decodeJson(json)  === codec.decodeJson(reverse(json))
   @Test def afterDecode(): Unit  = codec.afterDecode(_.reverse).decodeJson(json) === reverse(codec.decodeJson(json))
-  @Test def beforeEncode(): Unit = codec.beforeEncode(_.reverse).encode(list)    === codec.encode(list.reverse)
-  @Test def afterEncode(): Unit  = codec.afterEncode(reverse).encode(list)       === reverse(codec.encode(list))
-  @Test def andThen(): Unit      = codec.andThen(reverse).encode(list)           === reverse(codec.encode(list))
+  @Test def beforeEncode(): Unit = codec.beforeEncode(_.reverse).encode(list)    <=> codec.encode(list.reverse)
+  @Test def afterEncode(): Unit  = codec.afterEncode(reverse).encode(list)       <=> reverse(codec.encode(list))
+  @Test def andThen(): Unit      = codec.andThen(reverse).encode(list)           <=> reverse(codec.encode(list))
   @Test def compose(): Unit      = codec.compose(reverse).decodeJson(json)       === codec.decodeJson(reverse(json))
 
   @Test def xmapKeys(): Unit = mapCodec.xmapKeys[String](_.reverse)(_.reverse).calc(reversed ⇒ {
-    reversed.encode(Map("foo" → "bar"))         === mapCodec.encode(Map("oof" → "bar"))
+    reversed.encode(Map("foo" → "bar"))         <=> mapCodec.encode(Map("oof" → "bar"))
     reversed.decodeJson(jsonMap("foo" → "bar")) === mapCodec.decodeJson(jsonMap("oof" → "bar"))
   })
 
   @Test def xmapValues(): Unit = mapCodec.xmapValues[String](_.reverse)(_.reverse).calc(reversed ⇒ {
-    reversed.encode(Map("foo" → "bar"))         === mapCodec.encode(Map("foo" → "rab"))
+    reversed.encode(Map("foo" → "bar"))         <=> mapCodec.encode(Map("foo" → "rab"))
     reversed.decodeJson(jsonMap("foo" → "bar")) === mapCodec.decodeJson(jsonMap("foo" → "rab"))
   })
 
   @Test def xmapDisjunction(): Unit = stringCodec.xmapDisjunction[Int](attempt(_.toInt))(_.toString).calc(intCodec ⇒ {
-    intCodec.encode(3)                     === Json.jString("3")
+    intCodec.encode(3)                     <=> Json.jString("3")
     intCodec.decodeJson(Json.jString("3")) === DecodeResult.ok(3)
     intCodec.decodeJson(Json.jString("a")) === DecodeResult.fail("a", CursorHistory(Nil))
   })
@@ -114,15 +114,15 @@ class CodecJsonTest extends JsonUtil {
 }
 
 class EncodeJsonTest extends JsonUtil {
-  @Test def afterEncode(): Unit = encoder.afterEncode(reverse).encode(list)      === reverse(encoder.encode(list))
-  @Test def andThen(): Unit     = encoder.andThen(reverse).encode(list)          === reverse(encoder.encode(list))
-  @Test def downcast(): Unit    = Base.encoder.downcast[Derived].encode(derived) === derivedEncoded
+  @Test def afterEncode(): Unit = encoder.afterEncode(reverse).encode(list)      <=> reverse(encoder.encode(list))
+  @Test def andThen(): Unit     = encoder.andThen(reverse).encode(list)          <=> reverse(encoder.encode(list))
+  @Test def downcast(): Unit    = Base.encoder.downcast[Derived].encode(derived) <=> derivedEncoded
 
   @Test def contramapKeys(): Unit =
-    mapEncoder.contramapKeys[String](_.reverse).encode(Map("foo" → "bar")) === mapEncoder.encode(Map("oof" → "bar"))
+    mapEncoder.contramapKeys[String](_.reverse).encode(Map("foo" → "bar")) <=> mapEncoder.encode(Map("oof" → "bar"))
 
   @Test def contramapValues(): Unit =
-    mapEncoder.contramapValues[String](_.reverse).encode(Map("foo" → "bar")) === mapEncoder.encode(Map("foo" → "rab"))
+    mapEncoder.contramapValues[String](_.reverse).encode(Map("foo" → "bar")) <=> mapEncoder.encode(Map("foo" → "rab"))
 }
 
 class DecodeJsonTest extends JsonUtil {

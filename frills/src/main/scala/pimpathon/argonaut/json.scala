@@ -4,7 +4,9 @@ import scala.language.higherKinds
 
 import argonaut._
 import monocle.{Prism, Traversal}
-import monocle.{function ⇒ F}
+import monocle.{function ⇒ F, Iso}
+
+import scala.util.Try
 import pimpathon.function.Predicate
 
 import argonaut.Json._
@@ -84,6 +86,7 @@ object json {
 
   implicit class TraversalToJsonFrills[A](val traversal: Traversal[A, Json]) extends AnyVal {
     def descendant(path: String): Traversal[A, Json] = path.split("/").filter(_.nonEmpty).foldLeft(traversal) {
+      case (acc, "*")                                ⇒ (acc composeIso arrayObjectIso).obj composeTraversal F.each
       case (acc, subPath)                            ⇒ acc.obj composeTraversal F.filterIndex(keys(subPath))
     }
   }
@@ -93,6 +96,12 @@ object json {
       a.collect { case j if p(j) ⇒ j.filterR(p) }
   }
 
+  private val arrayObjectIso: Iso[Json, Json] = Iso[Json, Json](
+    j ⇒ j.array.filter(_.nonEmpty).fold(j)(array ⇒ jObjectFields(ints zip array: _*)))(
+    j ⇒ j.obj.filter(_.isNotEmpty).flatMap(o ⇒ Try(jArray(o.toMap.sortBy(_.toInt).values.toList)).toOption).getOrElse(j)
+  )
+
+  private def ints: Stream[String]              = Stream.iterate(0)(_ + 1).map(_.toString)
   private def keys(value: String): Set[String]  = value.stripAffixes("{", "}").split(",").map(_.trim).toSet
 }
 

@@ -125,6 +125,15 @@ class TraversalFrills extends JsonUtil {
     id.descendant("{name, age}").modify(_ ⇒ redacted)(jobj) === ("name" → redacted) ->: ("age" → redacted) ->: jobj
   }
 
+  @Test def descendant_all(): Unit = {
+    id.descendant("*").getAll(jobj) === List(name, age, lying, address, preferences, width)
+
+    id.descendant("*").modify(_ ⇒ jString("redacted"))(jobj) === jObjectFields(
+      "name" → redacted, "age" → redacted, "lying" → redacted, "address" → redacted, "preferences" → redacted,
+      "width" → redacted
+    )
+  }
+
   private val id: Traversal[Json, Json] = Traversal.id[Json]
 
   private val acaciaRoad = List(jString("29 Acacia Road"), jString("Nuttytown"))
@@ -134,7 +143,7 @@ class TraversalFrills extends JsonUtil {
     jBool(true), jString("Eric"), jArray(acaciaRoad), jNumber(3), jNumberOrNull(33.5), jObject(bananasAndMould)
   )
 
-  private val jobj: Json = Json.jObjectFields(
+  private val jobj: Json = jObjectFields(
     "name" → name, "age" → age, "lying" → lying, "address" → address, "preferences" → preferences, "width" → width
   )
 

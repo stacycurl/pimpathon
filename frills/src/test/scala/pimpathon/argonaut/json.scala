@@ -14,7 +14,7 @@ import pimpathon.pimpTry._
 import scalaz.{-\/, \/-, \/}
 
 
-class JsonTest {
+class JsonTest extends JsonUtil {
   @Test def filterNulls(): Unit = test(_.filterNulls,
     """null"""                        → """null""",
     """{ "a": null, "b": 3 }"""       → """{ "b": 3 }""",
@@ -22,6 +22,31 @@ class JsonTest {
     """{ "o": [ "a", null, "b" ] }""" → """{ "o": [ "a", "b" ] }""",
     """[ { "a": null, "b": 3 } ]"""   → """[ { "b": 3 } ]"""
   )
+
+  @Test def descendant_values(): Unit = {
+    jobj.descendant("age").getAll === List(age)
+    jobj.descendant("age").modify(_ ⇒ redacted) === ("age" → redacted) ->: jobj
+
+    jobj.descendant("{name, age}").getAll === List(name, age)
+    jobj.descendant("{name, age}").modify(_ ⇒ redacted) === ("name" → redacted) ->: ("age" → redacted) ->: jobj
+  }
+
+  @Test def descendant_elements(): Unit = {
+    jArray(fields).descendant("[0, 2]").getAll === List(lying, address)
+
+    jArray(fields).descendant("[0, 2]").modify(_ ⇒ redacted) === jArrayElements(
+      redacted, name, redacted, age, width, preferences
+    )
+  }
+
+  @Test def descendant_all(): Unit = {
+    jobj.descendant("*").getAll === List(name, age, lying, address, preferences, width)
+
+    jobj.descendant("*").modify(_ ⇒ jString("redacted")) === jObjectFields(
+      "name" → redacted, "age" → redacted, "lying" → redacted, "address" → redacted, "preferences" → redacted,
+      "width" → redacted
+    )
+  }
 
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
     case (input, expected) ⇒ f(parse(input)) === parse(expected)
@@ -143,19 +168,6 @@ class TraversalFrills extends JsonUtil {
   }
 
   private val id: Traversal[Json, Json] = Traversal.id[Json]
-
-  private val acaciaRoad = List(jString("29 Acacia Road"), jString("Nuttytown"))
-  private val bananasAndMould = JsonObject.empty + ("bananas", jBool(true)) + ("mould", jBool(false))
-
-  private val fields@List(lying, name, address, age, width, preferences) = List(
-    jBool(true), jString("Eric"), jArray(acaciaRoad), jNumber(3), jNumberOrNull(33.5), jObject(bananasAndMould)
-  )
-
-  private val jobj: Json = jObjectFields(
-    "name" → name, "age" → age, "lying" → lying, "address" → address, "preferences" → preferences, "width" → width
-  )
-
-  private val redacted = jString("redacted")
 }
 
 trait JsonUtil {
@@ -180,4 +192,17 @@ trait JsonUtil {
 
   val derived = Derived(123)
   val derivedEncoded = Derived.codec.encode(derived)
+
+  val acaciaRoad = List(jString("29 Acacia Road"), jString("Nuttytown"))
+  val bananasAndMould = JsonObject.empty + ("bananas", jBool(true)) + ("mould", jBool(false))
+
+  val fields@List(lying, name, address, age, width, preferences) = List(
+    jBool(true), jString("Eric"), jArray(acaciaRoad), jNumber(3), jNumberOrNull(33.5), jObject(bananasAndMould)
+  )
+
+  val jobj: Json = jObjectFields(
+    "name" → name, "age" → age, "lying" → lying, "address" → address, "preferences" → preferences, "width" → width
+  )
+
+  val redacted = jString("redacted")
 }

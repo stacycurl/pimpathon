@@ -9,6 +9,7 @@ import monocle.{function ⇒ F, Iso}
 import scala.util.Try
 
 import monocle.std.list.listFilterIndex
+import monocle.syntax.ApplyTraversal
 import pimpathon.function.Predicate
 
 import argonaut.Json._
@@ -21,6 +22,9 @@ import scalaz.std.iterable._
 
 object json {
   implicit class JsonFrills(val value: Json) extends AnyVal {
+    def descendant(path: String): ApplyTraversal[Json, Json, Json, Json] =
+      ApplyTraversal(value, Traversal.id[Json].descendant(path))
+
     def filterNulls: Json = filterR(_ != jNull)
 
     private[argonaut] def filterR(p: Predicate[Json]): Json =

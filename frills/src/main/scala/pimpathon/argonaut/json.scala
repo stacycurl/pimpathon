@@ -108,6 +108,12 @@ object json {
   implicit class PrismFrills[A, B](val prism: Prism[A, B]) {
     def toList: Prism[List[A], List[B]] =
       Prism[List[A], List[B]](la ⇒ la.flatMap(prism.getOption).ifSelf(_.size == la.size))(_.map(prism.reverseGet))
+
+    def toMap[K]: Prism[Map[K, A], Map[K, B]] = Prism[Map[K, A], Map[K, B]](mapKA ⇒ {
+      mapKA.updateValues(a ⇒ prism.getOption(a)).ifSelf(_ ⇒ true /*_.size == mapKA.size*/)
+    })((mapKB: Map[K, B]) ⇒ {
+      mapKB.mapValuesEagerly(prism.reverseGet)
+    })
   }
 
   private val arrayObjectIso: Iso[Json, Json] = Iso[Json, Json](
@@ -124,6 +130,7 @@ object json {
 case class CanPrismFrom[From, Elem, To](prism: Prism[From, To]) {
   def apply[A](traversal: Traversal[A, From]): Traversal[A, To] = traversal composePrism prism
   def toList: CanPrismFrom[List[From], Elem, List[To]] = CanPrismFrom(prism.toList)
+  def toMap[K]: CanPrismFrom[Map[K, From], Elem, Map[K, To]] = CanPrismFrom(prism.toMap[K])
 }
 
 object CanPrismFrom {
@@ -136,4 +143,16 @@ object CanPrismFrom {
 
   implicit def cpfl[From, Elem, To](implicit cpf: CanPrismFrom[From, Elem, To])
     : CanPrismFrom[List[From], Elem, List[To]] = cpf.toList
+
+  implicit def cpfm[From, Elem, To](implicit cpf: CanPrismFrom[From, Elem, To])
+    : CanPrismFrom[Map[String, From], Elem, Map[String, To]] = cpf.toMap
+
+  implicit def cpfJsonObjectToTypedMap[/*From, Elem, */Value](
+    implicit cpfv: CanPrismFrom[Json, Value, Value]
+  ): CanPrismFrom[JsonObject, Value, Map[String, Value]] = {
+    apply(jsonObjectMapIso.composePrism(cpfv.toMap[String].prism))
+  }
+
+  private val jsonObjectMapIso: Iso[JsonObject, Map[String, Json]] =
+    Iso[JsonObject, Map[String, Json]](_.toMap)(map ⇒ JsonObject.from[Seq](map.toSeq))
 }

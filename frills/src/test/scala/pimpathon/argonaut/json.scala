@@ -6,6 +6,7 @@ import monocle.Traversal
 import org.junit.Test
 
 import pimpathon.any._
+import pimpathon.map._
 import pimpathon.option._
 import pimpathon.util._
 import pimpathon.argonaut.json._
@@ -133,6 +134,17 @@ class TraversalFrills extends JsonUtil {
 
     calling(id.obj.modify(_ - "mould")).partitions(fields)
       .into(preferences → jObjectFields("bananas" → jBool(true)), others → unchanged)
+
+    id.obj.bool.getAll(preferences) === List(Map("bananas" → true, "mould" → false))
+    id.obj.bool.modify(_ + ("Selina" → true))(preferences) === ("Selina" → jBool(true)) ->: preferences
+
+    id.obj.obj.bool.getAll(jObjectFields("prefs" → preferences)) === List(
+      Map("prefs" → Map("bananas" -> true, "mould" → false))
+    )
+
+    id.obj.obj.bool.modify(_.mapKeysEagerly(_.capitalize))(jObjectFields("prefs" → preferences)) === jObjectFields(
+      "Prefs" → preferences
+    )
   }
 
   @Test def double(): Unit = {

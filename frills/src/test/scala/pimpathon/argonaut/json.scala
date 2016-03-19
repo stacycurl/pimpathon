@@ -117,6 +117,14 @@ class TraversalFrills extends JsonUtil {
     calling(id.int.modify(_ * 2)).partitions(fields).into(age → jNumber(6), others → unchanged)
   }
 
+  @Test def descendant_values(): Unit = {
+    id.descendant("age").getAll(jobj) === List(age)
+    id.descendant("age").modify(_ ⇒ redacted)(jobj) === ("age" → redacted) ->: jobj
+
+    id.descendant("{name, age}").getAll(jobj) === List(name, age)
+    id.descendant("{name, age}").modify(_ ⇒ redacted)(jobj) === ("name" → redacted) ->: ("age" → redacted) ->: jobj
+  }
+
   private val id: Traversal[Json, Json] = Traversal.id[Json]
 
   private val acaciaRoad = List(jString("29 Acacia Road"), jString("Nuttytown"))
@@ -125,6 +133,12 @@ class TraversalFrills extends JsonUtil {
   private val fields@List(lying, name, address, age, width, preferences) = List(
     jBool(true), jString("Eric"), jArray(acaciaRoad), jNumber(3), jNumberOrNull(33.5), jObject(bananasAndMould)
   )
+
+  private val jobj: Json = Json.jObjectFields(
+    "name" → name, "age" → age, "lying" → lying, "address" → address, "preferences" → preferences, "width" → width
+  )
+
+  private val redacted = jString("redacted")
 }
 
 trait JsonUtil {

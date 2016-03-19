@@ -4,11 +4,13 @@ import scala.language.higherKinds
 
 import argonaut._
 import monocle.{Prism, Traversal}
+import monocle.{function ⇒ F}
 import pimpathon.function.Predicate
 
 import argonaut.Json._
 import pimpathon.function._
 import pimpathon.map._
+import pimpathon.string._
 import scalaz.\/
 import scalaz.std.iterable._
 
@@ -80,10 +82,18 @@ object json {
       JsonObject.from(o.toMap.collectValues { case j if p(j) ⇒ j.filterR(p) })
   }
 
+  implicit class TraversalToJsonFrills[A](val traversal: Traversal[A, Json]) extends AnyVal {
+    def descendant(path: String): Traversal[A, Json] = path.split("/").filter(_.nonEmpty).foldLeft(traversal) {
+      case (acc, subPath)                            ⇒ acc.obj composeTraversal F.filterIndex(keys(subPath))
+    }
+  }
+
   private implicit class JsonArrayFrills(val a: JsonArray) extends AnyVal {
     private[argonaut] def filterR(p: Predicate[Json]): JsonArray =
       a.collect { case j if p(j) ⇒ j.filterR(p) }
   }
+
+  private def keys(value: String): Set[String]  = value.stripAffixes("{", "}").split(",").map(_.trim).toSet
 }
 
 

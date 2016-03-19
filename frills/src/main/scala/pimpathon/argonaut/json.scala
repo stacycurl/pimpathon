@@ -13,6 +13,8 @@ import monocle.syntax.ApplyTraversal
 import pimpathon.function.Predicate
 
 import argonaut.Json._
+import pimpathon.any._
+import pimpathon.argonaut.json._
 import pimpathon.function._
 import pimpathon.map._
 import pimpathon.string._
@@ -103,6 +105,11 @@ object json {
       a.collect { case j if p(j) ⇒ j.filterR(p) }
   }
 
+  implicit class PrismFrills[A, B](val prism: Prism[A, B]) {
+    def toList: Prism[List[A], List[B]] =
+      Prism[List[A], List[B]](la ⇒ la.flatMap(prism.getOption).ifSelf(_.size == la.size))(_.map(prism.reverseGet))
+  }
+
   private val arrayObjectIso: Iso[Json, Json] = Iso[Json, Json](
     j ⇒ j.array.filter(_.nonEmpty).fold(j)(array ⇒ jObjectFields(ints zip array: _*)))(
     j ⇒ j.obj.filter(_.isNotEmpty).flatMap(o ⇒ Try(jArray(o.toMap.sortBy(_.toInt).values.toList)).toOption).getOrElse(j)
@@ -116,6 +123,7 @@ object json {
 
 case class CanPrismFrom[From, Elem, To](prism: Prism[From, To]) {
   def apply[A](traversal: Traversal[A, From]): Traversal[A, To] = traversal composePrism prism
+  def toList: CanPrismFrom[List[From], Elem, List[To]] = CanPrismFrom(prism.toList)
 }
 
 object CanPrismFrom {
@@ -125,4 +133,7 @@ object CanPrismFrom {
   implicit val cpfJsonToJsonObject: CanPrismFrom[Json, JsonObject, JsonObject] = apply(jObjectPrism)
   implicit val cpfJsonToDouble:     CanPrismFrom[Json, Double,     Double]     = apply(jDoublePrism)
   implicit val cpfJsonToInt:        CanPrismFrom[Json, Int,        Int]        = apply(jIntPrism)
+
+  implicit def cpfl[From, Elem, To](implicit cpf: CanPrismFrom[From, Elem, To])
+    : CanPrismFrom[List[From], Elem, List[To]] = cpf.toList
 }

@@ -121,6 +121,11 @@ class TraversalFrills extends JsonUtil {
   @Test def array(): Unit = {
     calling(id.array.getAll)           .partitions(fields).into(address → List(acaciaRoad),           others → nil)
     calling(id.array.modify(_.reverse)).partitions(fields).into(address → jArray(acaciaRoad.reverse), others → unchanged)
+
+    id.array.string.getAll(address)              === List(List("29 Acacia Road", "Nuttytown"))
+    id.array.string.modify("Eric" :: _)(address) === jArray(jString("Eric") :: acaciaRoad)
+    id.array.int.getAll(address)                 === List()
+    id.array.int.modify(1 :: _)(address)         === jArray(acaciaRoad)
   }
 
   @Test def obj(): Unit = {

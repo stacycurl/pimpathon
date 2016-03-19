@@ -125,6 +125,14 @@ class TraversalFrills extends JsonUtil {
     id.descendant("{name, age}").modify(_ ⇒ redacted)(jobj) === ("name" → redacted) ->: ("age" → redacted) ->: jobj
   }
 
+  @Test def descendant_elements(): Unit = {
+    id.descendant("[0, 2]").getAll(jArray(fields)) === List(lying, address)
+
+    id.descendant("[0, 2]").modify(_ ⇒ redacted)(jArray(fields)) === jArrayElements(
+      redacted, name, redacted, age, width, preferences
+    )
+  }
+
   @Test def descendant_all(): Unit = {
     id.descendant("*").getAll(jobj) === List(name, age, lying, address, preferences, width)
 

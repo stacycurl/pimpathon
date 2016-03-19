@@ -11,6 +11,9 @@ import pimpathon.option._
 import pimpathon.util._
 import pimpathon.argonaut.json._
 import pimpathon.pimpTry._
+import sjc.delta.matchers.syntax.anyDeltaMatcherOps
+import sjc.delta.argonaut.matchers._
+import sjc.delta.argonaut.json.actualExpected.flat._
 
 import scalaz.{-\/, \/-, \/}
 
@@ -30,30 +33,56 @@ class JsonTest extends JsonUtil {
 
     jobj.descendant("{name, age}").getAll === List(name, age)
     jobj.descendant("{name, age}").modify(_ ⇒ redacted) === ("name" → redacted) ->: ("age" → redacted) ->: jobj
+
+    jobj.descendant("age").int.getAll === List(3)
+    jobj.descendant("age").int.modify(_ * 2) === ("age" → jNumber(6)) ->: jobj
   }
 
   @Test def descendant_elements(): Unit = {
     jArray(fields).descendant("[0, 2]").getAll === List(lying, address)
 
-    jArray(fields).descendant("[0, 2]").modify(_ ⇒ redacted) === jArrayElements(
-      redacted, name, redacted, age, width, preferences
+    jArray(fields).descendant("[0, 2]").modify(_ ⇒ redacted) <=> jArrayElements(
+      redacted, name, redacted, age, width, preferences, potatoes, knownUnknowns
     )
   }
 
   @Test def descendant_all(): Unit = {
-    jobj.descendant("*").getAll === List(name, age, lying, address, preferences, width)
+    jobj.descendant("*").getAll === List(name, age, lying, address, preferences, width, potatoes, knownUnknowns)
 
-    jobj.descendant("*").modify(_ ⇒ jString("redacted")) === jObjectFields(
+    jobj.descendant("*").modify(_ ⇒ jString("redacted")) <=> jObjectFields(
       "name" → redacted, "age" → redacted, "lying" → redacted, "address" → redacted, "preferences" → redacted,
-      "width" → redacted
+      "width" → redacted, "potatoes" → redacted, "knownUnknowns" → redacted
     )
+  }
+
+  @Test def descendant_complex(): Unit = {
+    jobj.descendant("preferences").obj.bool.modify(_.filterKeys(Set("bananas")))
+        .descendant("address").array.string.modify("Flat B" :: _)
+        .descendant("address/*").string.modify(_.toUpperCase)
+        .descendant("potatoes/*/variety").string.modify(_ ⇒ "Avalanche")
+        .descendant("knownUnknowns/*").int.modify(_ ⇒ 42) <=> parse("""
+          |{
+          |  "name" : "Eric",
+          |  "lying" : true,
+          |  "age" : 3,
+          |  "preferences" : {
+          |    "bananas" : true
+          |  },
+          |  "address" : [
+          |    "FLAT B",
+          |    "29 ACACIA ROAD",
+          |    "NUTTYTOWN"
+          |  ],
+          |  "width" : 33.5,
+          |  "knownUnknowns" : {},
+          |  "potatoes" : []
+          |}""".stripMargin
+        )
   }
 
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
     case (input, expected) ⇒ f(parse(input)) === parse(expected)
   }
-
-  private def parse(content: String): Json = Parse.parseOption(content).getOrThrow("Invalid json in test\n" + content)
 }
 
 class CodecJsonTest extends JsonUtil {
@@ -120,17 +149,20 @@ class TraversalFrills extends JsonUtil {
   }
 
   @Test def array(): Unit = {
-    calling(id.array.getAll)           .partitions(fields).into(address → List(acaciaRoad),           others → nil)
+    calling(id.array.getAll)           .partitions(fields)
+      .into(address → List(acaciaRoad), potatoes → List(Nil), others → nil)
+
     calling(id.array.modify(_.reverse)).partitions(fields).into(address → jArray(acaciaRoad.reverse), others → unchanged)
 
     id.array.string.getAll(address)              === List(List("29 Acacia Road", "Nuttytown"))
-    id.array.string.modify("Eric" :: _)(address) === jArray(jString("Eric") :: acaciaRoad)
+    id.array.string.modify("Eric" :: _)(address) <=> jArray(jString("Eric") :: acaciaRoad)
     id.array.int.getAll(address)                 === List()
-    id.array.int.modify(1 :: _)(address)         === jArray(acaciaRoad)
+    id.array.int.modify(1 :: _)(address)         <=> jArray(acaciaRoad)
   }
 
   @Test def obj(): Unit = {
-    calling(id.obj.getAll).partitions(fields).into(preferences → List(bananasAndMould), others → nil)
+    calling(id.obj.getAll).partitions(fields)
+      .into(preferences → List(bananasAndMould), knownUnknowns → List(JsonObject.empty), others → nil)
 
     calling(id.obj.modify(_ - "mould")).partitions(fields)
       .into(preferences → jObjectFields("bananas" → jBool(true)), others → unchanged)
@@ -161,26 +193,26 @@ class TraversalFrills extends JsonUtil {
 
   @Test def descendant_values(): Unit = {
     id.descendant("age").getAll(jobj) === List(age)
-    id.descendant("age").modify(_ ⇒ redacted)(jobj) === ("age" → redacted) ->: jobj
+    id.descendant("age").modify(_ ⇒ redacted)(jobj) <=> ("age" → redacted) ->: jobj
 
     id.descendant("{name, age}").getAll(jobj) === List(name, age)
-    id.descendant("{name, age}").modify(_ ⇒ redacted)(jobj) === ("name" → redacted) ->: ("age" → redacted) ->: jobj
+    id.descendant("{name, age}").modify(_ ⇒ redacted)(jobj) <=> ("name" → redacted) ->: ("age" → redacted) ->: jobj
   }
 
   @Test def descendant_elements(): Unit = {
     id.descendant("[0, 2]").getAll(jArray(fields)) === List(lying, address)
 
-    id.descendant("[0, 2]").modify(_ ⇒ redacted)(jArray(fields)) === jArrayElements(
-      redacted, name, redacted, age, width, preferences
+    id.descendant("[0, 2]").modify(_ ⇒ redacted)(jArray(fields)) <=> jArrayElements(
+      redacted, name, redacted, age, width, preferences, potatoes, knownUnknowns
     )
   }
 
   @Test def descendant_all(): Unit = {
-    id.descendant("*").getAll(jobj) === List(name, age, lying, address, preferences, width)
+    id.descendant("*").getAll(jobj) === List(name, age, lying, address, preferences, width, potatoes, knownUnknowns)
 
-    id.descendant("*").modify(_ ⇒ jString("redacted"))(jobj) === jObjectFields(
+    id.descendant("*").modify(_ ⇒ jString("redacted"))(jobj) <=> jObjectFields(
       "name" → redacted, "age" → redacted, "lying" → redacted, "address" → redacted, "preferences" → redacted,
-      "width" → redacted
+      "width" → redacted, "potatoes" → redacted, "knownUnknowns" → redacted
     )
   }
 
@@ -213,13 +245,17 @@ trait JsonUtil {
   val acaciaRoad = List(jString("29 Acacia Road"), jString("Nuttytown"))
   val bananasAndMould = JsonObject.empty + ("bananas", jBool(true)) + ("mould", jBool(false))
 
-  val fields@List(lying, name, address, age, width, preferences) = List(
-    jBool(true), jString("Eric"), jArray(acaciaRoad), jNumber(3), jNumberOrNull(33.5), jObject(bananasAndMould)
+  val fields@List(lying, name, address, age, width, preferences, potatoes, knownUnknowns) = List(
+    jBool(true), jString("Eric"), jArray(acaciaRoad), jNumber(3), jNumberOrNull(33.5), jObject(bananasAndMould),
+    jArrayElements(), jObjectFields()
   )
 
   val jobj: Json = jObjectFields(
-    "name" → name, "age" → age, "lying" → lying, "address" → address, "preferences" → preferences, "width" → width
+    "name" → name, "age" → age, "lying" → lying, "address" → address, "preferences" → preferences, "width" → width,
+    "potatoes" → potatoes, "knownUnknowns" → knownUnknowns
   )
 
   val redacted = jString("redacted")
+
+  def parse(jsonText: String) = Parse.parseOption(jsonText).getOrThrow("not json")
 }

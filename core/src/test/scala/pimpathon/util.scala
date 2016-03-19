@@ -1,8 +1,10 @@
 package pimpathon
 
+import scala.language.implicitConversions
+
 import _root_.java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import _root_.java.util.concurrent.atomic.AtomicBoolean
-import scala.language.implicitConversions
+
 import scala.{PartialFunction ⇒ ~>}
 import scala.collection.mutable.ListBuffer
 import scala.collection.{mutable ⇒ M}

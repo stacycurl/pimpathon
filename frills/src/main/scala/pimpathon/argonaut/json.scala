@@ -110,10 +110,21 @@ object json {
       Prism[List[A], List[B]](la ⇒ la.flatMap(prism.getOption).ifSelf(_.size == la.size))(_.map(prism.reverseGet))
 
     def toMap[K]: Prism[Map[K, A], Map[K, B]] = Prism[Map[K, A], Map[K, B]](mapKA ⇒ {
-      mapKA.updateValues(a ⇒ prism.getOption(a)).ifSelf(_ ⇒ true /*_.size == mapKA.size*/)
+      mapKA.updateValues(a ⇒ prism.getOption(a)).ifSelf(_.size == mapKA.size)
     })((mapKB: Map[K, B]) ⇒ {
       mapKB.mapValuesEagerly(prism.reverseGet)
     })
+  }
+
+  type SApplyTraversal[From, To] = ApplyTraversal[From, From, To, To]
+
+  implicit class ApplyTraversalFrills[From, To](val at: SApplyTraversal[From, To]) extends AnyVal {
+    def bool[That](  implicit cpf: CanPrismFrom[To, Boolean,    That]): SApplyTraversal[From, That] = cpf(at)
+    def string[That](implicit cpf: CanPrismFrom[To, String,     That]): SApplyTraversal[From, That] = cpf(at)
+    def array[That]( implicit cpf: CanPrismFrom[To, List[Json], That]): SApplyTraversal[From, That] = cpf(at)
+    def obj[That](   implicit cpf: CanPrismFrom[To, JsonObject, That]): SApplyTraversal[From, That] = cpf(at)
+    def double[That](implicit cpf: CanPrismFrom[To, Double,     That]): SApplyTraversal[From, That] = cpf(at)
+    def int[That](   implicit cpf: CanPrismFrom[To, Int,        That]): SApplyTraversal[From, That] = cpf(at)
   }
 
   private val arrayObjectIso: Iso[Json, Json] = Iso[Json, Json](
@@ -128,6 +139,7 @@ object json {
 
 
 case class CanPrismFrom[From, Elem, To](prism: Prism[From, To]) {
+  def apply[A](applyTraversal: ApplyTraversal[A, A, From, From]): ApplyTraversal[A, A, To, To] = applyTraversal composePrism prism
   def apply[A](traversal: Traversal[A, From]): Traversal[A, To] = traversal composePrism prism
   def toList: CanPrismFrom[List[From], Elem, List[To]] = CanPrismFrom(prism.toList)
   def toMap[K]: CanPrismFrom[Map[K, From], Elem, Map[K, To]] = CanPrismFrom(prism.toMap[K])

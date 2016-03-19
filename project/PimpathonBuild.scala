@@ -40,9 +40,11 @@ object PimpathonBuild extends Build {
     maxErrors := 1,
     parallelExecution in Test := true,
     scalacOptions := Seq("-feature", "-Xfatal-warnings", "-deprecation", "-unchecked"),
+    resolvers += "Stacy Curl's repo" at "http://dl.bintray.com/stacycurl/repo/",
     libraryDependencies ++= Seq(
-      "com.novocode"   % "junit-interface" % "0.11"  % "test",
-      "org.scala-lang" % "scala-compiler"  % scalaVersion.value
+      "com.novocode"          % "junit-interface" % "0.11"   % "test",
+      "com.github.stacycurl" %% "delta-matchers"  % "1.0.17" % "test",
+      "org.scala-lang"        % "scala-compiler"  % scalaVersion.value
     )
 //    coverageEnabled := true,
 //    coverageMinimum := 100,

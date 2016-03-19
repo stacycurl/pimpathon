@@ -22,7 +22,7 @@ object map {
     def containsAny[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.exists(map.contains)
     def containsAll[GK <: GenTraversableOnce[K]](gk: GK): Boolean = gk.forall(map.contains)
     def containsEntry(kv: (K, V)): Boolean = containsEntry(kv._1, kv._2)
-    def containsEntry(k: K, v: V): Boolean = map.get(k) == Some(v)
+    def containsEntry(k: K, v: V): Boolean = map.get(k).contains(v)
 
     def get(ok: Option[K]): Option[V]               = ok.flatMap(map.get)
     def getOrThrow(k: K, message: String): V        = getOrThrow(k, new IllegalArgumentException(message))
@@ -46,6 +46,7 @@ object map {
     def reverse(f: Set[K] ⇒ K): Map[V, K] = reverseToMultiMap.mapValuesEagerly(f)
     def reverseToMultiMap: MultiMap[Set, V, K] = map.map(_.swap)(breakOut)
 
+    def sortBy[C: Ordering](f: K => C): SortedMap[K, V] = sorted(Ordering[C].on[K](f))
     def sorted(implicit ordering: Ordering[K]): SortedMap[K, V] = TreeMap.empty[K, V](ordering) ++ map
 
     def composeM[C](other: Map[C, K]): Map[C, V] = other.andThenM(map)

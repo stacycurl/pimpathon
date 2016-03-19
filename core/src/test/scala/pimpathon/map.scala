@@ -193,6 +193,8 @@ class MapTest {
 
   @Test def sorted(): Unit = Map(1 → 2, 3 → 4).sorted(Ordering.Int.reverse).toList === List(3 → 4, 1 → 2)
 
+  @Test def sortBy(): Unit = Map(1 → 2, 3 → 4).sortBy(k ⇒ -k).toList === List(3 → 4, 1 → 2)
+
   @Test def andThenM(): Unit =
     Map(1 → 10, 2 → 20, 3 → 30).andThenM(Map(10 → 100, 20 → 200, 40 → 400)) === Map(1 → 100, 2 → 200)
 

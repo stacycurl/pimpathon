@@ -56,7 +56,7 @@ class JsonTest extends JsonUtil {
   }
 
   @Test def descendant_complex(): Unit = {
-    jobj.descendant("preferences").obj.bool.modify(_.filterKeys(Set("bananas")))
+    jobj.descendant("preferences/*").bool.set(false)
         .descendant("address").array.string.modify("Flat B" :: _)
         .descendant("address/*").string.modify(_.toUpperCase)
         .descendant("potatoes/*/variety").string.modify(_ ⇒ "Avalanche")
@@ -66,7 +66,7 @@ class JsonTest extends JsonUtil {
           |  "lying" : true,
           |  "age" : 3,
           |  "preferences" : {
-          |    "bananas" : true
+          |    "bananas" : false
           |  },
           |  "address" : [
           |    "FLAT B",
@@ -162,17 +162,14 @@ class TraversalFrills extends JsonUtil {
 
   @Test def obj(): Unit = {
     calling(id.obj.getAll).partitions(fields)
-      .into(preferences → List(bananasAndMould), knownUnknowns → List(JsonObject.empty), others → nil)
+      .into(preferences → List(bananas), knownUnknowns → List(JsonObject.empty), others → nil)
 
-    calling(id.obj.modify(_ - "mould")).partitions(fields)
-      .into(preferences → jObjectFields("bananas" → jBool(true)), others → unchanged)
+    calling(id.obj.modify(_ - "bananas")).partitions(fields).into(preferences → jEmptyObject, others → unchanged)
 
-    id.obj.bool.getAll(preferences) === List(Map("bananas" → true, "mould" → false))
+    id.obj.bool.getAll(preferences) === List(Map("bananas" → true))
     id.obj.bool.modify(_ + ("Selina" → true))(preferences) === ("Selina" → jBool(true)) ->: preferences
 
-    id.obj.obj.bool.getAll(jObjectFields("prefs" → preferences)) === List(
-      Map("prefs" → Map("bananas" -> true, "mould" → false))
-    )
+    id.obj.obj.bool.getAll(jObjectFields("prefs" → preferences)) === List(Map("prefs" → Map("bananas" -> true)))
 
     id.obj.obj.bool.modify(_.mapKeysEagerly(_.capitalize))(jObjectFields("prefs" → preferences)) === jObjectFields(
       "Prefs" → preferences
@@ -243,10 +240,10 @@ trait JsonUtil {
   val derivedEncoded = Derived.codec.encode(derived)
 
   val acaciaRoad = List(jString("29 Acacia Road"), jString("Nuttytown"))
-  val bananasAndMould = JsonObject.empty + ("bananas", jBool(true)) + ("mould", jBool(false))
+  val bananas = JsonObject.empty + ("bananas", jBool(true))
 
   val fields@List(lying, name, address, age, width, preferences, potatoes, knownUnknowns) = List(
-    jBool(true), jString("Eric"), jArray(acaciaRoad), jNumber(3), jNumberOrNull(33.5), jObject(bananasAndMould),
+    jBool(true), jString("Eric"), jArray(acaciaRoad), jNumber(3), jNumberOrNull(33.5), jObject(bananas),
     jArrayElements(), jObjectFields()
   )
 

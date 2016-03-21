@@ -142,8 +142,11 @@ object json {
   }
 
   private val arrayObjectIso: Iso[Json, Json] = Iso[Json, Json](
-    j ⇒ j.array.filter(_.nonEmpty).fold(j)(array ⇒ jObjectFields(ints zip array: _*)))(
-    j ⇒ j.obj.filter(_.isNotEmpty).flatMap(o ⇒ Try(jArray(o.toMap.sortBy(_.toInt).values.toList)).toOption).getOrElse(j)
+    json ⇒ json.array.filter(_.nonEmpty).fold(json)(array ⇒ jObjectFields(ints zip array: _*)))(
+    json ⇒ json.obj.filter(_.isNotEmpty).flatMap(obj ⇒ {
+      // Relying on this throwing for non integer keys, cannot use sortBy as the function isn't used for singleton maps
+      Try(jArray(obj.toMap.mapKeysEagerly(_.toInt).sorted.values.toList)).toOption
+    }).getOrElse(json)
   )
 
   private def keys(value: String): Set[String]  = value.stripAffixes("{", "}").split(",").map(_.trim).toSet

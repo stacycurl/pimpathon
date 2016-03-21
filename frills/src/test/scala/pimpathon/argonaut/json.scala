@@ -156,8 +156,8 @@ class TraversalFrills extends JsonUtil {
 
     id.array.string.getAll(address)              === List(List("29 Acacia Road", "Nuttytown"))
     id.array.string.modify("Eric" :: _)(address) <=> jArray(jString("Eric") :: acaciaRoad)
-    id.array.int.getAll(address)                 === List()
-    id.array.int.modify(1 :: _)(address)         <=> jArray(acaciaRoad)
+    id.array.int.getAll(address)                 === List(List())
+    id.array.int.modify(1 :: _)(address)         <=> jArrayElements(jNumber(1))
   }
 
   @Test def obj(): Unit = {

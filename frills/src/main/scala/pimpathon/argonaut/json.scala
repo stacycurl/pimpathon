@@ -114,10 +114,10 @@ object json {
 
   implicit class PrismFrills[A, B](val prism: Prism[A, B]) {
     def toList: Prism[List[A], List[B]] =
-      Prism[List[A], List[B]](la ⇒ la.flatMap(prism.getOption).ifSelf(_.size == la.size))(_.map(prism.reverseGet))
+      Prism[List[A], List[B]](la ⇒ Some(la.flatMap(prism.getOption)))(_.map(prism.reverseGet))
 
     def toMap[K]: Prism[Map[K, A], Map[K, B]] = Prism[Map[K, A], Map[K, B]](mapKA ⇒ {
-      mapKA.updateValues(a ⇒ prism.getOption(a)).ifSelf(_.size == mapKA.size)
+      Some(mapKA.updateValues(a ⇒ prism.getOption(a)))
     })((mapKB: Map[K, B]) ⇒ {
       mapKB.mapValuesEagerly(prism.reverseGet)
     })

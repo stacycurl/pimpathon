@@ -1,11 +1,13 @@
 package pimpathon.scalaz
 
 import org.junit.Test
+import scala.{PartialFunction ⇒ ~>}
 
 import pimpathon.builder._
 import pimpathon.tuple._
 import pimpathon.util._
 import pimpathon.scalaz.either._
+import scalaz.syntax.std.option._
 
 import scalaz.{\/-, -\/, \/}
 
@@ -45,6 +47,13 @@ class DisjunctionTest {
     on(-\/(-\/(1)), -\/(\/-("s")), \/-("s")).calling(_.flatten).produces(-\/(1), \/-("s"), \/-("s"))
   }
 
+  @Test def leftFlatMap(): Unit = on(\/-(123), -\/("456"), -\/("123"))
+    .calling(_.leftFlatMap(partial("123" → 123).toRightDisjunction)).produces(\/-(123), -\/("456"), \/-(123))
+
   private def left(i: Int): Int \/ String = -\/(i)
   private def right(s: String): Int \/ String = \/-(s)
+
+  implicit class PartialFunctionFrills[In, Out](pf: In ~> Out) {
+    def toRightDisjunction: In ⇒ In \/ Out = (in: In) ⇒ pf.lift(in).toRightDisjunction(in)
+  }
 }

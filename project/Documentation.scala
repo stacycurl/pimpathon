@@ -1105,6 +1105,11 @@ object Documentation {
       Partial("removeFrom", "(Shrinkable[L], Shrinkable[R]) ⇒ L \\/ R", "Removes values from a shrinkables",
         "      -\\/(1).removeFrom(ints, strings)" → "ints -= 1",
         "\\/-(\"foo\").removeFrom(ints, strings)" → "strings -= \"foo\""
+      ),
+      Partial("leftFlatMap", "L => L \\/ R => L \\/ R", "flatMap over the left, equivalent to swap.flatMap.swap",
+        "   \\/-(123).leftFlatMap(in => in match { case \"left\" => \\/-(100); case _ => -\\/(in) }" → "\\/-(123)",
+        "-\\/(\"left\").leftFlatMap(in => in match { case \"left\" => \\/-(100); case _ => -\\/(in) }" → "\\/-(100)",
+        " -\\/(\"101\").leftFlatMap(in => in match { case \"left\" => \\/-(100); case _ => -\\/(in) }" → "-\\/(\"101\")"
       )
     ), "(L \\/ (L \\/ R))" → List(
       Partial("flatten", "L \\/ R", "Flattens two level disjunction into one",

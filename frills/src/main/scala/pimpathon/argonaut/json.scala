@@ -101,11 +101,22 @@ object json {
 
   implicit class TraversalToJsonFrills[A](val traversal: Traversal[A, Json]) extends AnyVal {
     def descendant(path: String): Traversal[A, Json] = path.split("/").filter(_.nonEmpty).foldLeft(traversal) {
-      case (acc, "*")                                ⇒ (acc composeIso arrayObjectIso).obj composeTraversal F.each
+      case (acc, "*")                                ⇒ (acc composeIso arrayObjectIso).obj composeTraversal filter(None)
+      case (acc, Prop(key, value))                   ⇒ (acc composeIso arrayObjectIso).obj composeTraversal filter(Some(key, value))
       case (acc, subPath) if subPath.startsWith("[") ⇒ acc.array composeTraversal F.filterIndex(indecies(subPath))
       case (acc, subPath)                            ⇒ acc.obj composeTraversal F.filterIndex(keys(subPath))
     }
   }
+
+  private def filter(kv: Option[(String, String)]): Traversal[JsonObject, Json] = kv match {
+    case None ⇒ F.each
+    case Some((key, value)) ⇒ F.each composePrism       Prism[Json, Json](json ⇒ {
+      val field: Option[Json] = json.field(key)
+      if (field.contains(jString(value))) Some(json) else None
+    })(json ⇒ json)
+  }
+
+  private val Prop = """\*\[(.*)='(.*)'\]""".r
 
   private implicit class JsonArrayFrills(val a: JsonArray) extends AnyVal {
     private[argonaut] def filterR(p: Predicate[Json]): JsonArray =

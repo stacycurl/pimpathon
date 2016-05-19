@@ -118,6 +118,9 @@ class MapTest {
   @Test def seqMapKeys(): Unit = on(Map(2 → 4, 4 → 6), Map(1 → 3))
     .calling(_.seqMapKeys(k ⇒ (k % 2 == 0).option(k / 2))).produces(Some(Map(1 → 4, 2 → 6)), None)
 
+  @Test def seqMapValues(): Unit = on(Map(2 → 4, 4 → 6), Map(1 → 3))
+    .calling(_.seqMapValues(v ⇒ (v % 2 == 0).option(v / 2))).produces(Some(Map(2 → 2, 4 → 3)), None)
+
   @Test def findKey(): Unit = {
     empty.findKey(_ ⇒ true)     === None
     nonEmpty.findKey(_ ⇒ false) === None

@@ -5,6 +5,7 @@ import scala.collection.{mutable ⇒ M}
 
 import org.junit.Assert._
 import pimpathon.any._
+import pimpathon.boolean._
 import pimpathon.map._
 import pimpathon.util._
 
@@ -113,6 +114,9 @@ class MapTest {
 
   @Test def mapEntries(): Unit =
     Map(1 → 2, 2 → 4).mapEntries(k ⇒ v ⇒ (k.toString, v.toDouble)) === Map("1" → 2.0, "2" → 4.0)
+
+  @Test def seqMapKeys(): Unit = on(Map(2 → 4, 4 → 6), Map(1 → 3))
+    .calling(_.seqMapKeys(k ⇒ (k % 2 == 0).option(k / 2))).produces(Some(Map(1 → 4, 2 → 6)), None)
 
   @Test def findKey(): Unit = {
     empty.findKey(_ ⇒ true)     === None

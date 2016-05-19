@@ -612,6 +612,10 @@ object Documentation {
       Partial("mapEntries", "(K ⇒ V ⇒ (C, W)) ⇒ Map[C, W]", "Applies a function to each entry, result must be a Tuple2",
         "Map(1 → 2, 2 → 3).mapEntries(k ⇒ v ⇒ (k * 10, v + 0.5))" → "Map(10 → 2.5, 20 → 3.5)"
       ),
+      Partial("seqMapKeys", "(K ⇒ Option[C]) ⇒ Option[Map[C, V]]", "Eagerly applies a function to each key, produces a Map if it never equals None",
+        "Map(2 → 4, 4 → 6).seqMapKeys(k ⇒ (k % 2 == 0).option(k / 2)))" → "Some(Map(1 → 4, 2 → 6))",
+        "       Map(1 → 3).seqMapKeys(k ⇒ (k % 2 == 0).option(k / 2)))" → "None"
+      ),
       Partial("collectKeys", "PartialFunction[K, C] ⇒ Map[C, V]", "Applies a partial function to each key",
         "Map(1 → 2, 2 → 3).collectKeys { case 2 → 20 }" → "Map(20 → 3)" // TODO [28 Oct 2015] Remove this or updateKeys
       ),

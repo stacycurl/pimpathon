@@ -65,9 +65,11 @@ object map {
     def partitionEntriesBy[C, W](pf: (K, V) ~> (C, W)): (Map[K, V], Map[C, W]) =
       map.partition(pf.isUndefinedAt).tmap(identity, _.map(pf))
 
-    def mapKeysEagerly[C](f: K ⇒ C): Map[C, V]         = map.map { case (k, v) ⇒ (f(k), v) }(breakOut)
-    def mapValuesEagerly[W](f: V ⇒ W): Map[K, W]       = map.map { case (k, v) ⇒ (k, f(v)) }(breakOut)
-    def mapEntries[C, W](f: K ⇒ V ⇒ (C, W)): Map[C, W] = map.map { case (k, v) ⇒ f(k)(v)   }(breakOut)
+    def mapKeysEagerly[C](f: K ⇒ C): Map[C, V]         = map.map { case (k, v) ⇒ (f(k), v) }
+    def mapValuesEagerly[W](f: V ⇒ W): Map[K, W]       = map.map { case (k, v) ⇒ (k, f(v)) }
+    def mapEntries[C, W](f: K ⇒ V ⇒ (C, W)): Map[C, W] = map.map { case (k, v) ⇒ f(k)(v)   }
+
+    def seqMapKeys[C](f: K ⇒ Option[C]): Option[Map[C, V]]                = seqMapEntries(k ⇒ v ⇒ f(k).map(_ → v))
 
     def collectKeys[C](pf: K ~> C): Map[C, V] = map.collect(pf.first)
     def collectValues[W](pf: V ~> W): Map[K, W] = map.collect(pf.second)

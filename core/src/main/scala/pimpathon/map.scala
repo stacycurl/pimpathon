@@ -71,6 +71,7 @@ object map {
 
     def seqMapKeys[C](f: K ⇒ Option[C]): Option[Map[C, V]]                = seqMapEntries(k ⇒ v ⇒ f(k).map(_ → v))
     def seqMapValues[W](f: V ⇒ Option[W]): Option[Map[K, W]]              = seqMapEntries(k ⇒ v ⇒ f(v).map(k → _))
+    def seqMapEntries[C, W](f: K ⇒ V ⇒ Option[(C, W)]): Option[Map[C, W]] = map.seqMap { case (k, v) ⇒ f(k)(v) }
 
     def collectKeys[C](pf: K ~> C): Map[C, V] = map.collect(pf.first)
     def collectValues[W](pf: V ~> W): Map[K, W] = map.collect(pf.second)

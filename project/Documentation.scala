@@ -620,6 +620,10 @@ object Documentation {
         "Map(2 → 4, 4 → 6).seqMapValues(v ⇒ (v % 2 == 0).option(v / 2)))" → "Some(Map(2 → 2, 4 → 3))",
         "       Map(1 → 3).seqMapValues(v ⇒ (v % 2 == 0).option(v / 2)))" → "None"
       ),
+      Partial("seqMapEntries", "(K ⇒ V ⇒ Option[(C, W)]) ⇒ Option[Map[C, W]]", "Applies a function to each entry, produces a Map if it never equals None",
+        "Map(2 → 4, 4 → 6).seqMapEntries(k ⇒ v => (k % 2 == 0).option((k / 2) -> (v / 2)))" → "Some(Map(1 → 2, 2 → 3))",
+        "       Map(1 → 3).seqMapEntries(k ⇒ v => (k % 2 == 0).option((k / 2) -> (v / 2)))" → "None"
+      ),
       Partial("collectKeys", "PartialFunction[K, C] ⇒ Map[C, V]", "Applies a partial function to each key",
         "Map(1 → 2, 2 → 3).collectKeys { case 2 → 20 }" → "Map(20 → 3)" // TODO [28 Oct 2015] Remove this or updateKeys
       ),

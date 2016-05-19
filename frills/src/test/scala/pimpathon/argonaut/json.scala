@@ -42,16 +42,16 @@ class JsonTest extends JsonUtil {
     jArray(fields).descendant("[0, 2]").getAll <=> List(lying, address)
 
     jArray(fields).descendant("[0, 2]").modify(_ ⇒ redacted) <=> jArrayElements(
-      redacted, name, redacted, age, width, preferences, potatoes, knownUnknowns
+      redacted, name, redacted, age, width, preferences, potatoes, knownUnknowns, awkward
     )
   }
 
   @Test def descendant_all(): Unit = {
-    jobj.descendant("*").getAll <=> List(name, age, lying, address, preferences, width, potatoes, knownUnknowns)
+    jobj.descendant("*").getAll <=> List(name, age, lying, address, preferences, width, potatoes, knownUnknowns, awkward)
 
     jobj.descendant("*").modify(_ ⇒ jString("redacted")) <=> jObjectFields(
       "name" → redacted, "age" → redacted, "lying" → redacted, "address" → redacted, "preferences" → redacted,
-      "width" → redacted, "potatoes" → redacted, "knownUnknowns" → redacted
+      "width" → redacted, "potatoes" → redacted, "knownUnknowns" → redacted, "awkward" → redacted
     )
   }
 
@@ -60,7 +60,8 @@ class JsonTest extends JsonUtil {
         .descendant("address").array.string.modify("Flat B" :: _)
         .descendant("address/*").string.modify(_.toUpperCase)
         .descendant("potatoes/*/variety").string.modify(_ ⇒ "Avalanche")
-        .descendant("knownUnknowns/*").int.modify(_ ⇒ 42) <=> parse("""
+        .descendant("knownUnknowns/*").int.modify(_ ⇒ 42)
+        .descendant("awkward/*").string.modify(_.toUpperCase) <=> parse("""
           |{
           |  "name" : "Eric",
           |  "lying" : true,
@@ -75,7 +76,8 @@ class JsonTest extends JsonUtil {
           |  ],
           |  "width" : 33.5,
           |  "knownUnknowns" : {},
-          |  "potatoes" : []
+          |  "potatoes" : [],
+          |  "awkward" : { "1": "ONE" }
           |}""".stripMargin
         )
   }
@@ -164,15 +166,16 @@ trait JsonUtil {
 
   val acaciaRoad = List(jString("29 Acacia Road"), jString("Nuttytown"))
   val bananas = JsonObject.empty + ("bananas", jBool(true))
+  val intObj = JsonObject.empty + ("1", jString("one"))
 
-  val fields@List(lying, name, address, age, width, preferences, potatoes, knownUnknowns) = List(
+  val fields@List(lying, name, address, age, width, preferences, potatoes, knownUnknowns, awkward) = List(
     jBool(true), jString("Eric"), jArray(acaciaRoad), jNumber(3), jNumberOrNull(33.5), jObject(bananas),
-    jArrayElements(), jObjectFields()
+    jArrayElements(), jObjectFields(), jObject(intObj)
   )
 
   val jobj: Json = jObjectFields(
     "name" → name, "age" → age, "lying" → lying, "address" → address, "preferences" → preferences, "width" → width,
-    "potatoes" → potatoes, "knownUnknowns" → knownUnknowns
+    "potatoes" → potatoes, "knownUnknowns" → knownUnknowns, "awkward" → awkward
   )
 
   val redacted = jString("redacted")

@@ -6,14 +6,11 @@ import argonaut._
 import monocle.{Prism, Traversal}
 import monocle.{function ⇒ F, Iso}
 
-import scala.util.Try
-
 import monocle.std.list.listFilterIndex
 import monocle.syntax.ApplyTraversal
 import pimpathon.function.Predicate
 
 import argonaut.Json._
-import pimpathon.any._
 import pimpathon.argonaut.json._
 import pimpathon.function._
 import pimpathon.map._
@@ -104,7 +101,7 @@ object json {
       case (acc, "*")                                ⇒ (acc composeIso arrayObjectIso).obj composeTraversal filter(None)
       case (acc, Prop(key, value))                   ⇒ (acc composeIso arrayObjectIso).obj composeTraversal filter(Some(key, value))
       case (acc, subPath) if subPath.startsWith("[") ⇒ acc.array composeTraversal F.filterIndex(indecies(subPath))
-      case (acc, subPath)                            ⇒ acc.obj composeTraversal F.filterIndex(keys(subPath))
+      case (acc, subPath)                            ⇒ acc.obj   composeTraversal F.filterIndex(keys(subPath))
     }
   }
 
@@ -153,16 +150,15 @@ object json {
   }
 
   private val arrayObjectIso: Iso[Json, Json] = Iso[Json, Json](
-    json ⇒ json.array.filter(_.nonEmpty).fold(json)(array ⇒ jObjectFields(ints zip array: _*)))(
-    json ⇒ json.obj.filter(_.isNotEmpty).flatMap(obj ⇒ {
-      // Relying on this throwing for non integer keys, cannot use sortBy as the function isn't used for singleton maps
-      Try(jArray(obj.toMap.mapKeysEagerly(_.toInt).sorted.values.toList)).toOption
-    }).getOrElse(json)
+    json ⇒ json.array.filter(_.nonEmpty).fold(json)(array ⇒ Json.obj(prefixedKeys zip array: _*)))(
+    json ⇒ json.obj.filter(wasArray)    .fold(json)(obj   ⇒ Json.array(obj.toMap.sorted.values.toSeq: _*))
   )
 
-  private def keys(value: String): Set[String]  = value.stripAffixes("{", "}").split(",").map(_.trim).toSet
-  private def indecies(value: String): Set[Int] = value.stripAffixes("[", "]").split(",").map(_.trim.toInt).toSet
-  private def ints: Stream[String]              = Stream.iterate(0)(_ + 1).map(_.toString)
+  private def keys(value: String): Set[String]   = value.stripAffixes("{", "}").split(",").map(_.trim).toSet
+  private def indecies(value: String): Set[Int]  = value.stripAffixes("[", "]").split(",").map(_.trim.toInt).toSet
+  private def prefixedKeys: Stream[String]       = Stream.iterate(0)(_ + 1).map(prefix + _)
+  private def wasArray(obj: JsonObject): Boolean = obj.isNotEmpty && obj.fieldSet.forall(_.startsWith(prefix))
+  private def prefix: String                     = "was-array:"
 }
 
 

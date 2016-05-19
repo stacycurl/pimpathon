@@ -39,7 +39,7 @@ class TraversalFrills extends JsonUtil {
 
   @Test def obj(): Unit = {
     calling(id.obj.getAll).partitions(fields)
-      .into(preferences → List(bananas), knownUnknowns → List(JsonObject.empty), others → nil)
+      .into(preferences → List(bananas), knownUnknowns → List(JsonObject.empty), awkward → List(intObj), others → nil)
 
     calling(id.obj.modify(_ - "bananas")).partitions(fields).into(preferences → jEmptyObject, others → unchanged)
 
@@ -77,16 +77,18 @@ class TraversalFrills extends JsonUtil {
     id.descendant("[0, 2]").getAll(jArray(fields)) === List(lying, address)
 
     id.descendant("[0, 2]").modify(_ ⇒ redacted)(jArray(fields)) <=> jArrayElements(
-      redacted, name, redacted, age, width, preferences, potatoes, knownUnknowns
+      redacted, name, redacted, age, width, preferences, potatoes, knownUnknowns, awkward
     )
   }
 
   @Test def descendant_all(): Unit = {
-    id.descendant("*").getAll(jobj) === List(name, age, lying, address, preferences, width, potatoes, knownUnknowns)
+    id.descendant("*").getAll(jobj) === List(
+      name, age, lying, address, preferences, width, potatoes, knownUnknowns, awkward
+    )
 
     id.descendant("*").modify(_ ⇒ jString("redacted"))(jobj) <=> jObjectFields(
       "name" → redacted, "age" → redacted, "lying" → redacted, "address" → redacted, "preferences" → redacted,
-      "width" → redacted, "potatoes" → redacted, "knownUnknowns" → redacted
+      "width" → redacted, "potatoes" → redacted, "knownUnknowns" → redacted, "awkward" → redacted
     )
   }
 

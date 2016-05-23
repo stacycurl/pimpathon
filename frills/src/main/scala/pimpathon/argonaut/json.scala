@@ -1,6 +1,6 @@
 package pimpathon.argonaut
 
-import scala.language.higherKinds
+import scala.language.{higherKinds, implicitConversions}
 
 import argonaut._
 import monocle.{Prism, Traversal}
@@ -21,13 +21,35 @@ import scalaz.std.iterable._
 
 object json {
   implicit class JsonFrills(val value: Json) extends AnyVal {
-    def descendant(path: String): ApplyTraversal[Json, Json, Json, Json] =
-      ApplyTraversal(value, Traversal.id[Json].descendant(path))
-
+    def descendant(path: String): Descendant[Json, Json] = Descendant(value, Traversal.id[Json].descendant(path))
     def filterNulls: Json = filterR(_ != jNull)
 
     private[argonaut] def filterR(p: Predicate[Json]): Json =
       p.cond(value.withObject(_.filterR(p)).withArray(_.filterR(p)), jNull)(value)
+  }
+
+  object Descendant {
+    implicit def descendantAsApplyTraversal[From, To](descendant: Descendant[From, To]):
+      ApplyTraversal[From, From, To, To] = ApplyTraversal(descendant.from, descendant.traversal)
+  }
+
+  case class Descendant[From, To](from: From, traversal: Traversal[From, To]) {
+    def bool[That](  implicit cpf: CanPrismFrom[To, Boolean,    That]): Descendant[From, That] = apply(cpf)
+    def number[That](implicit cpf: CanPrismFrom[To, JsonNumber, That]): Descendant[From, That] = apply(cpf)
+    def string[That](implicit cpf: CanPrismFrom[To, String,     That]): Descendant[From, That] = apply(cpf)
+    def array[That]( implicit cpf: CanPrismFrom[To, List[Json], That]): Descendant[From, That] = apply(cpf)
+    def obj[That](   implicit cpf: CanPrismFrom[To, JsonObject, That]): Descendant[From, That] = apply(cpf)
+
+    def double[That](    implicit cpf: CanPrismFrom[To, Double,     That]): Descendant[From, That] = apply(cpf)
+    def int[That](       implicit cpf: CanPrismFrom[To, Int,        That]): Descendant[From, That] = apply(cpf)
+    def float[That](     implicit cpf: CanPrismFrom[To, Float,      That]): Descendant[From, That] = apply(cpf)
+    def short[That](     implicit cpf: CanPrismFrom[To, Short,      That]): Descendant[From, That] = apply(cpf)
+    def byte[That](      implicit cpf: CanPrismFrom[To, Byte,       That]): Descendant[From, That] = apply(cpf)
+    def bigDecimal[That](implicit cpf: CanPrismFrom[To, BigDecimal, That]): Descendant[From, That] = apply(cpf)
+    def bigInt[That](    implicit cpf: CanPrismFrom[To, BigInt,     That]): Descendant[From, That] = apply(cpf)
+
+    private def apply[Elem, That](cpf: CanPrismFrom[To, Elem, That]): Descendant[From, That] =
+      copy(traversal = traversal composePrism cpf.prism)
   }
 
   implicit class CodecJsonFrills[A](val value: CodecJson[A]) extends AnyVal {
@@ -76,19 +98,22 @@ object json {
   }
 
   implicit class TraversalFrills[A, B](val traversal: Traversal[A, B]) extends AnyVal {
-    def bool[That](  implicit cpf: CanPrismFrom[B, Boolean,    That]): Traversal[A, That] = cpf(traversal)
-    def number[That](implicit cpf: CanPrismFrom[B, JsonNumber, That]): Traversal[A, That] = cpf(traversal)
-    def string[That](implicit cpf: CanPrismFrom[B, String,     That]): Traversal[A, That] = cpf(traversal)
-    def array[That]( implicit cpf: CanPrismFrom[B, List[Json], That]): Traversal[A, That] = cpf(traversal)
-    def obj[That](   implicit cpf: CanPrismFrom[B, JsonObject, That]): Traversal[A, That] = cpf(traversal)
+    def bool[That](  implicit cpf: CanPrismFrom[B, Boolean,    That]): Traversal[A, That] = apply(cpf)
+    def number[That](implicit cpf: CanPrismFrom[B, JsonNumber, That]): Traversal[A, That] = apply(cpf)
+    def string[That](implicit cpf: CanPrismFrom[B, String,     That]): Traversal[A, That] = apply(cpf)
+    def array[That]( implicit cpf: CanPrismFrom[B, List[Json], That]): Traversal[A, That] = apply(cpf)
+    def obj[That](   implicit cpf: CanPrismFrom[B, JsonObject, That]): Traversal[A, That] = apply(cpf)
 
-    def double[That](    implicit cpf: CanPrismFrom[B, Double,     That]): Traversal[A, That] = cpf(traversal)
-    def int[That](       implicit cpf: CanPrismFrom[B, Int,        That]): Traversal[A, That] = cpf(traversal)
-    def float[That](     implicit cpf: CanPrismFrom[B, Float,      That]): Traversal[A, That] = cpf(traversal)
-    def short[That](     implicit cpf: CanPrismFrom[B, Short,      That]): Traversal[A, That] = cpf(traversal)
-    def byte[That](      implicit cpf: CanPrismFrom[B, Byte,       That]): Traversal[A, That] = cpf(traversal)
-    def bigDecimal[That](implicit cpf: CanPrismFrom[B, BigDecimal, That]): Traversal[A, That] = cpf(traversal)
-    def bigInt[That](    implicit cpf: CanPrismFrom[B, BigInt,     That]): Traversal[A, That] = cpf(traversal)
+    def double[That](    implicit cpf: CanPrismFrom[B, Double,     That]): Traversal[A, That] = apply(cpf)
+    def int[That](       implicit cpf: CanPrismFrom[B, Int,        That]): Traversal[A, That] = apply(cpf)
+    def float[That](     implicit cpf: CanPrismFrom[B, Float,      That]): Traversal[A, That] = apply(cpf)
+    def short[That](     implicit cpf: CanPrismFrom[B, Short,      That]): Traversal[A, That] = apply(cpf)
+    def byte[That](      implicit cpf: CanPrismFrom[B, Byte,       That]): Traversal[A, That] = apply(cpf)
+    def bigDecimal[That](implicit cpf: CanPrismFrom[B, BigDecimal, That]): Traversal[A, That] = apply(cpf)
+    def bigInt[That](    implicit cpf: CanPrismFrom[B, BigInt,     That]): Traversal[A, That] = apply(cpf)
+
+    private def apply[Elem, That](canPrismFrom: CanPrismFrom[B, Elem, That]): Traversal[A, That] =
+      traversal composePrism canPrismFrom.prism
   }
 
   private implicit class JsonObjectFrills(val o: JsonObject) extends AnyVal {
@@ -131,24 +156,6 @@ object json {
     })
   }
 
-  type SApplyTraversal[From, To] = ApplyTraversal[From, From, To, To]
-
-  implicit class ApplyTraversalFrills[From, To](val at: SApplyTraversal[From, To]) extends AnyVal {
-    def bool[That](  implicit cpf: CanPrismFrom[To, Boolean,    That]): SApplyTraversal[From, That] = cpf(at)
-    def number[That](implicit cpf: CanPrismFrom[To, JsonNumber, That]): SApplyTraversal[From, That] = cpf(at)
-    def string[That](implicit cpf: CanPrismFrom[To, String,     That]): SApplyTraversal[From, That] = cpf(at)
-    def array[That]( implicit cpf: CanPrismFrom[To, List[Json], That]): SApplyTraversal[From, That] = cpf(at)
-    def obj[That](   implicit cpf: CanPrismFrom[To, JsonObject, That]): SApplyTraversal[From, That] = cpf(at)
-
-    def double[That](    implicit cpf: CanPrismFrom[To, Double,     That]): SApplyTraversal[From, That] = cpf(at)
-    def int[That](       implicit cpf: CanPrismFrom[To, Int,        That]): SApplyTraversal[From, That] = cpf(at)
-    def float[That](     implicit cpf: CanPrismFrom[To, Float,      That]): SApplyTraversal[From, That] = cpf(at)
-    def short[That](     implicit cpf: CanPrismFrom[To, Short,      That]): SApplyTraversal[From, That] = cpf(at)
-    def byte[That](      implicit cpf: CanPrismFrom[To, Byte,       That]): SApplyTraversal[From, That] = cpf(at)
-    def bigDecimal[That](implicit cpf: CanPrismFrom[To, BigDecimal, That]): SApplyTraversal[From, That] = cpf(at)
-    def bigInt[That](    implicit cpf: CanPrismFrom[To, BigInt,     That]): SApplyTraversal[From, That] = cpf(at)
-  }
-
   private val arrayObjectIso: Iso[Json, Json] = Iso[Json, Json](
     json ⇒ json.array.filter(_.nonEmpty).fold(json)(array ⇒ Json.obj(prefixedKeys zip array: _*)))(
     json ⇒ json.obj.filter(wasArray)    .fold(json)(obj   ⇒ Json.array(obj.toMap.sorted.values.toSeq: _*))
@@ -163,9 +170,7 @@ object json {
 
 
 case class CanPrismFrom[From, Elem, To](prism: Prism[From, To]) {
-  def apply[A](applyTraversal: ApplyTraversal[A, A, From, From]): ApplyTraversal[A, A, To, To] = applyTraversal composePrism prism
-  def apply[A](traversal: Traversal[A, From]): Traversal[A, To] = traversal composePrism prism
-  def toList: CanPrismFrom[List[From], Elem, List[To]] = CanPrismFrom(prism.toList)
+  def toList:   CanPrismFrom[List[From],   Elem, List[To]]   = CanPrismFrom(prism.toList)
   def toMap[K]: CanPrismFrom[Map[K, From], Elem, Map[K, To]] = CanPrismFrom(prism.toMap[K])
 }
 
@@ -190,11 +195,8 @@ object CanPrismFrom {
   implicit def cpfm[From, Elem, To](implicit cpf: CanPrismFrom[From, Elem, To])
     : CanPrismFrom[Map[String, From], Elem, Map[String, To]] = cpf.toMap
 
-  implicit def cpfJsonObjectToTypedMap[/*From, Elem, */Value](
-    implicit cpfv: CanPrismFrom[Json, Value, Value]
-  ): CanPrismFrom[JsonObject, Value, Map[String, Value]] = {
-    apply(jsonObjectMapIso.composePrism(cpfv.toMap[String].prism))
-  }
+  implicit def cpfJsonObjectToTypedMap[V](implicit cpf: CanPrismFrom[Json, V, V])
+    : CanPrismFrom[JsonObject, V, Map[String, V]] = apply(jsonObjectMapIso.composePrism(cpf.toMap[String].prism))
 
   private val jsonObjectMapIso: Iso[JsonObject, Map[String, Json]] =
     Iso[JsonObject, Map[String, Json]](_.toMap)(map ⇒ JsonObject.from[Seq](map.toSeq))

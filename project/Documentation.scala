@@ -326,19 +326,8 @@ object Documentation {
       Partial("mapIfNonEmpty", "(A ⇒ B) ⇒ Option[List[B]]", "Map if non empty, None otherwise",
         "Nil.mapIfNonEmpty(_ * 10)" → "None", "List(1, 2, 3).mapIfNonEmpty(_ * 10)" → "Some(List(10, 20, 30))"
       ),
-      Partial("onlyOrThrow", "(List[A] ⇒ Exception) ⇒ A", "Head if list has 1 element, throws otherwise",
-        "Nil.onlyOrThrow(l ⇒ new Throwable(\"Not singleton: \"l.length)" → "throws \"Not singleton: 0\"",
-        "List(1).onlyOrThrow(l ⇒ new Throwable(\"Not singleton: \"l.length)" → "1",
-        "List(1, 2).onlyOrThrow(l ⇒ new Throwable(\"Not singleton: \"l.length)" → "throws \"Not singleton: 2\""
-      ),
-      Partial("onlyEither", "Either[List[A], A]", "Right if list has 1 element, Left otherwise",
-        "Nil.onlyEither" → "Left(Nil)", "List(1).onlyEither" → "Right(1)", "List(1, 2).onlyEither" → "Left(List(1, 2))"
-      ),
       Partial("onlyDisjunction", "List[A] \\/ A", "\\/- if list has 1 element, -\\/ otherwise",
         "Nil.onlyDisjunction" → "-\\/(Nil)", "List(1).onlyDisjunction" → "\\/-(1)", "List(1, 2).onlyDisjunction" → "-\\/(List(1, 2))"
-      ),
-      Partial("onlyOption", "Option[A]", "Head if list has 1 element, None otherwise",
-        "Nil.onlyOption" → "None", "List(1).onlyOption" → "Some(1)", "List(1, 2).onlyOption" → "None"
       ),
       Partial("uncons", "(⇒ B, List[A] ⇒ B) ⇒ B", "Convert to B depending on whether the list is empty or not",
         "          Nil.uncons(\"[]\", l ⇒ s\"[${l.length} elements]\"" → "\"[]\"",
@@ -470,6 +459,17 @@ object Documentation {
              |)""" →
           """|// 1 word length 1, 2 of length 3, 1 of length 4
              |Map(2 → 1, 3 → 2, 4 → 1)"""
+      ),
+      Partial("onlyOption", "Option[A]", "Head if gtl has 1 element, None otherwise",
+        "Nil.onlyOption" → "None", "Set(1).onlyOption" → "Some(1)", "Vector(1, 2).onlyOption" → "None"
+      ),
+      Partial("onlyOrThrow", "(CC[A] ⇒ Exception) ⇒ A", "Head if list gtl 1 element, throws otherwise",
+        "Nil.onlyOrThrow(l ⇒ new Throwable(\"Not singleton: \"l.length)" → "throws \"Not singleton: 0\"",
+        "Set(1).onlyOrThrow(s ⇒ new Throwable(\"Not singleton: \"s.length)" → "1",
+        "Vector(1, 2).onlyOrThrow(v ⇒ new Throwable(\"Not singleton: \"v.length)" → "throws \"Not singleton: 2\""
+      ),
+      Partial("onlyEither", "Either[CC[A], A]", "Right if gtl has 1 element, Left otherwise",
+        "Nil.onlyEither" → "Left(Nil)", "Set(1).onlyEither" → "Right(1)", "Vector(1, 2).onlyEither" → "Left(Vector(1, 2))"
       ),
       Partial("asMap.withEntries", "(A ⇒ (K, V)) ⇒ Map[K, V]", "Build a map by specifying entries",
         "List(2, 4).asMap.withEntries(i ⇒ (i/2, i*2))" → "Map(1 → 4, 2 → 8)"

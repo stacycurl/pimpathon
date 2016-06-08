@@ -45,7 +45,8 @@ object genTraversableLike {
     def all(a: A): Boolean  = gtl.forall(_ == a)
 
     def onlyOrThrow(f: CC[A] ⇒ Exception): A = onlyOption.getOrThrow(f(cc))
-    def onlyEither: Either[CC[A], A] = onlyOption.toRight(cc)
+    def onlyEither: Either[CC[A], A] = onlyOrEither(cc ⇒ cc)
+    def onlyOrEither[B](f: CC[A] ⇒ B): Either[B, A] = onlyOption.toRight(f(cc))
     def onlyOption: Option[A] = if (gtl.isEmpty || gtl.tail.nonEmpty) None else gtl.headOption
 
     def seqMap[B, To](f: A ⇒ Option[B])(implicit cbf: CanBuildFrom[Nothing, B, To]): Option[To] =

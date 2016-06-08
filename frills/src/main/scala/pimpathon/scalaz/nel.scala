@@ -4,12 +4,11 @@ import scala.collection.{GenTraversable, GenTraversableLike, mutable => M}
 import scalaz.{NonEmptyList, Order, \/}
 
 import pimpathon.CanBuildNonEmpty
-import pimpathon.frills.genTraversableLike.GenTraversableLikeOfDisjunctionFrillsMixin
+import pimpathon.frills.genTraversableLike.{GenTraversableLikeFrillsMixin, GenTraversableLikeOfDisjunctionFrillsMixin}
 
 import pimpathon.genTraversableLike._
 import pimpathon.list._
 import pimpathon.tuple._
-import scalaz.syntax.std.either._
 
 
 object nel {
@@ -18,14 +17,12 @@ object nel {
   }
 
   implicit class NelFrills[A](nel: NonEmptyList[A])
-    extends GenTraversableLikePimpsMixin[A, NonEmptyList] {
+    extends GenTraversableLikeFrillsMixin[A, NonEmptyList] {
 
     def distinct: NonEmptyList[A] = lift(_.distinct)
     def distinctBy[B](f: A ⇒ B): NonEmptyList[A] = lift(_.distinctBy(f))
     def max(implicit o: Order[A]): A = nel.list.max(o.toScalaOrdering)
     def min(implicit o: Order[A]): A = nel.list.min(o.toScalaOrdering)
-
-    def onlyDisjunction: NonEmptyList[A] \/ A  = onlyEither.disjunction
 
     private def lift(f: List[A] ⇒ List[A]): NonEmptyList[A] = f(nel.list).headTail.calc(NonEmptyList.nel)
 

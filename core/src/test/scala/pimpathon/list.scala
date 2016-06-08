@@ -139,6 +139,9 @@ class ListTest {
   @Test def onlyEither(): Unit =
     on(nil[Int], List(1, 2), List(1)).calling(_.onlyEither).produces(Left(Nil), Left(List(1, 2)), Right(1))
 
+  @Test def onlyOrEither(): Unit =
+    on(nil[Int], List(1, 2), List(1)).calling(_.onlyOrEither(_.size)).produces(Left(0), Left(2), Right(1))
+
   @Test def onlyOption(): Unit = on(nil[Int], List(1, 2), List(1)).calling(_.onlyOption).produces(None, None, Some(1))
 
   @Test def zipExact(): Unit = {

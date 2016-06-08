@@ -42,4 +42,7 @@ class NelTest {
 
   @Test def onlyDisjunction(): Unit =
     on(NonEmptyList(1, 2), NonEmptyList(1)).calling(_.onlyDisjunction).produces(NonEmptyList(1, 2).left, 1.right)
+
+  @Test def onlyOrDisjunction(): Unit =
+    on(NonEmptyList(1, 2), NonEmptyList(1)).calling(_.onlyOrDisjunction(_.size)).produces(2.left, 1.right)
 }

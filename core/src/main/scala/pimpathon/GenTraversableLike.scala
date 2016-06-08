@@ -13,6 +13,7 @@ import pimpathon.either._
 import pimpathon.function._
 import pimpathon.map._
 import pimpathon.multiMap._
+import pimpathon.option._
 import pimpathon.tuple._
 
 
@@ -20,6 +21,7 @@ object genTraversableLike {
   type GTLGT[+A] = GenTraversableLike[A, GenTraversable[A]]
 
   trait GenTraversableLikePimpsMixin[A, CC[_]] {
+    protected def cc: CC[A]
     protected def gtl: GTLGT[A]
 
     def asMap: GenTraversableLikeCapturer[A, Map, Map] = as[Map]
@@ -41,6 +43,10 @@ object genTraversableLike {
 
     def none(a: A): Boolean = gtl.forall(_ != a)
     def all(a: A): Boolean  = gtl.forall(_ == a)
+
+    def onlyOrThrow(f: CC[A] ⇒ Exception): A = onlyOption.getOrThrow(f(cc))
+    def onlyEither: Either[CC[A], A] = onlyOption.toRight(cc)
+    def onlyOption: Option[A] = if (gtl.isEmpty || gtl.tail.nonEmpty) None else gtl.headOption
 
     def seqMap[B, To](f: A ⇒ Option[B])(implicit cbf: CanBuildFrom[Nothing, B, To]): Option[To] =
       seqFold[M.Builder[B, To]](cbf())((builder, a) ⇒ f(a).map(builder += _)).map(_.result())
@@ -80,7 +86,10 @@ object genTraversableLike {
   }
 
   implicit class GenTraversableLikePimps[A](protected val gtl: GTLGT[A])
-    extends GenTraversableLikePimpsMixin[A, GTLGT]
+    extends GenTraversableLikePimpsMixin[A, GTLGT] {
+
+    protected def cc: GTLGT[A] = gtl
+  }
 
   implicit class GenTraversableLikeOfEitherPimps[L, R](protected val gtl: GTLGT[Either[L, R]])
     extends GenTraversableLikeOfEitherPimpsMixin[L, R, GTLGT]

@@ -86,6 +86,7 @@ object map {
     def updateValues[W](f: V ⇒ Option[W]): Map[K, W] = map.flatMap(kv ⇒ f(kv._2).map(kv._1 → _))
 
     protected def gtl: GenTraversableLike[(K, V), GenTraversable[(K, V)]] = map
+    protected def cc: GenTraversable[(K, V)] = map
   }
 
   class MapAndThen[K, V, A](map: Map[K, V], andThen: ((K, V)) ⇒ A) {

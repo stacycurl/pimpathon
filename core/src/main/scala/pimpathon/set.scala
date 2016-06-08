@@ -23,6 +23,7 @@ object set  {
     def mutable: M.Set[A] = M.Set.empty[A] ++ set
 
     protected def gtl: GenTraversableLike[A, GenTraversable[A]] = set
+    protected def cc: Set[A] = set
   }
 
   implicit class SetOfEitherPimps[L, R](set: Set[_ <: Either[L, R]])

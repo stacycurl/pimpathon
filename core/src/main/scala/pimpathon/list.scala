@@ -53,10 +53,6 @@ object list {
       (allBatches += lastBatch.toList).toList
     })
 
-    def onlyOrThrow(f: List[A] ⇒ Exception): A = onlyOption.getOrThrow(f(list))
-    def onlyEither: Either[List[A], A] = onlyOption.toRight(list)
-    def onlyOption: Option[A] = unconsC(None, head ⇒ tail ⇒ tail.headOption.invert(head))
-
     def headTail: (A, List[A]) = headTailOption.getOrThrow("headTail of empty list")
     def initLast: (List[A], A) = initLastOption.getOrThrow("initLast of empty list")
 
@@ -122,6 +118,7 @@ object list {
     private def zip[B](other: List[B]): Iterator[(A, B)] = list.iterator.zip(other.iterator)
 
     protected def gtl: GenTraversableLike[A, GenTraversable[A]] = list
+    protected def cc: List[A] = list
   }
 
   implicit class ListOfEithersPimps[L, R](list: List[_ <: Either[L, R]])

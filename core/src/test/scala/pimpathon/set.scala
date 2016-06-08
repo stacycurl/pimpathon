@@ -27,6 +27,16 @@ class SetTest {
   @Test def partitionEithers(): Unit =
     Set(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[Set] === (Set(1, 2), Set("abc", "def"))
 
+  @Test def onlyOrThrow(): Unit = {
+    on(Set.empty[Int], Set(1, 2)).calling(_.onlyOrThrow(s ⇒ exception(s"${s.size} elements"))).throws("0 elements", "2 elements")
+    Set(1).onlyOrThrow(_ ⇒ new Exception()) === 1
+  }
+
+  @Test def onlyEither(): Unit =
+    on(Set.empty[Int], Set(1, 2), Set(1)).calling(_.onlyEither).produces(Left(Set.empty[Int]), Left(Set(1, 2)), Right(1))
+
+  @Test def onlyOption(): Unit = on(Set.empty[Int], Set(1, 2), Set(1)).calling(_.onlyOption).produces(None, None, Some(1))
+
   @Test def toMultiMap(): Unit = on(Set((1, 10), (1, 11), (2, 20), (2, 21)))
     .calling(_.toMultiMap[List], _.toMultiMap[Set])
     .produces(Map(1 → List(10, 11), 2 → List(20, 21)), Map(1 → Set(10, 11), 2 → Set(20, 21)))

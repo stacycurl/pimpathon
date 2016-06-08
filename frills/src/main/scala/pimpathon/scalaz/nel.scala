@@ -26,12 +26,11 @@ object nel {
     def min(implicit o: Order[A]): A = nel.list.min(o.toScalaOrdering)
 
     def onlyDisjunction: NonEmptyList[A] \/ A  = onlyEither.disjunction
-    def onlyEither: Either[NonEmptyList[A], A] = onlyOption.toRight(nel)
-    def onlyOption: Option[A]                  = nel.list.onlyOption
 
     private def lift(f: List[A] ⇒ List[A]): NonEmptyList[A] = f(nel.list).headTail.calc(NonEmptyList.nel)
 
     protected def gtl: GTLGT[A] = nel.list
+    protected def cc: NonEmptyList[A] = nel
   }
 
   implicit class NelOfEithersFrills[L, R](nel: NonEmptyList[Either[L, R]])

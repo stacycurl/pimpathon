@@ -12,7 +12,7 @@
             <label class="open-nav" for="open-nav"></label>
             <a class="navbar-brand" href="/">
               <strong>Pimpathon</strong>
-              <span class="version">1.5.27</span>
+              <span class="version">1.5.31</span>
             </a>
           </div>
           <div class="navbar-left">
@@ -57,6 +57,12 @@
               <a href="#Map[K, V]_mapValuesEagerly">mapValuesEagerly<span data-category="Map[K, V]" class="label label-category pull-right">Map[K, V]</span></a>
             </li><li class="func" data-name="Map[K, V]_mapEntries" data-category="Map[K, V]">
               <a href="#Map[K, V]_mapEntries">mapEntries<span data-category="Map[K, V]" class="label label-category pull-right">Map[K, V]</span></a>
+            </li><li class="func" data-name="Map[K, V]_seqMapKeys" data-category="Map[K, V]">
+              <a href="#Map[K, V]_seqMapKeys">seqMapKeys<span data-category="Map[K, V]" class="label label-category pull-right">Map[K, V]</span></a>
+            </li><li class="func" data-name="Map[K, V]_seqMapValues" data-category="Map[K, V]">
+              <a href="#Map[K, V]_seqMapValues">seqMapValues<span data-category="Map[K, V]" class="label label-category pull-right">Map[K, V]</span></a>
+            </li><li class="func" data-name="Map[K, V]_seqMapEntries" data-category="Map[K, V]">
+              <a href="#Map[K, V]_seqMapEntries">seqMapEntries<span data-category="Map[K, V]" class="label label-category pull-right">Map[K, V]</span></a>
             </li><li class="func" data-name="Map[K, V]_collectKeys" data-category="Map[K, V]">
               <a href="#Map[K, V]_collectKeys">collectKeys<span data-category="Map[K, V]" class="label label-category pull-right">Map[K, V]</span></a>
             </li><li class="func" data-name="Map[K, V]_updateKeys" data-category="Map[K, V]">
@@ -315,6 +321,12 @@
               <a href="#GTL[A]_optHistogram">optHistogram<span data-category="GTL[A]" class="label label-category pull-right">GTL[A]</span></a>
             </li><li class="func" data-name="GTL[A]_histogram" data-category="GTL[A]">
               <a href="#GTL[A]_histogram">histogram<span data-category="GTL[A]" class="label label-category pull-right">GTL[A]</span></a>
+            </li><li class="func" data-name="GTL[A]_onlyOption" data-category="GTL[A]">
+              <a href="#GTL[A]_onlyOption">onlyOption<span data-category="GTL[A]" class="label label-category pull-right">GTL[A]</span></a>
+            </li><li class="func" data-name="GTL[A]_onlyOrThrow" data-category="GTL[A]">
+              <a href="#GTL[A]_onlyOrThrow">onlyOrThrow<span data-category="GTL[A]" class="label label-category pull-right">GTL[A]</span></a>
+            </li><li class="func" data-name="GTL[A]_onlyEither" data-category="GTL[A]">
+              <a href="#GTL[A]_onlyEither">onlyEither<span data-category="GTL[A]" class="label label-category pull-right">GTL[A]</span></a>
             </li><li class="func" data-name="GTL[A]_asMap.withEntries" data-category="GTL[A]">
               <a href="#GTL[A]_asMap.withEntries">asMap.withEntries<span data-category="GTL[A]" class="label label-category pull-right">GTL[A]</span></a>
             </li><li class="func" data-name="GTL[A]_asMap.withEntries" data-category="GTL[A]">
@@ -523,14 +535,8 @@
               <a href="#List[A]_calcIfNonEmpty">calcIfNonEmpty<span data-category="List[A]" class="label label-category pull-right">List[A]</span></a>
             </li><li class="func" data-name="List[A]_mapIfNonEmpty" data-category="List[A]">
               <a href="#List[A]_mapIfNonEmpty">mapIfNonEmpty<span data-category="List[A]" class="label label-category pull-right">List[A]</span></a>
-            </li><li class="func" data-name="List[A]_onlyOrThrow" data-category="List[A]">
-              <a href="#List[A]_onlyOrThrow">onlyOrThrow<span data-category="List[A]" class="label label-category pull-right">List[A]</span></a>
-            </li><li class="func" data-name="List[A]_onlyEither" data-category="List[A]">
-              <a href="#List[A]_onlyEither">onlyEither<span data-category="List[A]" class="label label-category pull-right">List[A]</span></a>
             </li><li class="func" data-name="List[A]_onlyDisjunction" data-category="List[A]">
               <a href="#List[A]_onlyDisjunction">onlyDisjunction<span data-category="List[A]" class="label label-category pull-right">List[A]</span></a>
-            </li><li class="func" data-name="List[A]_onlyOption" data-category="List[A]">
-              <a href="#List[A]_onlyOption">onlyOption<span data-category="List[A]" class="label label-category pull-right">List[A]</span></a>
             </li><li class="func" data-name="List[A]_uncons" data-category="List[A]">
               <a href="#List[A]_uncons">uncons<span data-category="List[A]" class="label label-category pull-right">List[A]</span></a>
             </li><li class="func" data-name="List[A]_unconsC" data-category="List[A]">
@@ -735,6 +741,8 @@
               <a href="#NonEmptyList[A]_distinct">distinct<span data-category="NonEmptyList[A]" class="label label-category pull-right">NonEmptyList[A]</span></a>
             </li><li class="func" data-name="NonEmptyList[A]_distinctBy" data-category="NonEmptyList[A]">
               <a href="#NonEmptyList[A]_distinctBy">distinctBy<span data-category="NonEmptyList[A]" class="label label-category pull-right">NonEmptyList[A]</span></a>
+            </li><li class="func" data-name="NonEmptyList[A]_filter" data-category="NonEmptyList[A]">
+              <a href="#NonEmptyList[A]_filter">filter<span data-category="NonEmptyList[A]" class="label label-category pull-right">NonEmptyList[A]</span></a>
             </li><li class="func" data-name="NonEmptyList[A]_onlyOption" data-category="NonEmptyList[A]">
               <a href="#NonEmptyList[A]_onlyOption">onlyOption<span data-category="NonEmptyList[A]" class="label label-category pull-right">NonEmptyList[A]</span></a>
             </li><li class="func" data-name="NonEmptyList[A]_onlyEither" data-category="NonEmptyList[A]">
@@ -1054,6 +1062,66 @@
             <div style="display: flex">
             <pre style="flex: 1"><code class="hljs javascript">Map(1 → 2, 2 → 3).mapEntries(k ⇒ v ⇒ (k * 10, v + 0.5))</code></pre>
             <pre><code class="hljs-comment">Map(10 → 2.5, 20 → 3.5)</code></pre>
+          </div>
+          </section><section class="card" id="Map[K, V]_seqMapKeys">
+            <h2>
+              <a tabindex="2" class="name" href="#Map[K, V]_seqMapKeys" id="id_Map[K, V]_seqMapKeys">seqMapKeys</a>
+              <span class="pull-right">
+                <span class="label label-category">Map[K, V]</span>
+                <a target="_blank" title="View source on GitHub" href="https://github.com/stacycurl/pimpathon/blob/master/core/src/main/scala/pimpathon/any.scala#L13"><small>GH</small></a>
+              </span>
+            </h2>
+
+            <div class="sig btn btn-link"><span class="caret rotated"></span>Map[K, V] ⇒ (K ⇒ Option[C]) ⇒ Option[Map[C, V]]</div>
+            <div class="description"><p>Eagerly applies a function to each key, produces a Map if it never equals None</p></div>
+
+            
+            <div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">Map(2 → 4, 4 → 6).seqMapKeys(k ⇒ (k % 2 == 0).option(k / 2)))</code></pre>
+            <pre><code class="hljs-comment">Some(Map(1 → 4, 2 → 6))</code></pre>
+          </div><div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">       Map(1 → 3).seqMapKeys(k ⇒ (k % 2 == 0).option(k / 2)))</code></pre>
+            <pre><code class="hljs-comment">None</code></pre>
+          </div>
+          </section><section class="card" id="Map[K, V]_seqMapValues">
+            <h2>
+              <a tabindex="2" class="name" href="#Map[K, V]_seqMapValues" id="id_Map[K, V]_seqMapValues">seqMapValues</a>
+              <span class="pull-right">
+                <span class="label label-category">Map[K, V]</span>
+                <a target="_blank" title="View source on GitHub" href="https://github.com/stacycurl/pimpathon/blob/master/core/src/main/scala/pimpathon/any.scala#L13"><small>GH</small></a>
+              </span>
+            </h2>
+
+            <div class="sig btn btn-link"><span class="caret rotated"></span>Map[K, V] ⇒ (V ⇒ Option[W]) ⇒ Option[Map[K, W]]</div>
+            <div class="description"><p>Eagerly applies a function to each value, produces a Map if it never equals None</p></div>
+
+            
+            <div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">Map(2 → 4, 4 → 6).seqMapValues(v ⇒ (v % 2 == 0).option(v / 2)))</code></pre>
+            <pre><code class="hljs-comment">Some(Map(2 → 2, 4 → 3))</code></pre>
+          </div><div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">       Map(1 → 3).seqMapValues(v ⇒ (v % 2 == 0).option(v / 2)))</code></pre>
+            <pre><code class="hljs-comment">None</code></pre>
+          </div>
+          </section><section class="card" id="Map[K, V]_seqMapEntries">
+            <h2>
+              <a tabindex="2" class="name" href="#Map[K, V]_seqMapEntries" id="id_Map[K, V]_seqMapEntries">seqMapEntries</a>
+              <span class="pull-right">
+                <span class="label label-category">Map[K, V]</span>
+                <a target="_blank" title="View source on GitHub" href="https://github.com/stacycurl/pimpathon/blob/master/core/src/main/scala/pimpathon/any.scala#L13"><small>GH</small></a>
+              </span>
+            </h2>
+
+            <div class="sig btn btn-link"><span class="caret rotated"></span>Map[K, V] ⇒ (K ⇒ V ⇒ Option[(C, W)]) ⇒ Option[Map[C, W]]</div>
+            <div class="description"><p>Applies a function to each entry, produces a Map if it never equals None</p></div>
+
+            
+            <div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">Map(2 → 4, 4 → 6).seqMapEntries(k ⇒ v =&gt; (k % 2 == 0).option((k / 2) -&gt; (v / 2)))</code></pre>
+            <pre><code class="hljs-comment">Some(Map(1 → 2, 2 → 3))</code></pre>
+          </div><div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">       Map(1 → 3).seqMapEntries(k ⇒ v =&gt; (k % 2 == 0).option((k / 2) -&gt; (v / 2)))</code></pre>
+            <pre><code class="hljs-comment">None</code></pre>
           </div>
           </section><section class="card" id="Map[K, V]_collectKeys">
             <h2>
@@ -3440,6 +3508,75 @@ Map(3 → 2, 4 → 1)</code></pre>
             <pre><code class="hljs-comment">// 1 word length 1, 2 of length 3, 1 of length 4
 Map(2 → 1, 3 → 2, 4 → 1)</code></pre>
           </div>
+          </section><section class="card" id="GTL[A]_onlyOption">
+            <h2>
+              <a tabindex="2" class="name" href="#GTL[A]_onlyOption" id="id_GTL[A]_onlyOption">onlyOption</a>
+              <span class="pull-right">
+                <span class="label label-category">GTL[A]</span>
+                <a target="_blank" title="View source on GitHub" href="https://github.com/stacycurl/pimpathon/blob/master/core/src/main/scala/pimpathon/any.scala#L13"><small>GH</small></a>
+              </span>
+            </h2>
+
+            <div class="sig btn btn-link"><span class="caret rotated"></span>GTL[A] ⇒ Option[A]</div>
+            <div class="description"><p>Head if gtl has 1 element, None otherwise</p></div>
+
+            
+            <div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">Nil.onlyOption</code></pre>
+            <pre><code class="hljs-comment">None</code></pre>
+          </div><div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">Set(1).onlyOption</code></pre>
+            <pre><code class="hljs-comment">Some(1)</code></pre>
+          </div><div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">Vector(1, 2).onlyOption</code></pre>
+            <pre><code class="hljs-comment">None</code></pre>
+          </div>
+          </section><section class="card" id="GTL[A]_onlyOrThrow">
+            <h2>
+              <a tabindex="2" class="name" href="#GTL[A]_onlyOrThrow" id="id_GTL[A]_onlyOrThrow">onlyOrThrow</a>
+              <span class="pull-right">
+                <span class="label label-category">GTL[A]</span>
+                <a target="_blank" title="View source on GitHub" href="https://github.com/stacycurl/pimpathon/blob/master/core/src/main/scala/pimpathon/any.scala#L13"><small>GH</small></a>
+              </span>
+            </h2>
+
+            <div class="sig btn btn-link"><span class="caret rotated"></span>GTL[A] ⇒ (CC[A] ⇒ Exception) ⇒ A</div>
+            <div class="description"><p>Head if list gtl 1 element, throws otherwise</p></div>
+
+            
+            <div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">Nil.onlyOrThrow(l ⇒ new Throwable(&quot;Not singleton: &quot;l.length)</code></pre>
+            <pre><code class="hljs-comment">throws &quot;Not singleton: 0&quot;</code></pre>
+          </div><div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">Set(1).onlyOrThrow(s ⇒ new Throwable(&quot;Not singleton: &quot;s.length)</code></pre>
+            <pre><code class="hljs-comment">1</code></pre>
+          </div><div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">Vector(1, 2).onlyOrThrow(v ⇒ new Throwable(&quot;Not singleton: &quot;v.length)</code></pre>
+            <pre><code class="hljs-comment">throws &quot;Not singleton: 2&quot;</code></pre>
+          </div>
+          </section><section class="card" id="GTL[A]_onlyEither">
+            <h2>
+              <a tabindex="2" class="name" href="#GTL[A]_onlyEither" id="id_GTL[A]_onlyEither">onlyEither</a>
+              <span class="pull-right">
+                <span class="label label-category">GTL[A]</span>
+                <a target="_blank" title="View source on GitHub" href="https://github.com/stacycurl/pimpathon/blob/master/core/src/main/scala/pimpathon/any.scala#L13"><small>GH</small></a>
+              </span>
+            </h2>
+
+            <div class="sig btn btn-link"><span class="caret rotated"></span>GTL[A] ⇒ Either[CC[A], A]</div>
+            <div class="description"><p>Right if gtl has 1 element, Left otherwise</p></div>
+
+            
+            <div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">Nil.onlyEither</code></pre>
+            <pre><code class="hljs-comment">Left(Nil)</code></pre>
+          </div><div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">Set(1).onlyEither</code></pre>
+            <pre><code class="hljs-comment">Right(1)</code></pre>
+          </div><div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">Vector(1, 2).onlyEither</code></pre>
+            <pre><code class="hljs-comment">Left(Vector(1, 2))</code></pre>
+          </div>
           </section><section class="card" id="GTL[A]_asMap.withEntries">
             <h2>
               <a tabindex="2" class="name" href="#GTL[A]_asMap.withEntries" id="id_GTL[A]_asMap.withEntries">asMap.withEntries</a>
@@ -5168,52 +5305,6 @@ Map(2 → 1, 3 → 2, 4 → 1)</code></pre>
             <pre style="flex: 1"><code class="hljs javascript">List(1, 2, 3).mapIfNonEmpty(_ * 10)</code></pre>
             <pre><code class="hljs-comment">Some(List(10, 20, 30))</code></pre>
           </div>
-          </section><section class="card" id="List[A]_onlyOrThrow">
-            <h2>
-              <a tabindex="2" class="name" href="#List[A]_onlyOrThrow" id="id_List[A]_onlyOrThrow">onlyOrThrow</a>
-              <span class="pull-right">
-                <span class="label label-category">List[A]</span>
-                <a target="_blank" title="View source on GitHub" href="https://github.com/stacycurl/pimpathon/blob/master/core/src/main/scala/pimpathon/any.scala#L13"><small>GH</small></a>
-              </span>
-            </h2>
-
-            <div class="sig btn btn-link"><span class="caret rotated"></span>List[A] ⇒ (List[A] ⇒ Exception) ⇒ A</div>
-            <div class="description"><p>Head if list has 1 element, throws otherwise</p></div>
-
-            
-            <div style="display: flex">
-            <pre style="flex: 1"><code class="hljs javascript">Nil.onlyOrThrow(l ⇒ new Throwable(&quot;Not singleton: &quot;l.length)</code></pre>
-            <pre><code class="hljs-comment">throws &quot;Not singleton: 0&quot;</code></pre>
-          </div><div style="display: flex">
-            <pre style="flex: 1"><code class="hljs javascript">List(1).onlyOrThrow(l ⇒ new Throwable(&quot;Not singleton: &quot;l.length)</code></pre>
-            <pre><code class="hljs-comment">1</code></pre>
-          </div><div style="display: flex">
-            <pre style="flex: 1"><code class="hljs javascript">List(1, 2).onlyOrThrow(l ⇒ new Throwable(&quot;Not singleton: &quot;l.length)</code></pre>
-            <pre><code class="hljs-comment">throws &quot;Not singleton: 2&quot;</code></pre>
-          </div>
-          </section><section class="card" id="List[A]_onlyEither">
-            <h2>
-              <a tabindex="2" class="name" href="#List[A]_onlyEither" id="id_List[A]_onlyEither">onlyEither</a>
-              <span class="pull-right">
-                <span class="label label-category">List[A]</span>
-                <a target="_blank" title="View source on GitHub" href="https://github.com/stacycurl/pimpathon/blob/master/core/src/main/scala/pimpathon/any.scala#L13"><small>GH</small></a>
-              </span>
-            </h2>
-
-            <div class="sig btn btn-link"><span class="caret rotated"></span>List[A] ⇒ Either[List[A], A]</div>
-            <div class="description"><p>Right if list has 1 element, Left otherwise</p></div>
-
-            
-            <div style="display: flex">
-            <pre style="flex: 1"><code class="hljs javascript">Nil.onlyEither</code></pre>
-            <pre><code class="hljs-comment">Left(Nil)</code></pre>
-          </div><div style="display: flex">
-            <pre style="flex: 1"><code class="hljs javascript">List(1).onlyEither</code></pre>
-            <pre><code class="hljs-comment">Right(1)</code></pre>
-          </div><div style="display: flex">
-            <pre style="flex: 1"><code class="hljs javascript">List(1, 2).onlyEither</code></pre>
-            <pre><code class="hljs-comment">Left(List(1, 2))</code></pre>
-          </div>
           </section><section class="card" id="List[A]_onlyDisjunction">
             <h2>
               <a tabindex="2" class="name" href="#List[A]_onlyDisjunction" id="id_List[A]_onlyDisjunction">onlyDisjunction</a>
@@ -5236,29 +5327,6 @@ Map(2 → 1, 3 → 2, 4 → 1)</code></pre>
           </div><div style="display: flex">
             <pre style="flex: 1"><code class="hljs javascript">List(1, 2).onlyDisjunction</code></pre>
             <pre><code class="hljs-comment">-\/(List(1, 2))</code></pre>
-          </div>
-          </section><section class="card" id="List[A]_onlyOption">
-            <h2>
-              <a tabindex="2" class="name" href="#List[A]_onlyOption" id="id_List[A]_onlyOption">onlyOption</a>
-              <span class="pull-right">
-                <span class="label label-category">List[A]</span>
-                <a target="_blank" title="View source on GitHub" href="https://github.com/stacycurl/pimpathon/blob/master/core/src/main/scala/pimpathon/any.scala#L13"><small>GH</small></a>
-              </span>
-            </h2>
-
-            <div class="sig btn btn-link"><span class="caret rotated"></span>List[A] ⇒ Option[A]</div>
-            <div class="description"><p>Head if list has 1 element, None otherwise</p></div>
-
-            
-            <div style="display: flex">
-            <pre style="flex: 1"><code class="hljs javascript">Nil.onlyOption</code></pre>
-            <pre><code class="hljs-comment">None</code></pre>
-          </div><div style="display: flex">
-            <pre style="flex: 1"><code class="hljs javascript">List(1).onlyOption</code></pre>
-            <pre><code class="hljs-comment">Some(1)</code></pre>
-          </div><div style="display: flex">
-            <pre style="flex: 1"><code class="hljs javascript">List(1, 2).onlyOption</code></pre>
-            <pre><code class="hljs-comment">None</code></pre>
           </div>
           </section><section class="card" id="List[A]_uncons">
             <h2>
@@ -6957,6 +7025,26 @@ Map(2 → 1, 3 → 2, 4 → 1)</code></pre>
             <div style="display: flex">
             <pre style="flex: 1"><code class="hljs javascript">NonEmptyList(&quot;foo&quot;, &quot;bar&quot;, &quot;bare&quot;, &quot;food&quot;).distinctBy(_.length)</code></pre>
             <pre><code class="hljs-comment">NonEmptyList(&quot;foo&quot;, &quot;bare&quot;)</code></pre>
+          </div>
+          </section><section class="card" id="NonEmptyList[A]_filter">
+            <h2>
+              <a tabindex="2" class="name" href="#NonEmptyList[A]_filter" id="id_NonEmptyList[A]_filter">filter</a>
+              <span class="pull-right">
+                <span class="label label-category">NonEmptyList[A]</span>
+                <a target="_blank" title="View source on GitHub" href="https://github.com/stacycurl/pimpathon/blob/master/core/src/main/scala/pimpathon/any.scala#L13"><small>GH</small></a>
+              </span>
+            </h2>
+
+            <div class="sig btn btn-link"><span class="caret rotated"></span>NonEmptyList[A] ⇒ Predicate[A]</div>
+            <div class="description"><p>filters the NonEmptyList</p></div>
+
+            
+            <div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">   NonEmptyList(1).filter(_ % 2 == 0)</code></pre>
+            <pre><code class="hljs-comment">None</code></pre>
+          </div><div style="display: flex">
+            <pre style="flex: 1"><code class="hljs javascript">NonEmptyList(1, 2).filter(_ % 2 == 0)</code></pre>
+            <pre><code class="hljs-comment">Some(NonEmptyList(2))</code></pre>
           </div>
           </section><section class="card" id="NonEmptyList[A]_onlyOption">
             <h2>

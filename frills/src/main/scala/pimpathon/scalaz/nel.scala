@@ -6,6 +6,7 @@ import scalaz.{NonEmptyList, Order, \/}
 import pimpathon.CanBuildNonEmpty
 import pimpathon.frills.genTraversableLike.{GenTraversableLikeFrillsMixin, GenTraversableLikeOfDisjunctionFrillsMixin}
 
+import pimpathon.function._
 import pimpathon.genTraversableLike._
 import pimpathon.list._
 import pimpathon.tuple._
@@ -21,13 +22,16 @@ object nel {
 
     def distinct: NonEmptyList[A] = lift(_.distinct)
     def distinctBy[B](f: A ⇒ B): NonEmptyList[A] = lift(_.distinctBy(f))
+    def filter(p: Predicate[A]): Option[NonEmptyList[A]] = liftO(_.filter(p))
     def max(implicit o: Order[A]): A = nel.list.max(o.toScalaOrdering)
     def min(implicit o: Order[A]): A = nel.list.min(o.toScalaOrdering)
 
-    private def lift(f: List[A] ⇒ List[A]): NonEmptyList[A] = f(nel.list).headTail.calc(NonEmptyList.nel)
+    private def lift(f: List[A] ⇒ List[A]): NonEmptyList[A] = toNel(f(nel.list).headTail)
+    private def liftO(f: List[A] ⇒ List[A]): Option[NonEmptyList[A]] = f(nel.list).headTailOption.map(toNel)
 
     protected def gtl: GTLGT[A] = nel.list
     protected def cc: NonEmptyList[A] = nel
+    private def toNel(ht: (A, List[A])): NonEmptyList[A] = ht.calc(NonEmptyList.nel)
   }
 
   implicit class NelOfEithersFrills[L, R](nel: NonEmptyList[Either[L, R]])

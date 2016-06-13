@@ -1138,6 +1138,10 @@ object Documentation {
       Partial("distinctBy", "(A ⇒ B) ⇒ NonEmptyList[A]", "Remove items with duplicate properties",
         "NonEmptyList(\"foo\", \"bar\", \"bare\", \"food\").distinctBy(_.length)" → "NonEmptyList(\"foo\", \"bare\")"
       ),
+      Partial("filter", "Predicate[A]", "filters the NonEmptyList",
+        "   NonEmptyList(1).filter(_ % 2 == 0)" → "None",
+        "NonEmptyList(1, 2).filter(_ % 2 == 0)" → "Some(NonEmptyList(2))"
+      ),
       Partial("onlyOption", "Option[A]", "Head if non-empty list has 1 element, None otherwise",
         "NonEmptyList(1).onlyOption" → "Some(1)", "NonEmptyList(1, 2).onlyOption" → "None"
       ),

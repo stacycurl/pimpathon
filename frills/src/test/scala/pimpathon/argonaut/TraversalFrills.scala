@@ -53,12 +53,12 @@ class TraversalFrills extends JsonUtil {
     )
   }
 
-  @Test def double(): Unit = {
-    calling(id.double.getAll).partitions(fields).into(age → List(3.0), width → List(33.5), others → nil)
-
-    calling(id.double.modify(_ * 2.0)).partitions(fields)
-      .into(age → jNumberOrNull(6.0), width → jNumberOrNull(67.0), others → unchanged)
-  }
+//  @Test def double(): Unit = {
+//    calling(id.double.getAll).partitions(fields).into(age → List(3.0), width → List(33.5), others → nil)
+//
+//    calling(id.double.modify(_ * 2.0)).partitions(fields)
+//      .into(age → jNumberOrNull(6.0), width → jNumberOrNull(67.0), others → unchanged)
+//  }
 
   @Test def int(): Unit = {
     calling(id.int.getAll)       .partitions(fields).into(age → List(3),    others → nil)

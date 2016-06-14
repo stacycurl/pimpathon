@@ -21,8 +21,10 @@ object PimpathonBuild extends Build {
     settings(commonSettings: _*)
     settings(Publishing.settings: _*)
     settings(libraryDependencies ++= Seq(
-      "io.argonaut" %% "argonaut"    % "6.1" % "provided",
-      "org.scalaz"  %% "scalaz-core" % "7.1.1"  % "provided"
+      "com.github.julien-truffaut" %% "monocle-core"     % "1.2.2"  % "provided",
+      "io.argonaut"                %% "argonaut"         % "6.2-M2" % "provided",
+      "io.argonaut"                %% "argonaut-monocle" % "6.2-M2" % "provided",
+      "org.scalaz"                 %% "scalaz-core"      % "7.2.2"  % "provided"
     ))
   )
 

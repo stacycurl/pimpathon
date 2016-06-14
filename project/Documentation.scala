@@ -1132,11 +1132,11 @@ object Documentation {
         "-\\/(-\\/(1)).flatten" → "-\\/(1)", "-\\/(\\/-(\"s\")).flatten" → "\\/-(\"s\")", "\\/-(\"s\").flatten" → "\\/-(\"s\")"
       )
     ), "NonEmptyList[A]" → List(
-      Partial("distinct", "NonEmptyList[A]", "Remove duplicates",
-        "NonEmptyList(3, 1, 4, 3, 4).distinct" → "NonEmptyList(3, 1, 4)"
+      Partial("unique", "NonEmptyList[A]", "Remove duplicates",
+        "NonEmptyList(3, 1, 4, 3, 4).unique" → "NonEmptyList(3, 1, 4)"
       ),
-      Partial("distinctBy", "(A ⇒ B) ⇒ NonEmptyList[A]", "Remove items with duplicate properties",
-        "NonEmptyList(\"foo\", \"bar\", \"bare\", \"food\").distinctBy(_.length)" → "NonEmptyList(\"foo\", \"bare\")"
+      Partial("uniqueBy", "(A ⇒ B) ⇒ NonEmptyList[A]", "Remove items with duplicate properties",
+        "NonEmptyList(\"foo\", \"bar\", \"bare\", \"food\").uniqueBy(_.length)" → "NonEmptyList(\"foo\", \"bare\")"
       ),
       Partial("filter", "Predicate[A]", "filters the NonEmptyList",
         "   NonEmptyList(1).filter(_ % 2 == 0)" → "None",

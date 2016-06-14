@@ -3,14 +3,18 @@ package pimpathon.argonaut
 import scala.language.{higherKinds, implicitConversions}
 
 import argonaut._
+import argonaut.JsonObjectMonocle._
 import monocle.{Prism, Traversal}
-import monocle.{function ⇒ F, Iso}
+import monocle.Iso
+import monocle.function.Each.each
+import monocle.function.FilterIndex.filterIndex
 
 import monocle.std.list.listFilterIndex
 import monocle.syntax.ApplyTraversal
 import pimpathon.function.Predicate
 
 import argonaut.Json._
+import argonaut.JsonMonocle._
 import pimpathon.argonaut.json._
 import pimpathon.function._
 import pimpathon.map._
@@ -76,7 +80,7 @@ object json {
     def upcast[B >: A]: DecodeJson[B] = value.map[B](a ⇒ a: B)
 
     private[argonaut] def afterDecode[B](f: A => String \/ B): DecodeJson[B] = // Probably publish later
-      DecodeJson[B](c => value.decode(c).flatMap(a => DecodeResult[B](f(a).leftMap(_ → c.history))))
+      DecodeJson[B](c => value.decode(c).flatMap(a => DecodeResult[B](f(a).leftMap(_ → c.history).toEither)))
   }
 
   implicit class DecodeJsonMapFrills[K, V](val value: DecodeJson[Map[K, V]]) extends AnyVal {
@@ -118,21 +122,21 @@ object json {
 
   private implicit class JsonObjectFrills(val o: JsonObject) extends AnyVal {
     private[argonaut] def filterR(p: Predicate[Json]): JsonObject =
-      JsonObject.from(o.toMap.collectValues { case j if p(j) ⇒ j.filterR(p) })
+      JsonObject.fromTraversableOnce(o.toMap.collectValues { case j if p(j) ⇒ j.filterR(p) })
   }
 
   implicit class TraversalToJsonFrills[A](val traversal: Traversal[A, Json]) extends AnyVal {
     def descendant(path: String): Traversal[A, Json] = path.split("/").filter(_.nonEmpty).foldLeft(traversal) {
       case (acc, "*")                                ⇒ (acc composeIso arrayObjectIso).obj composeTraversal filter(None)
       case (acc, Prop(key, value))                   ⇒ (acc composeIso arrayObjectIso).obj composeTraversal filter(Some(key, value))
-      case (acc, subPath) if subPath.startsWith("[") ⇒ acc.array composeTraversal F.filterIndex(indecies(subPath))
-      case (acc, subPath)                            ⇒ acc.obj   composeTraversal F.filterIndex(keys(subPath))
+      case (acc, subPath) if subPath.startsWith("[") ⇒ acc.array composeTraversal filterIndex(indecies(subPath))
+      case (acc, subPath)                            ⇒ acc.obj   composeTraversal filterIndex(keys(subPath))
     }
   }
 
   private def filter(kv: Option[(String, String)]): Traversal[JsonObject, Json] = kv match {
-    case None ⇒ F.each
-    case Some((key, value)) ⇒ F.each composePrism       Prism[Json, Json](json ⇒ {
+    case None ⇒ each
+    case Some((key, value)) ⇒ each composePrism       Prism[Json, Json](json ⇒ {
       val field: Option[Json] = json.field(key)
       if (field.contains(jString(value))) Some(json) else None
     })(json ⇒ json)
@@ -181,8 +185,8 @@ object CanPrismFrom {
   implicit val cpfJsonToJsonArray:  CanPrismFrom[Json, List[Json], List[Json]] = apply(jArrayPrism)
   implicit val cpfJsonToJsonObject: CanPrismFrom[Json, JsonObject, JsonObject] = apply(jObjectPrism)
   implicit val cpfJsonToBigDecimal: CanPrismFrom[Json, BigDecimal, BigDecimal] = apply(jBigDecimalPrism)
-  implicit val cpfJsonToDouble:     CanPrismFrom[Json, Double,     Double]     = apply(jDoublePrism)
-  implicit val cpfJsonToFloat:      CanPrismFrom[Json, Float,      Float]      = apply(jFloatPrism)
+//  implicit val cpfJsonToDouble:     CanPrismFrom[Json, Double,     Double]     = apply(jDoublePrism)
+//  implicit val cpfJsonToFloat:      CanPrismFrom[Json, Float,      Float]      = apply(jFloatPrism)
   implicit val cpfJsonToBigInt:     CanPrismFrom[Json, BigInt,     BigInt]     = apply(jBigIntPrism)
   implicit val cpfJsonToLong:       CanPrismFrom[Json, Long,       Long]       = apply(jLongPrism)
   implicit val cpfJsonToInt:        CanPrismFrom[Json, Int,        Int]        = apply(jIntPrism)
@@ -199,5 +203,5 @@ object CanPrismFrom {
     : CanPrismFrom[JsonObject, V, Map[String, V]] = apply(jsonObjectMapIso.composePrism(cpf.toMap[String].prism))
 
   private val jsonObjectMapIso: Iso[JsonObject, Map[String, Json]] =
-    Iso[JsonObject, Map[String, Json]](_.toMap)(map ⇒ JsonObject.from[Seq](map.toSeq))
+    Iso[JsonObject, Map[String, Json]](_.toMap)(map ⇒ JsonObject.fromTraversableOnce(map))
 }

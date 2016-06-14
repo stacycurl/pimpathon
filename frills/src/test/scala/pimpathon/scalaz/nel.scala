@@ -11,9 +11,9 @@ import scalaz.syntax.either._
 
 
 class NelTest {
-  @Test def distinct(): Unit = NonEmptyList(1, 2, 1).distinct === NonEmptyList(1, 2)
+  @Test def unique(): Unit = NonEmptyList(1, 2, 1).unique === NonEmptyList(1, 2)
 
-  @Test def distinctBy(): Unit = NonEmptyList("foo", "bar", "bard", "food", "foody", "bardo").distinctBy(_.length) ===
+  @Test def uniqueBy(): Unit = NonEmptyList("foo", "bar", "bard", "food", "foody", "bardo").uniqueBy(_.length) ===
     NonEmptyList("foo", "bard", "foody")
 
   @Test def filter(): Unit =
@@ -29,9 +29,10 @@ class NelTest {
     NonEmptyList(1.left, "abc".right, "def".right, 2.left).partitionDisjunctions[List] ===
       (List(1, 2), List("abc", "def"))
 
-  @Test def partitionEithers(): Unit =
-    NonEmptyList(Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[List] ===
+  @Test def partitionEithers(): Unit = {
+    NonEmptyList[Either[Int, String]](Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[List] ===
       (List(1, 2), List("abc", "def"))
+  }
 
   @Test def toMultiMap(): Unit = on(NonEmptyList((1, 10), (1, 11), (2, 20), (2, 21)))
     .calling(_.toMultiMap[List], _.toMultiMap[Set])

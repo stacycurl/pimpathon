@@ -19,6 +19,9 @@ class NelTest {
   @Test def filter(): Unit =
     on(NonEmptyList(1), NonEmptyList(1, 2)).calling(_.filter(_ % 2 == 0)).produces(None, Some(NonEmptyList(2)))
 
+  @Test def filterNot(): Unit =
+    on(NonEmptyList(2), NonEmptyList(1, 2)).calling(_.filterNot(_ % 2 == 0)).produces(None, Some(NonEmptyList(1)))
+
   @Test def max(): Unit = NonEmptyList(1, 3, 2).max(scalaz.std.anyVal.intInstance) === 3
   @Test def min(): Unit = NonEmptyList(3, 1, 2).min(scalaz.std.anyVal.intInstance) === 1
 

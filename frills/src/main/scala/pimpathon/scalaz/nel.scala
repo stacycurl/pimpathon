@@ -23,6 +23,7 @@ object nel {
     def distinct: NonEmptyList[A] = lift(_.distinct)
     def distinctBy[B](f: A ⇒ B): NonEmptyList[A] = lift(_.distinctBy(f))
     def filter(p: Predicate[A]): Option[NonEmptyList[A]] = liftO(_.filter(p))
+    def filterNot(p: Predicate[A]): Option[NonEmptyList[A]] = liftO(_.filterNot(p))
     def max(implicit o: Order[A]): A = nel.list.max(o.toScalaOrdering)
     def min(implicit o: Order[A]): A = nel.list.min(o.toScalaOrdering)
 

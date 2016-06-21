@@ -4,7 +4,7 @@ import org.junit.Test
 import scala.util.{Failure, Success}
 
 import pimpathon.builder._
-import pimpathon.either._
+import pimpathon.either.EitherPimps
 import pimpathon.function._
 import pimpathon.tuple._
 import pimpathon.util._
@@ -72,7 +72,11 @@ class EitherTest {
   @Test def toTry(): Unit = on(Left[Throwable, String](boom), Right[Throwable, String]("foo"))
     .calling(_.toTry).produces(Failure[String](boom), Success[String]("foo"))
 
+  @Test def toOption(): Unit = on(Left[Throwable, String](boom), Right[Throwable, String]("foo"))
+    .calling(_.toOption).produces(None, Some("foo"))
+
   @Test def rightBias(): Unit = {
+    import pimpathon.either._
     (right("foo"): Either.RightProjection[Int, String]) === right("foo").right
     (right("foo").right: Either[Int, String])           === right("foo")
 

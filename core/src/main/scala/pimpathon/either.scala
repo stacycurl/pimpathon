@@ -37,6 +37,7 @@ object either {
 
     def getMessage(implicit ev: L <:< Throwable): Option[String] = either.fold(t ⇒ Some(t.getMessage), _ ⇒ None)
     def toTry(implicit ev: L <:< Throwable): Try[R] = either.fold(Failure(_), Success(_))
+    def toOption: Option[R] = either.fold(_ => None, Some(_))
   }
 
   implicit def eitherToRightProjection[L, R](either: Either[L, R]): Either.RightProjection[L, R] = either.right

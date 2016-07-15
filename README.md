@@ -12,15 +12,13 @@ Pimpathon
 
 ### Using Pimpathon
 
-(1.n.0) release artefacts are published to the [Sonatype OSS Repository Hosting service][sonatype] and synced to Maven
-Central. (1.n.m) release artefacts are built using [Travis CI][ci] and automatically published
-to Bintray. To include the repositories in your SBT build you should add,
+Release artefacts are built using [Travis CI][ci] and automatically published to Bintray. To include the repositories in your SBT build you should add,
 
 ```scala
 resolvers += "jcenter" at "http://jcenter.bintray.com"
 // or
 resolvers += "Stacy Curl's repo" at "http://dl.bintray.com/stacycurl/repo/"
-// or
+// or (for releases [1.5.0][r1.5.0], [1.4.0][r1.4.0] [1.3.0][r1.3.0], [1.2.0][r1.2.0], [1.1.0][r1.1.0], [1.0.0][r1.0.0])
 resolvers += Resolver.sonatypeRepo("releases")
 ```
 
@@ -31,7 +29,7 @@ Builds are available for Scala 2.11.7
 The pimps in core depend only on the core scala & java libraries. You can use it by including the following:
 
 ```scala
-libraryDependencies += "com.github.stacycurl" %% "pimpathon-core" % "1.5.0"
+libraryDependencies += "com.github.stacycurl" %% "pimpathon-core" % "1.6.1"
 ```
 
 ### pimpathon-frills
@@ -39,7 +37,7 @@ libraryDependencies += "com.github.stacycurl" %% "pimpathon-core" % "1.5.0"
 The aim of frills is to pimp everything else. You can use it by including the following:
 
 ```scala
-libraryDependencies += "com.github.stacycurl" %% "pimpathon-frills" % "1.5.0" intransitive()
+libraryDependencies += "com.github.stacycurl" %% "pimpathon-frills" % "1.6.1" intransitive()
 ```
 
 'intransitive' means that frills won't force you to depend on everything that's pimped, you'll only get pimps for types in libraries you already depend on.
@@ -48,13 +46,11 @@ libraryDependencies += "com.github.stacycurl" %% "pimpathon-frills" % "1.5.0" in
 
 Release notes: [1.5.0][r1.5.0], [1.4.0][r1.4.0] [1.3.0][r1.3.0], [1.2.0][r1.2.0], [1.1.0][r1.1.0], [1.0.0][r1.0.0]
 
-Next minor release: [1.6.0][r1.6.0]
-
 ### Contributors
 
-+ Corina Usher <corina.usher@gmail.com> [@coughlac](https://twitter.com/coughlac]
++ Corina Usher <corina.usher@gmail.com> [@coughlac](https://twitter.com/coughlac)
 + Howard Branch <purestgreen@gmail.com> [@purestgreen](https://twitter.com/purestgreen)
-+ Julien Truffaut <truffaut.julien@gmail.com> [@julien-truffaut](https://twitter.com/julien-truffaut]
++ Julien Truffaut <truffaut.julien@gmail.com> [@julien-truffaut](https://twitter.com/julien-truffaut)
 + Raymond Barlow <rbarlow@raymanoz.com> [@raymanoz](https://twitter.com/raymanoz)
 + Sam Halliday <sam.halliday@gmail.com> [@fommil](https://twitter.com/fommil)
 + Stacy Curl <stacy.curl@gmail.com> [@stacycurl](https://twitter.com/stacycurl)

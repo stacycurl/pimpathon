@@ -81,7 +81,7 @@ abstract class Sonatype(build: Build) {
   })
 
   private def commonSettings: Seq[Setting[_]] = Seq(
-    moduleName <<= name("pimpathon-" + _),
+    moduleName := "pimpathon",
     publishMavenStyle := true,
     publishArtifact in Test := false,
     licenses +=("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html"))

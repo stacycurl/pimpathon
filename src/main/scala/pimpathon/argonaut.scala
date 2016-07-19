@@ -1,29 +1,28 @@
-package pimpathon.argonaut
+package pimpathon
 
 import scala.language.{higherKinds, implicitConversions}
 
-import argonaut._
-import argonaut.JsonObjectMonocle._
+import _root_.argonaut._
+import _root_.argonaut.JsonObjectMonocle._
+import _root_.argonaut.Json._
+import _root_.argonaut.JsonMonocle._
+import _root_.scalaz.\/
 import monocle.{Prism, Traversal}
 import monocle.Iso
 import monocle.function.Each.each
 import monocle.function.FilterIndex.filterIndex
-
 import monocle.std.list.listFilterIndex
 import monocle.syntax.ApplyTraversal
+
 import pimpathon.function.Predicate
 
-import argonaut.Json._
-import argonaut.JsonMonocle._
-import pimpathon.argonaut.json._
+import pimpathon.argonaut._
 import pimpathon.function._
 import pimpathon.map._
 import pimpathon.string._
-import scalaz.\/
-import scalaz.std.iterable._
 
 
-object json {
+object argonaut {
   implicit class JsonFrills(val value: Json) extends AnyVal {
     def descendant(path: String): Descendant[Json, Json] = Descendant(value, Traversal.id[Json].descendant(path))
     def filterNulls: Json = filterR(_ != jNull)

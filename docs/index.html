@@ -12,7 +12,7 @@
             <label class="open-nav" for="open-nav"></label>
             <a class="navbar-brand" href="/">
               <strong>Pimpathon</strong>
-              <span class="version">1.5.32</span>
+              <span class="version">1.7.0</span>
             </a>
           </div>
           <div class="navbar-left">
@@ -737,10 +737,10 @@
               <a href="#Json_filterNulls">filterNulls<span data-category="Json" class="label label-category pull-right">Json</span></a>
             </li><li class="func" data-name="NonEmptyList[K]_as[F]" data-category="NonEmptyList[K]">
               <a href="#NonEmptyList[K]_as[F]">as[F]<span data-category="NonEmptyList[K]" class="label label-category pull-right">NonEmptyList[K]</span></a>
-            </li><li class="func" data-name="NonEmptyList[A]_distinct" data-category="NonEmptyList[A]">
-              <a href="#NonEmptyList[A]_distinct">distinct<span data-category="NonEmptyList[A]" class="label label-category pull-right">NonEmptyList[A]</span></a>
-            </li><li class="func" data-name="NonEmptyList[A]_distinctBy" data-category="NonEmptyList[A]">
-              <a href="#NonEmptyList[A]_distinctBy">distinctBy<span data-category="NonEmptyList[A]" class="label label-category pull-right">NonEmptyList[A]</span></a>
+            </li><li class="func" data-name="NonEmptyList[A]_unique" data-category="NonEmptyList[A]">
+              <a href="#NonEmptyList[A]_unique">unique<span data-category="NonEmptyList[A]" class="label label-category pull-right">NonEmptyList[A]</span></a>
+            </li><li class="func" data-name="NonEmptyList[A]_uniqueBy" data-category="NonEmptyList[A]">
+              <a href="#NonEmptyList[A]_uniqueBy">uniqueBy<span data-category="NonEmptyList[A]" class="label label-category pull-right">NonEmptyList[A]</span></a>
             </li><li class="func" data-name="NonEmptyList[A]_filter" data-category="NonEmptyList[A]">
               <a href="#NonEmptyList[A]_filter">filter<span data-category="NonEmptyList[A]" class="label label-category pull-right">NonEmptyList[A]</span></a>
             </li><li class="func" data-name="NonEmptyList[A]_filterNot" data-category="NonEmptyList[A]">
@@ -6994,9 +6994,9 @@ Map(2 → 1, 3 → 2, 4 → 1)</code></pre>
 
             
             
-          </section><section class="card" id="NonEmptyList[A]_distinct">
+          </section><section class="card" id="NonEmptyList[A]_unique">
             <h2>
-              <a tabindex="2" class="name" href="#NonEmptyList[A]_distinct" id="id_NonEmptyList[A]_distinct">distinct</a>
+              <a tabindex="2" class="name" href="#NonEmptyList[A]_unique" id="id_NonEmptyList[A]_unique">unique</a>
               <span class="pull-right">
                 <span class="label label-category">NonEmptyList[A]</span>
                 <a target="_blank" title="View source on GitHub" href="https://github.com/stacycurl/pimpathon/blob/master/core/src/main/scala/pimpathon/any.scala#L13"><small>GH</small></a>
@@ -7008,12 +7008,12 @@ Map(2 → 1, 3 → 2, 4 → 1)</code></pre>
 
             
             <div style="display: flex">
-            <pre style="flex: 1"><code class="hljs javascript">NonEmptyList(3, 1, 4, 3, 4).distinct</code></pre>
+            <pre style="flex: 1"><code class="hljs javascript">NonEmptyList(3, 1, 4, 3, 4).unique</code></pre>
             <pre><code class="hljs-comment">NonEmptyList(3, 1, 4)</code></pre>
           </div>
-          </section><section class="card" id="NonEmptyList[A]_distinctBy">
+          </section><section class="card" id="NonEmptyList[A]_uniqueBy">
             <h2>
-              <a tabindex="2" class="name" href="#NonEmptyList[A]_distinctBy" id="id_NonEmptyList[A]_distinctBy">distinctBy</a>
+              <a tabindex="2" class="name" href="#NonEmptyList[A]_uniqueBy" id="id_NonEmptyList[A]_uniqueBy">uniqueBy</a>
               <span class="pull-right">
                 <span class="label label-category">NonEmptyList[A]</span>
                 <a target="_blank" title="View source on GitHub" href="https://github.com/stacycurl/pimpathon/blob/master/core/src/main/scala/pimpathon/any.scala#L13"><small>GH</small></a>
@@ -7025,7 +7025,7 @@ Map(2 → 1, 3 → 2, 4 → 1)</code></pre>
 
             
             <div style="display: flex">
-            <pre style="flex: 1"><code class="hljs javascript">NonEmptyList(&quot;foo&quot;, &quot;bar&quot;, &quot;bare&quot;, &quot;food&quot;).distinctBy(_.length)</code></pre>
+            <pre style="flex: 1"><code class="hljs javascript">NonEmptyList(&quot;foo&quot;, &quot;bar&quot;, &quot;bare&quot;, &quot;food&quot;).uniqueBy(_.length)</code></pre>
             <pre><code class="hljs-comment">NonEmptyList(&quot;foo&quot;, &quot;bare&quot;)</code></pre>
           </div>
           </section><section class="card" id="NonEmptyList[A]_filter">

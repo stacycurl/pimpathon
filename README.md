@@ -6,7 +6,7 @@ Pimpathon
 [![Coverage Status](https://coveralls.io/repos/stacycurl/pimpathon/badge.png)](https://coveralls.io/r/stacycurl/pimpathon)
 [![Gitter chat](https://badges.gitter.im/stacycurl/pimpathon.png)](https://gitter.im/stacycurl/pimpathon)
 [![Codacy](https://www.codacy.com/project/badge/ed149591303b4f2bb1575d20b5394fa0)](https://www.codacy.com/public/stacycurl/pimpathon.git)
-[![Bintray](https://api.bintray.com/packages/stacycurl/repo/pimpathon-core/images/download.svg) ](https://bintray.com/stacycurl/repo/pimpathon-core/_latestVersion)
+[![Bintray](https://api.bintray.com/packages/stacycurl/repo/pimpathon/images/download.svg) ](https://bintray.com/stacycurl/repo/pimpathon/_latestVersion)
 
 **Pimpathon** is a library that extends Scala & Java classes with 'extension methods' via the [Pimp my Library][pimp-my-library] pattern.
 

@@ -31,30 +31,6 @@ object argonaut {
       p.cond(value.withObject(_.filterR(p)).withArray(_.filterR(p)), jNull)(value)
   }
 
-  object Descendant {
-    implicit def descendantAsApplyTraversal[From, To](descendant: Descendant[From, To]):
-      ApplyTraversal[From, From, To, To] = ApplyTraversal(descendant.from, descendant.traversal)
-  }
-
-  case class Descendant[From, To](from: From, traversal: Traversal[From, To]) {
-    def bool[That](  implicit cpf: CanPrismFrom[To, Boolean,    That]): Descendant[From, That] = apply(cpf)
-    def number[That](implicit cpf: CanPrismFrom[To, JsonNumber, That]): Descendant[From, That] = apply(cpf)
-    def string[That](implicit cpf: CanPrismFrom[To, String,     That]): Descendant[From, That] = apply(cpf)
-    def array[That]( implicit cpf: CanPrismFrom[To, List[Json], That]): Descendant[From, That] = apply(cpf)
-    def obj[That](   implicit cpf: CanPrismFrom[To, JsonObject, That]): Descendant[From, That] = apply(cpf)
-
-    def double[That](    implicit cpf: CanPrismFrom[To, Double,     That]): Descendant[From, That] = apply(cpf)
-    def int[That](       implicit cpf: CanPrismFrom[To, Int,        That]): Descendant[From, That] = apply(cpf)
-    def float[That](     implicit cpf: CanPrismFrom[To, Float,      That]): Descendant[From, That] = apply(cpf)
-    def short[That](     implicit cpf: CanPrismFrom[To, Short,      That]): Descendant[From, That] = apply(cpf)
-    def byte[That](      implicit cpf: CanPrismFrom[To, Byte,       That]): Descendant[From, That] = apply(cpf)
-    def bigDecimal[That](implicit cpf: CanPrismFrom[To, BigDecimal, That]): Descendant[From, That] = apply(cpf)
-    def bigInt[That](    implicit cpf: CanPrismFrom[To, BigInt,     That]): Descendant[From, That] = apply(cpf)
-
-    private def apply[Elem, That](cpf: CanPrismFrom[To, Elem, That]): Descendant[From, That] =
-      copy(traversal = traversal composePrism cpf.prism)
-  }
-
   implicit class CodecJsonFrills[A](val value: CodecJson[A]) extends AnyVal {
     def beforeDecode(f: Json ⇒ Json): CodecJson[A] = compose(f)
     def afterDecode(f: A ⇒ A):  CodecJson[A] = derived(encoder ⇒ encoder)(_ map f)
@@ -203,4 +179,28 @@ object CanPrismFrom {
 
   private val jsonObjectMapIso: Iso[JsonObject, Map[String, Json]] =
     Iso[JsonObject, Map[String, Json]](_.toMap)(map ⇒ JsonObject.fromTraversableOnce(map))
+}
+
+object Descendant {
+  implicit def descendantAsApplyTraversal[From, To](descendant: Descendant[From, To]):
+  ApplyTraversal[From, From, To, To] = ApplyTraversal(descendant.from, descendant.traversal)
+}
+
+case class Descendant[From, To](from: From, traversal: Traversal[From, To]) {
+  def bool[That](  implicit cpf: CanPrismFrom[To, Boolean,    That]): Descendant[From, That] = apply(cpf)
+  def number[That](implicit cpf: CanPrismFrom[To, JsonNumber, That]): Descendant[From, That] = apply(cpf)
+  def string[That](implicit cpf: CanPrismFrom[To, String,     That]): Descendant[From, That] = apply(cpf)
+  def array[That]( implicit cpf: CanPrismFrom[To, List[Json], That]): Descendant[From, That] = apply(cpf)
+  def obj[That](   implicit cpf: CanPrismFrom[To, JsonObject, That]): Descendant[From, That] = apply(cpf)
+
+  def double[That](    implicit cpf: CanPrismFrom[To, Double,     That]): Descendant[From, That] = apply(cpf)
+  def int[That](       implicit cpf: CanPrismFrom[To, Int,        That]): Descendant[From, That] = apply(cpf)
+  def float[That](     implicit cpf: CanPrismFrom[To, Float,      That]): Descendant[From, That] = apply(cpf)
+  def short[That](     implicit cpf: CanPrismFrom[To, Short,      That]): Descendant[From, That] = apply(cpf)
+  def byte[That](      implicit cpf: CanPrismFrom[To, Byte,       That]): Descendant[From, That] = apply(cpf)
+  def bigDecimal[That](implicit cpf: CanPrismFrom[To, BigDecimal, That]): Descendant[From, That] = apply(cpf)
+  def bigInt[That](    implicit cpf: CanPrismFrom[To, BigInt,     That]): Descendant[From, That] = apply(cpf)
+
+  private def apply[Elem, That](cpf: CanPrismFrom[To, Elem, That]): Descendant[From, That] =
+    copy(traversal = traversal composePrism cpf.prism)
 }

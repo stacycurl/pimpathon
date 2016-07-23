@@ -9,7 +9,7 @@ object PimpathonBuild extends Build {
     settings(
       organization              := "com.github.stacycurl",
       scalaVersion              := "2.11.7",
-      scalacOptions             := Seq("-feature", "-Xfatal-warnings", "-deprecation", "-unchecked"),
+      scalacOptions             := Seq("-feature", "-Xfatal-warnings", "-deprecation", "-unchecked", "-target:jvm-1.8"),
       maxErrors                 := 1,
       parallelExecution in Test := true
       //    coverageEnabled := true,
@@ -25,8 +25,9 @@ object PimpathonBuild extends Build {
       "io.argonaut"                %% "argonaut"         % "6.2-M2" % "provided",
       "io.argonaut"                %% "argonaut-monocle" % "6.2-M2" % "provided",
       "org.scalaz"                 %% "scalaz-core"      % "7.2.2"  % "provided",
+      "io.gatling"                 %% "jsonpath"         % "0.6.7"  % "provided",
       "com.novocode"               %  "junit-interface"  % "0.11"   % "test",
-      "com.github.stacycurl"       %% "delta-matchers"   % "1.0.17" % "test"
+      "com.github.stacycurl"       %% "delta-matchers"   % "1.0.19" % "test"
     )
   ))
 }

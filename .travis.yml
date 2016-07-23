@@ -10,7 +10,7 @@ cache:
   - $HOME/.ivy2/cache
 
 jdk:
-- openjdk6
+- oraclejdk8
 
 before_script: ./project/bintray.sh
 

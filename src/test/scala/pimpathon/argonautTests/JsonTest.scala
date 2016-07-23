@@ -73,6 +73,120 @@ class JsonTest extends JsonUtil {
         )
   }
 
+  @Test def delete(): Unit = {
+//    println(parse(
+//      """{
+//        |   "a": {
+//        |     "nested": {
+//        |       "thing": "bye bye"
+//        |     }
+//        |   },
+//        |   "remainder": "still here"
+//        |}
+//      """.stripMargin).delete("a/nested/thing").spaces2)
+//
+//    println(parse("""{"candy": "lollipop", "noncandy": null,"other": "things"}""")
+//      .descendant("candy").string.set("big turks").filterNulls
+//      .delete("other").spaces2)
+//
+
+//    store.jsonPath("$.store.book[*].author").getAll.foreach(j ⇒ println(j.spaces2))
+
+
+
+    val conditions = parse("""{ "conditions":
+          			[
+          				{ "id": "i1", "condition": true },
+          				{ "id": "i2", "condition": false }
+          			]
+          		}""")
+
+    Json.jArray(conditions.descendant("$.conditions[?(@['condition'] == true)].id").getAll)  <=> parse("""["i1"]""")
+    Json.jArray(conditions.descendant("$.conditions[?(@['condition'] == false)].id").getAll) <=> parse("""["i2"]""")
+  }
+
+  private def print(values: List[Json]) = values.foreach(j ⇒ println(j.spaces2))
+
+
+  private val store = parse(
+    """
+      |{
+      |    "store": {
+      |        "book": [
+      |            {
+      |                "category": "reference",
+      |                "author": "Nigel Rees",
+      |                "title": "Sayings of the Century",
+      |                "price": 8.95
+      |            },
+      |            {
+      |                "category": "fiction",
+      |                "author": "Evelyn Waugh",
+      |                "title": "Sword of Honour",
+      |                "price": 12.99
+      |            },
+      |            {
+      |                "category": "fiction",
+      |                "author": "Herman Melville",
+      |                "title": "Moby Dick",
+      |                "isbn": "0-553-21311-3",
+      |                "price": 8.99
+      |            },
+      |            {
+      |                "category": "fiction",
+      |                "author": "J. R. R. Tolkien",
+      |                "title": "The Lord of the Rings",
+      |                "isbn": "0-395-19395-8",
+      |                "price": 22.99
+      |            }
+      |        ],
+      |        "bicycle": {
+      |            "color": "red",
+      |            "price": 19.95
+      |        }
+      |    },
+      |    "expensive": 10
+      |}
+    """.stripMargin)
+
+  @Test def workWithBooleanFilters(): Unit = {
+    val json = parse("""{ "conditions": [true, false, true] }""")
+
+    json.descendant("$.conditions[?(@ == true)]").getAll  <=> List(jTrue, jTrue)
+    json.descendant("$.conditions[?(@ == false)]").getAll <=> List(jFalse)
+    json.descendant("$.conditions[?(false == @)]").getAll <=> List(jFalse)
+  }
+
+  @Test def `work with test set 3`(): Unit = {
+    val json = parse("""{ "points": [
+          				             { "id":"i1", "x": 4, "y":-5 },
+          				             { "id":"i2", "x":-2, "y": 2, "z":1 },
+          				             { "id":"i3", "x": 8, "y": 3 },
+          				             { "id":"i4", "x":-6, "y":-1 },
+          				             { "id":"i5", "x": 0, "y": 2, "z":1 },
+          				             { "id":"i6", "x": 1, "y": 4 }
+          				           ]
+          				         }""")
+
+    json.descendant("$.points[1]").getAll <=> List(parse("""{ "id":"i2", "x":-2, "y": 2, "z":1 }"""))
+    json.descendant("$.points[4].x").getAll <=> List(jNumber(0))
+    json.descendant("$.points[?(@['id']=='i4')].x").getAll <=> List(jNumber(-6))
+    json.descendant("$.points[*].x").getAll <=> List(4, -2, 8, -6, 0, 1).map(jNumber)
+    // Non supported syntax "$['points'][?(@['x']*@['x']+@['y']*@['y'] > 50)].id"
+    json.descendant("$['points'][?(@['y'] >= 3)].id").getAll <=> List(jString("i3"), jString("i6"))
+    json.descendant("$.points[?(@['z'])].id").getAll <=> List(jString("i2"), jString("i5"))
+    // Non supported syntax "$.points[(count(@)-1)].id"
+  }
+
+  @Test def `"Multi-fields accessors" should "be interpreted correctly"`(): Unit = {
+    val json = parse("""{"menu":{"year":2013,"file":"open","options":[{"bold":true},{"font":"helvetica"},{"size":3}]}}""")
+    json.descendant("$.menu['file','year']").getAll <=> List(jNumber(2013), jString("open"))
+    json.descendant("$.menu.options['foo','bar']").getAll <=> Nil
+    json.descendant("$.menu.options[*]['bold','size']").getAll <=> List(jTrue, jNumber(3))
+//    json.descendant("$..options['foo','bar']").getAll <=> Nil
+//    json.descendant("$..options[*]['bold','size']").getAll <=> List(jTrue, jNumber(3))
+  }
+
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
     case (input, expected) ⇒ f(parse(input)) <=> parse(expected)
   }

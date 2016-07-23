@@ -1,9 +1,13 @@
 package pimpathon
 
+import io.gatling.jsonpath.AST._
+import io.gatling.jsonpath._
+import monocle.function.At
+
 import scala.language.{higherKinds, implicitConversions}
 
 import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, Json, JsonMonocle, JsonNumber, JsonObject}
-import _root_.argonaut.Json.{jNull, jString}
+import _root_.argonaut.Json.{jNull, jString, jBool, jTrue, jFalse}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
 
 import monocle.{Iso, Prism, Traversal}
@@ -22,7 +26,16 @@ import _root_.scalaz.{Applicative, \/}
 object argonaut {
   implicit class JsonFrills(val value: Json) extends AnyVal {
     def descendant(path: String): Descendant[Json, Json] = Descendant(value, Traversal.id[Json].descendant(path))
+    def compact: Json = filterNulls
     def filterNulls: Json = filterR(_ != jNull)
+
+//    def delete(path: String): Json = {
+//      path.split("/").toList.reverse match {
+//        case head :: Nil ⇒ descendant("").obj.delete(head)
+//        case head :: tail ⇒ descendant(tail.reverse.mkString("/")).obj.delete(head)
+//        case _ ⇒ Json.jNull
+//      }
+//    }
 
     private[argonaut] def filterR(p: Predicate[Json]): Json =
       p.cond(value.withObject(_.filterR(p)).withArray(_.filterR(p)), jNull)(value)
@@ -98,28 +111,9 @@ object argonaut {
   }
 
   implicit class TraversalToJsonFrills[A](val traversal: Traversal[A, Json]) extends AnyVal {
-    def descendant(path: String): Traversal[A, Json] = path.split("/").filter(_.nonEmpty).foldLeft(traversal) {
-      case (acc, "*")                            ⇒ acc composeTraversal objectValuesOrArrayElements
-      case (acc, r"""\*\[${key}='${value}'\]""") ⇒ acc.array composeTraversal each composePrism filterObject(key, value)
-      case (acc, r"""\[${Split(indices)}\]""")   ⇒ acc.array composeTraversal filterIndex(indices.map(_.toInt))
-      case (acc, r"""\{${Split(keys)}\}""")      ⇒ acc.obj   composeTraversal filterIndex(keys)
-      case (acc, key)                            ⇒ acc.obj   composeTraversal filterIndex(Set(key))
-    }
+    def descendant(path: String): Traversal[A, Json] =
+      if (path.startsWith("$")) Descendant.JsonPath.descend(traversal, path) else Descendant.Pimpathon.descend(traversal, path)
   }
-
-  private def filterObject(key: String, value: String) =
-    Prism[Json, Json](json ⇒ json.field(key).contains(jString(value)).option(json))(json ⇒ json)
-
-  final lazy val objectValuesOrArrayElements: Traversal[Json, Json] = new Traversal[Json, Json] {
-    def modifyF[F[_]](f: Json => F[Json])(j: Json)(implicit F: Applicative[F]): F[Json] = j.fold(
-      jsonNull   = F.pure(j), jsonBool = _ => F.pure(j), jsonNumber = _ => F.pure(j), jsonString = _ => F.pure(j),
-      jsonArray  = arr => F.map(each[List[Json], Json].modifyF(f)(arr))(Json.array(_: _*)),
-      jsonObject = obj => F.map(each[JsonObject, Json].modifyF(f)(obj))(Json.jObject)
-    )
-  }
-
-  private implicit class RegexMatcher(val sc: StringContext) extends AnyVal { def r = sc.parts.mkString("(.+)").r }
-  private object Split { def unapply(value: String): Option[Set[String]] = Some(value.split(",").map(_.trim).toSet) }
 
   private implicit class JsonArrayFrills(val a: List[Json]) extends AnyVal {
     private[argonaut] def filterR(p: Predicate[Json]): List[Json] = a.collect { case j if p(j) ⇒ j.filterR(p) }
@@ -167,8 +161,135 @@ object CanPrismFrom {
 }
 
 object Descendant {
+  import pimpathon.argonaut.TraversalFrills
+
   implicit def descendantAsApplyTraversal[From, To](descendant: Descendant[From, To]):
   ApplyTraversal[From, From, To, To] = ApplyTraversal(descendant.from, descendant.traversal)
+
+  implicit class DescendantToJsonObjectFrills[From](descendant: Descendant[From, JsonObject]) {
+//    def delete(key: String): From = {
+//      (descendant.traversal composeLens At.at(key)).set(None).apply(descendant.from)
+//    }
+  }
+
+  case object Descender {
+    implicit val kind: Descender = Pimpathon
+  }
+
+  sealed trait Descender {
+    def descend[A](from: Traversal[A, Json], path: String): Traversal[A, Json]
+  }
+
+  case object JsonPath extends Descender {
+    def descend[A](from: Traversal[A, Json], path: String): Traversal[A, Json] = {
+      new Parser().compile(path) match {
+        case Parser.Success(pathTokens, _) ⇒ new JsonPathIntegration().doIt(pathTokens, from)
+        case _                             ⇒ sys.error(s"Could not parse json path: $path")
+      }
+    }
+
+    private class JsonPathIntegration[A] {
+      def doIt(tokens: List[PathToken], start: Traversal[A, Json]): Traversal[A, Json] = tokens.foldLeft(start) {
+        case (acc, RecursiveField(name))           ⇒ sys.error("RecursiveFields not support !")
+        case (acc, RootNode)                       ⇒ acc
+        case (acc, AnyField)                       ⇒ acc.obj composeTraversal each
+        case (acc, MultiField(names))              ⇒ acc.obj composeTraversal filterIndex(names.toSet: Set[String])
+        case (acc, Field(name))                    ⇒ acc.obj composeTraversal filterIndex(Set(name))
+        case (acc, RecursiveAnyField)              ⇒ sys.error("RecursiveFields not support !")
+        case (acc, CurrentNode)                    ⇒ acc
+        case (acc, ComparisonFilter(op, lhs, rhs)) ⇒ comparisonFilter(acc, op, lhs, rhs)
+        case (acc, BooleanFilter(op, lhs, rhs))    ⇒ ???
+        case (acc, HasFilter(SubQuery(tokens)))    ⇒ hasFilter(acc, tokens)
+        case (acc, ArraySlice(None, None, 1))      ⇒ acc.array composeTraversal each
+        case (acc, ArraySlice(begin, end, step))   ⇒ ???
+        case (acc, ArrayRandomAccess(indecies))    ⇒ acc.array composeTraversal filterIndex(indecies.toSet: Set[Int])
+        case (acc, RecursiveFilterToken(_))        ⇒ ???
+      }
+
+      private def comparisonFilter(acc: Traversal[A, Json], op: ComparisonOperator, lhs: FilterValue, rhs: FilterValue) = (op, lhs, rhs) match {
+        case (EqOperator, EQ(fn), value)            ⇒ fn(value)(acc)
+        case (EqOperator, value, EQ(fn))            ⇒ fn(value)(acc)
+        case (GreaterOrEqOperator, GTEQ(fn), value) ⇒ fn(value)(acc)
+        case (op, lhs, rhs)                         ⇒ ???
+      }
+
+      val EQ = ComparisonArgument {
+        case SubQuery(List(CurrentNode))              ⇒ fn(rhs ⇒ filterArray(filterObject(_ == json(rhs))))
+        case SubQuery(List(CurrentNode, Field(name))) ⇒ fn(rhs ⇒ filterArray(filterObject(name, json(rhs))))
+      }
+
+      val GTEQ = {
+        implicit val orderingJson: Ordering[Json] = {
+          Ordering.Tuple4[Option[Boolean], Option[Int], Option[Double], Option[String]].on[Json](json ⇒ {
+            (json.bool, json.number.flatMap(_.toInt), json.number.flatMap(_.toDouble), json.string)
+          })
+        }
+
+        implicit def orderOps[B](a: B)(implicit O: Ordering[B]) = O.mkOrderingOps(a)
+
+        ComparisonArgument {
+          case SubQuery(List(CurrentNode, Field(name))) ⇒ fn(rhs ⇒ filterArray(filterObject(lhs ⇒ lhs.field(name) >= Some(json(rhs)))))
+        }
+      }
+
+      private def hasFilter(acc: Traversal[A, Json], tokens: List[PathToken]) = tokens match {
+        case List(CurrentNode, Field(name)) ⇒ filterArray(filterObject(_.hasField(name)))(acc)
+      }
+
+      trait ComparisonArgument {
+        def unapply(lhs: FilterValue): Option[FN]
+      }
+
+      object ComparisonArgument {
+        def apply(pf: PartialFunction[FilterValue, FN]): ComparisonArgument = new ComparisonArgument {
+          def unapply(lhs: FilterValue): Option[FN] = pf.lift(lhs)
+        }
+      }
+
+      type FN = FilterValue ⇒ Traversal[A, Json] ⇒ Traversal[A, Json]
+
+      private def fn(f: FN) = f
+
+      private def json(fdv: FilterValue): Json = fdv match {
+        case JPTrue          ⇒ jTrue
+        case JPFalse         ⇒ jFalse
+        case JPDouble(value) ⇒ Json.jNumberOrNull(value)
+        case JPLong(value)   ⇒ Json.jNumber(value)
+        case JPString(value) ⇒ jString(value)
+        case JPNull          ⇒ jNull
+        case unknown ⇒ sys.error(s"boom: $unknown")
+      }
+
+      def filterArray(prism: Prism[Json, Json])(acc: Traversal[A, Json]): Traversal[A, Json] = acc.array composeTraversal each composePrism prism
+    }
+  }
+
+  case object Pimpathon extends Descender {
+    def descend[A](from: Traversal[A, Json], path: String): Traversal[A, Json] = path.split("/").filter(_.nonEmpty).foldLeft(from) {
+      case (acc, "*")                            ⇒ acc composeTraversal objectValuesOrArrayElements
+      case (acc, r"""\*\[${key}='${value}'\]""") ⇒ acc.array composeTraversal each composePrism filterObject(key, jString(value))
+      case (acc, r"""\[${Split(indices)}\]""")   ⇒ acc.array composeTraversal filterIndex(indices.map(_.toInt))
+      case (acc, r"""\{${Split(keys)}\}""")      ⇒ acc.obj   composeTraversal filterIndex(keys)
+      case (acc, key)                            ⇒ acc.obj   composeTraversal filterIndex(Set(key))
+    }
+  }
+
+  private def filterObject(key: String, value: Json): Prism[Json, Json] =
+    filterObject(_.field(key).contains(value))
+
+  private def filterObject(p: Json ⇒ Boolean): Prism[Json, Json] =
+    Prism[Json, Json](json ⇒ p(json).option(json))(json ⇒ json)
+
+  private final lazy val objectValuesOrArrayElements: Traversal[Json, Json] = new Traversal[Json, Json] {
+    def modifyF[F[_]](f: Json => F[Json])(j: Json)(implicit F: Applicative[F]): F[Json] = j.fold(
+      jsonNull   = F.pure(j), jsonBool = _ => F.pure(j), jsonNumber = _ => F.pure(j), jsonString = _ => F.pure(j),
+      jsonArray  = arr => F.map(each[List[Json], Json].modifyF(f)(arr))(Json.array(_: _*)),
+      jsonObject = obj => F.map(each[JsonObject, Json].modifyF(f)(obj))(Json.jObject)
+    )
+  }
+
+  private implicit class RegexMatcher(val sc: StringContext) extends AnyVal { def r = sc.parts.mkString("(.+)").r }
+  private object Split { def unapply(value: String): Option[Set[String]] = Some(value.split(",").map(_.trim).toSet) }
 }
 
 case class Descendant[From, To](from: From, traversal: Traversal[From, To]) {

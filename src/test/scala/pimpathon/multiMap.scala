@@ -4,7 +4,6 @@ import org.junit.Test
 import scala.collection.{mutable ⇒ M}
 import scala.collection.generic.CanBuildFrom
 
-import org.junit.Assert._
 import pimpathon.builder._
 import pimpathon.multiMap._
 import pimpathon.util._
@@ -49,21 +48,17 @@ class MultiMapTest {
   ).calling(_.multiMap.head).produces(Map(1 → 10, 2 → 20), Map(2 → 20), Map())
 
   @Test def multiMap_tail(): Unit = on(
-    Map(1 → List(10, 11), 2 → List(20)), Map(1 → Nil, 2 → List(20)),
-    Map(1 → (Nil: List[Int])), MultiMap.empty[List, Int, Int]
+    Map(1 → List(10, 11), 2 → List(20)), Map(1 → Nil, 2 → List(20)), Map(1 → Nil), MultiMap.empty[List, Int, Int]
   ).calling(_.multiMap.tail).produces(Map(1 → List(11)), Map(), Map(), Map())
 
   @Test def onlyOption(): Unit = on(
-    Map(1 → Nil, 2 → List(20)), Map(1 → List(10, 11), 2 → List(20)),
-    Map(1 → (Nil: List[Int])), MultiMap.empty[List, Int, Int]
+    Map(1 → Nil, 2 → List(20)), Map(1 → List(10, 11), 2 → List(20)), Map(1 → Nil), MultiMap.empty[List, Int, Int]
   ).calling(_.onlyOption).produces(Some(Map(2 → 20)), None, None, None)
 
   @Test def headTailOption(): Unit = on(
-    Map(1 → List(10, 11), 2 → List(20)), Map(1 → Nil, 2 → List(20)),
-    Map(1 → (Nil: List[Int])), MultiMap.empty[List, Int, Int]
+    Map(1 → List(10, 11), 2 → List(20)), Map(1 → Nil, 2 → List(20)), Map(1 → Nil), MultiMap.empty[List, Int, Int]
   ).calling(_.headTailOption).produces(
-    Some(Map(1 → 10, 2 → 20), Map(1 → List(11))), Some(Map(2 → 20), MultiMap.empty[List, Int, Int]),
-    None, None
+    Some(Map(1 → 10, 2 → 20), Map(1 → List(11))), Some(Map(2 → 20), MultiMap.empty[List, Int, Int]), None, None
   )
 
   @Test def multiMap_values(): Unit = {
@@ -78,24 +73,23 @@ class MultiMapTest {
     Map(1 → List(10, 11), 2 → List(20, 21), 3 → List(30, 31)).multiMap.mapEntries(k ⇒ vs ⇒ (k % 2, vs)) ===
       Map(0 → List(20, 21), 1 → List(10, 11, 30, 31))
 
-  @Test def multiMap_mapEntriesU(): Unit = assertEquals(
-    Map(0 → Set(20, 21), 1 → Set(10, 11, 30, 31)),
-    Map(1 → List(10, 11), 2 → List(20, 21), 3 → List(30, 31)).multiMap.mapEntriesU(k ⇒ vs ⇒ (k % 2, vs.toSet))
-  )
+  @Test def multiMap_mapEntriesU(): Unit =
+    Map(1 → List(10, 11), 2 → List(20, 21), 3 → List(30, 31)).multiMap.mapEntriesU(k ⇒ vs ⇒ (k % 2, vs.toSet)) ===
+      Map(0 → Set(20, 21), 1 → Set(10, 11, 30, 31))
+
+  @Test def multiMap_mapValues(): Unit =
+    Map(1 → List(10, 11), 2 → List(20, 21), 3 → List(30, 31)).multiMap.mapValues(v ⇒ v * 2) ===
+      Map(1 → List(20, 22), 2 → List(40, 42), 3 → List(60, 62))
 
   @Test def flatMapValues(): Unit = Map(0 → List(1, 2), 1 → List(2, 3)).flatMapValues(v ⇒ List(v, -v)) ===
     Map(0 → List(1, -1, 2, -2), 1 → List(2, -2, 3, -3))
 
   @Test def flatMapValuesU(): Unit = {
-    assertEquals(
-      Map(0 → Set(1, -1, 2, -2), 1 → Set(2, -2, 3, -3)),
-      Map(0 → List(1, 2), 1 → List(2, 3)).flatMapValuesU(v ⇒ Set(v, -v))
-    )
+    Map(0 → List(1, 2), 1 → List(2, 3)).flatMapValuesU(v ⇒ Set(v, -v)) ===
+      Map(0 → Set(1, -1, 2, -2), 1 → Set(2, -2, 3, -3))
 
-    assertEquals(
-      Map(0 → List(1, -1, 2, -2), 1 → List(2, -2, 3, -3)),
-      Map(0 → Vector(1, 2), 1 → Vector(2, 3)).flatMapValuesU(v ⇒ List(v, -v))
-    )
+    Map(0 → Vector(1, 2), 1 → Vector(2, 3)).flatMapValuesU(v ⇒ List(v, -v)) ===
+      Map(0 → List(1, -1, 2, -2), 1 → List(2, -2, 3, -3))
   }
 
   @Test def pop(): Unit = on(Map(1 → List(2, 3), 2 → List(3))).calling(_.pop(1), _.pop(2), _.pop(3))

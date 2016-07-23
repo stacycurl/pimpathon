@@ -5,13 +5,13 @@ import scala.language.{higherKinds, implicitConversions}
 import scala.collection.{breakOut, mutable ⇒ M, GenTraversable}
 import scala.collection.generic.CanBuildFrom
 
-import pimpathon.any._
-import pimpathon.boolean._
-import pimpathon.builder._
-import pimpathon.function._
-import pimpathon.map._
-import pimpathon.stream._
-import pimpathon.tuple._
+import pimpathon.any.AnyPimps
+import pimpathon.boolean.BooleanPimps
+import pimpathon.builder.BuilderPimps
+import pimpathon.function.CurriedFunction2Pimps
+import pimpathon.map.MapPimps
+import pimpathon.stream.StreamPimps
+import pimpathon.tuple.Tuple2Pimps
 
 
 object multiMap {
@@ -66,6 +66,9 @@ object multiMap {
     def reverse(implicit crf: CanRebuildFrom[F, V], cbf: CCBF[K, F]): MultiMap[F, V, K] =
       value.toStream.flatMap(kvs ⇒ crf.toStream(kvs._2).map(_ → kvs._1))(collection.breakOut)
 
+    def mapValues[W](f: V ⇒ W)(implicit crfv: CanRebuildFrom[F, V], crfw: CanRebuildFrom[F, W]): MultiMap[F, K, W] =
+      value.mapValuesEagerly(crfv.map(_)(f))
+
     def mapEntries[C, W](f: K ⇒ F[V] ⇒ (C, F[W]))(
       implicit cbmmf: MMCBF[F, C, F[W]], crf: CanRebuildFrom[F, W], crff: CanRebuildFrom[F, F[W]]
     ): MultiMap[F, C, W] = value.asMultiMap[F].withEntries(f.tupled).mapValuesEagerly(crf.concat)
@@ -114,18 +117,21 @@ object multiMap {
   }
 
   trait CanRebuildFrom[F[_], V] {
-    def concat(ffv: F[F[V]])(implicit crff: CanRebuildFrom[F, F[V]]): F[V] = concat(crff.toStream(ffv))
-    def concat(fvs: Iterable[F[V]]): F[V] = (cbf.apply() +++= fvs.map(toStream)) result()
-    def pop(fv: F[V]): Option[F[V]] = flatMapS(fv)(_.tailOption.filter(_.nonEmpty))
-    def flatMapS(fv: F[V])(f: Stream[V] ⇒ Option[Stream[V]]): Option[F[V]] = f(toStream(fv)).map(fromStream)
-    def toStream(fv: F[V]): Stream[V]
+    final def concat(ffv: F[F[V]])(implicit crff: CanRebuildFrom[F, F[V]]): F[V] = concat(crff.toStream(ffv))
+    final def concat(fvs: Iterable[F[V]]): F[V] = (cbf.apply() +++= fvs.map(toStream)) result()
+    final def pop(fv: F[V]): Option[F[V]] = flatMapS(fv)(_.tailOption.filter(_.nonEmpty))
+    final def map[W](fv: F[V])(f: V ⇒ W)(implicit gcf: CanRebuildFrom[F, W]): F[W] = gcf.fromStream(toStream(fv).map(f))
 
-    def flatMap[GW](fv: F[V])(f: V ⇒ GW)(implicit gcrf: CanRebuildFrom.Unapply[GW]): gcrf.F[gcrf.V] =
+    private def flatMapS(fv: F[V])(f: Stream[V] ⇒ Option[Stream[V]]): Option[F[V]] = f(toStream(fv)).map(fromStream)
+
+    final def flatMap[GW](fv: F[V])(f: V ⇒ GW)(implicit gcrf: CanRebuildFrom.Unapply[GW]): gcrf.F[gcrf.V] =
       gcrf.fromStream(toStream(fv).flatMap(v ⇒ gcrf.toStream(f(v))))
 
-    protected val cbf: CanBuildFrom[F[V], V, F[V]]
-
     def fromStream(to: TraversableOnce[V]): F[V] = (cbf() ++= to).result()
+
+    def toStream(fv: F[V]): Stream[V]
+
+    protected val cbf: CanBuildFrom[F[V], V, F[V]]
   }
 
   object CanRebuildFrom {

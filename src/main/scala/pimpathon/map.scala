@@ -85,6 +85,9 @@ object map {
     def updateKeys[C](f: K ⇒ Option[C]): Map[C, V]   = map.flatMap(kv ⇒ f(kv._1).map(_ → kv._2))
     def updateValues[W](f: V ⇒ Option[W]): Map[K, W] = map.flatMap(kv ⇒ f(kv._2).map(kv._1 → _))
 
+    def zipWith[W, X](other: Map[K, W])(pf: (Option[V], Option[W]) ~> X): Map[K, X] =
+      map.keySet.union(other.keySet).flatMap(k ⇒ pf.lift((map.get(k), other.get(k))).map(k → _))(breakOut)
+
     protected def gtl: GenTraversableLike[(K, V), GenTraversable[(K, V)]] = map
     protected def cc: GenTraversable[(K, V)] = map
   }

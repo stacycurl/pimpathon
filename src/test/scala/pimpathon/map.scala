@@ -252,5 +252,10 @@ class MapTest {
     Map(1 → 2, 2 → 3).updateValues(util.partial(2 → 2)) === nonEmpty
   }
 
+  @Test def zipWith(): Unit = Map(1 → 2, 2 → 3).zipWith(Map(1 → 20, 3 → 30)) {
+    case (Some(lhs), Some(rhs)) ⇒ lhs + rhs
+    case (None,      Some(rhs)) ⇒ rhs
+  } === Map(1 → 22, 3 → 30)
+
   private val (empty, nonEmpty) = (Map.empty[Int, Int], Map(1 → 2))
 }

@@ -172,15 +172,11 @@ object Descendant {
 //    }
   }
 
-  case object Descender {
-    implicit val kind: Descender = Pimpathon
-  }
-
-  sealed trait Descender {
+  private sealed trait Descender {
     def descend[A](from: Traversal[A, Json], path: String): Traversal[A, Json]
   }
 
-  case object JsonPath extends Descender {
+  private case object JsonPath extends Descender {
     def descend[A](from: Traversal[A, Json], path: String): Traversal[A, Json] = {
       new Parser().compile(path) match {
         case Parser.Success(pathTokens, _) ⇒ new JsonPathIntegration().doIt(pathTokens, from)
@@ -264,7 +260,7 @@ object Descendant {
     }
   }
 
-  case object Pimpathon extends Descender {
+  private case object Pimpathon extends Descender {
     def descend[A](from: Traversal[A, Json], path: String): Traversal[A, Json] = path.split("/").filter(_.nonEmpty).foldLeft(from) {
       case (acc, "*")                            ⇒ acc composeTraversal objectValuesOrArrayElements
       case (acc, r"""\*\[${key}='${value}'\]""") ⇒ acc.array composeTraversal each composePrism filterObject(key, jString(value))
@@ -272,6 +268,17 @@ object Descendant {
       case (acc, r"""\{${Split(keys)}\}""")      ⇒ acc.obj   composeTraversal filterIndex(keys)
       case (acc, key)                            ⇒ acc.obj   composeTraversal filterIndex(Set(key))
     }
+
+    private final lazy val objectValuesOrArrayElements: Traversal[Json, Json] = new Traversal[Json, Json] {
+      def modifyF[F[_]](f: Json => F[Json])(j: Json)(implicit F: Applicative[F]): F[Json] = j.fold(
+        jsonNull   = F.pure(j), jsonBool = _ => F.pure(j), jsonNumber = _ => F.pure(j), jsonString = _ => F.pure(j),
+        jsonArray  = arr => F.map(each[List[Json], Json].modifyF(f)(arr))(Json.array(_: _*)),
+        jsonObject = obj => F.map(each[JsonObject, Json].modifyF(f)(obj))(Json.jObject)
+      )
+    }
+
+    private implicit class RegexMatcher(val sc: StringContext) extends AnyVal { def r = sc.parts.mkString("(.+)").r }
+    private object Split { def unapply(value: String): Option[Set[String]] = Some(value.split(",").map(_.trim).toSet) }
   }
 
   private def filterObject(key: String, value: Json): Prism[Json, Json] =
@@ -279,17 +286,6 @@ object Descendant {
 
   private def filterObject(p: Json ⇒ Boolean): Prism[Json, Json] =
     Prism[Json, Json](json ⇒ p(json).option(json))(json ⇒ json)
-
-  private final lazy val objectValuesOrArrayElements: Traversal[Json, Json] = new Traversal[Json, Json] {
-    def modifyF[F[_]](f: Json => F[Json])(j: Json)(implicit F: Applicative[F]): F[Json] = j.fold(
-      jsonNull   = F.pure(j), jsonBool = _ => F.pure(j), jsonNumber = _ => F.pure(j), jsonString = _ => F.pure(j),
-      jsonArray  = arr => F.map(each[List[Json], Json].modifyF(f)(arr))(Json.array(_: _*)),
-      jsonObject = obj => F.map(each[JsonObject, Json].modifyF(f)(obj))(Json.jObject)
-    )
-  }
-
-  private implicit class RegexMatcher(val sc: StringContext) extends AnyVal { def r = sc.parts.mkString("(.+)").r }
-  private object Split { def unapply(value: String): Option[Set[String]] = Some(value.split(",").map(_.trim).toSet) }
 }
 
 case class Descendant[From, To](from: From, traversal: Traversal[From, To]) {

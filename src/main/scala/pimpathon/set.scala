@@ -2,6 +2,7 @@ package pimpathon
 
 import pimpathon.genTraversableLike.{GenTraversableLikeOfTuple2Mixin, GenTraversableLikeOfEitherPimpsMixin, GTLGT}
 
+import scala.collection.immutable.TreeSet
 import scala.collection.{mutable ⇒ M, GenTraversable, GenTraversableLike}
 
 import pimpathon.any._
@@ -10,6 +11,8 @@ import pimpathon.list._
 
 object set  {
   implicit class SetPimps[A](set: Set[A]) extends genTraversableLike.GenTraversableLikePimpsMixin[A, Set] {
+    def sorted(implicit ordering: Ordering[A]): TreeSet[A] = TreeSet() ++ set
+
     def notContains(elem: A): Boolean = !set.contains(elem)
 
     def powerSet: Set[Set[A]] = {

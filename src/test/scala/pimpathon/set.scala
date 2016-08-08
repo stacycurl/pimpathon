@@ -1,7 +1,6 @@
 package pimpathon
 
 import org.junit.Test
-import pimpathon.util.on
 import scala.collection.{mutable ⇒ M}
 
 import org.junit.Assert._
@@ -21,6 +20,8 @@ class SetTest {
     Set(1).powerSet         === Set(Set.empty[Int], Set(1))
     Set(1, 2).powerSet      === Set(Set.empty[Int], Set(1), Set(2), Set(1, 2))
   }
+
+  @Test def sorted(): Unit = Set(4, 1, 2).sorted.toList === List(1, 2, 4)
 
   @Test def mutable(): Unit = on(Set(1, 2)).calling(_.mutable, _.toMutable).produces(M.Set(1, 2), M.Set(1, 2))
 

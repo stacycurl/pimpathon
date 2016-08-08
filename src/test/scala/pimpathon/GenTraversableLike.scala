@@ -147,13 +147,15 @@ class GenTraversableLikeTests {
   @Test def asMap_withUniqueKeys(): Unit = on(gtl(), gtl(1, 2), gtl(1, 2, 3))
     .calling(_.asMap.withUniqueKeys(_ % 2)).produces(Some(Map()), Some(Map(0 → 2, 1 → 1)), None)
 
-  @Test def histogram(): Unit = gtl("foo", "food", "bar").histogram(_.length) === Map(3 → 2, 4 → 1)
+  @Test def histogram(): Unit = gtl(1, 2, 3, 1, 2, 1).histogram.apply() === Map(1 → 3, 2 → 2, 3 → 1)
 
-  @Test def optHistogram(): Unit =
-    gtl("foo", "food", "bar", "oo").optHistogram(_.length.filterSelf(_ > 2)) === Map(3 → 2, 4 → 1)
+  @Test def histogram_by(): Unit = gtl("foo", "food", "bar").histogram.by(_.length) === Map(3 → 2, 4 → 1)
 
-  @Test def collectHistogram(): Unit =
-    gtl("foo", "food", "bar", "oo").collectHistogram { case word if word.length > 2 ⇒ word.length } ===
+  @Test def Histogram_opt(): Unit =
+    gtl("foo", "food", "bar", "oo").histogram.opt(_.length.filterSelf(_ > 2)) === Map(3 → 2, 4 → 1)
+
+  @Test def histogram_collect(): Unit =
+    gtl("foo", "food", "bar", "oo").histogram.collect { case word if word.length > 2 ⇒ word.length } ===
       Map(3 → 2, 4 → 1)
 
   @Test def toMultiMap(): Unit = on(gtl((1, 10), (1, 11), (2, 20), (2, 21)))

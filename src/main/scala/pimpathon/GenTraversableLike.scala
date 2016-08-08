@@ -26,9 +26,12 @@ object genTraversableLike {
 
     def asMap: GenTraversableLikeCapturer[A, Map, Map] = as[Map]
 
-    def histogram[B](f: A ⇒ B): Map[B, Int] = asMultiMap[Count].withKeys(f)(countValues)
-    def collectHistogram[B](f: A ~> B): Map[B, Int] = optHistogram(f.lift)
-    def optHistogram[B](f: A ⇒ Option[B]): Map[B, Int] = asMultiMap[Count].withSomeKeys(f)(countValues)
+    case object histogram {
+      def apply(): Map[A, Int] = by(a ⇒ a)
+      def by[B](f: A ⇒ B): Map[B, Int] = asMultiMap[Count].withKeys(f)(countValues)
+      def collect[B](f: A ~> B): Map[B, Int] = opt(f.lift)
+      def opt[B](f: A ⇒ Option[B]): Map[B, Int] = asMultiMap[Count].withSomeKeys(f)(countValues)
+    }
 
     def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Map] =
       GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Map](gtl)
@@ -147,7 +150,7 @@ case class GenTraversableLikeCapturer[A, F[_, _], G[_, _]](private val gtl: GenT
 
   private def groupBy[K, V](fk: A ⇒ K, f: GenTraversableLikeCapturer[A, F, G] ⇒ V)(
     implicit cbf: CanBuildFrom[Nothing, (K, V), G[K, V]]
-  ): G[K, V] = gtl.asMultiMap[List].withKeys(fk).map { case (k,as) ⇒ (k, f(copy(as))) }(breakOut)
+  ): G[K, V] = gtl.asMultiMap[List].withKeys(fk).map { case (k, as) ⇒ (k, f(copy(as))) }(breakOut)
 
   private def zip[K, V](fk: A ⇒ Option[K], fv: A ⇒ Option[V])(a: A): Option[(K, V)] = for { k ← fk(a); v ← fv(a) } yield (k, v)
 }

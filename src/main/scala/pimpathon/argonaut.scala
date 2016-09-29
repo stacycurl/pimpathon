@@ -172,46 +172,50 @@ object Descendant {
 //    }
   }
 
-  private sealed trait Descender {
+  sealed trait Descender {
     def descend[A](from: Traversal[A, Json], path: String): Traversal[A, Json]
   }
 
-  private case object JsonPath extends Descender {
+  case object JsonPath extends Descender {
     def descend[A](from: Traversal[A, Json], path: String): Traversal[A, Json] = {
       new Parser().compile(path) match {
         case Parser.Success(pathTokens, _) ⇒ new JsonPathIntegration().doIt(pathTokens, from)
-        case _                             ⇒ sys.error(s"Could not parse json path: $path")
+        case Parser.NoSuccess(msg, _)      ⇒ sys.error(s"Could not parse json path: $path, $msg")
       }
     }
 
     private class JsonPathIntegration[A] {
       def doIt(tokens: List[PathToken], start: Traversal[A, Json]): Traversal[A, Json] = tokens.foldLeft(start) {
-        case (acc, RecursiveField(name))           ⇒ sys.error("RecursiveFields not support !")
+        case (acc, RecursiveField(name))           ⇒ notSupported(s"RecursiveField($name)")
         case (acc, RootNode)                       ⇒ acc
         case (acc, AnyField)                       ⇒ acc.obj composeTraversal each
         case (acc, MultiField(names))              ⇒ acc.obj composeTraversal filterIndex(names.toSet: Set[String])
         case (acc, Field(name))                    ⇒ acc.obj composeTraversal filterIndex(Set(name))
-        case (acc, RecursiveAnyField)              ⇒ sys.error("RecursiveFields not support !")
+        case (acc, RecursiveAnyField)              ⇒ notSupported("RecursiveAnyField")
         case (acc, CurrentNode)                    ⇒ acc
         case (acc, ComparisonFilter(op, lhs, rhs)) ⇒ comparisonFilter(acc, op, lhs, rhs)
-        case (acc, BooleanFilter(op, lhs, rhs))    ⇒ ???
-        case (acc, HasFilter(SubQuery(tokens)))    ⇒ hasFilter(acc, tokens)
+        case (acc, BooleanFilter(op, lhs, rhs))    ⇒ notSupported(s"BooleanFilter($op, $lhs, $rhs)")
+        case (acc, HasFilter(SubQuery(subTokens))) ⇒ hasFilter(acc, subTokens)
         case (acc, ArraySlice(None, None, 1))      ⇒ acc.array composeTraversal each
-        case (acc, ArraySlice(begin, end, step))   ⇒ ???
+        case (acc, ArraySlice(begin, end, step))   ⇒ notSupported(s"ArraySlice($begin, $end, $step)")
         case (acc, ArrayRandomAccess(indecies))    ⇒ acc.array composeTraversal filterIndex(indecies.toSet: Set[Int])
-        case (acc, RecursiveFilterToken(_))        ⇒ ???
+        case (acc, RecursiveFilterToken(filter))   ⇒ notSupported(s"RecursiveFilterToken($filter)")
       }
 
       private def comparisonFilter(acc: Traversal[A, Json], op: ComparisonOperator, lhs: FilterValue, rhs: FilterValue) = (op, lhs, rhs) match {
         case (EqOperator, EQ(fn), value)            ⇒ fn(value)(acc)
         case (EqOperator, value, EQ(fn))            ⇒ fn(value)(acc)
         case (GreaterOrEqOperator, GTEQ(fn), value) ⇒ fn(value)(acc)
-        case (op, lhs, rhs)                         ⇒ ???
+        case _                                      ⇒ notSupported((op, lhs, rhs))
       }
 
+      // TODO make this fully recursive
       val EQ = ComparisonArgument {
-        case SubQuery(List(CurrentNode))              ⇒ fn(rhs ⇒ filterArray(filterObject(_ == json(rhs))))
-        case SubQuery(List(CurrentNode, Field(name))) ⇒ fn(rhs ⇒ filterArray(filterObject(name, json(rhs))))
+        case SubQuery(List(CurrentNode))                              ⇒ fn(rhs ⇒ filterArray(filterObject(_ == json(rhs))))
+        case SubQuery(List(CurrentNode, Field(name)))                 ⇒ fn(rhs ⇒ filterArray(filterObject(name, json(rhs))))
+        case SubQuery(List(CurrentNode, Field(first), Field(second))) ⇒ fn(rhs ⇒ filterArray(filterObject(j ⇒ {
+          j.fieldOrEmptyObject(first).field(second).contains(json(rhs))
+        })))
       }
 
       val GTEQ = {
@@ -225,8 +229,11 @@ object Descendant {
 
         ComparisonArgument {
           case SubQuery(List(CurrentNode, Field(name))) ⇒ fn(rhs ⇒ filterArray(filterObject(lhs ⇒ lhs.field(name) >= Some(json(rhs)))))
+          case other ⇒ notSupported(other)
         }
       }
+
+      private def notSupported[X](x: X): Nothing = sys.error(s"$x not supported !")
 
       private def hasFilter(acc: Traversal[A, Json], tokens: List[PathToken]) = tokens match {
         case List(CurrentNode, Field(name)) ⇒ filterArray(filterObject(_.hasField(name)))(acc)
@@ -253,14 +260,14 @@ object Descendant {
         case JPLong(value)   ⇒ Json.jNumber(value)
         case JPString(value) ⇒ jString(value)
         case JPNull          ⇒ jNull
-        case unknown ⇒ sys.error(s"boom: $unknown")
+        case unknown         ⇒ sys.error(s"boom: $unknown")
       }
 
       def filterArray(prism: Prism[Json, Json])(acc: Traversal[A, Json]): Traversal[A, Json] = acc.array composeTraversal each composePrism prism
     }
   }
 
-  private case object Pimpathon extends Descender {
+  case object Pimpathon extends Descender {
     def descend[A](from: Traversal[A, Json], path: String): Traversal[A, Json] = path.split("/").filter(_.nonEmpty).foldLeft(from) {
       case (acc, "*")                            ⇒ acc composeTraversal objectValuesOrArrayElements
       case (acc, r"""\*\[${key}='${value}'\]""") ⇒ acc.array composeTraversal each composePrism filterObject(key, jString(value))

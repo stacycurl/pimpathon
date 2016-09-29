@@ -187,6 +187,27 @@ class JsonTest extends JsonUtil {
 //    json.descendant("$..options[*]['bold','size']").getAll <=> List(jTrue, jNumber(3))
   }
 
+  @Test def filterOnNestedFields(): Unit = {
+    val json = parse(
+      """[
+        |  {
+        |    "documentType": {
+        |      "value": "Text"
+        |    },
+        |    "fileName": "Thing.txt"
+        |  },
+        |  {
+        |    "documentType": {
+        |      "value": "Image"
+        |    },
+        |    "fileName": "Duckies.img"
+        |  }
+        |]
+      """.stripMargin)
+
+    json.descendant("$[?(@.documentType.value == 'Text')].fileName").string.getAll <=> List("Thing.txt")
+  }
+
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
     case (input, expected) ⇒ f(parse(input)) <=> parse(expected)
   }

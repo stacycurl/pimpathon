@@ -63,6 +63,20 @@ class GenTraversableLikeTests {
     )
   )
 
+  @Test def histogram_by(): Unit = on(gtl(), words).calling(_.histogram.by(letter(0))).produces(
+    Map(), Map(
+      b → 3,
+      f → 3
+    )
+  )
+
+  @Test def histogram_by_2(): Unit = on(gtl(), words).calling(_.histogram.by(letter(0), letter(1))).produces(
+    Map(), Map(
+      b → Map(a → 2, o → 1),
+      f → Map(o → 2, a → 1)
+    )
+  )
+
   @Test def asMultiMap_withEntries_nested_2(): Unit = on(gtl(), words).calling(
     _.asMultiMap[List].withEntries(letter(0), letter(1), letter(2), s ⇒ s),
      _.asMultiMap[Set].withEntries(letter(0), letter(1), letter(2), s ⇒ s)
@@ -77,6 +91,13 @@ class GenTraversableLikeTests {
     )
   )
 
+  @Test def histogram_by_3(): Unit = on(gtl(), words).calling(_.histogram.by(letter(0), letter(1), letter(2))).produces(
+    Map(), Map(
+      b → Map(a → Map(r → 2), o → Map(o → 1)),
+      f → Map(o → Map(o → 2), a → Map(f → 1))
+    )
+  )
+
   @Test def asMultiMap_withEntries_nested_3(): Unit = on(gtl(), words).calling(
     _.asMultiMap[List].withEntries(letter(0), letter(1), letter(2), letter(3), s ⇒ s),
      _.asMultiMap[Set].withEntries(letter(0), letter(1), letter(2), letter(3), s ⇒ s)
@@ -88,6 +109,15 @@ class GenTraversableLikeTests {
     Map(), Map(
       b → Map(a → Map(r → Map(' ' → Set(bar), e → Set(bare))), o → Map(o → Map(m → Set(boom)))),
       f → Map(o → Map(o → Map(' ' → Set(foo), d → Set(food))), a → Map(f → Map(f → Set(faff))))
+    )
+  )
+
+  @Test def histogram_by_4(): Unit = on(gtl(), words).calling(
+    _.histogram.by(letter(0), letter(1), letter(2), letter(3))
+  ).produces(
+    Map(), Map(
+      b → Map(a → Map(r → Map(' ' → 1, e → 1)), o → Map(o → Map(m → 1))),
+      f → Map(o → Map(o → Map(' ' → 1, d → 1)), a → Map(f → Map(f → 1)))
     )
   )
 
@@ -149,7 +179,6 @@ class GenTraversableLikeTests {
 
   @Test def histogram(): Unit = gtl(1, 2, 3, 1, 2, 1).histogram.apply() === Map(1 → 3, 2 → 2, 3 → 1)
 
-  @Test def histogram_by(): Unit = gtl("foo", "food", "bar").histogram.by(_.length) === Map(3 → 2, 4 → 1)
 
   @Test def Histogram_opt(): Unit =
     gtl("foo", "food", "bar", "oo").histogram.opt(_.length.filterSelf(_ > 2)) === Map(3 → 2, 4 → 1)

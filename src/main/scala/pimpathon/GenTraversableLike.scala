@@ -28,9 +28,45 @@ object genTraversableLike {
 
     case object histogram {
       def apply(): Map[A, Int] = by(a ⇒ a)
-      def by[B](f: A ⇒ B): Map[B, Int] = asMultiMap[Count].withKeys(f)(countValues)
-      def collect[B](f: A ~> B): Map[B, Int] = opt(f.lift)
-      def opt[B](f: A ⇒ Option[B]): Map[B, Int] = asMultiMap[Count].withSomeKeys(f)(countValues)
+
+
+      def by[B](f: A ⇒ B): Map[B, Int] =
+        asMultiMap[Count].withKeys(f)
+
+      def by[B, C](f: A ⇒ B, g: A ⇒ C): Map[B, Map[C, Int]] =
+        asMultiMap[Count].withEntries(f, g, a ⇒ a)
+
+      def by[B, C, D](f: A ⇒ B, g: A ⇒ C, h: A ⇒ D): Map[B, Map[C, Map[D, Int]]] =
+        asMultiMap[Count].withEntries(f, g, h, a ⇒ a)
+
+      def by[B, C, D, E](f: A ⇒ B, g: A ⇒ C, h: A ⇒ D, i: A ⇒ E): Map[B, Map[C, Map[D, Map[E, Int]]]] =
+        asMultiMap[Count].withEntries(f, g, h, i, a ⇒ a)
+
+
+      def collect[B](f: A ~> B): Map[B, Int] =
+        asMultiMap[Count].withPFKeys(f)
+
+      def collect[B, C](f: A ~> B, g: A ~> C): Map[B, Map[C, Int]] =
+        asMultiMap[Count].withPFEntries(f, g, ~>(a ⇒ a))
+
+      def collect[B, C, D](f: A ~> B, g: A ~> C, h: A ~> D): Map[B, Map[C, Map[D, Int]]] =
+        asMultiMap[Count].withPFEntries(f, g, h, ~>(a ⇒ a))
+
+      def collect[B, C, D, E](f: A ~> B, g: A ~> C, h: A ~> D, i: A ~> E): Map[B, Map[C, Map[D, Map[E, Int]]]] =
+        asMultiMap[Count].withPFEntries(f, g, h, i, ~>(a ⇒ a))
+
+
+      def opt[B](f: A ⇒ Option[B]): Map[B, Int] =
+        asMultiMap[Count].withSomeKeys(f)
+
+      def opt[B, C](f: A ⇒ Option[B], g: A ⇒ Option[C]): Map[B, Map[C, Int]] =
+        asMultiMap[Count].withSomeEntries(f, g, a ⇒ Some(a))
+
+      def opt[B, C, D](f: A ⇒ Option[B], g: A ⇒ Option[C], h: A ⇒ Option[D]): Map[B, Map[C, Map[D, Int]]] =
+        asMultiMap[Count].withSomeEntries(f, g, h, a ⇒ Some(a))
+
+      def opt[B, C, D, E](f: A ⇒ Option[B], g: A ⇒ Option[C], h: A ⇒ Option[D], i: A ⇒ Option[E]): Map[B, Map[C, Map[D, Map[E, Int]]]] =
+        asMultiMap[Count].withSomeEntries(f, g, h, i, a ⇒ Some(a))
     }
 
     def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Map] =
@@ -70,7 +106,7 @@ object genTraversableLike {
       recurse(gtl, z)
     }
 
-    private def countValues[B]: CanBuildFrom[Nothing, (B, A), Map[B, Int]] =
+    private implicit def countValues[B]: CanBuildFrom[Nothing, (B, A), Map[B, Int]] =
       multiMap.build[Count, B, A](CanBuildNonEmpty.canBuildFromToCBNE(CountCBF))
 
     private type Count[_] = Int
@@ -128,15 +164,44 @@ case class GenTraversableLikeCapturer[A, F[_, _], G[_, _]](private val gtl: GenT
   def withEntries[K, V](k: A ⇒ K, v: A ⇒ V)(implicit cbf: CBF[K, V]): F[K, V] = gtl.map(a ⇒ (k(a), v(a)))(breakOut)
   def withEntries[K, V](f: A ⇒ ((K, V)))(implicit cbf: CBF[K, V]): F[K, V] = gtl.map(f)(breakOut)
 
-
   def withSomeKeys[K](f: A ⇒ Option[K])(implicit cbf: CBF[K, A]): F[K, A]   = withSomeEntries(a ⇒ f(a).map(_ → a))
   def withSomeValues[V](f: A ⇒ Option[V])(implicit cbf: CBF[A, V]): F[A, V] = withSomeEntries(a ⇒ f(a).map(a → _))
+
+
+  def withSomeEntries[K1, K2, K3, K4, V](fk1: A ⇒ Option[K1], fk2: A ⇒ Option[K2], fk3: A ⇒ Option[K3], fk4: A ⇒ Option[K4], fv: A ⇒ Option[V])(implicit
+    k4: CBF[K4, V], k3: GBF[K3, F[K4, V]], k2: GBF[K2, G[K3, F[K4, V]]], k1: GBF[K1, G[K2, G[K3, F[K4, V]]]]
+  ): G[K1, G[K2, G[K3, F[K4, V]]]] = optGroupBy(fk1, _.withSomeEntries(fk2, fk3, fk4, fv))
+
+  def withSomeEntries[K1, K2, K3, V](fk1: A ⇒ Option[K1], fk2: A ⇒ Option[K2], fk3: A ⇒ Option[K3], fv: A ⇒ Option[V])(implicit
+    k3: CBF[K3, V], k2: GBF[K2, F[K3, V]], k1: GBF[K1, G[K2, F[K3, V]]]
+  ): G[K1, G[K2, F[K3, V]]] = optGroupBy(fk1, _.withSomeEntries(fk2, fk3, fv))
+
+  def withSomeEntries[K1, K2, V](fk1: A ⇒ Option[K1], fk2: A ⇒ Option[K2], fv: A ⇒ Option[V])(implicit
+    k2: CBF[K2, V], k1: GBF[K1, F[K2, V]]
+  ): G[K1, F[K2, V]] = optGroupBy(fk1, _.withSomeEntries(fk2, fv))
+
   def withSomeEntries[K, V](fk: A ⇒ Option[K], fv: A ⇒ Option[V])(implicit cbf: CBF[K, V]): F[K, V] = withSomeEntries(zip(fk, fv))
+
   def withSomeEntries[K, V](f: A ⇒ Option[(K, V)])(implicit cbf: CBF[K, V]): F[K, V] = gtl.flatMap(a ⇒ f(a))(breakOut)
 
   def withPFKeys[K](pf: A ~> K)(implicit cbf: CBF[K, A]): F[K, A]   = withPFEntries(pf &&& identityPF[A])
   def withPFValues[V](pf: A ~> V)(implicit cbf: CBF[A, V]): F[A, V] = withPFEntries(identityPF[A] &&& pf)
+
+  def withPFEntries[K1, K2, K3, K4, V](fk1: A ~> K1, fk2: A ~> K2, fk3: A ~> K3, fk4: A ~> K4, fv: A ~> V)(implicit
+    k4: CBF[K4, V], k3: GBF[K3, F[K4, V]], k2: GBF[K2, G[K3, F[K4, V]]], k1: GBF[K1, G[K2, G[K3, F[K4, V]]]]
+  ): G[K1, G[K2, G[K3, F[K4, V]]]] = pfGroupBy(fk1, _.withPFEntries(fk2, fk3, fk4, fv))
+
+  def withPFEntries[K1, K2, K3, V](fk1: A ~> K1, fk2: A ~> K2, fk3: A ~> K3, fv: A ~> V)(implicit
+    k3: CBF[K3, V], k2: GBF[K2, F[K3, V]], k1: GBF[K1, G[K2, F[K3, V]]]
+  ): G[K1, G[K2, F[K3, V]]] = pfGroupBy(fk1, _.withPFEntries(fk2, fk3, fv))
+
+  def withPFEntries[K1, K2, V](fk1: A ~> K1, fk2: A ~> K2, fv: A ~> V)(implicit
+    k2: CBF[K2, V], k1: GBF[K1, F[K2, V]]
+  ): G[K1, F[K2, V]] = pfGroupBy(fk1, _.withPFEntries(fk2, fv))
+
   def withPFEntries[K, V](k: A ~> K, v: A ~> V)(implicit cbf: CBF[K, V]): F[K, V] = withPFEntries(k &&& v)
+
+
   def withPFEntries[K, V](pf: A ~> (K, V))(implicit cbf: CBF[K, V]): F[K, V] = gtl.collect(pf)(breakOut)
 
   def withManyKeys[K](f: A ⇒ List[K])(implicit cbf: CBF[K, A]): F[K, A] =
@@ -148,9 +213,19 @@ case class GenTraversableLikeCapturer[A, F[_, _], G[_, _]](private val gtl: GenT
     }.map { case (_, builder) ⇒ builder.result() }
   }
 
-  private def groupBy[K, V](fk: A ⇒ K, f: GenTraversableLikeCapturer[A, F, G] ⇒ V)(
-    implicit cbf: CanBuildFrom[Nothing, (K, V), G[K, V]]
-  ): G[K, V] = gtl.asMultiMap[List].withKeys(fk).map { case (k, as) ⇒ (k, f(copy(as))) }(breakOut)
+  private type Self[X, Y[_, _], Z[_, _]] = GenTraversableLikeCapturer[X, Y, Z]
+
+  private def groupBy[K, V](fk: A ⇒ K, grouping: Self[A, F, G] ⇒ V)(implicit cbf: GBF[K, V]): G[K, V] =
+    gtl.asMultiMap[List].withKeys(fk).calc(next(grouping))
+
+  private def optGroupBy[K, V](fk: A ⇒ Option[K], grouping: Self[A, F, G] ⇒ V)(implicit cbf: GBF[K, V]): G[K, V] =
+    gtl.asMultiMap[List].withSomeKeys(fk).calc(next(grouping))
+
+  private def pfGroupBy[K, V](fk: A ~> K, grouping: Self[A, F, G] ⇒ V)(implicit cbf: GBF[K, V]): G[K, V] =
+    gtl.asMultiMap[List].withPFKeys(fk).calc(next(grouping))
+
+  private def next[V, K](f: Self[A, F, G] ⇒ V)(implicit cbf: GBF[K, V]): MultiMap[List, K, A] ⇒ G[K, V] =
+    inner ⇒ inner.map { case (k, as) ⇒ (k, f(copy(as))) }(breakOut)
 
   private def zip[K, V](fk: A ⇒ Option[K], fv: A ⇒ Option[V])(a: A): Option[(K, V)] = for { k ← fk(a); v ← fv(a) } yield (k, v)
 }

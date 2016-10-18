@@ -10,8 +10,13 @@ object PimpathonBuild extends Build {
       organization              := "com.github.stacycurl",
       scalaVersion              := "2.11.7",
       scalacOptions             := Seq("-feature", "-Xfatal-warnings", "-deprecation", "-unchecked", "-target:jvm-1.8"),
+      javacOptions              := Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
       maxErrors                 := 1,
-      parallelExecution in Test := true
+      parallelExecution in Test := true,
+      initialize := {
+        val _ = initialize.value
+        require(sys.props("java.specification.version") == "1.8", "Java 8 is required for this project.")
+      }
       //    coverageEnabled := true,
       //    coverageMinimum := 100,
       //    coverageHighlighting := true,

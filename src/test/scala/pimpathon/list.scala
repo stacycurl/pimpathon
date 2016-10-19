@@ -174,4 +174,6 @@ class ListTest {
 
   @Test def sortDemoting(): Unit =
     List("black", "red", "purple", "green").sortDemoting("green", "black") === List("purple", "red", "green", "black")
+
+  @Test def shuffle(): Unit = List.range(1, 10).shuffle().sorted === List.range(1, 10)
 }

@@ -1,5 +1,6 @@
 package pimpathon
 
+import scala.util.Random
 import scala.{PartialFunction ⇒ ~>}
 import scala.annotation.tailrec
 import scala.collection.{mutable ⇒ M, GenTraversable, GenTraversableLike}
@@ -113,6 +114,8 @@ object list {
 
     def sortPromoting(first: A*)(implicit ordering: Ordering[A]): List[A] = list.sorted(ordering.promote(first: _*))
     def sortDemoting(last: A*)(implicit ordering: Ordering[A]): List[A]   = list.sorted(ordering.demote(last: _*))
+
+    def shuffle(): List[A] = Random.shuffle(list)
 
     private def equalBy[B](f: A ⇒ B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
     private def zip[B](other: List[B]): Iterator[(A, B)] = list.iterator.zip(other.iterator)

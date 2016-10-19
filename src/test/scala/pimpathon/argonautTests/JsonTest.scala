@@ -187,6 +187,18 @@ class JsonTest extends JsonUtil {
 //    json.descendant("$..options[*]['bold','size']").getAll <=> List(jTrue, jNumber(3))
   }
 
+  @Test def workWithDeepPredicates(): Unit = {
+    val json = parse(
+      """{
+        | "people": [
+        |  {"person": {"name": "Arnie", "age": 100}, "address": "California"},
+        |  {"person": {"name": "Raymond", "age": 21}, "address": "Brisvegas"}
+        | ]
+        |}
+      """.stripMargin)
+    json.descendant("$.people[?(@.person.name == 'Arnie')].address").getAll <=> List(jString("California"))
+  }
+
   @Test def filterOnNestedFields(): Unit = {
     val json = parse(
       """[

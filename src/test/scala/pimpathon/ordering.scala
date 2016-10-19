@@ -15,4 +15,9 @@ class OrderingTest {
 
   @Test def and: Unit =
     List((1, 2), (1, 3), (2, 3)).shuffle.sorted(Ordering.Int && Ordering.Int) === List((1, 2), (1, 3), (2, 3))
+
+  @Test def or: Unit =
+    List(4, 2, 1, 3).shuffle.sorted(bit(0) || bit(1)) === List(4, 2, 1, 3)
+
+  private def bit(index: Int): Ordering[Int] = Ordering.Boolean.on[Int](i ⇒ (i & (1 << index)) != 0)
 }

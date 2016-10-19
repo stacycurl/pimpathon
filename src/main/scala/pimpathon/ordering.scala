@@ -9,6 +9,7 @@ object ordering {
     def promote(as: A*): Ordering[A] = Tuple2[Option[Int], A](Option[Int](Int.reverse).reverse, o).on[A](index(as: _*))
     def demote(as: A*): Ordering[A]  = Tuple2[Option[Int], A](Option[Int](Int), o).on[A](index(as: _*))
 
+    def ||(next: Ordering[A]): Ordering[A] = &&(next).on[A](a ⇒ (a, a))
     def &&[B](next: Ordering[B]): Ordering[(A, B)] = Ordering.Tuple2(o, next)
 
     private def index(as: A*)(a: A): (Option[Int], A) = (as.indexOf(a).filterSelf(_ >= 0), a)

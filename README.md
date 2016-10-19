@@ -10,12 +10,16 @@ Pimpathon
 
 **Pimpathon** is a library that extends Scala & Java classes with 'extension methods' via the [Pimp my Library][pimp-my-library] pattern.
 
+Pimpathon contains pimps for classes in core scala & java libraries and pimps for external libraries. To avoid
+name clash the pimps for core classes are called XPimps (ListPimps, etc.) and those for external libraries are called
+XFrills (ListFrills, etc.)
+
 ### Using Pimpathon
 
 Release artefacts are published to Bintray and are built using [Travis CI][ci].
 The artefacts can be published to Sonatype upon request (if someone can tell me how to _fully_ automate that that would be great).
 
-To include the repositories in your SBT build you should add,
+To include the repositories in your SBT build you should add:
 
 ```scala
 resolvers += "jcenter" at "http://jcenter.bintray.com"
@@ -23,13 +27,7 @@ resolvers += "jcenter" at "http://jcenter.bintray.com"
 resolvers += "Stacy Curl's repo" at "http://dl.bintray.com/stacycurl/repo/"
 ```
 
-Builds are available for Scala 2.11.7
-
-### pimpathon
-
-Pimpathon contains pimps for classes in core scala & java libraries and pimps for external libraries. To avoid
-name class the pimps for core classes are called XPimps (ListPimps, etc.) and those for external libraries are called
-XFrills (ListFrills, etc.)
+To include pimpathon as a dependency you should add:
 
 ```scala
 libraryDependencies += "com.github.stacycurl" %% "pimpathon" % "1.7.0" intransitive()
@@ -37,6 +35,10 @@ libraryDependencies += "com.github.stacycurl" %% "pimpathon" % "1.7.0" intransit
 
 'intransitive' means that even though pimpathon pimps a few third party libraries it won't force you to depend on them,
 you'll only get pimps for types in libraries you already depend on.
+
+
+Builds are available for Scala 2.11.7
+
 
 [Documentation][doc]
 

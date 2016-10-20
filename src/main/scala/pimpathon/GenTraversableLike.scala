@@ -69,8 +69,7 @@ object genTraversableLike {
         asMultiMap[Count].withSomeEntries(f, g, h, i, a ⇒ Some(a))
     }
 
-    def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Map] =
-      GenTraversableLikeCapturer[A, ({ type MM[K, V] = MultiMap[F, K, V] })#MM, Map](gtl)
+    def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, MultiMap[F, ?, ?], Map] = GenTraversableLikeCapturer[A, MultiMap[F, ?, ?], Map](gtl)
 
     def as[F[_, _]]: GenTraversableLikeCapturer[A, F, F] = GenTraversableLikeCapturer[A, F, F](gtl)
 

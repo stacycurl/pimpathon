@@ -33,6 +33,7 @@ object PimpathonBuild extends Build {
       "io.gatling"                 %% "jsonpath"         % "0.6.7"  % "provided",
       "com.novocode"               %  "junit-interface"  % "0.11"   % "test",
       "com.github.stacycurl"       %% "delta-matchers"   % "1.0.19" % "test"
-    )
-  ))
+    ))
+    settings addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.7.1")
+  )
 }

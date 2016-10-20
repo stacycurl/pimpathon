@@ -183,6 +183,7 @@ object Descendant {
 
   implicit class DescendantToJsonObjectFrills[From](descendant: Descendant[From, JsonObject]) {
     def renameField(from: String, to: String): From = descendant.modify(_.renameField(from, to))
+    def renameFields(fromTos: (String, String)*): From = descendant.modify(_.renameFields(fromTos: _*))
 
 //    def delete(key: String): From = {
 //      (descendant.traversal composeLens At.at(key)).set(None).apply(descendant.from)

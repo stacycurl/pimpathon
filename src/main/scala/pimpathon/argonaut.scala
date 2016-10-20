@@ -115,6 +115,9 @@ object argonaut {
 
     def renameField(from: String, to: String): JsonObject = o(from).fold(o)(value ⇒ (o - from) + (to, value))
 
+    def addIfMissing(name: String, value: Json): JsonObject =
+      o(name).fold(o + (name, value))(_ => o)
+
     private[argonaut] def filterR(p: Predicate[Json]): JsonObject =
       JsonObject.fromTraversableOnce(o.toMap.collectValues { case j if p(j) ⇒ j.filterR(p) })
   }

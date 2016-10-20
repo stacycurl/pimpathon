@@ -4,6 +4,7 @@ import argonaut.Json._
 import argonaut._
 import org.junit.Test
 import pimpathon.argonaut._
+import pimpathon.util.on
 import sjc.delta.argonaut.json.actualExpected.flat._
 import sjc.delta.argonaut.matchers._
 import sjc.delta.matchers.syntax.anyDeltaMatcherOps
@@ -249,6 +250,11 @@ class JsonObjectTest extends JsonUtil {
 
   @Test def renameFields(): Unit =
     jObjectFields("a" → jTrue, "b" → jFalse).withObject(_.renameFields("a" → "A", "b" → "B")) <=> jObjectFields("A" → jTrue, "B" → jFalse)
+
+  @Test def addIfMissing(): Unit = on(jEmptyObject, jObjectFields("a" → jTrue))
+    .calling(_.withObject(_.addIfMissing("a", jFalse))).produces(
+    jObjectFields("a" → jFalse), jObjectFields("a" → jTrue)
+  )
 }
 
 

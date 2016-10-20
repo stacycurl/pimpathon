@@ -201,27 +201,6 @@ class JsonTest extends JsonUtil {
     json.descendant("$.people[?(@.person.name == 'Arnie')].address").getAll <=> List(jString("California"))
   }
 
-  @Test def filterOnNestedFields(): Unit = {
-    val json = parse(
-      """[
-        |  {
-        |    "documentType": {
-        |      "value": "Text"
-        |    },
-        |    "fileName": "Thing.txt"
-        |  },
-        |  {
-        |    "documentType": {
-        |      "value": "Image"
-        |    },
-        |    "fileName": "Duckies.img"
-        |  }
-        |]
-      """.stripMargin)
-
-    json.descendant("$[?(@.documentType.value == 'Text')].fileName").string.getAll <=> List("Thing.txt")
-  }
-
   @Test def descendant_renameField(): Unit =
     parse("""{ "thing": { "original": true } }""").descendant("thing").renameField("original", "renamed") <=> parse("""{ "thing": { "renamed": true } }""")
 

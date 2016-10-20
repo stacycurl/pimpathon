@@ -4,6 +4,7 @@ import scala.language.{higherKinds, implicitConversions}
 
 import scala.collection.{breakOut, mutable ⇒ M, GenTraversable}
 import scala.collection.generic.CanBuildFrom
+import scala.collection.immutable.{Map ⇒ ▶:}
 
 import pimpathon.any.AnyPimps
 import pimpathon.boolean.BooleanPimps
@@ -15,39 +16,39 @@ import pimpathon.tuple.Tuple2Pimps
 
 
 object multiMap {
-  type MultiMap[F[_], K, V] = Map[K, F[V]]
-  type MMCBF[F[_], K, V] = CanBuildFrom[Nothing, (K, V), MultiMap[F, K, V]]
+  type MultiMap[F[_], K, V] = K ▶: F[V]
+  type MMCBF[F[_], K, V] = CanBuildFrom[Nothing, (K, V), K ▶: F[V]]
 
   implicit def build[F[_], K, V](implicit fcbne: CanBuildNonEmpty[V, F[V]]): MMCBF[F, K, V] = MultiMap.build
 
-  implicit class MultiMapPimps[F[_], K, V](val value: MultiMap[F, K, V]) extends AnyVal {
-    def select[W](f: F[V] ⇒ W): Map[K, W] = value.mapValuesEagerly(f) // just an alias for mapValuesEagerly
+  implicit class MultiMapPimps[F[_], K, V](val value: K ▶: F[V]) extends AnyVal {
+    def select[W](f: F[V] ⇒ W): K ▶: W = value.mapValuesEagerly(f) // just an alias for mapValuesEagerly
 
-    def merge(other: MultiMap[F, K, V])(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] =
+    def merge(other: K ▶: F[V])(implicit crf: CanRebuildFrom[F, V]): K ▶: F[V] =
       if (value.isEmpty) other else other.foldLeft(value) {
         case (acc, (key, otherValues)) ⇒ acc.append(key, otherValues)
       }
 
-    def append(key: K, newValues: F[V])(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] =
+    def append(key: K, newValues: F[V])(implicit crf: CanRebuildFrom[F, V]): K ▶: F[V] =
       value + ((key, crf.concat(List(value.get(key), Some(newValues)).flatten)))
 
-    def pop(key: K)(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValue(key, crf.pop)
+    def pop(key: K)(implicit crf: CanRebuildFrom[F, V]): K ▶: F[V] = value.updateValue(key, crf.pop)
 
-    def onlyOption(implicit gtl: F[V] <:< GenTraversable[V], crf: CanRebuildFrom[F, V]): Option[Map[K, V]] =
+    def onlyOption(implicit gtl: F[V] <:< GenTraversable[V], crf: CanRebuildFrom[F, V]): Option[K ▶: V] =
       headTailOption.flatMap(_.calcC(head ⇒ tail ⇒ tail.isEmpty.option(head)))
 
-    def sequence(implicit bf: CCBF[Map[K, V], F], gtl: F[V] <:< GenTraversable[V],
-      crf: CanRebuildFrom[F, V], crsm: CanRebuildFrom[F, Map[K, V]]
-    ): F[Map[K, V]] = crsm.fromStream(value.unfold(_.headTailOption))
+    def sequence(implicit bf: CCBF[K ▶: V, F], gtl: F[V] <:< GenTraversable[V],
+      crf: CanRebuildFrom[F, V], crsm: CanRebuildFrom[F, K ▶: V]
+    ): F[K ▶: V] = crsm.fromStream(value.unfold(_.headTailOption))
 
     def headTailOption(implicit gtl: F[V] <:< GenTraversable[V], crf: CanRebuildFrom[F, V])
-      : Option[(Map[K, V], MultiMap[F, K, V])] = multiMap.head.filterSelf(_.nonEmpty).map(_ → multiMap.tail)
+      : Option[(K ▶: V, K ▶: F[V])] = multiMap.head.filterSelf(_.nonEmpty).map(_ → multiMap.tail)
 
     def flatMapValues[W](f: V ⇒ F[W])(implicit crfv: CanRebuildFrom[F, V], crfw: CanRebuildFrom[F, W])
-      : MultiMap[F, K, W] = value.mapValuesEagerly(crfv.flatMap(_)(f))
+      : K ▶: F[W] = value.mapValuesEagerly(crfv.flatMap(_)(f))
 
     def flatMapValuesU[GW](f: V ⇒ GW)(implicit crfv: CanRebuildFrom[F, V], u: CanRebuildFrom.Unapply[GW])
-      : MultiMap[u.F, K, u.V] = value.mapValuesEagerly(crfv.flatMap(_)(f))
+      : K ▶: u.F[u.V] = value.mapValuesEagerly(crfv.flatMap(_)(f))
 
     def getOrEmpty(k: K)(implicit fcbf: CCBF[V, F]): F[V] = value.getOrElse(k, fcbf.apply().result())
 
@@ -55,40 +56,40 @@ object multiMap {
   }
 
 
-  class MultiMapConflictingPimps[F[_], K, V](value: MultiMap[F, K, V]) {
+  class MultiMapConflictingPimps[F[_], K, V](value: K ▶: F[V]) {
     // These operations cannot be defined on MultiMapOps because non-implicit methods of the same name exist on Map
-    def head(implicit gtl: F[V] <:< GenTraversable[V]): Map[K, V] =
+    def head(implicit gtl: F[V] <:< GenTraversable[V]): K ▶: V =
       value.flatMap { case (k, fv) ⇒ fv.headOption.map(k → _) }
 
-    def tail(implicit crf: CanRebuildFrom[F, V]): MultiMap[F, K, V] = value.updateValues(crf.pop _)
+    def tail(implicit crf: CanRebuildFrom[F, V]): K ▶: F[V] = value.updateValues(crf.pop _)
     def values(implicit crf: CanRebuildFrom[F, V]): F[V] = crf.concat(value.values)
 
-    def reverse(implicit crf: CanRebuildFrom[F, V], cbf: CCBF[K, F]): MultiMap[F, V, K] =
+    def reverse(implicit crf: CanRebuildFrom[F, V], cbf: CCBF[K, F]): V ▶: F[K] =
       value.toStream.flatMap(kvs ⇒ crf.toStream(kvs._2).map(_ → kvs._1))(collection.breakOut)
 
-    def mapValues[W](f: V ⇒ W)(implicit crfv: CanRebuildFrom[F, V], crfw: CanRebuildFrom[F, W]): MultiMap[F, K, W] =
+    def mapValues[W](f: V ⇒ W)(implicit crfv: CanRebuildFrom[F, V], crfw: CanRebuildFrom[F, W]): K ▶: F[W] =
       value.mapValuesEagerly(crfv.map(_)(f))
 
     def mapEntries[C, W](f: K ⇒ F[V] ⇒ (C, F[W]))(
       implicit cbmmf: MMCBF[F, C, F[W]], crf: CanRebuildFrom[F, W], crff: CanRebuildFrom[F, F[W]]
-    ): MultiMap[F, C, W] = value.asMultiMap[F].withEntries(f.tupled).mapValuesEagerly(crf.concat)
+    ): C ▶: F[W] = value.asMultiMap[F].withEntries(f.tupled).mapValuesEagerly(crf.concat)
 
     def mapEntriesU[C, GW](f: K ⇒ F[V] ⇒ (C, GW))(
       implicit cbmmf: MMCBF[F, C, GW], u: CanRebuildFrom.Unapply[GW], crf: CanRebuildFrom[F, GW]
-    ): MultiMap[u.F, C, u.V] = value.asMultiMap[F].withEntries(f.tupled).mapValuesEagerly(u.concat[F](_)(crf))
+    ): C ▶: u.F[u.V] = value.asMultiMap[F].withEntries(f.tupled).mapValuesEagerly(u.concat[F](_)(crf))
 
 
-    def sliding(size: Int)(implicit bf: CCBF[Map[K, V], F], gtl: F[V] <:< GenTraversable[V],
-      crf: CanRebuildFrom[F, V], crsm: CanRebuildFrom[F, MultiMap[F, K, V]], fcbf: CanBuildFrom[Nothing, V, F[V]]
-    ): F[MultiMap[F, K, V]] = {
+    def sliding(size: Int)(implicit bf: CCBF[K ▶: V, F], gtl: F[V] <:< GenTraversable[V],
+      crf: CanRebuildFrom[F, V], crsm: CanRebuildFrom[F, K ▶: F[V]], fcbf: CanBuildFrom[Nothing, V, F[V]]
+    ): F[K ▶: F[V]] = {
       crsm.fromStream(value.unfold(_.headTailOption).sliding(size)
-        .map(_.flatMap[(K, V), MultiMap[F, K, V]](_.toStream)(breakOut)).toStream)
+        .map(_.flatMap[(K, V), K ▶: F[V]](_.toStream)(breakOut)).toStream)
     }
   }
 
   object MultiMap {
     def build[F[_], K, V](implicit fcbne: CanBuildNonEmpty[V, F[V]]): MMCBF[F, K, V] = new MultiMapCanBuildFrom[F, K, V]
-    def empty[F[_], K, V]: MultiMap[F, K, V] = Map.empty[K, F[V]]
+    def empty[F[_], K, V]: K ▶: F[V] = Map.empty[K, F[V]]
   }
 
 
@@ -97,9 +98,9 @@ object multiMap {
   }
 
   class MultiMapCanBuildFrom[F[_], K, V](implicit fcbne: CanBuildNonEmpty[V, F[V]])
-    extends MMCBF[F, K, V] with IgnoreFromCBF[Nothing, (K, V), MultiMap[F, K, V]] {
+    extends MMCBF[F, K, V] with IgnoreFromCBF[Nothing, (K, V), K ▶: F[V]] {
 
-    def apply(): M.Builder[(K, V), MultiMap[F, K, V]] = new MultiMapBuilder[F, K, V]
+    def apply(): M.Builder[(K, V), K ▶: F[V]] = new MultiMapBuilder[F, K, V]
   }
 
   class MultiMapBuilder[F[_], K, V](
@@ -107,11 +108,11 @@ object multiMap {
   )(
     implicit fcbne: CanBuildNonEmpty[V, F[V]]
   )
-    extends M.Builder[(K, V), MultiMap[F, K, V]] {
+    extends M.Builder[(K, V), K ▶: F[V]] {
 
     def +=(elem: (K, V)): this.type = { add(elem._1, elem._2); this }
     def clear(): Unit = map.clear()
-    def result(): Map[K, F[V]] = map.map(kv ⇒ (kv._1, kv._2.result()))(breakOut)
+    def result(): K ▶: F[V] = map.map(kv ⇒ (kv._1, kv._2.result()))(breakOut)
 
     private def add(k: K, v: V): Unit = map.put(k, map.get(k).fold(fcbne.builder(v))(_ += v))
   }

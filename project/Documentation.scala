@@ -2,6 +2,7 @@ import java.io.{FileOutputStream, File}
 import java.nio.charset.Charset
 import sbt.{Info, Pure, Task}
 import scala.xml.{NodeSeq, Elem}
+import scala.collection.immutable.{Map ⇒ ▶:}
 
 
 object Documentation {
@@ -1231,7 +1232,7 @@ object Documentation {
       //<pre><code class="hljs javascript"></code></pre>
   }
 
-  def template(version: String, partials0: Map[String, List[Partial]]): Elem = {
+  def template(version: String, partials0: String ▶: List[Partial]): Elem = {
     val partials = partials0
 //      .filterKeys(_ == "GTL[A]").mapValues(_.filter(p ⇒ p.name == "asMultiMap.withEntries" && p.description.contains("nested")))
 

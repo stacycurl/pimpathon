@@ -5,6 +5,7 @@ import scala.{PartialFunction ⇒ ~>}
 import scala.annotation.tailrec
 import scala.collection.{mutable ⇒ M, GenTraversable, GenTraversableLike}
 import scala.collection.immutable._
+import scala.collection.immutable.{Map ⇒ ▶:}
 
 import pimpathon.genTraversableLike.{GenTraversableLikeOfTuple2Mixin, GenTraversableLikeOfEitherPimpsMixin, GTLGT}
 
@@ -25,7 +26,7 @@ object list {
 
     def emptyTo(alternative: ⇒ List[A]): List[A] = uncons(alternative, _ ⇒ list)
 
-    def zipToMap[B](values: List[B]): Map[A, B] = zip(values).toMap
+    def zipToMap[B](values: List[B]): A ▶: B = zip(values).toMap
     def zipWith[B, C](values: List[B])(f: ((A, B)) ⇒ C): List[C] = zip(values).map(f).toList
 
     def fraction(p: Predicate[A]): Double = countWithSize(p).fold(Double.NaN)(_.to[Double].calc(_ / _))
@@ -40,7 +41,7 @@ object list {
     def duplicatesBy[B](f: A ⇒ B): List[A] = (countBy(f) - 1).multiMap.values
     def distinctBy[B](f: A ⇒ B): List[A] = list.map(equalBy(f)).distinct.map(_.a)
 
-    def countBy[B](f: A ⇒ B): MultiMap[List, Int, A] =
+    def countBy[B](f: A ⇒ B): Int ▶: List[A] =
       list.asMultiMap[List].withKeys(f).multiMap.mapEntries(_ ⇒ values ⇒ (values.size, values))
 
     def batchBy[B](f: A ⇒ B): List[List[A]] = list.unconsC(empty = Nil, nonEmpty = head ⇒ tail ⇒ {

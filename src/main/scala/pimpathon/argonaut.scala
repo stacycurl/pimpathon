@@ -10,6 +10,8 @@ import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, Json, J
 import _root_.argonaut.Json.{jNull, jString, jTrue, jFalse}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
 
+import scala.collection.immutable.{Map ⇒ ▶:}
+
 import monocle.{Iso, Prism, Traversal}
 import monocle.function.Each.each
 import monocle.function.FilterIndex.filterIndex
@@ -60,9 +62,9 @@ object argonaut {
       CodecJson.derived[B](f(value.Encoder), g(value.Decoder))
   }
 
-  implicit class CodecJsonMapFrills[K, V](val value: CodecJson[Map[K, V]]) extends AnyVal {
-    def xmapKeys[C](kc: K ⇒ C)(ck: C ⇒ K): CodecJson[Map[C, V]]   = value.derived(_ contramapKeys ck)(_ mapKeys kc)
-    def xmapValues[W](vw: V ⇒ W)(wv: W ⇒ V): CodecJson[Map[K, W]] = value.derived(_ contramapValues wv)(_ mapValues vw)
+  implicit class CodecJsonMapFrills[K, V](val value: CodecJson[K ▶: V]) extends AnyVal {
+    def xmapKeys[C](kc: K ⇒ C)(ck: C ⇒ K): CodecJson[C ▶: V]   = value.derived(_ contramapKeys ck)(_ mapKeys kc)
+    def xmapValues[W](vw: V ⇒ W)(wv: W ⇒ V): CodecJson[K ▶: W] = value.derived(_ contramapValues wv)(_ mapValues vw)
   }
 
   implicit class DecodeJsonFrills[A](val value: DecodeJson[A]) extends AnyVal {
@@ -74,9 +76,9 @@ object argonaut {
       DecodeJson[B](c => value.decode(c).flatMap(a => DecodeResult[B](f(a).leftMap(_ → c.history).toEither)))
   }
 
-  implicit class DecodeJsonMapFrills[K, V](val value: DecodeJson[Map[K, V]]) extends AnyVal {
-    def mapKeys[C](f: K ⇒ C): DecodeJson[Map[C, V]] = value.map(_.mapKeysEagerly(f))
-    def mapValues[W](f: V ⇒ W): DecodeJson[Map[K, W]] = value.map(_.mapValuesEagerly(f))
+  implicit class DecodeJsonMapFrills[K, V](val value: DecodeJson[K ▶: V]) extends AnyVal {
+    def mapKeys[C](f: K ⇒ C): DecodeJson[C ▶: V] = value.map(_.mapKeysEagerly(f))
+    def mapValues[W](f: V ⇒ W): DecodeJson[K ▶: W] = value.map(_.mapValuesEagerly(f))
   }
 
   implicit class EncodeJsonFrills[A](val value: EncodeJson[A]) extends AnyVal {
@@ -87,9 +89,9 @@ object argonaut {
     private[argonaut] def beforeEncode[B](f: B => A): EncodeJson[B] = value contramap f // Probably publish later
   }
 
-  implicit class EncodeJsonMapFrills[K, V](val value: EncodeJson[Map[K, V]]) extends AnyVal {
-    def contramapKeys[C](f: C ⇒ K): EncodeJson[Map[C, V]] = value.contramap[Map[C, V]](_.mapKeysEagerly(f))
-    def contramapValues[W](f: W ⇒ V): EncodeJson[Map[K, W]] = value.contramap[Map[K, W]](_.mapValuesEagerly(f))
+  implicit class EncodeJsonMapFrills[K, V](val value: EncodeJson[K ▶: V]) extends AnyVal {
+    def contramapKeys[C](f: C ⇒ K): EncodeJson[C ▶: V] = value.contramap[C ▶: V](_.mapKeysEagerly(f))
+    def contramapValues[W](f: W ⇒ V): EncodeJson[K ▶: W] = value.contramap[K ▶: W](_.mapValuesEagerly(f))
   }
 
   implicit class TraversalFrills[A, B](val traversal: Traversal[A, B]) extends AnyVal {
@@ -144,9 +146,9 @@ case class CanPrismFrom[From, Elem, To](prism: Prism[From, To]) {
   def toList: CanPrismFrom[List[From], Elem, List[To]] =
     CanPrismFrom(Prism[List[From], List[To]](la ⇒ Some(la.flatMap(prism.getOption)))(_.map(prism.reverseGet)))
 
-  def toMap[K]: CanPrismFrom[Map[K, From], Elem, Map[K, To]] = CanPrismFrom(Prism[Map[K, From], Map[K, To]](mapKA ⇒ {
+  def toMap[K]: CanPrismFrom[K ▶: From, Elem, K ▶: To] = CanPrismFrom(Prism[K ▶: From, K ▶: To](mapKA ⇒ {
     Some(mapKA.updateValues(a ⇒ prism.getOption(a)))
-  })((mapKB: Map[K, To]) ⇒ {
+  })((mapKB: K ▶: To) ⇒ {
     mapKB.mapValuesEagerly(prism.reverseGet)
   }))
 }
@@ -170,13 +172,13 @@ object CanPrismFrom {
     : CanPrismFrom[List[From], Elem, List[To]] = cpf.toList
 
   implicit def cpfm[From, Elem, To](implicit cpf: CanPrismFrom[From, Elem, To])
-    : CanPrismFrom[Map[String, From], Elem, Map[String, To]] = cpf.toMap
+    : CanPrismFrom[String ▶: From, Elem, String ▶: To] = cpf.toMap
 
   implicit def cpfJsonObjectToTypedMap[V](implicit cpf: CanPrismFrom[Json, V, V])
-    : CanPrismFrom[JsonObject, V, Map[String, V]] = apply(jsonObjectMapIso.composePrism(cpf.toMap[String].prism))
+    : CanPrismFrom[JsonObject, V, String ▶: V] = apply(jsonObjectMapIso.composePrism(cpf.toMap[String].prism))
 
-  private val jsonObjectMapIso: Iso[JsonObject, Map[String, Json]] =
-    Iso[JsonObject, Map[String, Json]](_.toMap)(map ⇒ JsonObject.fromTraversableOnce(map))
+  private val jsonObjectMapIso: Iso[JsonObject, String ▶: Json] =
+    Iso[JsonObject, String ▶: Json](_.toMap)(map ⇒ JsonObject.fromTraversableOnce(map))
 }
 
 object Descendant {

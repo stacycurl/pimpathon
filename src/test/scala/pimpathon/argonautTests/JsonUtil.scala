@@ -4,6 +4,7 @@ import _root_.argonaut.Json._
 import _root_.argonaut.JsonIdentity.ToJsonIdentity
 import _root_.argonaut._
 import pimpathon.option._
+import scala.collection.immutable.{Map ⇒ ▶:}
 
 
 trait JsonUtil {
@@ -11,7 +12,7 @@ trait JsonUtil {
   def reverse[A](decodeResult: DecodeResult[List[A]]): DecodeResult[List[A]] = decodeResult.map(_.reverse)
 
   val codec: CodecJson[List[String]]           = CodecJson.derived[List[String]]
-  val mapCodec: CodecJson[Map[String, String]] = CodecJson.derived[Map[String, String]]
+  val mapCodec: CodecJson[String ▶: String] = CodecJson.derived[String ▶: String]
   val stringCodec: CodecJson[String]           = CodecJson.derived[String]
   val (encoder, decoder)       = (codec.Encoder, codec.Decoder)
   val (mapEncoder, mapDecoder) = (mapCodec.Encoder, mapCodec.Decoder)

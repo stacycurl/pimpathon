@@ -2,7 +2,7 @@ package pimpathon
 
 import scala.{PartialFunction ⇒ ~>}
 import scala.collection.{breakOut, mutable ⇒ M, GenTraversable, GenTraversableLike, GenTraversableOnce}
-import scala.collection.immutable.{SortedMap, TreeMap}
+import scala.collection.immutable.{Map ⇒ ▶:, SortedMap, TreeMap}
 
 import pimpathon.genTraversableLike.{GenTraversableLikeOfTuple2Mixin, GenTraversableLikePimpsMixin}
 
@@ -13,7 +13,7 @@ import pimpathon.tuple._
 
 
 object map {
-  implicit class MapPimps[K, V](map: Map[K, V])
+  implicit class MapPimps[K, V](map: K ▶: V)
     extends GenTraversableLikePimpsMixin[(K, V), GenTraversable]
     with GenTraversableLikeOfTuple2Mixin[K, V] {
 
@@ -31,26 +31,26 @@ object map {
     def findKey(p: Predicate[K]): Option[K]   = keyFor.matchingKey(p)
     def findValue(p: Predicate[V]): Option[V] = valueFor.matchingValue(p)
 
-    def filterKeysNot(p: Predicate[K]): Map[K, V]   = map.filterNot(kv ⇒ p(kv._1))
-    def filterValuesNot(p: Predicate[V]): Map[K, V] = map.filterNot(kv ⇒ p(kv._2))
-    def filterValues(p: Predicate[V]): Map[K, V]    = map.filter(kv ⇒ p(kv._2))
+    def filterKeysNot(p: Predicate[K]):   K ▶: V = map.filterNot(kv ⇒ p(kv._1))
+    def filterValuesNot(p: Predicate[V]): K ▶: V = map.filterNot(kv ⇒ p(kv._2))
+    def filterValues(p: Predicate[V]):    K ▶: V = map.filter(kv ⇒ p(kv._2))
 
 
     def keyExists(p: Predicate[K]): Boolean   = map.exists(kv ⇒ p(kv._1))
     def valueExists(p: Predicate[V]): Boolean = map.exists(kv ⇒ p(kv._2))
 
-    def emptyTo(empty: ⇒ Map[K, V]): Map[K, V]            = uncons(empty, _ ⇒ map)
-    def calcIfNonEmpty[A](f: Map[K, V] ⇒ A): Option[A]    = map.calcIf(_.nonEmpty)(f)
-    def uncons[A](empty: ⇒ A, nonEmpty: Map[K, V] ⇒ A): A = if (map.isEmpty) empty else nonEmpty(map)
+    def emptyTo(empty: ⇒ K ▶: V): K ▶: V            = uncons(empty, _ ⇒ map)
+    def calcIfNonEmpty[A](f: K ▶: V ⇒ A): Option[A]    = map.calcIf(_.nonEmpty)(f)
+    def uncons[A](empty: ⇒ A, nonEmpty: K ▶: V ⇒ A): A = if (map.isEmpty) empty else nonEmpty(map)
 
-    def reverse(f: Set[K] ⇒ K): Map[V, K] = reverseToMultiMap.mapValuesEagerly(f)
-    def reverseToMultiMap: MultiMap[Set, V, K] = map.map(_.swap)(breakOut)
+    def reverse(f: Set[K] ⇒ K): V ▶: K = reverseToMultiMap.mapValuesEagerly(f)
+    def reverseToMultiMap: V ▶: Set[K] = map.map(_.swap)(breakOut)
 
     def sortBy[C: Ordering](f: K => C): SortedMap[K, V] = sorted(Ordering[C].on[K](f))
     def sorted(implicit ordering: Ordering[K]): SortedMap[K, V] = TreeMap.empty[K, V](ordering) ++ map
 
-    def composeM[C](other: Map[C, K]): Map[C, V] = other.andThenM(map)
-    def andThenM[W](other: Map[V, W]): Map[K, W] = updateValues(other.get _)
+    def composeM[C](other: C ▶: K): C ▶: V = other.andThenM(map)
+    def andThenM[W](other: V ▶: W): K ▶: W = updateValues(other.get _)
 
     def toMutable: M.Map[K, V] = mutable
     def mutable: M.Map[K, V] = M.Map.empty[K, V] ++ map
@@ -59,40 +59,40 @@ object map {
     def keyFor:   MapAndThen[K, V, K]      = new MapAndThen[K, V, K](map, key)
     def valueFor: MapAndThen[K, V, V]      = new MapAndThen[K, V, V](map, value)
 
-    def partitionKeysBy[C](pf: K ~> C): (Map[K, V], Map[C, V])   = partitionEntriesBy(pf.first[V])
-    def partitionValuesBy[W](pf: V ~> W): (Map[K, V], Map[K, W]) = partitionEntriesBy(pf.second[K])
+    def partitionKeysBy[C](pf: K ~> C):   (K ▶: V, C ▶: V) = partitionEntriesBy(pf.first[V])
+    def partitionValuesBy[W](pf: V ~> W): (K ▶: V, K ▶: W) = partitionEntriesBy(pf.second[K])
 
-    def partitionEntriesBy[C, W](pf: (K, V) ~> (C, W)): (Map[K, V], Map[C, W]) =
+    def partitionEntriesBy[C, W](pf: (K, V) ~> (C, W)): (K ▶: V, C ▶: W) =
       map.partition(pf.isUndefinedAt).tmap(identity, _.map(pf))
 
-    def mapKeysEagerly[C](f: K ⇒ C): Map[C, V]         = map.map { case (k, v) ⇒ (f(k), v) }
-    def mapValuesEagerly[W](f: V ⇒ W): Map[K, W]       = map.map { case (k, v) ⇒ (k, f(v)) }
-    def mapEntries[C, W](f: K ⇒ V ⇒ (C, W)): Map[C, W] = map.map { case (k, v) ⇒ f(k)(v)   }
+    def mapKeysEagerly[C](f: K ⇒ C):         C ▶: V = map.map { case (k, v) ⇒ (f(k), v) }
+    def mapValuesEagerly[W](f: V ⇒ W):       K ▶: W = map.map { case (k, v) ⇒ (k, f(v)) }
+    def mapEntries[C, W](f: K ⇒ V ⇒ (C, W)): C ▶: W = map.map { case (k, v) ⇒ f(k)(v)   }
 
-    def seqMapKeys[C](f: K ⇒ Option[C]): Option[Map[C, V]]                = seqMapEntries(k ⇒ v ⇒ f(k).map(_ → v))
-    def seqMapValues[W](f: V ⇒ Option[W]): Option[Map[K, W]]              = seqMapEntries(k ⇒ v ⇒ f(v).map(k → _))
-    def seqMapEntries[C, W](f: K ⇒ V ⇒ Option[(C, W)]): Option[Map[C, W]] = map.seqMap { case (k, v) ⇒ f(k)(v) }
+    def seqMapKeys[C](f: K ⇒ Option[C]):                Option[C ▶: V] = seqMapEntries(k ⇒ v ⇒ f(k).map(_ → v))
+    def seqMapValues[W](f: V ⇒ Option[W]):              Option[K ▶: W] = seqMapEntries(k ⇒ v ⇒ f(v).map(k → _))
+    def seqMapEntries[C, W](f: K ⇒ V ⇒ Option[(C, W)]): Option[C ▶: W] = map.seqMap { case (k, v) ⇒ f(k)(v) }
 
-    def collectKeys[C](pf: K ~> C): Map[C, V] = map.collect(pf.first)
-    def collectValues[W](pf: V ~> W): Map[K, W] = map.collect(pf.second)
+    def collectKeys[C](pf: K ~> C):   C ▶: V = map.collect(pf.first)
+    def collectValues[W](pf: V ~> W): K ▶: W = map.collect(pf.second)
 
-    def updateValue(key: K, f: V ⇒ Option[V]): Map[K, V] =
+    def updateValue(key: K, f: V ⇒ Option[V]): K ▶: V =
       map.get(key).flatMap(f).fold(map - key)(newValue ⇒ map + ((key, newValue)))
 
-    def updateKeys[C](pf: K ~> C): Map[C, V] = updateKeys(pf.lift)
-    def updateValues[W](pf: V ~> W): Map[K, W] = updateValues(pf.lift)
+    def updateKeys[C](pf: K ~> C):   C ▶: V = updateKeys(pf.lift)
+    def updateValues[W](pf: V ~> W): K ▶: W = updateValues(pf.lift)
 
-    def updateKeys[C](f: K ⇒ Option[C]): Map[C, V]   = map.flatMap(kv ⇒ f(kv._1).map(_ → kv._2))
-    def updateValues[W](f: V ⇒ Option[W]): Map[K, W] = map.flatMap(kv ⇒ f(kv._2).map(kv._1 → _))
+    def updateKeys[C](f: K ⇒ Option[C]):   C ▶: V = map.flatMap(kv ⇒ f(kv._1).map(_ → kv._2))
+    def updateValues[W](f: V ⇒ Option[W]): K ▶: W = map.flatMap(kv ⇒ f(kv._2).map(kv._1 → _))
 
-    def zipWith[W, X](other: Map[K, W])(pf: (Option[V], Option[W]) ~> X): Map[K, X] =
+    def zipWith[W, X](other: K ▶: W)(pf: (Option[V], Option[W]) ~> X): K ▶: X =
       map.keySet.union(other.keySet).flatMap(k ⇒ pf.lift((map.get(k), other.get(k))).map(k → _))(breakOut)
 
     protected def gtl: GenTraversableLike[(K, V), GenTraversable[(K, V)]] = map
     protected def cc: GenTraversable[(K, V)] = map
   }
 
-  class MapAndThen[K, V, A](map: Map[K, V], andThen: ((K, V)) ⇒ A) {
+  class MapAndThen[K, V, A](map: K ▶: V, andThen: ((K, V)) ⇒ A) {
     def maxValue(implicit O: Ordering[V]): Option[A] = map.calcIfNonEmpty(_.maxBy(value)).map(andThen)
     def minValue(implicit O: Ordering[V]): Option[A] = map.calcIfNonEmpty(_.minBy(value)).map(andThen)
     def maxKey(implicit O: Ordering[K]): Option[A] = map.calcIfNonEmpty(_.maxBy(key)).map(andThen)

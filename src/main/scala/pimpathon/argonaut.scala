@@ -117,6 +117,10 @@ object argonaut {
 
     def renameField(from: String, to: String): JsonObject = o(from).fold(o)(value ⇒ (o - from) + (to, value))
 
+    def addIfMissing(assocs: Json.JsonAssoc*): JsonObject = assocs.foldLeft(o) {
+      case (acc, (name, value)) ⇒ acc.addIfMissing(name, value)
+    }
+
     def addIfMissing(name: String, value: Json): JsonObject =
       o(name).fold(o + (name, value))(_ => o)
 

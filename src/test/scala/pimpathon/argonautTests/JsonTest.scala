@@ -1,6 +1,7 @@
 package pimpathon.argonautTests
 
 import argonaut.Json._
+import argonaut.JsonIdentity.ToJsonIdentity
 import argonaut._
 import org.junit.Test
 import pimpathon.argonaut._
@@ -251,8 +252,8 @@ class JsonTest extends JsonUtil {
     parse("""{ "thing": {"a": false} }"""), parse("""{ "thing": {"a": true} }""")
   )
 
-  @Test def addIfMissing(): Unit = on(jEmptyObject, jObjectFields("a" → jTrue)).calling(_.addIfMissing("a", jFalse))
-    .produces(jObjectFields("a" → jFalse), jObjectFields("a" → jTrue))
+  @Test def addIfMissing(): Unit = on(jEmptyObject, parse("""{"a": true}""")).calling(_.addIfMissing("a", jFalse))
+    .produces(jObjectFields("a" → jFalse), parse("""{"a": true}"""))
 
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
     case (input, expected) ⇒ f(parse(input)) <=> parse(expected)
@@ -261,15 +262,28 @@ class JsonTest extends JsonUtil {
 
 class JsonObjectTest extends JsonUtil {
   @Test def renameField(): Unit =
-    jObjectFields("original" → jTrue).withObject(_.renameField("original", "renamed")) <=> jObjectFields("renamed" → jTrue)
+    jobj("original" → true).withObject(_.renameField("original", "renamed")) <=> jobj("renamed" → true)
 
   @Test def renameFields(): Unit =
-    jObjectFields("a" → jTrue, "b" → jFalse).withObject(_.renameFields("a" → "A", "b" → "B")) <=> jObjectFields("A" → jTrue, "B" → jFalse)
+    jobj("a" → true, "b" → false).withObject(_.renameFields("a" → "A", "b" → "B")) <=> jobj("A" → true, "B" → false)
 
-  @Test def addIfMissing(): Unit = on(jEmptyObject, jObjectFields("a" → jTrue))
-    .calling(_.withObject(_.addIfMissing("a", jFalse))).produces(
-    jObjectFields("a" → jFalse), jObjectFields("a" → jTrue)
+  @Test def addIfMissing(): Unit = on(jEmptyObject, jobj("a" → existing))
+  .calling(_.withObject(_.addIfMissing("a", added))).produces(
+    jobj("a" → added), jobj("a" → existing)
   )
+
+  @Test def addIfMissing_many(): Unit = on(
+    jEmptyObject,         jobj("a" → existing),
+    jobj("b" → existing), jobj("a" → existing, "b" → existing)
+  ).calling(_.withObject(_.addIfMissing("a" → added, "b" → added))).produces(
+    jobj("a" → added, "b" → added),    jobj("a" → existing, "b" → added),
+    jobj("a" → added, "b" → existing), jobj("a" → existing, "b" → existing)
+  )
+
+  private val added    = jString("added")
+  private var existing = jString("existing")
+
+  private def jobj[V: EncodeJson](kvs: (String, V)*): Json = jObjectFields(kvs.map { case (k, v) ⇒ (k, v.asJson) }: _*)
 }
 
 

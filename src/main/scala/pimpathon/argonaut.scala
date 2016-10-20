@@ -32,6 +32,8 @@ object argonaut {
     def renameField(from: String, to: String): Json = value.withObject(_.renameField(from, to))
     def renameFields(fromTos: (String, String)*): Json = value.withObject(_.renameFields(fromTos: _*))
 
+    def addIfMissing(name: String, value: Json): Json = this.value.withObject(_.addIfMissing(name, value))
+
 //    def delete(path: String): Json = {
 //      path.split("/").toList.reverse match {
 //        case head :: Nil ⇒ descendant("").obj.delete(head)

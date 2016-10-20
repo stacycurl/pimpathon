@@ -239,6 +239,9 @@ class JsonTest extends JsonUtil {
   @Test def renameFields(): Unit =
     jObjectFields("a" → jTrue, "b" → jFalse).renameFields("a" → "A", "b" → "B") <=> jObjectFields("A" → jTrue, "B" → jFalse)
 
+  @Test def addIfMissing(): Unit = on(jEmptyObject, jObjectFields("a" → jTrue)).calling(_.addIfMissing("a", jFalse))
+    .produces(jObjectFields("a" → jFalse), jObjectFields("a" → jTrue))
+
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
     case (input, expected) ⇒ f(parse(input)) <=> parse(expected)
   }

@@ -229,6 +229,9 @@ class JsonTest extends JsonUtil {
   @Test def renameField(): Unit =
     jObjectFields("original" → jTrue).renameField("original", "renamed") <=> jObjectFields("renamed" → jTrue)
 
+  @Test def descendant_renameFields(): Unit =
+    parse("""{ "thing": { "a": true, "b": false} }""").descendant("thing").renameFields("a" → "A", "b" → "B") <=> parse("""{ "thing": { "A": true, "B": false} }""")
+
   @Test def descendant_obj_renameFields(): Unit =
     parse("""{ "thing": { "a": true, "b": false} }""").descendant("thing").obj.renameFields("a" → "A", "b" → "B") <=> parse("""{ "thing": { "A": true, "B": false} }""")
 

@@ -220,6 +220,9 @@ class JsonTest extends JsonUtil {
     json.descendant("$[?(@.documentType.value == 'Text')].fileName").string.getAll <=> List("Thing.txt")
   }
 
+  @Test def renameField(): Unit =
+    jObjectFields("original" → jTrue).renameField("original", "renamed") <=> jObjectFields("renamed" → jTrue)
+
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
     case (input, expected) ⇒ f(parse(input)) <=> parse(expected)
   }

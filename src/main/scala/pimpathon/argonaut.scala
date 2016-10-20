@@ -7,7 +7,7 @@ import monocle.function.At
 import scala.language.{higherKinds, implicitConversions}
 
 import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, Json, JsonMonocle, JsonNumber, JsonObject}
-import _root_.argonaut.Json.{jNull, jString, jBool, jTrue, jFalse}
+import _root_.argonaut.Json.{jNull, jString, jTrue, jFalse}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
 
 import monocle.{Iso, Prism, Traversal}
@@ -28,6 +28,8 @@ object argonaut {
     def descendant(path: String): Descendant[Json, Json] = Descendant(value, Traversal.id[Json].descendant(path))
     def compact: Json = filterNulls
     def filterNulls: Json = filterR(_ != jNull)
+
+    def renameField(from: String, to: String): Json = value.withObject(_.renameField(from, to))
 
 //    def delete(path: String): Json = {
 //      path.split("/").toList.reverse match {

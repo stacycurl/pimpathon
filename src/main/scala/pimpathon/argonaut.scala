@@ -191,7 +191,9 @@ object Descendant {
     def renameField(from: String, to: String): From = descendant.modify(_.renameField(from, to))
     def renameFields(fromTos: (String, String)*): From = descendant.modify(_.renameFields(fromTos: _*))
 
-//    def delete(key: String): From = {
+    def addIfMissing(name: String, value: Json): From = descendant.modify(_.addIfMissing(name, value))
+
+    //    def delete(key: String): From = {
 //      (descendant.traversal composeLens At.at(key)).set(None).apply(descendant.from)
 //    }
   }

@@ -258,6 +258,14 @@ class JsonTest extends JsonUtil {
     obj("a" → added), obj("a" → existing)
   )
 
+  @Test def descendant_obj_addIfMissing_many(): Unit = on(
+    thing(jEmptyObject),        thing(obj("a" → existing)),
+    thing(obj("b" → existing)), thing(obj("a" → existing, "b" → existing))
+  ).calling(_.descendant("thing").obj.addIfMissing("a" → added, "b" → added)).produces(
+    thing(obj("a" → added, "b" → added)),    thing(obj("a" → existing, "b" → added)),
+    thing(obj("a" → added, "b" → existing)), thing(obj("a" → existing, "b" → existing))
+  )
+
   @Test def addIfMissing_many(): Unit = on(
     jEmptyObject,        obj("a" → existing),
     obj("b" → existing), obj("a" → existing, "b" → existing)
@@ -269,6 +277,8 @@ class JsonTest extends JsonUtil {
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
     case (input, expected) ⇒ f(parse(input)) <=> parse(expected)
   }
+
+  private def thing(value: Json): Json = obj("thing" → value)
 
   private val added    = jString("added")
   private var existing = jString("existing")

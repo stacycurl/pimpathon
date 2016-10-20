@@ -192,6 +192,7 @@ object Descendant {
     def renameFields(fromTos: (String, String)*): From = descendant.modify(_.renameFields(fromTos: _*))
 
     def addIfMissing(name: String, value: Json): From = descendant.modify(_.addIfMissing(name, value))
+    def addIfMissing(assocs: Json.JsonAssoc*): From = descendant.modify(_.addIfMissing(assocs: _*))
   }
 
   implicit class DescendantToJsonObjectFrills[From](descendant: Descendant[From, JsonObject]) {

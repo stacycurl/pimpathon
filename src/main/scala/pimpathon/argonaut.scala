@@ -108,6 +108,10 @@ object argonaut {
   }
 
   implicit class JsonObjectFrills(val o: JsonObject) extends AnyVal {
+    def renameFields(fromTos: (String, String)*): JsonObject = fromTos.foldLeft(o) {
+      case (acc, (from, to)) ⇒ acc.renameField(from, to)
+    }
+
     def renameField(from: String, to: String): JsonObject = o(from).fold(o)(value ⇒ (o - from) + (to, value))
 
     private[argonaut] def filterR(p: Predicate[Json]): JsonObject =

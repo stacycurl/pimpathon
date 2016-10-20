@@ -237,6 +237,9 @@ class JsonTest extends JsonUtil {
 class JsonObjectTest extends JsonUtil {
   @Test def renameField(): Unit =
     jObjectFields("original" → jTrue).withObject(_.renameField("original", "renamed")) <=> jObjectFields("renamed" → jTrue)
+
+  @Test def renameFields(): Unit =
+    jObjectFields("a" → jTrue, "b" → jFalse).withObject(_.renameFields("a" → "A", "b" → "B")) <=> jObjectFields("A" → jTrue, "B" → jFalse)
 }
 
 

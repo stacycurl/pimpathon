@@ -220,6 +220,9 @@ class JsonTest extends JsonUtil {
     json.descendant("$[?(@.documentType.value == 'Text')].fileName").string.getAll <=> List("Thing.txt")
   }
 
+  @Test def descendant_renameField(): Unit =
+    parse("""{ "thing": { "original": true } }""").descendant("thing").renameField("original", "renamed") <=> parse("""{ "thing": { "renamed": true } }""")
+
   @Test def descendant_obj_renameField(): Unit =
     parse("""{ "thing": { "original": true } }""").descendant("thing").obj.renameField("original", "renamed") <=> parse("""{ "thing": { "renamed": true } }""")
 

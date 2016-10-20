@@ -166,10 +166,15 @@ object CanPrismFrom {
 
 object Descendant {
   import pimpathon.argonaut.TraversalFrills
+  import pimpathon.argonaut.JsonFrills
   import pimpathon.argonaut.JsonObjectFrills
 
   implicit def descendantAsApplyTraversal[From, To](descendant: Descendant[From, To]):
     ApplyTraversal[From, From, To, To] = ApplyTraversal(descendant.from, descendant.traversal)
+
+  implicit class DescendantToJsonFrills[From](descendant: Descendant[From, Json]) {
+    def renameField(from: String, to: String): From = descendant.modify(_.renameField(from, to))
+  }
 
   implicit class DescendantToJsonObjectFrills[From](descendant: Descendant[From, JsonObject]) {
     def renameField(from: String, to: String): From = descendant.modify(_.renameField(from, to))

@@ -239,6 +239,12 @@ class JsonTest extends JsonUtil {
   @Test def renameFields(): Unit =
     jObjectFields("a" → jTrue, "b" → jFalse).renameFields("a" → "A", "b" → "B") <=> jObjectFields("A" → jTrue, "B" → jFalse)
 
+  @Test def descendant_addIfMissing(): Unit = on(
+    parse("""{ "thing": {} }"""),           parse("""{ "thing": {"a": true} }""")
+  ).calling(_.descendant("thing").addIfMissing("a", jFalse)).produces(
+    parse("""{ "thing": {"a": false} }"""), parse("""{ "thing": {"a": true} }""")
+  )
+
   @Test def descendant_obj_addIfMissing(): Unit = on(
     parse("""{ "thing": {} }"""),           parse("""{ "thing": {"a": true} }""")
   ).calling(_.descendant("thing").obj.addIfMissing("a", jFalse)).produces(

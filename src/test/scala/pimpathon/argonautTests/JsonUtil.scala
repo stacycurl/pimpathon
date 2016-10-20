@@ -1,6 +1,7 @@
 package pimpathon.argonautTests
 
 import _root_.argonaut.Json._
+import _root_.argonaut.JsonIdentity.ToJsonIdentity
 import _root_.argonaut._
 import pimpathon.option._
 
@@ -45,4 +46,6 @@ trait JsonUtil {
   val redacted = jString("redacted")
 
   def parse(jsonText: String) = Parse.parseOption(jsonText).getOrThrow("not json")
+
+  def obj[V: EncodeJson](kvs: (String, V)*): Json = Json.jObjectFields(kvs.map { case (k, v) ⇒ (k, v.asJson) }: _*)
 }

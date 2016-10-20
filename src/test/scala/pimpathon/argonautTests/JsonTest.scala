@@ -252,38 +252,51 @@ class JsonTest extends JsonUtil {
     parse("""{ "thing": {"a": false} }"""), parse("""{ "thing": {"a": true} }""")
   )
 
-  @Test def addIfMissing(): Unit = on(jEmptyObject, parse("""{"a": true}""")).calling(_.addIfMissing("a", jFalse))
-    .produces(jObjectFields("a" → jFalse), parse("""{"a": true}"""))
+  @Test def addIfMissing(): Unit = on(
+    jEmptyObject,     obj("a" → existing)
+  ).calling(_.addIfMissing("a", added)).produces(
+    obj("a" → added), obj("a" → existing)
+  )
+
+  @Test def addIfMissing_many(): Unit = on(
+    jEmptyObject,        obj("a" → existing),
+    obj("b" → existing), obj("a" → existing, "b" → existing)
+  ).calling(_.addIfMissing("a" → added, "b" → added)).produces(
+    obj("a" → added, "b" → added),    obj("a" → existing, "b" → added),
+    obj("a" → added, "b" → existing), obj("a" → existing, "b" → existing)
+  )
 
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
     case (input, expected) ⇒ f(parse(input)) <=> parse(expected)
   }
+
+  private val added    = jString("added")
+  private var existing = jString("existing")
 }
 
 class JsonObjectTest extends JsonUtil {
   @Test def renameField(): Unit =
-    jobj("original" → true).withObject(_.renameField("original", "renamed")) <=> jobj("renamed" → true)
+    obj("original" → true).withObject(_.renameField("original", "renamed")) <=> obj("renamed" → true)
 
   @Test def renameFields(): Unit =
-    jobj("a" → true, "b" → false).withObject(_.renameFields("a" → "A", "b" → "B")) <=> jobj("A" → true, "B" → false)
+    obj("a" → true, "b" → false).withObject(_.renameFields("a" → "A", "b" → "B")) <=> obj("A" → true, "B" → false)
 
-  @Test def addIfMissing(): Unit = on(jEmptyObject, jobj("a" → existing))
-  .calling(_.withObject(_.addIfMissing("a", added))).produces(
-    jobj("a" → added), jobj("a" → existing)
+  @Test def addIfMissing(): Unit = on(
+    jEmptyObject,     obj("a" → existing)
+  ).calling(_.withObject(_.addIfMissing("a", added))).produces(
+    obj("a" → added), obj("a" → existing)
   )
 
   @Test def addIfMissing_many(): Unit = on(
-    jEmptyObject,         jobj("a" → existing),
-    jobj("b" → existing), jobj("a" → existing, "b" → existing)
+    jEmptyObject,        obj("a" → existing),
+    obj("b" → existing), obj("a" → existing, "b" → existing)
   ).calling(_.withObject(_.addIfMissing("a" → added, "b" → added))).produces(
-    jobj("a" → added, "b" → added),    jobj("a" → existing, "b" → added),
-    jobj("a" → added, "b" → existing), jobj("a" → existing, "b" → existing)
+    obj("a" → added, "b" → added),    obj("a" → existing, "b" → added),
+    obj("a" → added, "b" → existing), obj("a" → existing, "b" → existing)
   )
 
   private val added    = jString("added")
   private var existing = jString("existing")
-
-  private def jobj[V: EncodeJson](kvs: (String, V)*): Json = jObjectFields(kvs.map { case (k, v) ⇒ (k, v.asJson) }: _*)
 }
 
 

@@ -225,10 +225,10 @@ class JsonTest extends JsonUtil {
   }
 }
 
-
-
-
-
+class JsonObjectTest extends JsonUtil {
+  @Test def renameField(): Unit =
+    jObjectFields("original" → jTrue).withObject(_.renameField("original", "renamed")) <=> jObjectFields("renamed" → jTrue)
+}
 
 
 

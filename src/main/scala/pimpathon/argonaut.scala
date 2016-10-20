@@ -105,7 +105,9 @@ object argonaut {
       traversal composePrism canPrismFrom.prism
   }
 
-  private implicit class JsonObjectFrills(val o: JsonObject) extends AnyVal {
+  implicit class JsonObjectFrills(val o: JsonObject) extends AnyVal {
+    def renameField(from: String, to: String): JsonObject = o(from).fold(o)(value ⇒ (o - from) + (to, value))
+
     private[argonaut] def filterR(p: Predicate[Json]): JsonObject =
       JsonObject.fromTraversableOnce(o.toMap.collectValues { case j if p(j) ⇒ j.filterR(p) })
   }

@@ -30,6 +30,7 @@ object argonaut {
     def filterNulls: Json = filterR(_ != jNull)
 
     def renameField(from: String, to: String): Json = value.withObject(_.renameField(from, to))
+    def renameFields(fromTos: (String, String)*): Json = value.withObject(_.renameFields(fromTos: _*))
 
 //    def delete(path: String): Json = {
 //      path.split("/").toList.reverse match {

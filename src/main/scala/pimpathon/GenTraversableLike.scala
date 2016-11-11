@@ -39,39 +39,39 @@ object genTraversableLike {
     }
 
     abstract class aggregator[▷:[_, _]] {
-      def apply(): A ▷: A = by(a ⇒ a)
+      def apply(): A ▷: A = by(id)
 
 
       def by[B](b: A ⇒ B): B ▷: A =
-        counter.withEntries(b, a ⇒ a)
+        counter.withEntries(b, id)
 
       def by[C, B](c: A ⇒ C, b: A ⇒ B): C ▶: B ▷: A =
-        counter.withEntries(c, b, a ⇒ a)
+        counter.withEntries(c, b, id)
 
       def by[D, C, B](d: A ⇒ D, c: A ⇒ C, b: A ⇒ B): D ▶: C ▶: B ▷: A =
-        counter.withEntries(d, c, b, a ⇒ a)
+        counter.withEntries(d, c, b, id)
 
       def by[E, D, C, B](e: A ⇒ E, d: A ⇒ D, c: A ⇒ C, b: A ⇒ B): E ▶: D ▶: C ▶: B ▷: A =
-        counter.withEntries(e, d, c, b, a ⇒ a)
+        counter.withEntries(e, d, c, b, id)
 
       def by[F, E, D, C, B](f: A ⇒ F, e: A ⇒ E, d: A ⇒ D, c: A ⇒ C, b: A ⇒ B): F ▶: E ▶: D ▶: C ▶: B ▷: A =
-        counter.withEntries(f, e, d, c, b, a ⇒ a)
+        counter.withEntries(f, e, d, c, b, id)
 
 
       def collect[B](b: A ~> B): B ▷: A =
-        counter.withPFEntries(b, ~>(a ⇒ a))
+        counter.withPFEntries(b, idp)
 
       def collect[C, B](c: A ~> C, b: A ~> B): C ▶: B ▷: A =
-        counter.withPFEntries(c, b, ~>(a ⇒ a))
+        counter.withPFEntries(c, b, idp)
 
       def collect[D, C, B](d: A ~> D, c: A ~> C, b: A ~> B): D ▶: C ▶: B ▷: A =
-        counter.withPFEntries(d, c, b, ~>(a ⇒ a))
+        counter.withPFEntries(d, c, b, idp)
 
       def collect[E, D, C, B](e: A ~> E, d: A ~> D, c: A ~> C, b: A ~> B): E ▶: D ▶: C ▶: B ▷: A =
-        counter.withPFEntries(e, d, c, b, ~>(a ⇒ a))
+        counter.withPFEntries(e, d, c, b, idp)
 
       def collect[F, E, D, C, B](f: A ~> F, e: A ~> E, d: A ~> D, c: A ~> C, b: A ~> B): F ▶: E ▶: D ▶: C ▶: B ▷: A =
-        counter.withPFEntries(f, e, d, c, b, ~>(a ⇒ a))
+        counter.withPFEntries(f, e, d, c, b, idp)
 
 
       def opt[B](b: A ⇒ Option[B]): B ▷: A =
@@ -108,6 +108,7 @@ object genTraversableLike {
       protected implicit def cbf[B]: CanBuildFrom[Nothing, (B, A), B ▷: A]
 
       private def counter: GenTraversableLikeCapturer[A, ▶:, ▷:] = using[▶:, ▷:]
+      private val (id, idp) = (identity[A] _, identityPF[A])
     }
 
     def asMultiMap[F[_]]: GenTraversableLikeCapturer[A, ▶:, MultiMap[F, ?, ?]] = using[▶:, MultiMap[F, ?, ?]]

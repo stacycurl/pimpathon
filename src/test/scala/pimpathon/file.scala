@@ -11,11 +11,11 @@ import pimpathon.any._
 import pimpathon.java.io.inputStream._
 import pimpathon.map._
 import pimpathon.util._
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 
 class FileTest {
-  private val file = new FileUtils(currentTime = util.currentTime)
+  private val file = new FileUtils(currentTime = () ⇒ util.currentTime())
 
   import file._
 
@@ -374,9 +374,9 @@ class FileTest {
   }
 
   private def shutdownHooks(): Set[Thread] = {
-    asScalaSet(Class.forName("java.lang.ApplicationShutdownHooks")
+    asScalaSetConverter(Class.forName("java.lang.ApplicationShutdownHooks")
       .getDeclaredField("hooks").tap(_.setAccessible(true))
-      .get(null).asInstanceOf[_root_.java.util.Map[Thread, Thread]].keySet).toSet
+      .get(null).asInstanceOf[_root_.java.util.Map[Thread, Thread]].keySet).asScala.toSet
   }
 
   private def relativeName(relativeTo: File, file: File): File =

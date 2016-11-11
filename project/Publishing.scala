@@ -20,7 +20,7 @@ import bintray.Keys._
 import sbt._
 import Keys._
 
-object Publishing extends Sonatype(PimpathonBuild) {
+object Publishing extends Sonatype {
   def projectUrl    = "https://github.com/stacycurl"
   def developerId   = "stacycurl"
   def developerName = "Stacy Curl"
@@ -39,9 +39,7 @@ object Publishing extends Sonatype(PimpathonBuild) {
 // user=<username>
 // password=<password>
 
-abstract class Sonatype(build: Build) {
-  import build._
-
+abstract class Sonatype {
   val ossSnapshots = "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
   val ossStaging   = "Sonatype OSS Staging" at "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 

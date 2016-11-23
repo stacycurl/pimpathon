@@ -1,23 +1,19 @@
 package pimpathon
 
+import scala.language.{dynamics, higherKinds, implicitConversions}
 import io.gatling.jsonpath.AST._
 import io.gatling.jsonpath._
 import monocle.function.At
-
-import scala.language.{higherKinds, implicitConversions}
-
 import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, Json, JsonMonocle, JsonNumber, JsonObject}
-import _root_.argonaut.Json.{jNull, jString, jTrue, jFalse}
+import _root_.argonaut.Json.{jFalse, jNull, jString, jTrue}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
 
 import scala.collection.immutable.{Map ⇒ ▶:}
-
-import monocle.{Iso, Prism, Traversal}
+import monocle.{Iso, Optional, Prism, Traversal}
 import monocle.function.Each.each
 import monocle.function.FilterIndex.filterIndex
 import monocle.std.list.{listEach, listFilterIndex}
 import monocle.syntax.ApplyTraversal
-
 import pimpathon.boolean.BooleanPimps
 import pimpathon.function.{Predicate, PredicatePimps}
 import pimpathon.map.MapPimps
@@ -27,6 +23,7 @@ import _root_.scalaz.{Applicative, \/}
 
 object argonaut {
   implicit class JsonFrills(val value: Json) extends AnyVal {
+    def descendant: Descendant[Json, Json] = descendant("")
     def descendant(path: String): Descendant[Json, Json] = Descendant(value, Traversal.id[Json].descendant(path))
     def compact: Json = filterNulls
     def filterNulls: Json = filterR(_ != jNull)
@@ -195,6 +192,8 @@ object Descendant {
 
     def addIfMissing(name: String, value: Json): From = descendant.modify(_.addIfMissing(name, value))
     def addIfMissing(assocs: Json.JsonAssoc*): From = descendant.modify(_.addIfMissing(assocs: _*))
+
+    def each: Descendant[From, Json] = descendant composeTraversal objectValuesOrArrayElements
   }
 
   implicit class DescendantToJsonObjectFrills[From](descendant: Descendant[From, JsonObject]) {
@@ -203,6 +202,8 @@ object Descendant {
 
     def addIfMissing(name: String, value: Json): From = descendant.modify(_.addIfMissing(name, value))
     def addIfMissing(assocs: Json.JsonAssoc*): From = descendant.modify(_.addIfMissing(assocs: _*))
+
+    def each: Descendant[From, Json] = descendant composeTraversal monocle.function.Each.each
 
     //    def delete(key: String): From = {
 //      (descendant.traversal composeLens At.at(key)).set(None).apply(descendant.from)
@@ -313,14 +314,6 @@ object Descendant {
       case (acc, key)                            ⇒ acc.obj   composeTraversal filterIndex(Set(key))
     }
 
-    private final lazy val objectValuesOrArrayElements: Traversal[Json, Json] = new Traversal[Json, Json] {
-      def modifyF[F[_]](f: Json => F[Json])(j: Json)(implicit F: Applicative[F]): F[Json] = j.fold(
-        jsonNull   = F.pure(j), jsonBool = _ => F.pure(j), jsonNumber = _ => F.pure(j), jsonString = _ => F.pure(j),
-        jsonArray  = arr => F.map(each[List[Json], Json].modifyF(f)(arr))(Json.array(_: _*)),
-        jsonObject = obj => F.map(each[JsonObject, Json].modifyF(f)(obj))(Json.jObject)
-      )
-    }
-
     private implicit class RegexMatcher(val sc: StringContext) extends AnyVal { def r = sc.parts.mkString("(.+)").r }
     private object Split { def unapply(value: String): Option[Set[String]] = Some(value.split(",").map(_.trim).toSet) }
   }
@@ -330,9 +323,17 @@ object Descendant {
 
   private def filterObject(p: Json ⇒ Boolean): Prism[Json, Json] =
     Prism[Json, Json](json ⇒ p(json).option(json))(json ⇒ json)
+
+  private final lazy val objectValuesOrArrayElements: Traversal[Json, Json] = new Traversal[Json, Json] {
+    def modifyF[F[_]](f: Json => F[Json])(j: Json)(implicit F: Applicative[F]): F[Json] = j.fold(
+      jsonNull   = F.pure(j), jsonBool = _ => F.pure(j), jsonNumber = _ => F.pure(j), jsonString = _ => F.pure(j),
+      jsonArray  = arr => F.map(each[List[Json], Json].modifyF(f)(arr))(Json.array(_: _*)),
+      jsonObject = obj => F.map(each[JsonObject, Json].modifyF(f)(obj))(Json.jObject)
+    )
+  }
 }
 
-case class Descendant[From, To](from: From, traversal: Traversal[From, To]) {
+case class Descendant[From, To](from: From, traversal: Traversal[From, To]) extends Dynamic {
   def bool[That](  implicit cpf: CanPrismFrom[To, Boolean,    That]): Descendant[From, That] = apply(cpf)
   def number[That](implicit cpf: CanPrismFrom[To, JsonNumber, That]): Descendant[From, That] = apply(cpf)
   def string[That](implicit cpf: CanPrismFrom[To, String,     That]): Descendant[From, That] = apply(cpf)
@@ -347,6 +348,15 @@ case class Descendant[From, To](from: From, traversal: Traversal[From, To]) {
   def bigDecimal[That](implicit cpf: CanPrismFrom[To, BigDecimal, That]): Descendant[From, That] = apply(cpf)
   def bigInt[That](    implicit cpf: CanPrismFrom[To, BigInt,     That]): Descendant[From, That] = apply(cpf)
 
-  private def apply[Elem, That](cpf: CanPrismFrom[To, Elem, That]): Descendant[From, That] =
-    copy(traversal = traversal composePrism cpf.prism)
+  def selectDynamic(key: String)(implicit cpf: CanPrismFrom[To, JsonObject, JsonObject]): Descendant[From, Json] =
+    obj[JsonObject] composeTraversal filterIndex(Set(key))
+
+  private def apply[Elem, That](cpf: CanPrismFrom[To, Elem, That]): Descendant[From, That] = composePrism(cpf.prism)
+
+  def composePrism[That](next: Prism[To, That]):         Descendant[From, That] = withTraversal(traversal composePrism next)
+  def composeTraversal[That](next: Traversal[To, That]): Descendant[From, That] = withTraversal(traversal composeTraversal next)
+  def composeOptional[That](next: Optional[To, That]):   Descendant[From, That] = withTraversal(traversal composeOptional next)
+  def composeIso[That](next: Iso[To, That]):             Descendant[From, That] = withTraversal(traversal composeIso next)
+
+  private def withTraversal[That](value: Traversal[From, That]) = copy(traversal = value)
 }

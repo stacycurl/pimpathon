@@ -7,7 +7,7 @@ import pimpathon.pimpTry._
 
 
 object pimpTry {
-  implicit class TryFrills[A](val value: Try[A]) extends AnyVal {
-    def toDisjunction: Throwable \/ A = value.fold(-\/(_), \/-(_))
+  implicit class TryFrills[A](val self: Try[A]) extends AnyVal {
+    def toDisjunction: Throwable \/ A = self.fold(-\/(_), \/-(_))
   }
 }

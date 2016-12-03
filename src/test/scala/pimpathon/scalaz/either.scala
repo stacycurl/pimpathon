@@ -53,7 +53,7 @@ class DisjunctionTest {
   private def left(i: Int): Int \/ String = -\/(i)
   private def right(s: String): Int \/ String = \/-(s)
 
-  implicit class PartialFunctionFrills[In, Out](pf: In ~> Out) {
-    def toRightDisjunction: In ⇒ In \/ Out = (in: In) ⇒ pf.lift(in).toRightDisjunction(in)
+  implicit class PartialFunctionFrills[In, Out](self: In ~> Out) {
+    def toRightDisjunction: In ⇒ In \/ Out = (in: In) ⇒ self.lift(in).toRightDisjunction(in)
   }
 }

@@ -7,10 +7,10 @@ import scalaz.\/
 
 
 object function {
-  implicit class PartialFunctionFrills[In, Out](pf: In ~> Out) {
+  implicit class PartialFunctionFrills[In, Out](self: In ~> Out) {
     def \/[In2](rhs: In2 ~> Out): (In \/ In2) ~> Out = new ((In \/ In2) ~> Out) {
-      def isDefinedAt(in: In \/ In2): Boolean = in.fold(pf.isDefinedAt, rhs.isDefinedAt)
-      def apply(in: In \/ In2): Out = in.fold(pf.apply, rhs.apply)
+      def isDefinedAt(in: In \/ In2): Boolean = in.fold(self.isDefinedAt, rhs.isDefinedAt)
+      def apply(in: In \/ In2): Out = in.fold(self.apply, rhs.apply)
     }
   }
 }

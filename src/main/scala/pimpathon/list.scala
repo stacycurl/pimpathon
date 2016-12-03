@@ -19,12 +19,12 @@ import pimpathon.tuple._
 
 
 object list {
-  implicit class ListPimps[A](list: List[A]) extends genTraversableLike.GenTraversableLikePimpsMixin[A, List] {
+  implicit class ListPimps[A](self: List[A]) extends genTraversableLike.GenTraversableLikePimpsMixin[A, List] {
     def tapEmpty[Discarded](empty: ⇒ Discarded): List[A] = tap(empty, _ ⇒ {})
     def tapNonEmpty[Discarded](nonEmpty: List[A] ⇒ Discarded): List[A] = tap({}, nonEmpty)
-    def tap[Discarded](empty: ⇒ Discarded, nonEmpty: List[A] ⇒ Discarded): List[A] = { uncons(empty, nonEmpty); list }
+    def tap[Discarded](empty: ⇒ Discarded, nonEmpty: List[A] ⇒ Discarded): List[A] = { uncons(empty, nonEmpty); self }
 
-    def emptyTo(alternative: ⇒ List[A]): List[A] = uncons(alternative, _ ⇒ list)
+    def emptyTo(alternative: ⇒ List[A]): List[A] = uncons(alternative, _ ⇒ self)
 
     def zipToMap[B](values: List[B]): A ▶: B = zip(values).toMap
     def zipWith[B, C](values: List[B])(f: ((A, B)) ⇒ C): List[C] = zip(values).map(f).toList
@@ -39,12 +39,12 @@ object list {
 
     def duplicates: List[A] = duplicatesBy(identity[A])
     def duplicatesBy[B](f: A ⇒ B): List[A] = (countBy(f) - 1).multiMap.values
-    def distinctBy[B](f: A ⇒ B): List[A] = list.map(equalBy(f)).distinct.map(_.a)
+    def distinctBy[B](f: A ⇒ B): List[A] = self.map(equalBy(f)).distinct.map(_.a)
 
     def countBy[B](f: A ⇒ B): Int ▶: List[A] =
-      list.asMultiMap[List].withKeys(f).multiMap.mapEntries(_ ⇒ values ⇒ (values.size, values))
+      self.asMultiMap[List].withKeys(f).multiMap.mapEntries(_ ⇒ values ⇒ (values.size, values))
 
-    def batchBy[B](f: A ⇒ B): List[List[A]] = list.unconsC(empty = Nil, nonEmpty = head ⇒ tail ⇒ {
+    def batchBy[B](f: A ⇒ B): List[List[A]] = self.unconsC(empty = Nil, nonEmpty = head ⇒ tail ⇒ {
       val (_, lastBatch, allBatches) = tail.foldLeft((f(head), M.ListBuffer(head), M.ListBuffer[List[A]]())) {
         case ((currentKey, batch, batches), a) ⇒ f(a).cond(_ == currentKey,
           ifTrue  = key ⇒ (key, batch += a,      batches),
@@ -64,14 +64,14 @@ object list {
     def tailOption: Option[List[A]] = uncons(None, nonEmpty ⇒ Some(nonEmpty.tail))
     def initOption: Option[List[A]] = uncons(None, nonEmpty ⇒ Some(nonEmpty.init))
 
-    def calcIfNonEmpty[B](f: List[A] ⇒ B): Option[B] = list.calcIf(_.nonEmpty)(f)
-    def mapIfNonEmpty[B](f: A ⇒ B): Option[List[B]] = list.calcIf(_.nonEmpty)(_.map(f))
+    def calcIfNonEmpty[B](f: List[A] ⇒ B): Option[B] = self.calcIf(_.nonEmpty)(f)
+    def mapIfNonEmpty[B](f: A ⇒ B): Option[List[B]] = self.calcIf(_.nonEmpty)(_.map(f))
 
-    def amass[B](pf: A ~> List[B]): List[B] = list.flatMap(a ⇒ pf.lift(a).getOrElse(Nil))
+    def amass[B](pf: A ~> List[B]): List[B] = self.flatMap(a ⇒ pf.lift(a).getOrElse(Nil))
 
-    def uncons[B](empty: ⇒ B, nonEmpty: List[A] ⇒ B): B = if (list.isEmpty) empty else nonEmpty(list)
+    def uncons[B](empty: ⇒ B, nonEmpty: List[A] ⇒ B): B = if (self.isEmpty) empty else nonEmpty(self)
 
-    def unconsC[B](empty: ⇒ B, nonEmpty: A ⇒ List[A] ⇒ B): B = list match {
+    def unconsC[B](empty: ⇒ B, nonEmpty: A ⇒ List[A] ⇒ B): B = self match {
       case Nil          ⇒ empty
       case head :: tail ⇒ nonEmpty(head)(tail)
     }
@@ -81,12 +81,12 @@ object list {
       case Some((init, last)) ⇒ nonEmpty(init)(last)
     }
 
-    def const[B](elem: B): List[B] = list.map(_ ⇒ elem)
+    def const[B](elem: B): List[B] = self.map(_ ⇒ elem)
 
-    def lpair[B](f: A ⇒ B): List[(B, A)] = list.map(_.lpair(f))
-    def rpair[B](f: A ⇒ B): List[(A, B)] = list.map(_.rpair(f))
+    def lpair[B](f: A ⇒ B): List[(B, A)] = self.map(_.lpair(f))
+    def rpair[B](f: A ⇒ B): List[(A, B)] = self.map(_.rpair(f))
 
-    def prefixPadTo(len: Int, elem: A): List[A] = List.fill(len - list.length)(elem) ++ list
+    def prefixPadTo(len: Int, elem: A): List[A] = List.fill(len - self.length)(elem) ++ self
 
     def sharedPrefix(other: List[A])(implicit compare: A ⇒ A ⇒ Boolean = equalC[A]): (List[A], List[A], List[A]) = {
       @tailrec def recurse(lefts: List[A], rights: List[A], acc: List[A]): (List[A], List[A], List[A]) = {
@@ -96,7 +96,7 @@ object list {
         }
       }
 
-      recurse(list, other, Nil)
+      recurse(self, other, Nil)
     }
 
     def zipExact[B](bs: List[B]): (List[(A, B)], Option[Either[List[A], List[B]]]) = zipExactWith(bs)((a, b) ⇒ (a, b))
@@ -110,35 +110,33 @@ object list {
         case (Nil, bs)          ⇒ (cs.reverse, Some(Right(bs)))
       }
 
-      recurse(list, other, Nil)
+      recurse(self, other, Nil)
     }
 
-    def sortPromoting(first: A*)(implicit ordering: Ordering[A]): List[A] = list.sorted(ordering.promote(first: _*))
-    def sortDemoting(last: A*)(implicit ordering: Ordering[A]): List[A]   = list.sorted(ordering.demote(last: _*))
+    def sortPromoting(first: A*)(implicit ordering: Ordering[A]): List[A] = self.sorted(ordering.promote(first: _*))
+    def sortDemoting(last: A*)(implicit ordering: Ordering[A]): List[A]   = self.sorted(ordering.demote(last: _*))
 
-    def shuffle(): List[A] = Random.shuffle(list)
+    def shuffle(): List[A] = Random.shuffle(self)
 
     private def equalBy[B](f: A ⇒ B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
-    private def zip[B](other: List[B]): Iterator[(A, B)] = list.iterator.zip(other.iterator)
+    private def zip[B](other: List[B]): Iterator[(A, B)] = self.iterator.zip(other.iterator)
 
-    protected def gtl: GenTraversableLike[A, GenTraversable[A]] = list
-    protected def cc: List[A] = list
+    protected def gtl: GenTraversableLike[A, GenTraversable[A]] = self
+    protected def cc: List[A] = self
   }
 
-  implicit class ListOfEithersPimps[L, R](list: List[_ <: Either[L, R]])
-    extends GenTraversableLikeOfEitherPimpsMixin[L, R, List] {
-
-    protected def gtl: GTLGT[Either[L, R]] = list
+  implicit class ListOfEithersPimps[L, R](self: List[_ <: Either[L, R]]) extends GenTraversableLikeOfEitherPimpsMixin[L, R, List] {
+    protected def gtl: GTLGT[Either[L, R]] = self
   }
 
-  implicit class ListOfTuple2Pimps[K, V](list: List[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
-    def mapC[W](f: K ⇒ V ⇒ W): List[W] = list.map(kv ⇒ f(kv._1)(kv._2))
+  implicit class ListOfTuple2Pimps[K, V](self: List[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
+    def mapC[W](f: K ⇒ V ⇒ W): List[W] = self.map(kv ⇒ f(kv._1)(kv._2))
 
-    protected def gtl: GTLGT[(K, V)] = list
+    protected def gtl: GTLGT[(K, V)] = self
   }
 
-  implicit class MatrixPimps[A](list: List[List[A]]) {
-    def cartesianProduct: List[List[A]] = list.foldRight(List(Nil): List[List[A]]) {
+  implicit class MatrixPimps[A](val self: List[List[A]]) extends AnyVal {
+    def cartesianProduct: List[List[A]] = self.foldRight(List(Nil): List[List[A]]) {
       case (item, acc) ⇒ for { a ← item; b ← acc } yield a :: b
     }
   }

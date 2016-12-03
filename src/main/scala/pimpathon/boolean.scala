@@ -2,14 +2,14 @@ package pimpathon
 
 
 object boolean {
-  implicit class BooleanPimps(val value: Boolean) extends AnyVal {
-    def asInt: Int = if (value) 1 else 0
-    def either[R](right: R): EitherCapturer[R] = new EitherCapturer[R](value, right)
-    def option[A](a: ⇒ A): Option[A] = if (value) Some(a) else None
-    def implies(rhs: Boolean): Boolean = !value || rhs
-    def nor(rhs: Boolean): Boolean = !(value || rhs)
-    def nand(rhs: Boolean): Boolean = !(value && rhs)
-    def cond[A](ifTrue: ⇒ A, ifFalse: ⇒ A): A = if (value) ifTrue else ifFalse
+  implicit class BooleanPimps(val self: Boolean) extends AnyVal {
+    def asInt: Int = if (self) 1 else 0
+    def either[R](right: R): EitherCapturer[R] = new EitherCapturer[R](self, right)
+    def option[A](a: ⇒ A): Option[A] = if (self) Some(a) else None
+    def implies(rhs: Boolean): Boolean = !self || rhs
+    def nor(rhs: Boolean): Boolean = !(self || rhs)
+    def nand(rhs: Boolean): Boolean = !(self && rhs)
+    def cond[A](ifTrue: ⇒ A, ifFalse: ⇒ A): A = if (self) ifTrue else ifFalse
   }
 
   class EitherCapturer[R](value: Boolean, right: R) {

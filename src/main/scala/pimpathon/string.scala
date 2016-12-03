@@ -8,30 +8,30 @@ import pimpathon.list._
 
 
 object string {
-  implicit class StringPimps(val string: String) extends AnyVal {
-    def emptyTo(alternative: ⇒ String): String = if (string.isEmpty) alternative else string
+  implicit class StringPimps(val self: String) extends AnyVal {
+    def emptyTo(alternative: ⇒ String): String = if (self.isEmpty) alternative else self
 
-    def quote: String = "\"" + string + "\""
-    def unquote: String = string.stripAffixes("\"", "\"")
+    def quote: String = "\"" + self + "\""
+    def unquote: String = self.stripAffixes("\"", "\"")
 
-    def stripAffixes(prefix: String, suffix: String): String = string.stripPrefix(prefix).stripSuffix(suffix)
+    def stripAffixes(prefix: String, suffix: String): String = self.stripPrefix(prefix).stripSuffix(suffix)
     def affixWith(prefix: String, suffix: String): String = prefixWith(prefix).suffixWith(suffix)
 
-    def prefixWith(prefix: String): String = if (string.startsWith(prefix)) string else prefix + string
-    def suffixWith(suffix: String): String = if (string.endsWith(suffix))   string else string + suffix
+    def prefixWith(prefix: String): String = if (self.startsWith(prefix)) self else prefix + self
+    def suffixWith(suffix: String): String = if (self.endsWith(suffix))   self else self + suffix
 
     def sharedPrefix(other: String): (String, String, String) = {
-      val (prefix, rest, otherRest) = string.toList.sharedPrefix(other.toList)
+      val (prefix, rest, otherRest) = self.toList.sharedPrefix(other.toList)
 
       (fromChars(prefix), fromChars(rest), fromChars(otherRest))
     }
 
-    def prefixPadTo(len: Int, elem: Char): String = (elem.toString * (len - string.length)) + string
+    def prefixPadTo(len: Int, elem: Char): String = (elem.toString * (len - self.length)) + self
 
-    def md5: String = MessageDigest.getInstance("MD5").digest(string.getBytes).toHex(length = 32)
+    def md5: String = MessageDigest.getInstance("MD5").digest(self.getBytes).toHex(length = 32)
 
-    def toByteArray: Array[Byte] = string.getBytes(Charset.forName("UTF-8"))
-    def toByteArray(charset: Charset): Array[Byte] = string.getBytes(charset)
+    def toByteArray: Array[Byte] = self.getBytes(Charset.forName("UTF-8"))
+    def toByteArray(charset: Charset): Array[Byte] = self.getBytes(charset)
   }
 
   def fromChars(chars: List[Char]): String =

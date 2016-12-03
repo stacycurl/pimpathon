@@ -13,7 +13,7 @@ object callable {
     override def call(): A = action
   }
 
-  implicit class CallablePimps[A](val value: Callable[A]) extends AnyVal {
-    def attempt: Callable[Try[A]] = create(Try(value.call()))
+  implicit class CallablePimps[A](val self: Callable[A]) extends AnyVal {
+    def attempt: Callable[Try[A]] = create(Try(self.call()))
   }
 }

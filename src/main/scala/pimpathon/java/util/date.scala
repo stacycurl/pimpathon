@@ -6,8 +6,8 @@ import pimpathon.any._
 
 
 object date {
-  implicit class DatePimps(val value: Date) extends AnyVal {
+  implicit class DatePimps(val self: Date) extends AnyVal {
     def addDay(offset: Int): Date =
-      Calendar.getInstance().tap(_.setTime(value), _.add(Calendar.DAY_OF_YEAR, offset)).getTime
+      Calendar.getInstance().tap(_.setTime(self), _.add(Calendar.DAY_OF_YEAR, offset)).getTime
   }
 }

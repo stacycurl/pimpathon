@@ -6,8 +6,8 @@ import pimpathon.any._
 
 
 object throwable {
-  implicit class ThrowablePimps(val value: Throwable) extends AnyVal {
+  implicit class ThrowablePimps(val self: Throwable) extends AnyVal {
     def stackTraceAsString(): String =
-      new StringWriter().tap(sw ⇒ value.printStackTrace(new PrintWriter(sw, true))).toString
+      new StringWriter().tap(sw ⇒ self.printStackTrace(new PrintWriter(sw, true))).toString
   }
 }

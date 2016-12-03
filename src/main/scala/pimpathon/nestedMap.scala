@@ -14,17 +14,19 @@ object nestedMap {
 
   implicit def build[K1, K2, V]: NMCBF[K1, K2, V] = new NestedMapCanBuilderFrom[K1, K2, V]
 
-  implicit class NestedMapPimps[K1, K2, V](val value: K1 ▶: K2 ▶: V) extends AnyVal {
-    def flipNesting: K2 ▶: K1 ▶: V = value.flatMap(o ⇒ o._2.map(i ⇒ (i._1, o._1, i._2)))(breakOut)
-    def nestedMap: NestedMapConflictingPimps[K1, K2, V] = new NestedMapConflictingPimps[K1, K2, V](value)
-    def +(kkv: (K1, K2, V)): K1 ▶: K2 ▶: V = append(kkv._1, kkv._2, kkv._3)
-    def append(k1: K1, k2: K2, v: V): K1 ▶: K2 ▶: V = value + ((k1, value.getOrEmpty(k1) + ((k2, v))))
-    def getOrEmpty(k1: K1): K2 ▶: V = value.getOrElse(k1, Map.empty[K2, V])
+  implicit class NestedMapPimps[K1, K2, V](val self: K1 ▶: K2 ▶: V) extends AnyVal {
+    def flipNesting:                  K2 ▶: K1 ▶: V = self.flatMap(o ⇒ o._2.map(i ⇒ (i._1, o._1, i._2)))(breakOut)
+    def +(kkv: (K1, K2, V)):          K1 ▶: K2 ▶: V = append(kkv._1, kkv._2, kkv._3)
+    def append(k1: K1, k2: K2, v: V): K1 ▶: K2 ▶: V = self + ((k1, self.getOrEmpty(k1) + ((k2, v))))
+
+    def getOrEmpty(k1: K1): K2 ▶: V = self.getOrElse(k1, Map.empty[K2, V])
+
+    def nestedMap: NestedMapConflictingPimps[K1, K2, V] = new NestedMapConflictingPimps[K1, K2, V](self)
   }
 
-  class NestedMapConflictingPimps[K1, K2, V](value: K1 ▶: K2 ▶: V) {
-    def mapValuesEagerly[W](f: V ⇒ W): K1 ▶: K2 ▶: W = value.mapValuesEagerly(_.mapValuesEagerly(f))
-    def mapKeysEagerly[C](f: K2 ⇒ C): K1 ▶: C ▶: V   = value.mapValuesEagerly(_.mapKeysEagerly(f))
+  class NestedMapConflictingPimps[K1, K2, V](self: K1 ▶: K2 ▶: V) {
+    def mapValuesEagerly[W](f: V ⇒ W): K1 ▶: K2 ▶: W = self.mapValuesEagerly(_.mapValuesEagerly(f))
+    def mapKeysEagerly[C](f: K2 ⇒ C):  K1 ▶: C ▶: V  = self.mapValuesEagerly(_.mapKeysEagerly(f))
   }
 
   object NestedMap {

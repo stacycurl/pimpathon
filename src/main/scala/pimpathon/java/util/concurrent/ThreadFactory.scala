@@ -7,8 +7,8 @@ import pimpathon.any._
 
 
 object threadFactory {
-  implicit class ThreadFactoryPimps(val value: ThreadFactory) extends AnyVal {
-    def naming(f: Int ⇒ String): ThreadFactory = NamingThreadFactory(value, f)
+  implicit class ThreadFactoryPimps(val self: ThreadFactory) extends AnyVal {
+    def naming(f: Int ⇒ String): ThreadFactory = NamingThreadFactory(self, f)
   }
 
   case class NamingThreadFactory(adapted: ThreadFactory, f: Int ⇒ String) extends ThreadFactory {

@@ -9,14 +9,12 @@ import pimpathon.frills.genTraversableLike.{GenTraversableLikeFrillsMixin, GenTr
 
 
 object set {
-  implicit class SetFrills[A](value: Set[A]) extends GenTraversableLikeFrillsMixin[A, Set] {
-    protected def gtl: GTLGT[A] = value
-    protected def cc: Set[A] = value
+  implicit class SetFrills[A](self: Set[A]) extends GenTraversableLikeFrillsMixin[A, Set] {
+    protected def gtl: GTLGT[A] = self
+    protected def cc: Set[A] = self
   }
 
-  implicit class SetOfDisjunctionsFrills[L, R](set: Set[L \/ R])
-    extends GenTraversableLikeOfDisjunctionFrillsMixin[L, R] {
-
-    protected def gtl: GenTraversableLike[L \/ R, GenTraversable[L \/ R]] = set
+  implicit class SetOfDisjunctionsFrills[L, R](self: Set[L \/ R]) extends GenTraversableLikeOfDisjunctionFrillsMixin[L, R] {
+    protected def gtl: GenTraversableLike[L \/ R, GenTraversable[L \/ R]] = self
   }
 }

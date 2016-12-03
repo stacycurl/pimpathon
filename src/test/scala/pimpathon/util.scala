@@ -18,8 +18,8 @@ import pimpathon.pimpTry._
 
 
 object util {
-  implicit class AnyTestPimp[A](val actual: A) extends AnyVal {
-    def ===(expected: A): Unit = assertEquals(expected, actual)
+  implicit class AnyTestPimp[A](val self: A) extends AnyVal {
+    def ===(expected: A): Unit = assertEquals(expected, self)
   }
 
   def ignore(f: ⇒ Unit): Unit = {}

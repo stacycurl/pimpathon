@@ -26,6 +26,8 @@ object argonaut {
     def descendant(path: String): Descendant[Json, Json] = Descendant(self, Traversal.id[Json].descendant(path))
     def compact: Json = filterNulls
     def filterNulls: Json = filterR(_ != jNull)
+    def filterKeys(p: Predicate[String]): Json = self.withObject(_.filterKeys(p))
+    def filterValues(p: Predicate[Json]): Json = self.withObject(_.filterValues(p))
 
     def renameField(from: String, to: String):    Json = self.withObject(_.renameField(from, to))
     def renameFields(fromTos: (String, String)*): Json = self.withObject(_.renameFields(fromTos: _*))
@@ -130,8 +132,8 @@ object argonaut {
   }
 
   implicit class JsonObjectFrills(val self: JsonObject) extends AnyVal {
-    def filterKeys(p: String ⇒ Boolean): JsonObject = mapMap(_.filterKeys(p))
-    def filterValues(p: Json ⇒ Boolean): JsonObject = mapMap(_.filterValues(p))
+    def filterKeys(p: Predicate[String]): JsonObject = mapMap(_.filterKeys(p))
+    def filterValues(p: Predicate[Json]): JsonObject = mapMap(_.filterValues(p))
     def removeFields(names: String*): JsonObject = mapMap(_.filterKeysNot(names.toSet))
 
     def renameFields(fromTos: (String, String)*): JsonObject = fromTos.foldLeft(self) {
@@ -360,7 +362,7 @@ object Descendant {
   private def filterObject(key: String, value: Json): Prism[Json, Json] =
     filterObject(_.field(key).contains(value))
 
-  private def filterObject(p: Json ⇒ Boolean): Prism[Json, Json] =
+  private def filterObject(p: Predicate[Json]): Prism[Json, Json] =
     Prism[Json, Json](json ⇒ p(json).option(json))(json ⇒ json)
 
   private final lazy val objectValuesOrArrayElements: Traversal[Json, Json] = new Traversal[Json, Json] {

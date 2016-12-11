@@ -1,9 +1,9 @@
 package pimpathon.argonautTests
 
 import _root_.argonaut.Json._
-import _root_.argonaut.JsonIdentity.ToJsonIdentity
 import _root_.argonaut._
 import pimpathon.option._
+
 import scala.collection.immutable.{Map ⇒ ▶:}
 
 
@@ -48,5 +48,5 @@ trait JsonUtil {
 
   def parse(jsonText: String) = Parse.parseOption(jsonText).getOrThrow("not json")
 
-  def obj[V: EncodeJson](kvs: (String, V)*): Json = Json.jObjectFields(kvs.map { case (k, v) ⇒ (k, v.asJson) }: _*)
+  def obj(socks: Json.JsonAssoc*): Json = Json.jObjectFields(socks: _*)
 }

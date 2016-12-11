@@ -80,7 +80,7 @@ abstract class Sonatype {
 
   private def commonSettings: Seq[Setting[_]] = Seq(
     moduleName := "pimpathon",
-    publishMavenStyle := true,
+    publishMavenStyle := true, // sbt complains about this, but jcenter requires it.
     publishArtifact in Test := false,
     licenses +=("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html"))
   )

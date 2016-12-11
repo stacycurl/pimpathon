@@ -2,6 +2,7 @@ package pimpathon.argonautTests
 
 import argonaut.Json._
 import argonaut._
+import argonaut.StringWrap.StringToStringWrap
 import org.junit.Test
 import pimpathon.argonaut._
 import pimpathon.util.on
@@ -258,33 +259,39 @@ class JsonTest extends JsonUtil {
   )
 
   @Test def addIfMissing(): Unit = on(
-    jEmptyObject,     obj("a" → existing)
-  ).calling(_.addIfMissing("a", added)).produces(
-    obj("a" → added), obj("a" → existing)
+    jEmptyObject,      obj("a" := existing)
+  ).calling(_.addIfMissing("a", jString(added))).produces(
+    obj("a" := added), obj("a" := existing)
   )
 
   @Test def descendant_addIfMissing_many(): Unit = on(
-    thing(jEmptyObject),        thing(obj("a" → existing)),
-    thing(obj("b" → existing)), thing(obj("a" → existing, "b" → existing))
-  ).calling(_.descendant("thing").addIfMissing("a" → added, "b" → added)).produces(
-    thing(obj("a" → added, "b" → added)),    thing(obj("a" → existing, "b" → added)),
-    thing(obj("a" → added, "b" → existing)), thing(obj("a" → existing, "b" → existing))
+    thing(jEmptyObject),         thing(obj("a" := existing)),
+    thing(obj("b" := existing)), thing(obj("a" := existing, "b" := existing))
+  ).calling(_.descendant("thing").addIfMissing("a" := added, "b" := added)).produces(
+    thing(obj("a" := added, "b" := added)),    thing(obj("a" := existing, "b" := added)),
+    thing(obj("a" := added, "b" := existing)), thing(obj("a" := existing, "b" := existing))
   )
 
   @Test def descendant_obj_addIfMissing_many(): Unit = on(
-    thing(jEmptyObject),        thing(obj("a" → existing)),
-    thing(obj("b" → existing)), thing(obj("a" → existing, "b" → existing))
-  ).calling(_.descendant("thing").obj.addIfMissing("a" → added, "b" → added)).produces(
-    thing(obj("a" → added, "b" → added)),    thing(obj("a" → existing, "b" → added)),
-    thing(obj("a" → added, "b" → existing)), thing(obj("a" → existing, "b" → existing))
+    thing(jEmptyObject),         thing(obj("a" := existing)),
+    thing(obj("b" := existing)), thing(obj("a" := existing, "b" := existing))
+  ).calling(_.descendant("thing").obj.addIfMissing("a" := added, "b" := added)).produces(
+    thing(obj("a" := added, "b" := added)),    thing(obj("a" := existing, "b" := added)),
+    thing(obj("a" := added, "b" := existing)), thing(obj("a" := existing, "b" := existing))
   )
 
   @Test def addIfMissing_many(): Unit = on(
-    jEmptyObject,        obj("a" → existing),
-    obj("b" → existing), obj("a" → existing, "b" → existing)
-  ).calling(_.addIfMissing("a" → added, "b" → added)).produces(
-    obj("a" → added, "b" → added),    obj("a" → existing, "b" → added),
-    obj("a" → added, "b" → existing), obj("a" → existing, "b" → existing)
+    jEmptyObject,         obj("a" := existing),
+    obj("b" := existing), obj("a" := existing, "b" := existing)
+  ).calling(_.addIfMissing("a" := added, "b" := added)).produces(
+    obj("a" := added, "b" := added),    obj("a" := existing, "b" := added),
+    obj("a" := added, "b" := existing), obj("a" := existing, "b" := existing)
+  )
+
+  @Test def removeFields(): Unit = on(
+    obj("a" := "value", "b" := 123, "c" := true), obj("a" := "value", "b" := 123)
+  ).calling(_.removeFields("b", "c")).produces(
+    obj("a" := "value"), obj("a" := "value")
   )
 
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
@@ -293,33 +300,33 @@ class JsonTest extends JsonUtil {
 
   private def thing(value: Json): Json = obj("thing" → value)
 
-  private val added    = jString("added")
-  private var existing = jString("existing")
+  private val added    = "added"
+  private val existing = "existing"
 }
 
 class JsonObjectTest extends JsonUtil {
   @Test def renameField(): Unit =
-    obj("original" → true).withObject(_.renameField("original", "renamed")) <=> obj("renamed" → true)
+    obj("original" := true).withObject(_.renameField("original", "renamed")) <=> obj("renamed" := true)
 
   @Test def renameFields(): Unit =
-    obj("a" → true, "b" → false).withObject(_.renameFields("a" → "A", "b" → "B")) <=> obj("A" → true, "B" → false)
+    obj("a" := true, "b" := false).withObject(_.renameFields("a" → "A", "b" → "B")) <=> obj("A" := true, "B" := false)
 
   @Test def addIfMissing(): Unit = on(
-    jEmptyObject,     obj("a" → existing)
+    jEmptyObject,     obj("a" := existing)
   ).calling(_.withObject(_.addIfMissing("a", added))).produces(
-    obj("a" → added), obj("a" → existing)
+    obj("a" := added), obj("a" := existing)
   )
 
   @Test def addIfMissing_many(): Unit = on(
-    jEmptyObject,        obj("a" → existing),
-    obj("b" → existing), obj("a" → existing, "b" → existing)
-  ).calling(_.withObject(_.addIfMissing("a" → added, "b" → added))).produces(
-    obj("a" → added, "b" → added),    obj("a" → existing, "b" → added),
-    obj("a" → added, "b" → existing), obj("a" → existing, "b" → existing)
+    jEmptyObject,        obj("a" := existing),
+    obj("b" := existing), obj("a" := existing, "b" := existing)
+  ).calling(_.withObject(_.addIfMissing("a" := added, "b" := added))).produces(
+    obj("a" := added, "b" := added),    obj("a" := existing, "b" := added),
+    obj("a" := added, "b" := existing), obj("a" := existing, "b" := existing)
   )
 
   private val added    = jString("added")
-  private var existing = jString("existing")
+  private val existing = jString("existing")
 }
 
 

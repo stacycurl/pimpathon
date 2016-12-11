@@ -3,7 +3,6 @@ package pimpathon
 import scala.language.{dynamics, higherKinds, implicitConversions}
 import io.gatling.jsonpath.AST._
 import io.gatling.jsonpath._
-import monocle.function.At
 import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, Json, JsonMonocle, JsonNumber, JsonObject}
 import _root_.argonaut.Json.{jFalse, jNull, jString, jTrue}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
@@ -28,11 +27,13 @@ object argonaut {
     def compact: Json = filterNulls
     def filterNulls: Json = filterR(_ != jNull)
 
-    def renameField(from: String, to: String): Json = self.withObject(_.renameField(from, to))
+    def renameField(from: String, to: String):    Json = self.withObject(_.renameField(from, to))
     def renameFields(fromTos: (String, String)*): Json = self.withObject(_.renameFields(fromTos: _*))
 
-    def addIfMissing(name: String, value: Json): Json = this.self.withObject(_.addIfMissing(name, value))
-    def addIfMissing(assocs: Json.JsonAssoc*): Json = this.self.withObject(_.addIfMissing(assocs: _*))
+    def addIfMissing(name: String, value: Json): Json = self.withObject(_.addIfMissing(name, value))
+    def addIfMissing(assocs: Json.JsonAssoc*):   Json = self.withObject(_.addIfMissing(assocs: _*))
+
+    def removeFields(names: String*): Json = self.withObject(_.removeFields(names: _*))
 
 //    def delete(path: String): Json = {
 //      path.split("/").toList.reverse match {
@@ -47,12 +48,18 @@ object argonaut {
   }
 
   implicit class CodecJsonFrills[A](val self: CodecJson[A]) extends AnyVal {
+    def renameField(from: String, to: String):    CodecJson[A] = afterEncode(_.renameField(from, to))
+    def renameFields(fromTos: (String, String)*): CodecJson[A] = afterEncode(_.renameFields(fromTos: _*))
+    def addIfMissing(name: String, value: Json):  CodecJson[A] = afterEncode(_.addIfMissing(name, value))
+    def addIfMissing(assocs: Json.JsonAssoc*):    CodecJson[A] = afterEncode(_.addIfMissing(assocs: _*))
+    def removeFields(names: String*):             CodecJson[A] = afterEncode(_.removeFields(names: _*))
+
     def beforeDecode(f: Json ⇒ Json): CodecJson[A] = compose(f)
-    def afterDecode(f: A ⇒ A):  CodecJson[A] = derived(encoder ⇒ encoder)(_ map f)
-    def beforeEncode(f: A ⇒ A): CodecJson[A] = derived(_ contramap f)(decoder ⇒ decoder)
-    def afterEncode(f: Json ⇒ Json): CodecJson[A] = andThen(f)
-    def andThen(f: Json ⇒ Json): CodecJson[A] = derived(_ andThen f)(decoder ⇒ decoder)
-    def compose(f: Json ⇒ Json): CodecJson[A] = derived(encoder ⇒ encoder)(_ compose f)
+    def afterDecode(f: A ⇒ A):        CodecJson[A] = derived(encoder ⇒ encoder)(_ map f)
+    def beforeEncode(f: A ⇒ A):       CodecJson[A] = derived(_ contramap f)(decoder ⇒ decoder)
+    def afterEncode(f: Json ⇒ Json):  CodecJson[A] = andThen(f)
+    def andThen(f: Json ⇒ Json):      CodecJson[A] = derived(_ andThen f)(decoder ⇒ decoder)
+    def compose(f: Json ⇒ Json):      CodecJson[A] = derived(encoder ⇒ encoder)(_ compose f)
     def xmapDisjunction[B](f: A => String \/ B)(g: B => A): CodecJson[B] = derived(_ beforeEncode g)(_ afterDecode f)
 
     private[argonaut] def derived[B](f: EncodeJson[A] ⇒ EncodeJson[B])(g: DecodeJson[A] ⇒ DecodeJson[B]) =
@@ -65,6 +72,12 @@ object argonaut {
   }
 
   implicit class DecodeJsonFrills[A](val self: DecodeJson[A]) extends AnyVal {
+    def renameField(from: String, to: String):    DecodeJson[A] = beforeDecode(_.renameField(from, to))
+    def renameFields(fromTos: (String, String)*): DecodeJson[A] = beforeDecode(_.renameFields(fromTos: _*))
+    def addIfMissing(name: String, value: Json):  DecodeJson[A] = beforeDecode(_.addIfMissing(name, value))
+    def addIfMissing(assocs: Json.JsonAssoc*):    DecodeJson[A] = beforeDecode(_.addIfMissing(assocs: _*))
+    def removeFields(names: String*):             DecodeJson[A] = beforeDecode(_.removeFields(names: _*))
+
     def beforeDecode(f: Json ⇒ Json): DecodeJson[A] = compose(f)
     def compose(f: Json ⇒ Json):      DecodeJson[A] = DecodeJson[A](hc ⇒ self.decode(hc >-> f))
     def upcast[B >: A]:               DecodeJson[B] = self.map[B](a ⇒ a: B)
@@ -79,6 +92,12 @@ object argonaut {
   }
 
   implicit class EncodeJsonFrills[A](val self: EncodeJson[A]) extends AnyVal {
+    def renameField(from: String, to: String):    EncodeJson[A] = afterEncode(_.renameField(from, to))
+    def renameFields(fromTos: (String, String)*): EncodeJson[A] = afterEncode(_.renameFields(fromTos: _*))
+    def addIfMissing(name: String, value: Json):  EncodeJson[A] = afterEncode(_.addIfMissing(name, value))
+    def addIfMissing(assocs: Json.JsonAssoc*):    EncodeJson[A] = afterEncode(_.addIfMissing(assocs: _*))
+    def removeFields(names: String*):             EncodeJson[A] = afterEncode(_.removeFields(names: _*))
+
     def afterEncode(f: Json ⇒ Json): EncodeJson[A] = andThen(f)
     def andThen(f: Json ⇒ Json):     EncodeJson[A] = EncodeJson[A](a ⇒ f(self.encode(a)))
     def downcast[B <: A]:            EncodeJson[B] = self.contramap[B](b ⇒ b: A)
@@ -111,11 +130,17 @@ object argonaut {
   }
 
   implicit class JsonObjectFrills(val self: JsonObject) extends AnyVal {
+    def filterKeys(p: String ⇒ Boolean): JsonObject = mapMap(_.filterKeys(p))
+    def filterValues(p: Json ⇒ Boolean): JsonObject = mapMap(_.filterValues(p))
+    def removeFields(names: String*): JsonObject = mapMap(_.filterKeysNot(names.toSet))
+
     def renameFields(fromTos: (String, String)*): JsonObject = fromTos.foldLeft(self) {
       case (acc, (from, to)) ⇒ acc.renameField(from, to)
     }
 
-    def renameField(from: String, to: String): JsonObject = self(from).fold(self)(value ⇒ (self - from) + (to, value))
+    def renameField(from: String, to: String): JsonObject =
+      self(from).fold(self)(value ⇒ (self - from) + (to, value))
+
 
     def addIfMissing(assocs: Json.JsonAssoc*): JsonObject = assocs.foldLeft(self) {
       case (acc, (name, value)) ⇒ acc.addIfMissing(name, value)
@@ -124,11 +149,21 @@ object argonaut {
     def addIfMissing(name: String, value: Json): JsonObject =
       self(name).fold(self + (name, value))(_ => self)
 
+
     private[argonaut] def filterR(p: Predicate[Json]): JsonObject =
-      JsonObject.fromTraversableOnce(self.toMap.collectValues { case j if p(j) ⇒ j.filterR(p) })
+      mapMap(_.collectValues { case j if p(j) ⇒ j.filterR(p) })
+
+    private def mapMap(f: Map[String, Json] ⇒ Map[String, Json]): JsonObject =
+      JsonObject.fromTraversableOnce(f(self.toMap))
   }
 
   implicit class TraversalToJsonFrills[A](val self: Traversal[A, Json]) extends AnyVal {
+    def renameField(from: String, to: String):    Traversal[A, Json] =
+      self composeIso Iso[Json, Json](_.renameField(from, to))(_.renameField(to, from))
+
+    def renameFields(fromTos: (String, String)*): Traversal[A, Json] =
+      self composeIso Iso[Json, Json](_.renameFields(fromTos: _*))(_.renameFields(fromTos.map(_.swap): _*))
+
     def descendant(path: String): Traversal[A, Json] =
       if (path.startsWith("$")) Descendant.JsonPath.descend(self, path) else Descendant.Pimpathon.descend(self, path)
   }
@@ -193,6 +228,8 @@ object Descendant {
     def addIfMissing(name: String, value: Json): From = self.modify(_.addIfMissing(name, value))
     def addIfMissing(assocs: Json.JsonAssoc*):   From = self.modify(_.addIfMissing(assocs: _*))
 
+    def removeFields(names: String*): From = self.modify(_.removeFields(names: _*))
+
     def each: Descendant[From, Json] = self composeTraversal objectValuesOrArrayElements
   }
 
@@ -202,6 +239,8 @@ object Descendant {
 
     def addIfMissing(name: String, value: Json): From = self.modify(_.addIfMissing(name, value))
     def addIfMissing(assocs: Json.JsonAssoc*):   From = self.modify(_.addIfMissing(assocs: _*))
+
+    def removeFields(names: String*): From = self.modify(_.removeFields(names: _*))
 
     def each: Descendant[From, Json] = self composeTraversal monocle.function.Each.each
 
@@ -263,7 +302,7 @@ object Descendant {
           })
         }
 
-        implicit def orderOps[B](a: B)(implicit O: Ordering[B]) = O.mkOrderingOps(a)
+        implicit def orderOps[B](a: B)(implicit O: Ordering[B]): O.Ops = O.mkOrderingOps(a)
 
         ComparisonArgument {
           case SubQuery(List(CurrentNode, Field(name))) ⇒ fn(rhs ⇒ filterArray(filterObject(lhs ⇒ lhs.field(name) >= Some(json(rhs)))))

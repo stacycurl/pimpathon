@@ -3,9 +3,10 @@ package pimpathon
 import scala.{PartialFunction ⇒ ~>}
 import scala.collection.generic.{Growable, Shrinkable}
 import scala.util.Try
-
 import pimpathon.boolean._
 import pimpathon.function._
+
+import scala.reflect.ClassTag
 
 
 object any {
@@ -21,6 +22,9 @@ object any {
     def tapUnless[Discarded](p: Predicate[A])(actions: (A ⇒ Discarded)*): A = if (p(self)) self else tap(actions: _*)
 
     def tapPF[Discarded](action: A ~> Discarded): A = { action.lift(self); self }
+
+    def castTo[B](implicit tag: ClassTag[B]): Option[B] =
+      if (tag.runtimeClass.isAssignableFrom(self.getClass)) Some(self.asInstanceOf[B]) else None
 
     def attempt[B](f: A ⇒ B): Try[B] = Try(f(self))
 

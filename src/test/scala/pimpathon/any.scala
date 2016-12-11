@@ -32,6 +32,9 @@ class AnyTest {
   @Test def tapPF(): Unit =
     ints().run(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapPF { case j if j % 2 != 0 ⇒ is += j })) === List(1, 3)
 
+  @Test def castTo(): Unit =
+    on("foo", 123).calling(_.castTo[String]).produces(Some("foo"), None)
+
   @Test def cond(): Unit = on("true", "false").calling(_.cond(_ == "true", _ ⇒ "T", _ ⇒ "F")).produces("T", "F")
 
   @Test def partialMatch(): Unit =

@@ -14,6 +14,8 @@ object string {
     def quote: String = "\"" + self + "\""
     def unquote: String = self.stripAffixes("\"", "\"")
 
+    def hyphenate: String = splitByCase("-").toLowerCase
+
     def stripAffixes(prefix: String, suffix: String): String = self.stripPrefix(prefix).stripSuffix(suffix)
     def affixWith(prefix: String, suffix: String): String = prefixWith(prefix).suffixWith(suffix)
 
@@ -32,6 +34,9 @@ object string {
 
     def toByteArray: Array[Byte] = self.getBytes(Charset.forName("UTF-8"))
     def toByteArray(charset: Charset): Array[Byte] = self.getBytes(charset)
+
+    private def splitByCase(sep: String = " "): String =
+      self.replaceAll("""(?<=[A-Z])(?=[A-Z][a-z])|(?<=[^A-Z])(?=[A-Z])|(?<=[A-Za-z])(?=[^A-Za-z])""", sep)
   }
 
   def fromChars(chars: List[Char]): String =

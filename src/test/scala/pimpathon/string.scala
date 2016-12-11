@@ -21,6 +21,9 @@ class StringTest {
   @Test def unquote(): Unit =
     on("foo", "\"foo", "foo\"", "\"foo\"").calling(_.unquote).produces("foo", "foo", "foo", "foo")
 
+  @Test def hyphenate(): Unit =
+    on("foo", "fooFood").calling(_.hyphenate).produces("foo", "foo-food")
+
   @Test def prefixWith(): Unit = {
     "".prefixWith("") === ""
     on("", "-suffix", "prefix").calling(_.prefixWith("prefix")).produces("prefix", "prefix-suffix", "prefix")

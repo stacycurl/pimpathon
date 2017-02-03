@@ -45,7 +45,7 @@ object argonaut {
 //      }
 //    }
 
-    private[argonaut] def filterR(p: Predicate[Json]): Json =
+    def filterR(p: Predicate[Json]): Json =
       p.cond(self.withObject(_.filterR(p)).withArray(_.filterR(p)), jNull)(self)
   }
 
@@ -152,7 +152,7 @@ object argonaut {
       self(name).fold(self + (name, value))(_ => self)
 
 
-    private[argonaut] def filterR(p: Predicate[Json]): JsonObject =
+    def filterR(p: Predicate[Json]): JsonObject =
       mapMap(_.collectValues { case j if p(j) ⇒ j.filterR(p) })
 
     private def mapMap(f: Map[String, Json] ⇒ Map[String, Json]): JsonObject =
@@ -170,8 +170,8 @@ object argonaut {
       if (path.startsWith("$")) Descendant.JsonPath.descend(self, path) else Descendant.Pimpathon.descend(self, path)
   }
 
-  private implicit class JsonArrayFrills(val self: List[Json]) extends AnyVal {
-    private[argonaut] def filterR(p: Predicate[Json]): List[Json] = self.collect { case j if p(j) ⇒ j.filterR(p) }
+  implicit class JsonArrayFrills(val self: List[Json]) extends AnyVal {
+    def filterR(p: Predicate[Json]): List[Json] = self.collect { case j if p(j) ⇒ j.filterR(p) }
   }
 }
 

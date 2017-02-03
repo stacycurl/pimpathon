@@ -20,6 +20,14 @@ class JsonTest extends JsonUtil {
     """[ { "a": null, "b": 3 } ]"""   → """[ { "b": 3 } ]"""
   )
 
+  @Test def filterR(): Unit = test(_.filterR(_ != Json.jEmptyObject),
+    """{}"""                        → """null""",
+    """{ "a": {}, "b": 3 }"""       → """{ "b": 3 }""",
+    """[ "a", {}, "b" ]"""          → """[ "a", "b" ]""",
+    """{ "o": [ "a", {}, "b" ] }""" → """{ "o": [ "a", "b" ] }""",
+    """[ { "a": {}, "b": 3 } ]"""   → """[ { "b": 3 } ]"""
+  )
+
   @Test def descendant_values(): Unit = {
     jobj.descendant("age").getAll <=> List(age)
     jobj.descendant("age").modify(_ ⇒ redacted) <=> ("age" → redacted) ->: jobj

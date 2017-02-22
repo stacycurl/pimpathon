@@ -111,6 +111,9 @@ object argonaut {
   }
 
   implicit class EncodeJsonMapFrills[K, V](val self: EncodeJson[K ▶: V]) extends AnyVal {
+    def contramapEntries[C, W](f: (C, W) => (K, V)): EncodeJson[C ▶: W] =
+      self.contramap[C ▶: W](_.mapEntries(c => w => f(c, w)))
+
     def contramapKeys[C](f: C ⇒ K):   EncodeJson[C ▶: V] = self.contramap[C ▶: V](_.mapKeysEagerly(f))
     def contramapValues[W](f: W ⇒ V): EncodeJson[K ▶: W] = self.contramap[K ▶: W](_.mapValuesEagerly(f))
   }

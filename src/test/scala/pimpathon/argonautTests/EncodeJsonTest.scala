@@ -12,6 +12,9 @@ class EncodeJsonTest extends JsonUtil {
   @Test def andThen(): Unit     = encoder.andThen(reverse).encode(list)          <=> reverse(encoder.encode(list))
   @Test def downcast(): Unit    = Base.encoder.downcast[Derived].encode(derived) <=> derivedEncoded
 
+  @Test def contramapEntries(): Unit =
+    mapEncoder.contramapEntries[String, String](reverseEntry).encode(Map("foo" → "bar")) <=> mapEncoder.encode(Map("oof" → "rab"))
+
   @Test def contramapKeys(): Unit =
     mapEncoder.contramapKeys[String](_.reverse).encode(Map("foo" → "bar")) <=> mapEncoder.encode(Map("oof" → "bar"))
 

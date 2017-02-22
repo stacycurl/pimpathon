@@ -25,6 +25,11 @@ class NestedMapTest {
     Map(1 → Map(2 → 3, 3 → 4), 2 → Map(3 → 4, 4 → 5)).nestedMap.mapKeysEagerly(_ * 2) ===
       Map(1 → Map(4 → 3, 6 → 4), 2 → Map(6 → 4, 8 → 5))
 
+  @Test def nesteMap_mapEntries(): Unit =
+    Map(1 → Map(2 → 3, 3 → 4), 2 → Map(3 → 4, 4 → 5)).nestedMap.mapEntries {
+      case (outer, inner, value) => (outer + 1, inner - 1, value * 10)
+    } === Map(2 → Map(1 → 30, 2 → 40), 3 → Map(2 → 40, 3 → 50))
+
   @Test def flipNesting(): Unit = Map(10 → Map(2 → 3, 3 → 4), 20 → Map(3 → 4, 4 → 5)).flipNesting ===
     Map(2 → Map(10 → 3), 3 → Map(10 → 4, 20 → 4), 4 → Map(20 → 5))
 

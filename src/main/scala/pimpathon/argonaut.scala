@@ -69,6 +69,9 @@ object argonaut {
   }
 
   implicit class CodecJsonMapFrills[K, V](val self: CodecJson[K ▶: V]) extends AnyVal {
+    def xmapEntries[C, W](kvcw: (K, V) => (C, W))(cwkv: (C, W) => (K, V)): CodecJson[C ▶: W] =
+      self.derived[C ▶: W](_ contramapEntries cwkv)(_ mapEntries kvcw)
+
     def xmapKeys[C](kc: K ⇒ C)(ck: C ⇒ K):   CodecJson[C ▶: V] = self.derived(_ contramapKeys ck)(_ mapKeys kc)
     def xmapValues[W](vw: V ⇒ W)(wv: W ⇒ V): CodecJson[K ▶: W] = self.derived(_ contramapValues wv)(_ mapValues vw)
   }

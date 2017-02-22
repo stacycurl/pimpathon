@@ -4,7 +4,6 @@ import _root_.argonaut._
 import org.junit.Test
 import pimpathon.any._
 import pimpathon.argonaut._
-import pimpathon.pimpTry._
 import pimpathon.util._
 import sjc.delta.argonaut.json.actualExpected.flat._
 import sjc.delta.argonaut.matchers._
@@ -20,6 +19,11 @@ class CodecJsonTest extends JsonUtil {
   @Test def afterEncode(): Unit  = codec.afterEncode(reverse).encode(list)       <=> reverse(codec.encode(list))
   @Test def andThen(): Unit      = codec.andThen(reverse).encode(list)           <=> reverse(codec.encode(list))
   @Test def compose(): Unit      = codec.compose(reverse).decodeJson(json)       === codec.decodeJson(reverse(json))
+
+  @Test def xmapEntries(): Unit = mapCodec.xmapEntries[String, String](reverseEntry)(reverseEntry).calc(reversed ⇒ {
+    reversed.encode(Map("foo" → "bar"))         <=> mapCodec.encode(Map("oof" → "rab"))
+    reversed.decodeJson(jsonMap("foo" → "bar")) === mapCodec.decodeJson(jsonMap("oof" → "rab"))
+  })
 
   @Test def xmapKeys(): Unit = mapCodec.xmapKeys[String](_.reverse)(_.reverse).calc(reversed ⇒ {
     reversed.encode(Map("foo" → "bar"))         <=> mapCodec.encode(Map("oof" → "bar"))

@@ -89,6 +89,9 @@ object argonaut {
   }
 
   implicit class DecodeJsonMapFrills[K, V](val self: DecodeJson[K ▶: V]) extends AnyVal {
+    def mapEntries[C, W](f: (K, V) => (C, W)): DecodeJson[C ▶: W] =
+      self.map(_.mapEntries(k => v => f(k, v)))
+
     def mapKeys[C](f: K ⇒ C):   DecodeJson[C ▶: V] = self.map(_.mapKeysEagerly(f))
     def mapValues[W](f: V ⇒ W): DecodeJson[K ▶: W] = self.map(_.mapValuesEagerly(f))
   }

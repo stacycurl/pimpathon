@@ -49,4 +49,6 @@ trait JsonUtil {
   def parse(jsonText: String) = Parse.parseOption(jsonText).getOrThrow("not json")
 
   def obj(socks: Json.JsonAssoc*): Json = Json.jObjectFields(socks: _*)
+
+  def reverseEntry(key: String, value: String): (String, String) = (key.reverse, value.reverse)
 }

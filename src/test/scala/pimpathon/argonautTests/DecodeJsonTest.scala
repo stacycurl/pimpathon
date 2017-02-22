@@ -11,6 +11,9 @@ class DecodeJsonTest extends JsonUtil {
   @Test def compose(): Unit      = decoder.compose(reverse).decodeJson(json)      === decoder.decodeJson(reverse(json))
   @Test def upcast(): Unit       = Derived.codec.upcast[Base].decodeJson(derivedEncoded) === DecodeResult.ok(derived)
 
+  @Test def mapEntries(): Unit =
+    mapDecoder.mapEntries(reverseEntry).decodeJson(jsonMap("foo" → "bar")) === mapDecoder.decodeJson(jsonMap("oof" → "rab"))
+
   @Test def mapKeys(): Unit =
     mapDecoder.mapKeys(_.reverse).decodeJson(jsonMap("foo" → "bar")) === mapDecoder.decodeJson(jsonMap("oof" → "bar"))
 

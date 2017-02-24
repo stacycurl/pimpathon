@@ -110,6 +110,10 @@ object argonaut {
     def andThen(f: Json ⇒ Json):     EncodeJson[A] = EncodeJson[A](a ⇒ f(self.encode(a)))
     def downcast[B <: A]:            EncodeJson[B] = self.contramap[B](b ⇒ b: A)
 
+    def add(assocsFn: (A => Json.JsonAssoc)*): EncodeJson[A] = {
+      EncodeJson[A](a ⇒ self.encode(a).addIfMissing(assocsFn.map(assoc => assoc.apply(a)): _*))
+    }
+
     private[argonaut] def beforeEncode[B](f: B => A): EncodeJson[B] = self contramap f // Probably publish later
   }
 

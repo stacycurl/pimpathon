@@ -50,4 +50,15 @@ class StringTest {
     Assert.assertArrayEquals(Array('a'.toByte, 'b'.toByte, 'c'.toByte), "abc".toByteArray(Charset.forName("UTF-8")))
     Assert.assertArrayEquals(Array('d'.toByte, 'e'.toByte, 'f'.toByte), "def".toByteArray)
   }
+
+  @Test def wrap(): Unit = {
+    val wrapped =
+      """|Pimpathon contains pimps
+         |for classes in core
+         |scala & java libraries
+         |and pimps for external
+         |libraries""".stripMargin
+
+    wrapped.replaceAllLiterally("\n", " ").wrap(24) === wrapped
+  }
 }

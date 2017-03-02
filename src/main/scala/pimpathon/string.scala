@@ -16,6 +16,9 @@ object string {
 
     def hyphenate: String = splitByCase("-").toLowerCase
 
+    def wrap(length: Int): String =
+      self.split(" ").toList.batchWhile(_.mkString(" ").length <= length).map(_.mkString(" ")).mkString("\n")
+
     def stripAffixes(prefix: String, suffix: String): String = self.stripPrefix(prefix).stripSuffix(suffix)
     def affixWith(prefix: String, suffix: String): String = prefixWith(prefix).suffixWith(suffix)
 

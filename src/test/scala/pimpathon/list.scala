@@ -109,6 +109,9 @@ class ListTest {
     List(List(1 → 1, 1 → 2), List(2 → 1), List(1 → 3), List(2 → 2, 2 → 3))
   }
 
+  @Test def batchWhile(): Unit = List("foo", "food", "bar", "bare", "barf")
+    .batchWhile(_.mkString("").distinct.length <= 4) === List(List("foo", "food"), List("bar", "bare"), List("barf"))
+
   @Test def prefixPadTo(): Unit = List(1, 2, 3).prefixPadTo(6, 0) === List(0, 0, 0, 1, 2, 3)
 
   @Test def tap(): Unit = {

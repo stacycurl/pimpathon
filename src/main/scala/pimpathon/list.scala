@@ -55,6 +55,14 @@ object list {
       (allBatches += lastBatch.toList).toList
     })
 
+    def batchWhile(p: Predicate[List[A]]): List[List[A]] = {
+      val (last, res) = self.foldLeft((List.empty[A], List.empty[List[A]])) {
+        case ((current, acc), a) ⇒ if (p(a :: current)) (a :: current, acc) else (a :: Nil, current.reverse :: acc)
+      }
+
+      (last.reverse :: res).reverse
+    }
+
     def headTail: (A, List[A]) = headTailOption.getOrThrow("headTail of empty list")
     def initLast: (List[A], A) = initLastOption.getOrThrow("initLast of empty list")
 

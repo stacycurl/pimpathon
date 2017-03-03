@@ -60,6 +60,8 @@ class PredicateTest {
   @Test def ifSome(): Unit = List(None, Some(3), Some(4), None, Some(6)).filter(isEven.ifSome) ===
     List(Some(4), Some(6))
 
+  @Test def first():  Unit = List((1, 2), (2, 3)).filter(isEven.first[Int])  === List((2, 3))
+
   @Test def guard(): Unit = on(1, 2, 3, 4).calling((isEven guard double).lift).produces(None, Some(4), None, Some(8))
 
   @Test def nand(): Unit = {

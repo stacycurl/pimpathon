@@ -214,6 +214,9 @@ class MapTest {
   @Test def partitionKeys(): Unit =
     Map(1 → 2, 2 → 3).partitionKeys(_ == 1) === (Map(1 → 2), Map(2 → 3))
 
+  @Test def partitionValues(): Unit =
+    Map(1 → 2, 2 → 3).partitionValues(_ == 2) === (Map(1 → 2), Map(2 → 3))
+
   @Test def partitionKeysBy(): Unit =
     Map(1 → 2, 2 → 3).partitionKeysBy { case 1 ⇒ "foo" } === (Map(2 → 3), Map("foo" → 2))
 

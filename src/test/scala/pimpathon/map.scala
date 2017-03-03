@@ -211,6 +211,9 @@ class MapTest {
   @Test def composeM(): Unit =
     Map(10 → 100, 20 → 200, 40 → 400).composeM(Map(1 → 10, 2 → 20, 3 → 30)) === Map(1 → 100, 2 → 200)
 
+  @Test def partitionKeys(): Unit =
+    Map(1 → 2, 2 → 3).partitionKeys(_ == 1) === (Map(1 → 2), Map(2 → 3))
+
   @Test def partitionKeysBy(): Unit =
     Map(1 → 2, 2 → 3).partitionKeysBy { case 1 ⇒ "foo" } === (Map(2 → 3), Map("foo" → 2))
 

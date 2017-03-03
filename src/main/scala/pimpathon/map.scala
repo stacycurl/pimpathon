@@ -59,6 +59,8 @@ object map {
     def keyFor:   MapAndThen[K, V, K]      = new MapAndThen[K, V, K](self, key)
     def valueFor: MapAndThen[K, V, V]      = new MapAndThen[K, V, V](self, value)
 
+    def partitionKeys(p: Predicate[K]):   (K ▶: V, K ▶: V) = self.partition(p.first[V])
+
     def partitionKeysBy[C](pf: K ~> C):   (K ▶: V, C ▶: V) = partitionEntriesBy(pf.first[V])
     def partitionValuesBy[W](pf: V ~> W): (K ▶: V, K ▶: W) = partitionEntriesBy(pf.second[K])
 

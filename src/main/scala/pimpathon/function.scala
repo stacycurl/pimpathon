@@ -45,6 +45,7 @@ object function {
     def ifSome: Predicate[Option[A]] = _.exists(self)
 
     def first[B]: Predicate[(A, B)] = (ab: (A, B)) => self(ab._1)
+    def second[B]: Predicate[(B, A)] = (ba: (B, A)) => self(ba._2)
 
     def guard[B](f: A ⇒ B): A ~> B = new GuardedPartialFunction[A, B](self, f)
   }

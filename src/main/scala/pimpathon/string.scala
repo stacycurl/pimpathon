@@ -11,7 +11,8 @@ object string {
   implicit class StringPimps(val self: String) extends AnyVal {
     def emptyTo(alternative: ⇒ String): String = if (self.isEmpty) alternative else self
 
-    def quote: String = "\"" + self + "\""
+    def quote: String = quoteWith('"')
+    def quoteWith(char: Char) = s"$char$self$char"
     def unquote: String = self.stripAffixes("\"", "\"")
 
     def hyphenate: String = splitByCase("-").toLowerCase

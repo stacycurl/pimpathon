@@ -18,6 +18,9 @@ class StringTest {
   @Test def quote(): Unit =
     on("foo", "\"foo", "foo\"", "\"foo\"").calling(_.quote).produces("\"foo\"", "\"\"foo\"", "\"foo\"\"", "\"\"foo\"\"")
 
+  @Test def quoteWith(): Unit =
+    on("foo", "'foo", "foo'", "'foo'").calling(_.quoteWith(''')).produces("'foo'", "''foo'", "'foo''", "''foo''")
+
   @Test def unquote(): Unit =
     on("foo", "\"foo", "foo\"", "\"foo\"").calling(_.unquote).produces("foo", "foo", "foo", "foo")
 

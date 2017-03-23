@@ -140,6 +140,7 @@ object list {
   }
 
   implicit class ListOfTuple2Pimps[K, V](self: List[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
+    def mapFirst[C](f: K => C): List[(C, V)] = mapC(k => v => (f(k), v))
     def mapC[W](f: K ⇒ V ⇒ W): List[W] = self.map(kv ⇒ f(kv._1)(kv._2))
 
     protected def gtl: GTLGT[(K, V)] = self

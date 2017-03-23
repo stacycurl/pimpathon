@@ -56,6 +56,26 @@ class JsonTest extends JsonUtil {
     )
   }
 
+  @Test def descendant_ancestors(): Unit = {
+    jobj.descendant("$.preferences.bananas").string.ancestors <=> jObjectFields(
+      "$"                     -> Json.jArray(List(jobj)),
+      "$.preferences"         -> Json.jArray(jobj.descendant("$.preferences").getAll),
+      "$.preferences.bananas" -> Json.jArray(jobj.descendant("$.preferences.bananas").getAll)
+    )
+
+    jobj.descendant("preferences/bananas").string.ancestors <=> jObjectFields(
+      ""                    -> Json.jArray(List(jobj)),
+      "preferences"         -> Json.jArray(jobj.descendant("$.preferences").getAll),
+      "preferences/bananas" -> Json.jArray(jobj.descendant("$.preferences.bananas").getAll)
+    )
+  }
+
+  @Test def descendant_firstEmptyAt(): Unit = {
+    jobj.descendant("$.preferences.bananas").firstEmptyAt <=> None
+    jobj.descendant("$.preferences.apples").firstEmptyAt  <=> Some("$.preferences.apples")
+    jobj.descendant("$.prefs.apples").firstEmptyAt        <=> Some("$.prefs")
+  }
+
   @Test def descendant_complex(): Unit = {
     jobj.descendant("preferences/*").bool.set(false)
         .descendant("address").array.string.modify("Flat B" :: _)
@@ -212,6 +232,7 @@ class JsonTest extends JsonUtil {
     // Non supported syntax "$['points'][?(@['x']*@['x']+@['y']*@['y'] > 50)].id"
     json.descendant("$['points'][?(@['y'] >= 3)].id").getAll <=> List(jString("i3"), jString("i6"))
     json.descendant("$.points[?(@['z'])].id").getAll <=> List(jString("i2"), jString("i5"))
+    json.descendant("$.points[?(@.z)].id").getAll <=> List(jString("i2"), jString("i5"))
     // Non supported syntax "$.points[(count(@)-1)].id"
   }
 

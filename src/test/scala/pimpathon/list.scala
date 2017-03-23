@@ -86,6 +86,9 @@ class ListTest {
   @Test def mapFirst(): Unit =
     on(nil[(Int, Int)], List((1, 2), (2, 3))).calling(_.mapFirst(_ * 2)).produces(nil[(Int, Int)], List((2, 2), (4, 3)))
 
+  @Test def mapSecond(): Unit =
+    on(nil[(Int, Int)], List((1, 2), (2, 3))).calling(_.mapSecond(_ * 2)).produces(nil[(Int, Int)], List((1, 4), (2, 6)))
+
   @Test def lpair(): Unit =
     on(nil[Int], List(1, 2, 3)).calling(_.lpair(_ * 2)).produces(nil[(Int, Int)], List((2,1), (4,2), (6,3)))
 

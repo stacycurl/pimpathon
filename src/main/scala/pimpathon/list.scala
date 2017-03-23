@@ -109,16 +109,18 @@ object list {
 
     def zipExact[B](bs: List[B]): (List[(A, B)], Option[Either[List[A], List[B]]]) = zipExactWith(bs)((a, b) ⇒ (a, b))
 
-    def zipExactWith[B, C](other: List[B])(f: (A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]]) = {
-      @tailrec
-      def recurse(la: List[A], lb: List[B], cs: List[C]): (List[C], Option[Either[List[A], List[B]]]) = (la, lb) match {
-        case (a :: as, b :: bs) ⇒ recurse(as, bs, f(a, b) :: cs)
-        case (Nil, Nil)         ⇒ (cs.reverse, None)
-        case (as, Nil)          ⇒ (cs.reverse, Some(Left(as)))
-        case (Nil, bs)          ⇒ (cs.reverse, Some(Right(bs)))
-      }
+    case class zipExactWith[B](other: List[B]) {
+      def apply[C](f: (A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]]) = {
+        @tailrec
+        def recurse(la: List[A], lb: List[B], cs: List[C]): (List[C], Option[Either[List[A], List[B]]]) = (la, lb) match {
+          case (a :: as, b :: bs) ⇒ recurse(as, bs, f(a, b) :: cs)
+          case (Nil, Nil)         ⇒ (cs.reverse, None)
+          case (as, Nil)          ⇒ (cs.reverse, Some(Left(as)))
+          case (Nil, bs)          ⇒ (cs.reverse, Some(Right(bs)))
+        }
 
-      recurse(self, other, Nil)
+        recurse(self, other, Nil)
+      }
     }
 
     def sortPromoting(first: A*)(implicit ordering: Ordering[A]): List[A] = self.sorted(ordering.promote(first: _*))
@@ -126,7 +128,7 @@ object list {
 
     def shuffle(): List[A] = Random.shuffle(self)
 
-    private def equalBy[B](f: A ⇒ B)(a: A): EqualBy[A, B] = new EqualBy(f(a))(a)
+    private def equalBy[B](f: A ⇒ B)(a: A): EqualBy[A, B] = EqualBy(f(a))(a)
     private def zip[B](other: List[B]): Iterator[(A, B)] = self.iterator.zip(other.iterator)
 
     protected def gtl: GenTraversableLike[A, GenTraversable[A]] = self

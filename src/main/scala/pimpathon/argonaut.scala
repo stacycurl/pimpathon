@@ -372,9 +372,9 @@ object Descendant {
 
       // TODO make this fully recursive
       val EQ = ComparisonArgument {
-        case SubQuery(List(CurrentNode))                              ⇒ fn(rhs ⇒ filterArray(filterObject(_ == json(rhs))))
-        case SubQuery(List(CurrentNode, Field(name)))                 ⇒ fn(rhs ⇒ filterArray(filterObject(name, json(rhs))))
-        case SubQuery(List(CurrentNode, Field(first), Field(second))) ⇒ fn(rhs ⇒ filterArray(filterObject(j ⇒ {
+        case SubQuery(List(CurrentNode))                              ⇒ fn(rhs ⇒ filterArrayOrObject(filterObject(_ == json(rhs))))
+        case SubQuery(List(CurrentNode, Field(name)))                 ⇒ fn(rhs ⇒ filterArrayOrObject(filterObject(name, json(rhs))))
+        case SubQuery(List(CurrentNode, Field(first), Field(second))) ⇒ fn(rhs ⇒ filterArrayOrObject(filterObject(j ⇒ {
           j.fieldOrEmptyObject(first).field(second).contains(json(rhs))
         })))
       }
@@ -389,7 +389,7 @@ object Descendant {
         implicit def orderOps[B](a: B)(implicit O: Ordering[B]): O.Ops = O.mkOrderingOps(a)
 
         ComparisonArgument {
-          case SubQuery(List(CurrentNode, Field(name))) ⇒ fn(rhs ⇒ filterArray(filterObject(lhs ⇒ lhs.field(name) >= Some(json(rhs)))))
+          case SubQuery(List(CurrentNode, Field(name))) ⇒ fn(rhs ⇒ filterArrayOrObject(filterObject(lhs ⇒ lhs.field(name) >= Some(json(rhs)))))
           case other ⇒ notSupported(other)
         }
       }
@@ -397,7 +397,7 @@ object Descendant {
       private def notSupported[X](x: X): Nothing = sys.error(s"$x not supported !")
 
       private def hasFilter(acc: Traversal[A, Json], tokens: List[PathToken]) = tokens match {
-        case List(CurrentNode, Field(name)) ⇒ filterArray(filterObject(_.hasField(name)))(acc)
+        case List(CurrentNode, Field(name)) ⇒ filterArrayOrObject(filterObject(_.hasField(name)))(acc)
       }
 
       trait ComparisonArgument {
@@ -424,7 +424,8 @@ object Descendant {
         case unknown         ⇒ sys.error(s"boom: $unknown")
       }
 
-      def filterArray(prism: Prism[Json, Json])(acc: Traversal[A, Json]): Traversal[A, Json] = acc.array composeTraversal each composePrism prism
+      def filterArrayOrObject(prism: Prism[Json, Json])(acc: Traversal[A, Json]): Traversal[A, Json] =
+        acc composeTraversal objectValuesOrArrayElements composePrism prism
     }
   }
 

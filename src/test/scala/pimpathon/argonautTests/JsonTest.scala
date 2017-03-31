@@ -160,6 +160,32 @@ class JsonTest extends JsonUtil {
 
     Json.jArray(conditions.descendant("$.conditions[?(@['condition'] == true)].id").getAll)  <=> parse("""["i1"]""")
     Json.jArray(conditions.descendant("$.conditions[?(@['condition'] == false)].id").getAll) <=> parse("""["i2"]""")
+
+    conditions.descendant("$.conditions[?(@['condition'] == true)]").modify(_.addIfMissing("matched" := true)) <=> parse("""{
+      "conditions": [
+        { "id": "i1", "condition": true, "matched": true },
+        { "id": "i2", "condition": false }
+      ]
+    }""")
+
+
+
+    val objConditions = parse("""{ "conditions":
+        {
+          "first": { "id": "i1", "condition": true },
+          "second": { "id": "i2", "condition": false }
+        }
+      }""")
+
+    Json.jArray(objConditions.descendant("$.conditions[?(@['condition'] == true)].id").getAll)  <=> parse("""["i1"]""")
+    Json.jArray(objConditions.descendant("$.conditions[?(@['condition'] == false)].id").getAll) <=> parse("""["i2"]""")
+
+    objConditions.descendant("$.conditions[?(@['condition'] == true)]").modify(_.addIfMissing("matched" := true)) <=> parse("""{
+      "conditions": {
+        "first": { "id": "i1", "condition": true, "matched": true },
+        "second": { "id": "i2", "condition": false }
+      }
+    }""")
   }
 
   private def print(values: List[Json]) = values.foreach(j ⇒ println(j.spaces2))

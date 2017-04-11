@@ -86,6 +86,9 @@ object list {
       recurse(Nil, self, rhs)
     }
 
+    def interleaveWith[B, C](rhs: List[B])(f: Either[A, B] => C): List[C] =
+      self.map(a => f(Left(a))).interleave(rhs.map(b => f(Right(b))))
+
     def uncons[B](empty: ⇒ B, nonEmpty: List[A] ⇒ B): B = if (self.isEmpty) empty else nonEmpty(self)
 
     def unconsC[B](empty: ⇒ B, nonEmpty: A ⇒ List[A] ⇒ B): B = self match {

@@ -137,6 +137,8 @@ class ListTest {
 
   @Test def amass(): Unit = List(1, 2, 3, 4).amass { case i if i % 2 == 0 ⇒ List(i, -i) } === List(2, -2, 4, -4)
 
+  @Test def interleave(): Unit = List(1, 2, 3).interleave(List(10, 20)) === List(1, 10, 2, 20, 3)
+
   @Test def cartesianProduct(): Unit = List(List(1, 2), List(10, 20), List(100, 200)).cartesianProduct ===
     (for { a ← List(1, 2); b ← List(10, 20); c ← List(100, 200) } yield List(a, b, c))
 

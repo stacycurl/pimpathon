@@ -77,6 +77,15 @@ object list {
 
     def amass[B](pf: A ~> List[B]): List[B] = self.flatMap(a ⇒ pf.lift(a).getOrElse(Nil))
 
+    def interleave(rhs: List[A]): List[A] = {
+      def recurse(acc: List[A], next: List[A], after: List[A]): List[A] = next match {
+        case Nil => acc.reverse ::: after
+        case head :: tail => recurse(head :: acc, after, tail)
+      }
+
+      recurse(Nil, self, rhs)
+    }
+
     def uncons[B](empty: ⇒ B, nonEmpty: List[A] ⇒ B): B = if (self.isEmpty) empty else nonEmpty(self)
 
     def unconsC[B](empty: ⇒ B, nonEmpty: A ⇒ List[A] ⇒ B): B = self match {

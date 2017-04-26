@@ -40,6 +40,10 @@ class JsonTest extends JsonUtil {
     jobj.descendant("age").int.modify(_ * 2) <=> ("age" → jNumber(6)) ->: jobj
   }
 
+  @Test def descendant_multiple(): Unit = {
+    jobj.descendant("name", "age").getAll <=> List(name, age)
+  }
+
   @Test def descendant_elements(): Unit = {
     jArray(fields).descendant("[0, 2]").getAll <=> List(lying, address)
 

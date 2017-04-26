@@ -23,8 +23,14 @@ import scala.language.{dynamics, higherKinds, implicitConversions}
 
 object argonaut {
   implicit class JsonFrills(val self: Json) extends AnyVal {
-    def descendant: Descendant[Json, Json, Json] = descendant("")
-    def descendant(path: String): Descendant[Json, Json, Json] = Descendant.Descender(path).descendant(self, Traversal.id[Json], path)
+    def descendant: Descendant[Json, Json, Json] =
+      Descendant(self, List(Traversal.id[Json]), () => List("" -> Traversal.id[Json]))
+
+    def descendant(paths: String*): Descendant[Json, Json, Json] = Descendant(self,
+      paths.map(Descendant.Descender.traversal)(collection.breakOut),
+      () => paths.flatMap(Descendant.Descender.ancestors)(collection.breakOut)
+    )
+
     def compact: Json = filterNulls
     def filterNulls: Json = filterR(_ != jNull)
     def filterKeys(p: Predicate[String]): Json = self.withObject(_.filterKeys(p))
@@ -232,8 +238,8 @@ object CanPrismFrom {
 object Descendant {
   import pimpathon.argonaut.{JsonFrills, JsonObjectFrills, TraversalFrills}
 
-  implicit def descendantAsApplyTraversal[From, Via, To](descendant: Descendant[From, Via, To]):
-    ApplyTraversal[From, From, To, To] = ApplyTraversal(descendant.from, descendant.traversal)
+//  implicit def descendantAsApplyTraversal[From, Via, To](descendant: Descendant[From, Via, To]):
+//    ApplyTraversal[From, From, To, To] = ApplyTraversal(descendant.from, descendant.traversal)
 
   implicit class DescendantToJsonFrills[From](self: Descendant[From, Json, Json]) {
     def renameField(from: String, to: String):    From = self.modify(_.renameField(from, to))
@@ -277,11 +283,14 @@ object Descendant {
 
   object Descender {
     def apply(path: String): Descender = if (path.startsWith("$")) JsonPath else Pimpathon
+
+    def traversal(path: String): Traversal[Json, Json] = apply(path).traversal(Traversal.id[Json], path)
+    def ancestors(path: String): List[(String, Traversal[Json, Json])] = apply(path).ancestors(Traversal.id[Json], path)
   }
 
   sealed trait Descender {
     def descendant[A](from: A, start: Traversal[A, Json], path: String): Descendant[A, Json, Json] =
-      Descendant(from, traversal(start, path), () => ancestors(start, path))
+      Descendant(from, List(traversal(start, path)), () => ancestors(start, path))
 
     def traversal[A](from: Traversal[A, Json], path: String): Traversal[A, Json]
     def ancestors[A](from: Traversal[A, Json], path: String): List[(String, Traversal[A, Json])]
@@ -467,7 +476,7 @@ object Descendant {
   }
 }
 
-case class Descendant[From, Via, To](from: From, traversal: Traversal[From, To], ancestorsFn: () => List[(String, Traversal[From, Via])]) extends Dynamic {
+case class Descendant[From, Via, To](from: From, traversals: List[Traversal[From, To]], ancestorsFn: () => List[(String, Traversal[From, Via])]) extends Dynamic {
   def bool[That](  implicit cpf: CanPrismFrom[To, Boolean,    That]): Descendant[From, Via, That] = apply(cpf)
   def number[That](implicit cpf: CanPrismFrom[To, JsonNumber, That]): Descendant[From, Via, That] = apply(cpf)
   def string[That](implicit cpf: CanPrismFrom[To, String,     That]): Descendant[From, Via, That] = apply(cpf)
@@ -487,10 +496,20 @@ case class Descendant[From, Via, To](from: From, traversal: Traversal[From, To],
 
   private def apply[Elem, That](cpf: CanPrismFrom[To, Elem, That]): Descendant[From, Via, That] = composePrism(cpf.prism)
 
-  def composePrism[That](next: Prism[To, That]):         Descendant[From, Via, That] = withTraversal(traversal composePrism next)
-  def composeTraversal[That](next: Traversal[To, That]): Descendant[From, Via, That] = withTraversal(traversal composeTraversal next)
-  def composeOptional[That](next: Optional[To, That]):   Descendant[From, Via, That] = withTraversal(traversal composeOptional next)
-  def composeIso[That](next: Iso[To, That]):             Descendant[From, Via, That] = withTraversal(traversal composeIso next)
+  def composePrism[That](next: Prism[To, That]):         Descendant[From, Via, That] = withTraversal(_ composePrism next)
+  def composeTraversal[That](next: Traversal[To, That]): Descendant[From, Via, That] = withTraversal(_ composeTraversal next)
+  def composeOptional[That](next: Optional[To, That]):   Descendant[From, Via, That] = withTraversal(_ composeOptional next)
+  def composeIso[That](next: Iso[To, That]):             Descendant[From, Via, That] = withTraversal(_ composeIso next)
 
-  private def withTraversal[That](value: Traversal[From, That]): Descendant[From, Via, That] = copy(traversal = value)
+  def headOption: Option[To] = traversals.flatMap(_.headOption(from)).headOption
+  def getAll: List[To] = traversals.flatMap(_.getAll(from))
+
+  def set(to: To):         From = foldLeft(_.set(to))
+  def modify(f: To => To): From = foldLeft(_.modify(f))
+
+  private def foldLeft(f: Traversal[From, To] => From => From): From = traversals.foldLeft(from) {
+    case (acc, traversal) => f(traversal)(acc)
+  }
+
+  private def withTraversal[That](fn: Traversal[From, To] => Traversal[From, That]): Descendant[From, Via, That] = copy(traversals = traversals.map(fn))
 }

@@ -75,19 +75,6 @@ class EitherTest {
   @Test def toOption(): Unit = on(Left[Throwable, String](boom), Right[Throwable, String]("foo"))
     .calling(_.toOption).produces(None, Some("foo"))
 
-  @Test def rightBias(): Unit = {
-    import pimpathon.either._
-    (right("foo"): Either.RightProjection[Int, String]) === right("foo").right
-    (right("foo").right: Either[Int, String])           === right("foo")
-
-    val result: Either[Int, String] = for {
-      x ← right("foo"): Either[Int, String]
-      y ← right("oof"): Either[Int, String]
-    } yield x + y
-
-    result === right("foooof")
-  }
-
   private def left(i: Int): Either[Int, String] = Left(i)
   private def right(s: String): Either[Int, String] = Right(s)
 }

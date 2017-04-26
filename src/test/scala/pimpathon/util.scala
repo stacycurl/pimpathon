@@ -62,6 +62,15 @@ object util {
     }
   }
 
+  implicit class onFnPimps[A, B](self: on[A => B]) {
+    def maps[C](abs: (A, B)*): Unit = applying(abs.map(_._1): _*).produces(abs.map(_._2): _*)
+
+    def applying(as: A*): on[Unit]#calling[B] = on(()).calling[B]((for {
+      ab ← self.as
+      a  ← as
+    } yield (_: Unit) ⇒ ab.apply(a)): _*)
+  }
+
   object Expectation {
     implicit def tupleAsExpectation[A, B](ab: (A, B)):   Expectation[A, B]       = Expectation(Right(ab))
     implicit def otherAsExpectation[A, B](ob: (others, B)): Expectation[A, B] = Expectation(Left(_ ⇒ ob._2))

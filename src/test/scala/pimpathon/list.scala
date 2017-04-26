@@ -32,8 +32,7 @@ class ListTest {
     List(1).zipToMap(List(2))   === Map(1 → 2)
   }
 
-  @Test def zipWith(): Unit = List(2, 0).zipWith[Int, Int](List(3))(lr ⇒ lr._1 * lr._2) === List(6)
-
+  @Test def zipWith(): Unit = List(2, 0).zipWith(List(3))(lr ⇒ lr._1 * lr._2) === List(6)
 
   @Test def countWithSize(): Unit = on(nil[Int], List(0), List(1), List(0, 1))
     .calling(_.countWithSize(_ < 1)).produces(None, Some((1, 1)), Some((0, 1)), Some((1, 2)))

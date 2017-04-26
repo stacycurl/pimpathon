@@ -4,6 +4,7 @@ import argonaut.Json._
 import argonaut._
 import argonaut.StringWrap.StringToStringWrap
 import org.junit.Test
+import pimpathon.Descendant
 import pimpathon.argonaut._
 import pimpathon.util.on
 import sjc.delta.argonaut.json.actualExpected.flat._
@@ -58,23 +59,21 @@ class JsonTest extends JsonUtil {
 
   @Test def descendant_ancestors(): Unit = {
     jobj.descendant("$.preferences.bananas").string.ancestors <=> jObjectFields(
-      "$"                     -> Json.jArray(List(jobj)),
+      "$"                     -> Json.jArray(jobj.descendant("$").getAll),
       "$.preferences"         -> Json.jArray(jobj.descendant("$.preferences").getAll),
       "$.preferences.bananas" -> Json.jArray(jobj.descendant("$.preferences.bananas").getAll)
     )
 
     jobj.descendant("preferences/bananas").string.ancestors <=> jObjectFields(
-      ""                    -> Json.jArray(List(jobj)),
-      "preferences"         -> Json.jArray(jobj.descendant("$.preferences").getAll),
-      "preferences/bananas" -> Json.jArray(jobj.descendant("$.preferences.bananas").getAll)
+      ""                    -> Json.jArray(jobj.descendant("").getAll),
+      "preferences"         -> Json.jArray(jobj.descendant("preferences").getAll),
+      "preferences/bananas" -> Json.jArray(jobj.descendant("preferences/bananas").getAll)
     )
   }
 
-  @Test def descendant_firstEmptyAt(): Unit = {
-    jobj.descendant("$.preferences.bananas").firstEmptyAt <=> None
-    jobj.descendant("$.preferences.apples").firstEmptyAt  <=> Some("$.preferences.apples")
-    jobj.descendant("$.prefs.apples").firstEmptyAt        <=> Some("$.prefs")
-  }
+  @Test def descendant_firstEmptyAt(): Unit = on((path: String) => jobj.descendant(path).firstEmptyAt).maps(
+    "$.preferences.bananas" → None, "$.preferences.apples" → Some("$.preferences.apples"), "$.prefs.apples" → Some("$.prefs")
+  )
 
   @Test def descendant_complex(): Unit = {
     jobj.descendant("preferences/*").bool.set(false)

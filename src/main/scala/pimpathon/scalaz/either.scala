@@ -1,7 +1,8 @@
 package pimpathon.scalaz
 
-import scala.collection.generic.{Shrinkable, Growable}
-import scalaz.{-\/, \/-, \/}
+import scala.collection.generic.{Growable, Shrinkable}
+import scala.util.{Failure, Success, Try}
+import scalaz.{-\/, \/, \/-}
 
 
 object either {
@@ -14,6 +15,9 @@ object either {
     def tap[Discarded](l: L ⇒ Discarded, r: R ⇒ Discarded): L \/ R = { self.fold(l, r); self }
 
     def leftFlatMap(f: L ⇒ L \/ R): L \/ R  = self.fold(f, \/-(_))
+
+    def getMessage(implicit ev: L <:< Throwable): Option[String] = self.fold(t ⇒ Some(t.getMessage), _ ⇒ None)
+    def toTry(implicit ev: L <:< Throwable): Try[R] = self.fold(Failure(_), Success(_))
   }
 
   implicit class DisjunctionFrillsNestedL[L, R](val self: (L \/ R) \/ R) {

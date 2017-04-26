@@ -2,11 +2,11 @@ package pimpathon
 
 import scala.language.implicitConversions
 
-import scala.{PartialFunction ⇒ ~>}
-import scala.util.{Failure, Success, Try}
 import scala.collection.generic.{Growable, Shrinkable}
+import scala.util.{Failure, Success, Try}
+import scala.{PartialFunction => ~>}
 
-import pimpathon.function._
+import pimpathon.function.PartialFunctionPimps
 
 
 object either {
@@ -40,6 +40,11 @@ object either {
     def toOption: Option[R] = self.fold(_ => None, Some(_))
   }
 
-  implicit def eitherToRightProjection[L, R](either: Either[L, R]): Either.RightProjection[L, R] = either.right
-  implicit def rightProjectionToEither[L, R](rp: Either.RightProjection[L, R]): Either[L, R] = rp.e
+  implicit class EitherPimpsNestedL[L, R](val self: Either[Either[L, R], R]) {
+    def flatten: Either[L, R] = self.fold(identity, Right(_))
+  }
+
+  implicit class EitherFrillsNestedR[L, R](val self: Either[L, Either[L, R]]) {
+    def flatten: Either[L, R] = self.fold(Left(_), identity)
+  }
 }

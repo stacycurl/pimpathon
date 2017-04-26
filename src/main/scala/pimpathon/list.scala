@@ -1,21 +1,22 @@
 package pimpathon
 
 import scala.util.Random
-import scala.{PartialFunction ⇒ ~>}
+import scala.{PartialFunction => ~>}
 import scala.annotation.tailrec
-import scala.collection.{mutable ⇒ M, GenTraversable, GenTraversableLike}
+import scala.collection.{GenTraversable, GenTraversableLike, mutable => M}
 import scala.collection.immutable._
-import scala.collection.immutable.{Map ⇒ ▶:}
-
-import pimpathon.genTraversableLike.{GenTraversableLikeOfTuple2Mixin, GenTraversableLikeOfEitherPimpsMixin, GTLGT}
-
-import pimpathon.any._
-import pimpathon.boolean._
-import pimpathon.function._
-import pimpathon.multiMap._
+import scala.collection.immutable.{Map => ▶:}
+import pimpathon.genTraversableLike.{GTLGT, GenTraversableLikeOfEitherPimpsMixin, GenTraversableLikeOfTuple2Mixin}
+import pimpathon.any.AnyPimps
+import pimpathon.boolean.BooleanPimps
+import pimpathon.function.{Predicate, equalC}
+import pimpathon.multiMap.{MultiMapPimps, build}
 import pimpathon.option._
 import pimpathon.ordering._
 import pimpathon.tuple._
+import pimpathon.builder.BuilderPimps
+
+import scala.collection.generic.CanBuildFrom
 
 
 object list {
@@ -27,7 +28,11 @@ object list {
     def emptyTo(alternative: ⇒ List[A]): List[A] = uncons(alternative, _ ⇒ self)
 
     def zipToMap[B](values: List[B]): A ▶: B = zip(values).toMap
-    def zipWith[B, C](values: List[B])(f: ((A, B)) ⇒ C): List[C] = zip(values).map(f).toList
+
+    case class zipWith[B](values: List[B]) {
+      def apply[C, That](f: ((A, B)) ⇒ C)(implicit cbf: CanBuildFrom[List[C], C, That]): That =
+        cbf.apply().run(_ ++= zip(values).map(f))
+    }
 
     def fraction(p: Predicate[A]): Double = countWithSize(p).fold(Double.NaN)(_.to[Double].calc(_ / _))
 

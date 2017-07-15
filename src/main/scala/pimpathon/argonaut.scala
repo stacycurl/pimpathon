@@ -8,7 +8,6 @@ import io.gatling.jsonpath._
 import monocle.function.Each.each
 import monocle.function.FilterIndex.filterIndex
 import monocle.std.list.{listEach, listFilterIndex}
-import monocle.syntax.ApplyTraversal
 import monocle.{Iso, Optional, Prism, Traversal}
 import pimpathon.boolean.BooleanPimps
 import pimpathon.function.{Predicate, PredicatePimps}
@@ -19,6 +18,7 @@ import pimpathon.list.ListOfTuple2Pimps
 import _root_.scalaz.{Applicative, \/}
 import scala.collection.immutable.{Map => ▶:}
 import scala.language.{dynamics, higherKinds, implicitConversions}
+import scala.util.parsing.combinator.RegexParsers
 
 
 object argonaut {
@@ -238,9 +238,6 @@ object CanPrismFrom {
 object Descendant {
   import pimpathon.argonaut.{JsonFrills, JsonObjectFrills, TraversalFrills}
 
-//  implicit def descendantAsApplyTraversal[From, Via, To](descendant: Descendant[From, Via, To]):
-//    ApplyTraversal[From, From, To, To] = ApplyTraversal(descendant.from, descendant.traversal)
-
   implicit class DescendantToJsonFrills[From](self: Descendant[From, Json, Json]) {
     def renameField(from: String, to: String):    From = self.modify(_.renameField(from, to))
     def renameFields(fromTos: (String, String)*): From = self.modify(_.renameFields(fromTos: _*))
@@ -297,18 +294,15 @@ object Descendant {
   }
 
   case object JsonPath extends Descender {
-    def traversal[A](from: Traversal[A, Json], path: String): Traversal[A, Json] = {
-      new Parser().compile(path) match {
-        case Parser.Success(pathTokens, _) ⇒ new JsonPathIntegration().traversal(pathTokens, from)
-        case Parser.NoSuccess(msg, _)      ⇒ sys.error(s"Could not parse json path: $path, $msg")
-      }
-    }
+    def traversal[A](from: Traversal[A, Json], path: String): Traversal[A, Json] =
+      parse(path)(new JsonPathIntegration().traversal(_, from))
 
-    def ancestors[A](from: Traversal[A, Json], path: String): List[(String, Traversal[A, Json])] = {
-      new Parser().compile(path) match {
-        case Parser.Success(pathTokens, _) ⇒ new JsonPathIntegration().ancestors(pathTokens, from)
-        case Parser.NoSuccess(msg, _)      ⇒ sys.error(s"Could not parse json path: $path, $msg")
-      }
+    def ancestors[A](from: Traversal[A, Json], path: String): List[(String, Traversal[A, Json])] =
+      parse(path)(new JsonPathIntegration().ancestors(_, from))
+
+    private def parse[A](path: String)(onSuccess: List[PathToken] => A): A = new ExtendedParser().compile(path) match {
+      case ExtendedParser.Success(pathTokens, _) ⇒ onSuccess(pathTokens)
+      case ExtendedParser.NoSuccess(msg, _)      ⇒ sys.error(s"Could not parse json path: $path, $msg")
     }
 
     private class JsonPathIntegration[A] {
@@ -512,4 +506,180 @@ case class Descendant[From, Via, To](from: From, traversals: List[Traversal[From
   }
 
   private def withTraversal[That](fn: Traversal[From, To] => Traversal[From, That]): Descendant[From, Via, That] = copy(traversals = traversals.map(fn))
+}
+
+class ExtendedParser {
+  val query = ExtendedParser.query
+  def compile(jsonpath: String): ExtendedParser.ParseResult[List[PathToken]] = ExtendedParser.parse(query, jsonpath)
+}
+
+object ExtendedParser extends ParserBase
+
+trait ParserBase extends RegexParsers {
+
+  val NumberRegex = """-?\d+""".r
+  val FieldRegex = """[$_\d\p{L}][$_\-\d\p{L}]*""".r
+  val SingleQuotedFieldRegex = """(\\.|[^'])+""".r
+  val DoubleQuotedFieldRegex = """(\\.|[^"])+""".r
+  val SingleQuotedValueRegex = """(\\.|[^'])*""".r
+  val DoubleQuotedValueRegex = """(\\.|[^"])*""".r
+  val NumberValueRegex = """-?\d+(\.\d*)?""".r
+
+  /// general purpose parsers ///////////////////////////////////////////////
+
+  def number: Parser[Int] = NumberRegex ^^ (_.toInt)
+
+  def field: Parser[String] = FieldRegex
+
+  import FastStringOps._
+  def singleQuotedField = "'" ~> SingleQuotedFieldRegex <~ "'" ^^ (_.fastReplaceAll("\\'", "'"))
+  def doubleQuotedField = "\"" ~> DoubleQuotedFieldRegex <~ "\"" ^^ (_.fastReplaceAll("\\\"", "\""))
+  def singleQuotedValue = "'" ~> SingleQuotedValueRegex <~ "'" ^^ (_.fastReplaceAll("\\'", "'"))
+  def doubleQuotedValue = "\"" ~> DoubleQuotedValueRegex <~ "\"" ^^ (_.fastReplaceAll("\\\"", "\""))
+  def quotedField: Parser[String] = singleQuotedField | doubleQuotedField
+  def quotedValue: Parser[String] = singleQuotedValue | doubleQuotedValue
+
+  /// array parsers /////////////////////////////////////////////////////////
+
+  def arraySliceStep: Parser[Option[Int]] = ":" ~> number.?
+
+  def arraySlice: Parser[ArraySlice] =
+    (":" ~> number.?) ~ arraySliceStep.? ^^ {
+      case end ~ step => ArraySlice(None, end, step.flatten.getOrElse(1))
+    }
+
+  def arrayRandomAccess: Parser[Option[ArrayRandomAccess]] =
+    rep1("," ~> number).? ^^ (indices => indices.map(ArrayRandomAccess))
+
+  def arrayPartial: Parser[ArrayAccessor] =
+    number ~ (arraySlice | arrayRandomAccess) ^^ {
+      case i ~ None                             => ArrayRandomAccess(i :: Nil)
+      case i ~ Some(ArrayRandomAccess(indices)) => ArrayRandomAccess(i :: indices)
+      case i ~ (as @ ArraySlice(_, _, _))       => as.copy(start = Some(i))
+    }
+
+  def arrayAll: Parser[ArraySlice] =
+    "*" ^^ (_ => ArraySlice(None, None))
+
+  def arrayAccessors: Parser[ArrayAccessor] =
+    "[" ~> (arrayAll | arrayPartial | arraySlice) <~ "]"
+
+  /// filters parsers ///////////////////////////////////////////////////////
+
+  def numberValue: Parser[JPNumber] = NumberValueRegex ^^ {
+    s => if (s.indexOf('.') != -1) JPDouble(s.toDouble) else JPLong(s.toLong)
+  }
+
+  def booleanValue: Parser[FilterDirectValue] =
+    "true" ^^ (_ => JPTrue) |
+      "false" ^^ (_ => JPFalse)
+
+  def nullValue: Parser[FilterValue] =
+    "null" ^^ (_ => JPNull)
+
+  def stringValue: Parser[JPString] = quotedValue ^^ { JPString }
+  def value: Parser[FilterValue] = booleanValue | numberValue | nullValue | stringValue
+
+  def comparisonOperator: Parser[Extended.ComparisonOperator] =
+    baseComparisonOperator ^^ (op => Extended.BaseComparisonOperator(op))
+
+  def baseComparisonOperator: Parser[ComparisonOperator] =
+    "==" ^^ (_ => EqOperator) |
+      "!=" ^^ (_ => NotEqOperator) |
+      "<=" ^^ (_ => LessOrEqOperator) |
+      "<" ^^ (_ => LessOperator) |
+      ">=" ^^ (_ => GreaterOrEqOperator) |
+      ">" ^^ (_ => GreaterOperator)
+
+  def current: Parser[PathToken] = "@" ^^ (_ => CurrentNode)
+
+  def subQuery: Parser[SubQuery] =
+    (current | root) ~ pathSequence ^^ { case c ~ ps => SubQuery(c :: ps) }
+
+  def expression1: Parser[Extended.FilterToken] =
+    subQuery ~ (comparisonOperator ~ (subQuery | value)).? ^^ {
+      case subq1 ~ None         => HasFilter(subq1)
+      case lhs ~ Some(op ~ rhs) => Extended.ComparisonFilter(op, lhs, rhs)
+    }
+
+  def expression2: Parser[Extended.FilterToken] =
+    value ~ comparisonOperator ~ subQuery ^^ {
+      case lhs ~ op ~ rhs => Extended.ComparisonFilter(op, lhs, rhs)
+    }
+
+  def expression: Parser[Extended.FilterToken] = expression1 | expression2
+
+  def booleanOperator: Parser[BinaryBooleanOperator] = "&&" ^^ (_ => AndOperator) | "||" ^^ (_ => OrOperator)
+
+  def booleanExpression: Parser[Extended.FilterToken] =
+    expression ~ (booleanOperator ~ booleanExpression).? ^^ {
+      case lhs ~ None => lhs
+      // Balance the AST tree so that all "Or" operations are always on top of any "And" operation.
+      // Indeed, the "And" operations have a higher priority and must be executed first.
+      case lhs1 ~ Some(AndOperator ~ BooleanFilter(OrOperator, lhs2, rhs2)) =>
+        Extended.BooleanFilter(OrOperator, Extended.BooleanFilter(AndOperator, lhs1, lhs2), rhs2)
+      case lhs ~ Some(op ~ rhs) => Extended.BooleanFilter(op, lhs, rhs)
+    }
+
+  def recursiveSubscriptFilter: Parser[Extended.RecursiveFilterToken] =
+    (("..*" | "..") ~> subscriptFilter) ^^ {
+      case filterToken => Extended.RecursiveFilterToken(filterToken)
+    }
+
+  def subscriptFilter: Parser[Extended.FilterToken] =
+    "[?(" ~> booleanExpression <~ ")]"
+
+  /// child accessors parsers ///////////////////////////////////////////////
+
+  def subscriptField: Parser[FieldAccessor] =
+    "[" ~> repsep(quotedField, ",") <~ "]" ^^ {
+      case f1 :: Nil => Field(f1)
+      case fields    => MultiField(fields)
+    }
+
+  def dotField: Parser[FieldAccessor] =
+    "." ~> field ^^ Field
+
+  // TODO recursive with `subscriptField`
+  def recursiveField: Parser[FieldAccessor] =
+    ".." ~> field ^^ RecursiveField
+
+  def anyChild: Parser[FieldAccessor] = (".*" | "['*']" | """["*"]""") ^^ (_ => AnyField)
+
+  def recursiveAny: Parser[FieldAccessor] = "..*" ^^ (_ => RecursiveAnyField)
+
+  def fieldAccessors = (
+    dotField
+    | recursiveSubscriptFilter
+    | recursiveAny
+    | recursiveField
+    | anyChild
+    | subscriptField
+  )
+
+  /// Main parsers //////////////////////////////////////////////////////////
+
+  def childAccess = fieldAccessors | arrayAccessors
+
+  def pathSequence: Parser[List[Extended.PathToken]] = rep(childAccess | subscriptFilter)
+
+  def root: Parser[PathToken] = "$" ^^ (_ => RootNode)
+
+  def query: Parser[List[PathToken]] =
+    phrase(root ~ pathSequence) ^^ { case r ~ ps => r :: ps }
+}
+
+
+object Extended {
+  sealed trait ComparisonOperator
+  implicit class BaseComparisonOperator(op: io.gatling.jsonpath.ComparisonOperator) extends ComparisonOperator
+
+  sealed trait PathToken
+  implicit case class BasePathToken(pathToken: io.gatling.jsonpath.AST.PathToken) extends PathToken
+  case class RecursiveFilterToken(filter: FilterToken) extends PathToken
+
+  sealed trait FilterToken
+  implicit case class BaseFilterToken(filterToken: io.gatling.jsonpath.AST.FilterToken) extends FilterToken
+  case class ComparisonFilter(operator: ComparisonOperator, lhs: FilterValue, rhs: FilterValue) extends FilterToken
+  case class BooleanFilter(fun: BinaryBooleanOperator, lhs: FilterToken, rhs: FilterToken) extends FilterToken
 }

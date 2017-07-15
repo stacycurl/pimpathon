@@ -1,5 +1,8 @@
+This software contains code that was derived (*) from https://github.com/gatling/jsonpath, their license follows
+    (*) - Extending their parser to support additional comparison operators, for example.
+
 /**
- * Copyright 2014-2017 Stacy Curl (github.com/stacycurl)
+ * Copyright 2011-2016 GatlingCorp (http://gatling.io)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

@@ -1,26 +1,30 @@
 package pimpathon
 
-import scala.util.Random
-import scala.{PartialFunction => ~>}
-import scala.annotation.tailrec
-import scala.collection.{GenTraversable, GenTraversableLike, mutable => M}
-import scala.collection.immutable._
-import scala.collection.immutable.{Map => ▶:}
-import pimpathon.genTraversableLike.{GTLGT, GenTraversableLikeOfEitherPimpsMixin, GenTraversableLikeOfTuple2Mixin}
 import pimpathon.any.AnyPimps
 import pimpathon.boolean.BooleanPimps
+import pimpathon.builder.BuilderPimps
 import pimpathon.function.{Predicate, equalC}
+import pimpathon.genTraversableLike.{GTLGT, GenTraversableLikeOfEitherPimpsMixin, GenTraversableLikeOfTuple2Mixin}
 import pimpathon.multiMap.{MultiMapPimps, build}
 import pimpathon.option._
 import pimpathon.ordering._
 import pimpathon.tuple._
-import pimpathon.builder.BuilderPimps
 
+import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
+import scala.collection.immutable.{Map ⇒ ▶:, _}
+import scala.collection.{GenTraversable, GenTraversableLike, mutable ⇒ M}
+import scala.util.Random
+import scala.{PartialFunction ⇒ ~>}
 
 
 object list {
   implicit class ListPimps[A](self: List[A]) extends genTraversableLike.GenTraversableLikePimpsMixin[A, List] {
+    def updateIf(pred: A ⇒ Boolean, updateFn: A ⇒ A): List[A] = self.map {
+      case x if pred(x) ⇒ updateFn(x)
+      case x            ⇒ x
+    }
+
     def tapEmpty[Discarded](empty: ⇒ Discarded): List[A] = tap(empty, _ ⇒ {})
     def tapNonEmpty[Discarded](nonEmpty: List[A] ⇒ Discarded): List[A] = tap({}, nonEmpty)
     def tap[Discarded](empty: ⇒ Discarded, nonEmpty: List[A] ⇒ Discarded): List[A] = { uncons(empty, nonEmpty); self }
@@ -84,15 +88,15 @@ object list {
 
     def interleave(rhs: List[A]): List[A] = {
       def recurse(acc: List[A], next: List[A], after: List[A]): List[A] = next match {
-        case Nil => acc.reverse ::: after
-        case head :: tail => recurse(head :: acc, after, tail)
+        case Nil ⇒ acc.reverse ::: after
+        case head :: tail ⇒ recurse(head :: acc, after, tail)
       }
 
       recurse(Nil, self, rhs)
     }
 
-    def interleaveWith[B, C](rhs: List[B])(f: Either[A, B] => C): List[C] =
-      self.map(a => f(Left(a))).interleave(rhs.map(b => f(Right(b))))
+    def interleaveWith[B, C](rhs: List[B])(f: Either[A, B] ⇒ C): List[C] =
+      self.map(a ⇒ f(Left(a))).interleave(rhs.map(b ⇒ f(Right(b))))
 
     def uncons[B](empty: ⇒ B, nonEmpty: List[A] ⇒ B): B = if (self.isEmpty) empty else nonEmpty(self)
 
@@ -157,8 +161,8 @@ object list {
   }
 
   implicit class ListOfTuple2Pimps[K, V](self: List[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
-    def mapFirst[C](f: K => C): List[(C, V)] = mapC(k => v => (f(k), v))
-    def mapSecond[W](f: V => W): List[(K, W)] = mapC(k => v => (k, f(v)))
+    def mapFirst[C](f: K ⇒ C): List[(C, V)] = mapC(k ⇒ v ⇒ (f(k), v))
+    def mapSecond[W](f: V ⇒ W): List[(K, W)] = mapC(k ⇒ v ⇒ (k, f(v)))
     def mapC[W](f: K ⇒ V ⇒ W): List[W] = self.map(kv ⇒ f(kv._1)(kv._2))
 
     protected def gtl: GTLGT[(K, V)] = self

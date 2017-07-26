@@ -1,12 +1,11 @@
 package pimpathon
 
-import org.junit.Test
-
 import org.junit.Assert._
+import org.junit.Test
 import pimpathon.builder._
+import pimpathon.either._
 import pimpathon.list._
 import pimpathon.util._
-import pimpathon.either._
 
 
 class ListTest {
@@ -190,4 +189,10 @@ class ListTest {
     List("black", "red", "purple", "green").sortDemoting("green", "black") === List("purple", "red", "green", "black")
 
   @Test def shuffle(): Unit = List.range(1, 10).shuffle().sorted === List.range(1, 10)
+
+  @Test def updateIf(): Unit = {
+    val isEven = (x: Int) => x % 2 == 0
+    val decrement = (x: Int) => x-1
+    List.range(1, 6).updateIf(isEven, decrement) === List(1, 1, 3, 3, 5)
+  }
 }

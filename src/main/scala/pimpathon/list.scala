@@ -21,6 +21,11 @@ import scala.collection.generic.CanBuildFrom
 
 object list {
   implicit class ListPimps[A](self: List[A]) extends genTraversableLike.GenTraversableLikePimpsMixin[A, List] {
+    def updateIf(pred: A ⇒ Boolean, updateFn: A ⇒ A): List[A] = self.map {
+      case x if pred(x) ⇒ updateFn(x)
+      case x            ⇒ x
+    }
+
     def tapEmpty[Discarded](empty: ⇒ Discarded): List[A] = tap(empty, _ ⇒ {})
     def tapNonEmpty[Discarded](nonEmpty: List[A] ⇒ Discarded): List[A] = tap({}, nonEmpty)
     def tap[Discarded](empty: ⇒ Discarded, nonEmpty: List[A] ⇒ Discarded): List[A] = { uncons(empty, nonEmpty); self }

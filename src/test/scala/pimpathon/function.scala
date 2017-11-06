@@ -25,6 +25,8 @@ class FunctionTest {
     pf.lift === f
   })
 
+  @Test def tuple2(): Unit = f.tuple2.apply(1, 2)          === (None, Some(2))
+
   private val f: (Int) ⇒ Option[Int] = (i: Int) ⇒ i.filterSelf(_ % 2 == 0)
   private val isEven: Predicate[Int] = _ % 2 == 0
   private val double: (Int ⇒ Int)   = _ * 2

@@ -14,10 +14,12 @@ import scala.util.Try
 
 object function {
   type Predicate[-A] = A ⇒ Boolean
+  type T2[A] = (A, A)
 
   implicit class FunctionPimps[A, B](val self: A ⇒ B) extends AnyVal {
     def attempt: A ⇒ Try[B] = a ⇒ Try(self(a))
     def guardWith(p: Predicate[A]): A ~> B = p guard self
+    def tuple2: T2[A] => T2[B] = a => (self(a._1), self(a._2))
   }
 
   implicit class FunctionOptionPimps[A, B](val self: A ⇒ Option[B]) extends AnyVal {

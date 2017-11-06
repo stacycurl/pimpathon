@@ -37,6 +37,7 @@ class FunctionTest {
 
 class Function2Test {
   @Test def tuple2(): Unit = f.tuple2.apply((1, 2),          (10, 20))             === (11, 22)
+  @Test def tuple3(): Unit = f.tuple3.apply((1, 2, 3),       (10, 20, 30))         === (11, 22, 33)
 
   private val f: (Int, Int) ⇒ Int = _ + _
 }

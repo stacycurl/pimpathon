@@ -28,6 +28,10 @@ object function {
     def tuple5: T5[A] => T5[B] = a => (self(a._1), self(a._2), self(a._3), self(a._4), self(a._5))
   }
 
+  implicit class Function2Pimps[A, B, C](val self: (A, B) => C) extends AnyVal {
+    def tuple2: (T2[A], T2[B]) => T2[C] = (a,b) => (self(a._1, b._1), self(a._2, b._2))
+  }
+
   implicit class FunctionOptionPimps[A, B](val self: A ⇒ Option[B]) extends AnyVal {
     def unlift: A ~> B = new AbstractPartialFunction[A, B] { // Gee thanks for making PF.Lifted & Unlifted private
       def isDefinedAt(a: A): Boolean = self(a).isDefined

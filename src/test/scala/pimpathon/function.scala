@@ -35,6 +35,12 @@ class FunctionTest {
   private val double: (Int ⇒ Int)   = _ * 2
 }
 
+class Function2Test {
+  @Test def tuple2(): Unit = f.tuple2.apply((1, 2),          (10, 20))             === (11, 22)
+
+  private val f: (Int, Int) ⇒ Int = _ + _
+}
+
 class CurriedFunction2Test {
   @Test def tupled(): Unit = ((i: Int) ⇒ (j: Int) ⇒ i + j).tupled((1, 2)) === 3
 }

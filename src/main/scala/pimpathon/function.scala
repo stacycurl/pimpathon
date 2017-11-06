@@ -17,6 +17,7 @@ object function {
   type T2[A] = (A, A)
   type T3[A] = (A, A, A)
   type T4[A] = (A, A, A, A)
+  type T5[A] = (A, A, A, A, A)
 
   implicit class FunctionPimps[A, B](val self: A ⇒ B) extends AnyVal {
     def attempt: A ⇒ Try[B] = a ⇒ Try(self(a))
@@ -24,6 +25,7 @@ object function {
     def tuple2: T2[A] => T2[B] = a => (self(a._1), self(a._2))
     def tuple3: T3[A] => T3[B] = a => (self(a._1), self(a._2), self(a._3))
     def tuple4: T4[A] => T4[B] = a => (self(a._1), self(a._2), self(a._3), self(a._4))
+    def tuple5: T5[A] => T5[B] = a => (self(a._1), self(a._2), self(a._3), self(a._4), self(a._5))
   }
 
   implicit class FunctionOptionPimps[A, B](val self: A ⇒ Option[B]) extends AnyVal {

@@ -27,6 +27,7 @@ class FunctionTest {
 
   @Test def tuple2(): Unit = f.tuple2.apply(1, 2)          === (None, Some(2))
   @Test def tuple3(): Unit = f.tuple3.apply(1, 2, 3)       === (None, Some(2), None)
+  @Test def tuple4(): Unit = f.tuple4.apply(1, 2, 3, 4)    === (None, Some(2), None, Some(4))
 
   private val f: (Int) ⇒ Option[Int] = (i: Int) ⇒ i.filterSelf(_ % 2 == 0)
   private val isEven: Predicate[Int] = _ % 2 == 0

@@ -38,6 +38,12 @@ class OptionTest {
   @Test def amass(): Unit = on(none[Int], some(1), some(2), some(3))
     .calling(_.amass(util.partial(2 → none, 3 → some("three")))).produces(none, none, none, some("three"))
 
+  @Test def toEither(): Unit ={
+    none[String].toEither(42, identity[String]) === Left(42)
+    some("forty two").toEither(42, identity[String]) === Right("forty two")
+    some("change me").toEither(1, s => s.dropRight(2) + "you") === Right("change you")
+  }
+
   private def none[A]: Option[A]       = None
   private def some[A](a: A): Option[A] = Some(a)
 }

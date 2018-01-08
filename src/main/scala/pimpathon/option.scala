@@ -14,5 +14,6 @@ object option {
     def toTry: Try[A] = self.fold(pimpTry.failure[A](new NoSuchElementException))(pimpTry.success[A])
     def invert(a: A): Option[A] = self.fold(Some(a): Option[A])(_ ⇒ None)
     def amass[B](pf: A ~> Option[B]): Option[B] = self.flatMap(a ⇒ pf.lift(a).getOrElse(None))
+    def toEither[L,R](none: => L, some: A => R): Either[L,R] = self.map(a => Right(some(a))).getOrElse(Left(none))
   }
 }

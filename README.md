@@ -5,7 +5,6 @@ Pimpathon
 [![Stories in Ready](https://badge.waffle.io/stacycurl/pimpathon.png?label=ready&title=Ready)](http://waffle.io/stacycurl/pimpathon)
 [![Coverage Status](https://coveralls.io/repos/stacycurl/pimpathon/badge.png)](https://coveralls.io/r/stacycurl/pimpathon)
 [![Gitter chat](https://badges.gitter.im/stacycurl/pimpathon.png)](https://gitter.im/stacycurl/pimpathon)
-[![Codacy](https://www.codacy.com/project/badge/ed149591303b4f2bb1575d20b5394fa0)](https://www.codacy.com/public/stacycurl/pimpathon.git)
 [![Bintray](https://api.bintray.com/packages/stacycurl/repo/pimpathon/images/download.svg) ](https://bintray.com/stacycurl/repo/pimpathon/_latestVersion)
 
 **Pimpathon** is a library that extends Scala & Java classes with 'extension methods' via the [Pimp my Library][pimp-my-library] pattern.
@@ -30,14 +29,14 @@ resolvers += "Stacy Curl's repo" at "http://dl.bintray.com/stacycurl/repo/"
 To include pimpathon as a dependency you should add:
 
 ```scala
-libraryDependencies += "com.github.stacycurl" %% "pimpathon" % "1.7.0" intransitive()
+libraryDependencies += "com.github.stacycurl" %% "pimpathon" % "1.8.16" intransitive()
 ```
 
 'intransitive' means that even though pimpathon pimps a few third party libraries it won't force you to depend on them,
 you'll only get pimps for types in libraries you already depend on.
 
 
-Builds are available for Scala 2.11.7
+Builds are available for Scala 2.11.7 & 2.12.0
 
 
 [Documentation][doc]

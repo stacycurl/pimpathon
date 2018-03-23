@@ -79,6 +79,11 @@ class JsonTest extends JsonUtil {
     "$.preferences.bananas" → None, "$.preferences.apples" → Some("$.preferences.apples"), "$.prefs.apples" → Some("$.prefs")
   )
 
+  @Test def as(): Unit = {
+    jobj.descendant("$.address").as[Address].getAll            <=> List(Address(List("29 Acacia Road", "Nuttytown")))
+    jobj.descendant("$.address").as[Address].modify(_.reverse) <=> jobj.descendant("$.address").array.modify(_.reverse)
+  }
+
   @Test def descendant_complex(): Unit = {
     jobj.descendant("preferences/*").bool.set(false)
         .descendant("address").array.string.modify("Flat B" :: _)

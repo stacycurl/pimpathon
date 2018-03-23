@@ -44,6 +44,15 @@ trait JsonUtil {
     "potatoes" → potatoes, "knownUnknowns" → knownUnknowns, "awkward" → awkward
   )
 
+  case class Address(lines: List[String]) {
+    def reverse: Address = copy(lines.reverse)
+  }
+
+  object Address {
+    implicit val addressCodec: CodecJson[Address] =
+      CodecJson.derived[List[String]].xmap[Address](Address(_))(_.lines)
+  }
+
   val redacted = jString("redacted")
 
   def parse(jsonText: String) = Parse.parseOption(jsonText).getOrThrow("not json")

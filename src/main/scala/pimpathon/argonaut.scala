@@ -8,7 +8,6 @@ import io.gatling.jsonpath._
 import monocle.function.Each.each
 import monocle.function.FilterIndex.filterIndex
 import monocle.std.list.{listEach, listFilterIndex}
-import monocle.syntax.ApplyTraversal
 import monocle.{Iso, Optional, Prism, Traversal}
 import pimpathon.boolean.BooleanPimps
 import pimpathon.function.{Predicate, PredicatePimps}
@@ -221,6 +220,12 @@ object CanPrismFrom {
   implicit val cpfJsonToInt:        CanPrismFrom[Json, Int,        Int]        = apply(JsonMonocle.jIntPrism)
   implicit val cpfJsonToShort:      CanPrismFrom[Json, Short,      Short]      = apply(JsonMonocle.jShortPrism)
   implicit val cpfJsonToByte:       CanPrismFrom[Json, Byte,       Byte]       = apply(JsonMonocle.jBytePrism)
+
+  implicit def cpfJsonToCodec[A: CodecJson]: CanPrismFrom[Json, A, A] = {
+    val A = CodecJson.derived[A]
+
+    apply(Prism[Json, A](json => A.decodeJson(json).toOption)(A.encode))
+  }
 
   implicit def cpfl[From, Elem, To](implicit cpf: CanPrismFrom[From, Elem, To])
     : CanPrismFrom[List[From], Elem, List[To]] = cpf.toList
@@ -474,6 +479,13 @@ object Descendant {
       jsonObject = obj ⇒ F.map(each[JsonObject, Json].modifyF(f)(obj))(Json.jObject)
     )
   }
+
+  case class As[From, Via, To, A: CodecJson](from: Descendant[From, Via, To])
+
+  object As {
+    implicit def asToDescendant[From, Via, To, A, That](as: As[From, Via, To, A])
+      (implicit cpf: CanPrismFrom[To, A, That]): Descendant[From, Via, That] = as.from.composePrism(cpf.prism)
+  }
 }
 
 case class Descendant[From, Via, To](from: From, traversals: List[Traversal[From, To]], ancestorsFn: () => List[(String, Traversal[From, Via])]) extends Dynamic {
@@ -490,6 +502,8 @@ case class Descendant[From, Via, To](from: From, traversals: List[Traversal[From
   def byte[That](      implicit cpf: CanPrismFrom[To, Byte,       That]): Descendant[From, Via, That] = apply(cpf)
   def bigDecimal[That](implicit cpf: CanPrismFrom[To, BigDecimal, That]): Descendant[From, Via, That] = apply(cpf)
   def bigInt[That](    implicit cpf: CanPrismFrom[To, BigInt,     That]): Descendant[From, Via, That] = apply(cpf)
+
+  def as[A: CodecJson]: Descendant.As[From, Via, To, A] = Descendant.As[From, Via, To, A](this)
 
   def selectDynamic(key: String)(implicit cpf: CanPrismFrom[To, JsonObject, JsonObject]): Descendant[From, Via, Json] =
     obj[JsonObject] composeTraversal filterIndex(Set(key))

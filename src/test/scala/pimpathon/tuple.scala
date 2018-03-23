@@ -25,6 +25,8 @@ class TupleTest {
 
   @Test def map1(): Unit = (2, "abc").map1(_ * 3) === (6, "abc")
 
+  @Test def map2(): Unit = (2, "abc").map2(_.reverse) === (2, "cba")
+
   @Test def addTo(): Unit =
     (ints(), strings()).tap(is ⇒ ss ⇒ (1, "foo").addTo(is, ss)).tmap(_.result(), _.result()) === (List(1), List("foo"))
 

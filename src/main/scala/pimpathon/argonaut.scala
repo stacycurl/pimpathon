@@ -333,13 +333,18 @@ object Descendant {
         case Field(name)                    ⇒ acc.obj composeTraversal filterIndex(Set(name))
         case RecursiveAnyField              ⇒ notSupported("RecursiveAnyField")
         case CurrentNode                    ⇒ acc
-        case ComparisonFilter(op, lhs, rhs) ⇒ comparisonFilter(acc, op, lhs, rhs)
-        case BooleanFilter(op, lhs, rhs)    ⇒ notSupported(s"BooleanFilter($op, $lhs, $rhs)")
-        case HasFilter(SubQuery(subTokens)) ⇒ hasFilter(acc, subTokens)
+        case filterToken: FilterToken       => filterArrayOrObject(filterObject(filterTokenStep(filterToken)))(acc)
         case ArraySlice(None, None, 1)      ⇒ acc.array composeTraversal each
         case ArraySlice(begin, end, step)   ⇒ notSupported(s"ArraySlice($begin, $end, $step)")
         case ArrayRandomAccess(indecies)    ⇒ acc.array composeTraversal filterIndex(indecies.toSet: Set[Int])
         case RecursiveFilterToken(filter)   ⇒ notSupported(s"RecursiveFilterToken($filter)")
+      }
+
+      private def filterTokenStep(token: FilterToken): Predicate[Json] = token match {
+        case ComparisonFilter(op, lhs, rhs)       ⇒ comparisonFilter(op, lhs, rhs)
+        case BooleanFilter(AndOperator, lhs, rhs) ⇒ filterTokenStep(lhs) and filterTokenStep(rhs)
+        case BooleanFilter(OrOperator, lhs, rhs)  ⇒ filterTokenStep(lhs) or filterTokenStep(rhs)
+        case HasFilter(SubQuery(subTokens))       ⇒ hasFilter(subTokens)
       }
 
       private def anotate(tokens: List[PathToken], traversals: List[Traversal[A, Json]]): List[(String, Traversal[A, Json])] = {
@@ -349,14 +354,16 @@ object Descendant {
       private def toString(token: PathToken): String = token match {
         case RootNode                       ⇒ "$"
         case AnyField                       ⇒ ".*"
-        case MultiField(names)              ⇒ names.map(_.quoteWith(''')).mkString(", ")
+        case MultiField(names)              ⇒ names.map(_.quoteWith('\'')).mkString(", ")
         case Field(name)                    ⇒ s".$name"
         case CurrentNode                    ⇒ "@"
         case ComparisonFilter(op, lhs, rhs) ⇒ s"?(${toString(lhs)} ${toString(op)} ${toString(rhs)})"
         case HasFilter(SubQuery(subTokens)) ⇒ subTokens.map(toString).mkString("")
         case ArraySlice(None, None, 1)      ⇒ "[*]"
         case ArrayRandomAccess(indecies)    ⇒ indecies.mkString(", ")
-        case _                              ⇒ ???
+        case BooleanFilter(AndOperator, lhs, rhs) => s"${toString(lhs)} && ${toString(rhs)}"
+        case BooleanFilter(OrOperator, lhs, rhs) => s"${toString(lhs)} || ${toString(rhs)}"
+        case _ => ???
       }
 
       private def toString(op: ComparisonOperator): String = op match {
@@ -372,25 +379,23 @@ object Descendant {
         case JPTrue           ⇒ "true"
         case JPFalse          ⇒ "false"
         case JPLong(value)    ⇒ value.toString
-        case JPString(value)  ⇒ value.quoteWith(''')
+        case JPString(value)  ⇒ value.quoteWith('\'')
         case SubQuery(tokens) ⇒ tokens.map(toString).mkString("")
         case _      ⇒ sys.error(fv.toString)
       }
 
-      private def comparisonFilter(acc: Traversal[A, Json], op: ComparisonOperator, lhs: FilterValue, rhs: FilterValue) = (op, lhs, rhs) match {
-        case (EqOperator, EQ(fn), value)            ⇒ fn(value)(acc)
-        case (EqOperator, value, EQ(fn))            ⇒ fn(value)(acc)
-        case (GreaterOrEqOperator, GTEQ(fn), value) ⇒ fn(value)(acc)
+      private def comparisonFilter(op: ComparisonOperator, lhs: FilterValue, rhs: FilterValue): Predicate[Json] = (op, lhs, rhs) match {
+        case (EqOperator, EQ(fn), value)            ⇒ fn(value)
+        case (EqOperator, value, EQ(fn))            ⇒ fn(value)
+        case (GreaterOrEqOperator, GTEQ(fn), value) ⇒ fn(value)
         case _                                      ⇒ notSupported((op, lhs, rhs))
       }
 
       // TODO make this fully recursive
       val EQ = ComparisonArgument {
-        case SubQuery(List(CurrentNode))                              ⇒ fn(rhs ⇒ filterArrayOrObject(filterObject(_ == json(rhs))))
-        case SubQuery(List(CurrentNode, Field(name)))                 ⇒ fn(rhs ⇒ filterArrayOrObject(filterObject(name, json(rhs))))
-        case SubQuery(List(CurrentNode, Field(first), Field(second))) ⇒ fn(rhs ⇒ filterArrayOrObject(filterObject(j ⇒ {
-          j.fieldOrEmptyObject(first).field(second).contains(json(rhs))
-        })))
+        case SubQuery(List(CurrentNode))                              ⇒ toPredicate(rhs ⇒ _ == json(rhs))
+        case SubQuery(List(CurrentNode, Field(name)))                 ⇒ toPredicate(rhs ⇒ _.field(name).contains(json(rhs)))
+        case SubQuery(List(CurrentNode, Field(first), Field(second))) ⇒ toPredicate(rhs ⇒ _.fieldOrEmptyObject(first).field(second).contains(json(rhs)))
       }
 
       val GTEQ = {
@@ -403,15 +408,15 @@ object Descendant {
         implicit def orderOps[B](a: B)(implicit O: Ordering[B]): O.Ops = O.mkOrderingOps(a)
 
         ComparisonArgument {
-          case SubQuery(List(CurrentNode, Field(name))) ⇒ fn(rhs ⇒ filterArrayOrObject(filterObject(lhs ⇒ lhs.field(name) >= Some(json(rhs)))))
+          case SubQuery(List(CurrentNode, Field(name))) ⇒ toPredicate(rhs ⇒ lhs ⇒ lhs.field(name) >= Some(json(rhs)))
           case other ⇒ notSupported(other)
         }
       }
 
       private def notSupported[X](x: X): Nothing = sys.error(s"$x not supported !")
 
-      private def hasFilter(acc: Traversal[A, Json], tokens: List[PathToken]) = tokens match {
-        case List(CurrentNode, Field(name)) ⇒ filterArrayOrObject(filterObject(_.hasField(name)))(acc)
+      private def hasFilter(tokens: List[PathToken]): Predicate[Json] = tokens match {
+        case List(CurrentNode, Field(name)) ⇒ _.hasField(name)
       }
 
       trait ComparisonArgument {
@@ -424,9 +429,9 @@ object Descendant {
         }
       }
 
-      type FN = FilterValue ⇒ Traversal[A, Json] ⇒ Traversal[A, Json]
+      type FN = FilterValue ⇒ Predicate[Json]
 
-      private def fn(f: FN) = f
+      private def toPredicate(f: FilterValue => Predicate[Json]): FN = f
 
       private def json(fdv: FilterValue): Json = fdv match {
         case JPTrue          ⇒ jTrue

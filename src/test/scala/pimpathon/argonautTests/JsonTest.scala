@@ -13,6 +13,21 @@ import sjc.delta.matchers.syntax.anyDeltaMatcherOps
 
 
 class JsonTest extends JsonUtil {
+  @Test def booleanFilter(): Unit = {
+    val json = parse(
+      """{
+        | "people": [
+        |  {"person": {"name": "Arnie", "age": 100}, "address": "California"},
+        |  {"person": {"name": "Raymond", "age": 21}, "address": "Brisvegas"},
+        |  {"person": {"name": "Raymond", "age": 35}, "address": "London"}
+        | ]
+        |}
+      """.stripMargin)
+
+    json.descendant("$.people[?(@.person.name == 'Raymond' && @.person.age == 21)].address").getAll <=> List(jString("Brisvegas"))
+    json.descendant("$.people[?(@.person.name == 'Arnie' || @.person.age == 21)].address").getAll <=> List(jString("California"), jString("Brisvegas"))
+  }
+
   @Test def filterNulls(): Unit = test(_.filterNulls,
     """null"""                        → """null""",
     """{ "a": null, "b": 3 }"""       → """{ "b": 3 }""",

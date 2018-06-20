@@ -26,6 +26,11 @@ object list {
       case x            ⇒ x
     }
 
+    def update(pf: A ~> A): List[A] = self.map {
+      case x if pf.isDefinedAt(x) => pf(x)
+      case x                      => x
+    }
+
     def tapEmpty[Discarded](empty: ⇒ Discarded): List[A] = tap(empty, _ ⇒ {})
     def tapNonEmpty[Discarded](nonEmpty: List[A] ⇒ Discarded): List[A] = tap({}, nonEmpty)
     def tap[Discarded](empty: ⇒ Discarded, nonEmpty: List[A] ⇒ Discarded): List[A] = { uncons(empty, nonEmpty); self }

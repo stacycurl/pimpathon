@@ -49,6 +49,7 @@ Builds are available for Scala 2.11.7 & 2.12.0
 + Raymond Barlow <rbarlow@raymanoz.com> [@raymanoz](https://twitter.com/raymanoz)
 + Sam Halliday <sam.halliday@gmail.com> [@fommil](https://twitter.com/fommil)
 + Stacy Curl <stacy.curl@gmail.com> [@stacycurl](https://twitter.com/stacycurl)
++ Xavier GUIHOT <x.guihot@gmail.com> (http://xavierguihot.com)
 
 [ci]: https://travis-ci.org/stacycurl/pimpathon
 [sonatype]: https://oss.sonatype.org/index.html#nexus-search;quick~pimpathon

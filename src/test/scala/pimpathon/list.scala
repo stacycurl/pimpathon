@@ -214,4 +214,8 @@ class ListTest {
     val decrement = (x: Int) => x-1
     List.range(1, 6).updateIf(isEven, decrement) === List(1, 1, 3, 3, 5)
   }
+
+  @Test def update(): Unit = {
+    List.range(1, 6).update { case x if x % 2 == 0 => x - 1 } === List(1, 1, 3, 3, 5)
+  }
 }

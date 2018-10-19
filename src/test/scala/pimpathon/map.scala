@@ -112,6 +112,9 @@ class MapTest {
     assertEquals("Shouldn't have iterated over the original map twice", List(1, 2), originalValuesSeen.toList)
   }
 
+  @Test def mapValuesWithKey(): Unit =
+    Map(1 → 2, 2 → 4).mapValuesWithKey(k ⇒ v ⇒ s"$k: $v") === Map(1 → "1: 2", 2 → "2: 4")
+
   @Test def mapEntries(): Unit =
     Map(1 → 2, 2 → 4).mapEntries(k ⇒ v ⇒ (k.toString, v.toDouble)) === Map("1" → 2.0, "2" → 4.0)
 

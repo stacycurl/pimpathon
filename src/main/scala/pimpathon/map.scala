@@ -1,11 +1,9 @@
 package pimpathon
 
-import scala.{PartialFunction ⇒ ~>}
-import scala.collection.{breakOut, mutable ⇒ M, GenTraversable, GenTraversableLike, GenTraversableOnce}
-import scala.collection.immutable.{Map ⇒ ▶:, SortedMap, TreeMap}
-
+import scala.{PartialFunction => ~>}
+import scala.collection.{GenTraversable, GenTraversableLike, GenTraversableOnce, breakOut, mutable => M}
+import scala.collection.immutable.{SortedMap, TreeMap, Map => ▶:}
 import pimpathon.genTraversableLike.{GenTraversableLikeOfTuple2Mixin, GenTraversableLikePimpsMixin}
-
 import pimpathon.any._
 import pimpathon.function._
 import pimpathon.multiMap._
@@ -71,6 +69,8 @@ object map {
     def mapKeysEagerly[C](f: K ⇒ C):         C ▶: V = self.map { case (k, v) ⇒ (f(k), v) }
     def mapValuesEagerly[W](f: V ⇒ W):       K ▶: W = self.map { case (k, v) ⇒ (k, f(v)) }
     def mapEntries[C, W](f: K ⇒ V ⇒ (C, W)): C ▶: W = self.map { case (k, v) ⇒ f(k)(v)   }
+
+    def mapValuesWithKey[W](f: K => V => W): K ▶: W = self.map { case (k, v) => (k, f(k)(v)) }
 
     def seqMapKeys[C](f: K ⇒ Option[C]):                Option[C ▶: V] = seqMapEntries(k ⇒ v ⇒ f(k).map(_ → v))
     def seqMapValues[W](f: V ⇒ Option[W]):              Option[K ▶: W] = seqMapEntries(k ⇒ v ⇒ f(v).map(k → _))

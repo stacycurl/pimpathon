@@ -8,5 +8,9 @@ object dynamicVariable {
       self.value = f(self.value)
       self
     }
+
+    def withModification[B](f: A => A)(thunk: => B): B = {
+      self.withValue(f(self.value))(thunk)
+    }
   }
 }

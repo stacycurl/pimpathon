@@ -13,5 +13,14 @@ class DynamicVariableTest {
     dyn.value === (123 * 2)
   }
 
+  @Test def withModification(): Unit = {
+    dyn.withModification(_ * 2) {
+      dyn.value === (123 * 2)
+      "foo"
+    } === "foo"
+
+    dyn.value === 123
+  }
+
   private val dyn = new DynamicVariable[Int](123)
 }

@@ -192,6 +192,9 @@ class ListTest {
     nil[Int].zipExactWith(List(4, 5, 6))(_ + _)      === (nil[Int], Some(Right(List(4, 5, 6))))
     List(1, 2, 3).zipExactWith(List(4))(_ + _)       === (List(5), Some(Left(List(2, 3))))
     List(1).zipExactWith(List(4, 5, 6))(_ + _)       === (List(5), Some(Right(List(5, 6))))
+
+    List(1).zipExactWith(List(4, 5, 6))(_ + _, _ * -10, _ * 10)       === List(5, 50, 60)
+    List(4, 5, 6).zipExactWith(List(1))(_ + _, _ * -10, _ * 10)       === List(5, -50, -60)
   }
 
   @Test def partitionEithers(): Unit =

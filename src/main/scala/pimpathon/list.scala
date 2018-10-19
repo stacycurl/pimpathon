@@ -137,10 +137,16 @@ object list {
     def zipExact[B](bs: List[B]): (List[(A, B)], Option[Either[List[A], List[B]]]) = zipExactWith(bs)((a, b) ⇒ (a, b))
 
     case class zipExactWith[B](other: List[B]) {
-      def apply[C](f: (A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]]) = {
+      def apply[C](fromTuple: (A, B) ⇒ C, fromLhs: A => C, fromRhs: B => C): List[C] = apply(fromTuple).calc {
+        case (cs, None)            => cs
+        case (cs, Some(Left(as)))  => cs ++ as.map(fromLhs)
+        case (cs, Some(Right(bs))) => cs ++ bs.map(fromRhs)
+      }
+
+      def apply[C](fromTuple: (A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]]) = {
         @tailrec
         def recurse(la: List[A], lb: List[B], cs: List[C]): (List[C], Option[Either[List[A], List[B]]]) = (la, lb) match {
-          case (a :: as, b :: bs) ⇒ recurse(as, bs, f(a, b) :: cs)
+          case (a :: as, b :: bs) ⇒ recurse(as, bs, fromTuple(a, b) :: cs)
           case (Nil, Nil)         ⇒ (cs.reverse, None)
           case (as, Nil)          ⇒ (cs.reverse, Some(Left(as)))
           case (Nil, bs)          ⇒ (cs.reverse, Some(Right(bs)))

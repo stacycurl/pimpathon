@@ -46,6 +46,7 @@ class OptionTest {
 
   @Test def containedIn(): Unit = {
     on(some(1), none, some(2)).calling(_.containedIn(Set(0, 1))).produces(true, false, false)
+    on(some(1), none, some(2)).calling(_.containedIn(0, 1)).produces(true, false, false)
   }
 
   private def none[A]: Option[A]       = None

@@ -21,6 +21,7 @@ object option {
 
     def amass[B](pf: A ~> Option[B]): Option[B] = self.flatMap(a ⇒ pf.lift(a).flatten)
 
+    def containedIn(s: A*): Boolean = self.fold(false)(_.containedIn(s.toSet))
     def containedIn(s: Set[A]): Boolean = self.fold(false)(_.containedIn(s))
   }
 }

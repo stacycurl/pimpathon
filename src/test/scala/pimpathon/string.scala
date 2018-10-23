@@ -19,7 +19,7 @@ class StringTest {
     on("foo", "\"foo", "foo\"", "\"foo\"").calling(_.quote).produces("\"foo\"", "\"\"foo\"", "\"foo\"\"", "\"\"foo\"\"")
 
   @Test def quoteWith(): Unit =
-    on("foo", "'foo", "foo'", "'foo'").calling(_.quoteWith(''')).produces("'foo'", "''foo'", "'foo''", "''foo''")
+    on("foo", "'foo", "foo'", "'foo'").calling(_.quoteWith('\'')).produces("'foo'", "''foo'", "'foo''", "''foo''")
 
   @Test def unquote(): Unit =
     on("foo", "\"foo", "foo\"", "\"foo\"").calling(_.unquote).produces("foo", "foo", "foo", "foo")
@@ -63,5 +63,18 @@ class StringTest {
          |libraries""".stripMargin
 
     wrapped.replaceAllLiterally("\n", " ").wrap(24) === wrapped
+  }
+
+  @Test def indent(): Unit = {
+    """|Pimpathon contains pimps
+       |  for classes in core
+       |    scala & java libraries
+       |  and pimps for external
+       |libraries""".stripMargin.indent ===
+    """|  Pimpathon contains pimps
+       |    for classes in core
+       |      scala & java libraries
+       |    and pimps for external
+       |  libraries""".stripMargin
   }
 }

@@ -120,4 +120,7 @@ object function {
   def nor[A](ps: Predicate[A]*): Predicate[A]  = or(ps: _*).not
   def or[A](ps: Predicate[A]*): Predicate[A]   = ps.foldLeft((a: A) ⇒ false)(_ or _)
   def and[A](ps: Predicate[A]*): Predicate[A]  = ps.foldLeft((a: A) ⇒ true)(_ and _)
+
+  def partialChain[A, B](first: A => B => B, rest: (A => B => B)*): A => B => B = a => Function.chain((first +: rest).map(fn => fn(a)))
+  def partialChain2[A, B, C](first: (A, B) => C => C, rest: ((A, B) => C => C)*): (A, B) => C => C = (a, b) => Function.chain((first +: rest).map(fn => fn(a, b)))
 }

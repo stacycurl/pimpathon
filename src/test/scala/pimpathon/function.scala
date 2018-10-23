@@ -125,4 +125,18 @@ class PartialFunctionTest {
 
   @Test def contramap(): Unit = on(10, 20, 30)
     .calling(util.partial(1 → 2, 2 → 3).contramap[Int](_ / 10).lift).produces(Some(2), Some(3), None)
+
+  @Test def partialChain(): Unit = {
+    def reverse(prefix: Int)(value: String): String = prefix + value.reverse
+    def duplicate(prefix: Int)(value: String): String = prefix + value + value
+
+    function.partialChain(reverse, duplicate)(1)("Bolton") === "11notloB1notloB"
+  }
+
+  @Test def partialChain2(): Unit = {
+    def reverse(prefix: Int, suffix: String)(value: String): String = prefix + value.reverse + suffix
+    def duplicate(prefix: Int, suffix: String)(value: String): String = prefix + value + value + suffix
+
+    function.partialChain2(reverse, duplicate)(1, "2")("Bolton") === "11notloB21notloB22"
+  }
 }

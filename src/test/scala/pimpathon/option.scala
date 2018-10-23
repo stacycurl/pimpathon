@@ -44,6 +44,10 @@ class OptionTest {
     some("change me").toEither(1, s => s.dropRight(2) + "you") === Right("change you")
   }
 
+  @Test def containedIn(): Unit = {
+    on(some(1), none, some(2)).calling(_.containedIn(Set(0, 1))).produces(true, false, false)
+  }
+
   private def none[A]: Option[A]       = None
   private def some[A](a: A): Option[A] = Some(a)
 }

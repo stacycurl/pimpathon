@@ -48,6 +48,7 @@ Builds are available for Scala 2.11.7 & 2.12.0
 + Julien Truffaut <truffaut.julien@gmail.com> [@julien-truffaut](https://twitter.com/julien-truffaut)
 + Raymond Barlow <rbarlow@raymanoz.com> [@raymanoz](https://twitter.com/raymanoz)
 + Sam Halliday <sam.halliday@gmail.com> [@fommil](https://twitter.com/fommil)
++ Shing Hing Man <shinghing.man@gmail.com>
 + Stacy Curl <stacy.curl@gmail.com> [@stacycurl](https://twitter.com/stacycurl)
 + Xavier GUIHOT <x.guihot@gmail.com> (http://xavierguihot.com)
 

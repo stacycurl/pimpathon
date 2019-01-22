@@ -3,9 +3,13 @@ import sbt._
 //import scoverage.ScoverageKeys._
 
 
-object PimpathonBuild extends Build {
-  lazy val pimpathon = (project in file(".")
-    settings(
+lazy val pimpathon = {
+  def dependencies(modules: (String, List[ModuleID])*)(version: String) = modules.toMap.apply(version)
+
+  Project(
+    id = "pimpathon",
+    base = file("."),
+    settings = Seq(
       organization              := "com.github.stacycurl",
       scalaVersion              := "2.12.0",
       crossScalaVersions        := Seq("2.12.0", "2.11.7"),
@@ -15,7 +19,7 @@ object PimpathonBuild extends Build {
       parallelExecution in Test := true,
       resolvers += "Stacy Curl's repo" at "http://dl.bintray.com/stacycurl/repo/",
       resolvers += "jcenter" at "http://jcenter.bintray.com",
-      libraryDependencies <++= scalaVersion(dependencies("2.12.0" → List(
+      libraryDependencies ++= scalaVersion(dependencies("2.12.0" → List(
         "org.scala-lang"             % "scala-compiler"    % "2.12.0" exclude("org.scala-lang.modules", "scala-xml_2.12"),
         "org.scala-lang"             % "scala-library"     % "2.12.0"    % "test",
         "com.github.julien-truffaut" %% "monocle-core"     % "1.3.2"     % "provided",
@@ -33,20 +37,18 @@ object PimpathonBuild extends Build {
         "io.gatling"                 %% "jsonpath"         % "0.6.7"  % "provided",
         "com.novocode"               %  "junit-interface"  % "0.11"   % "test",
         "com.github.stacycurl"       %% "delta-matchers"   % "1.0.19" % "test"
-      ))),
+      ))).value,
       doc := version.apply(Documentation.generate).value,
       initialize := {
         val _ = initialize.value
         require(sys.props("java.specification.version") == "1.8", "Java 8 is required for this project.")
-      }
+      },
+      addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
       //    coverageEnabled := true,
       //    coverageMinimum := 100,
       //    coverageHighlighting := true,
       //    coverageFailOnMinimum := true
-    )
-    settings(Publishing.settings: _*)
-    settings addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
-  )
+    )).settings(Publishing.settings: _*)
 
-  private def dependencies(modules: (String, List[ModuleID])*)(version: String) = modules.toMap.apply(version)
 }
+

@@ -72,9 +72,9 @@ abstract class Sonatype {
     )
     case None ⇒ Seq(
       credentialsSetting,
-      publishTo <<= version((v: String) ⇒ Some(if (v.trim endsWith "SNAPSHOT") ossSnapshots else ossStaging)),
+      publishTo := version((v: String) ⇒ Some(if (v.trim endsWith "SNAPSHOT") ossSnapshots else ossStaging)).value,
       pomIncludeRepository := (_ ⇒ false),
-      pomExtra <<= scalaVersion(generatePomExtra)
+      pomExtra := scalaVersion(generatePomExtra).value
     )
   })
 

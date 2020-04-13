@@ -88,11 +88,13 @@ object argonaut {
   }
 
   implicit class DecodeJsonFrills[A](val self: DecodeJson[A]) extends AnyVal {
-    def renameField(from: String, to: String):    DecodeJson[A] = beforeDecode(_.renameField(from, to))
-    def renameFields(fromTos: (String, String)*): DecodeJson[A] = beforeDecode(_.renameFields(fromTos: _*))
-    def addIfMissing(name: String, value: Json):  DecodeJson[A] = beforeDecode(_.addIfMissing(name, value))
-    def addIfMissing(assocs: Json.JsonAssoc*):    DecodeJson[A] = beforeDecode(_.addIfMissing(assocs: _*))
-    def removeFields(names: String*):             DecodeJson[A] = beforeDecode(_.removeFields(names: _*))
+    def renameField(from: String, to: String):      DecodeJson[A] = beforeDecode(_.renameField(from, to))
+    def renameFields(fromTos: (String, String)*):   DecodeJson[A] = beforeDecode(_.renameFields(fromTos: _*))
+    def addIfMissing(name: String, value: Json):    DecodeJson[A] = beforeDecode(_.addIfMissing(name, value))
+    def addIfMissing(assocs: Json.JsonAssoc*):      DecodeJson[A] = beforeDecode(_.addIfMissing(assocs: _*))
+    def removeIfPresent(name: String, value: Json): DecodeJson[A] = beforeDecode(_.removeIfPresent(name, value))
+    def removeIfPresent(assocs: Json.JsonAssoc*):   DecodeJson[A] = beforeDecode(_.removeIfPresent(assocs: _*))
+    def removeFields(names: String*):               DecodeJson[A] = beforeDecode(_.removeFields(names: _*))
 
     def beforeDecode(f: Json ⇒ Json): DecodeJson[A] = compose(f)
     def compose(f: Json ⇒ Json):      DecodeJson[A] = DecodeJson[A](hc ⇒ self.decode(hc >-> f))
@@ -111,11 +113,13 @@ object argonaut {
   }
 
   implicit class EncodeJsonFrills[A](val self: EncodeJson[A]) extends AnyVal {
-    def renameField(from: String, to: String):    EncodeJson[A] = afterEncode(_.renameField(from, to))
-    def renameFields(fromTos: (String, String)*): EncodeJson[A] = afterEncode(_.renameFields(fromTos: _*))
-    def addIfMissing(name: String, value: Json):  EncodeJson[A] = afterEncode(_.addIfMissing(name, value))
-    def addIfMissing(assocs: Json.JsonAssoc*):    EncodeJson[A] = afterEncode(_.addIfMissing(assocs: _*))
-    def removeFields(names: String*):             EncodeJson[A] = afterEncode(_.removeFields(names: _*))
+    def renameField(from: String, to: String):      EncodeJson[A] = afterEncode(_.renameField(from, to))
+    def renameFields(fromTos: (String, String)*):   EncodeJson[A] = afterEncode(_.renameFields(fromTos: _*))
+    def addIfMissing(name: String, value: Json):    EncodeJson[A] = afterEncode(_.addIfMissing(name, value))
+    def addIfMissing(assocs: Json.JsonAssoc*):      EncodeJson[A] = afterEncode(_.addIfMissing(assocs: _*))
+    def removeIfPresent(name: String, value: Json): EncodeJson[A] = afterEncode(_.removeIfPresent(name, value))
+    def removeIfPresent(assocs: Json.JsonAssoc*):   EncodeJson[A] = afterEncode(_.removeIfPresent(assocs: _*))
+    def removeFields(names: String*):               EncodeJson[A] = afterEncode(_.removeFields(names: _*))
 
     def afterEncode(f: Json ⇒ Json): EncodeJson[A] = andThen(f)
     def andThen(f: Json ⇒ Json):     EncodeJson[A] = EncodeJson[A](a ⇒ f(self.encode(a)))

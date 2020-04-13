@@ -41,6 +41,9 @@ object argonaut {
     def addIfMissing(name: String, value: Json): Json = self.withObject(_.addIfMissing(name, value))
     def addIfMissing(assocs: Json.JsonAssoc*):   Json = self.withObject(_.addIfMissing(assocs: _*))
 
+    def removeIfPresent(name: String, value: Json): Json = self.withObject(_.removeIfPresent(name, value))
+    def removeIfPresent(assocs: Json.JsonAssoc*): Json = self.withObject(_.removeIfPresent(assocs: _*))
+
     def removeFields(names: String*): Json = self.withObject(_.removeFields(names: _*))
 
 //    def delete(path: String): Json = {
@@ -56,11 +59,13 @@ object argonaut {
   }
 
   implicit class CodecJsonFrills[A](val self: CodecJson[A]) extends AnyVal {
-    def renameField(from: String, to: String):    CodecJson[A] = afterEncode(_.renameField(from, to))
-    def renameFields(fromTos: (String, String)*): CodecJson[A] = afterEncode(_.renameFields(fromTos: _*))
-    def addIfMissing(name: String, value: Json):  CodecJson[A] = afterEncode(_.addIfMissing(name, value))
-    def addIfMissing(assocs: Json.JsonAssoc*):    CodecJson[A] = afterEncode(_.addIfMissing(assocs: _*))
-    def removeFields(names: String*):             CodecJson[A] = afterEncode(_.removeFields(names: _*))
+    def renameField(from: String, to: String):      CodecJson[A] = afterEncode(_.renameField(from, to))
+    def renameFields(fromTos: (String, String)*):   CodecJson[A] = afterEncode(_.renameFields(fromTos: _*))
+    def addIfMissing(name: String, value: Json):    CodecJson[A] = afterEncode(_.addIfMissing(name, value))
+    def addIfMissing(assocs: Json.JsonAssoc*):      CodecJson[A] = afterEncode(_.addIfMissing(assocs: _*))
+    def removeIfPresent(name: String, value: Json): CodecJson[A] = afterEncode(_.removeIfPresent(name, value))
+    def removeIfPresent(assocs: Json.JsonAssoc*):   CodecJson[A] = afterEncode(_.removeIfPresent(assocs: _*))
+    def removeFields(names: String*):               CodecJson[A] = afterEncode(_.removeFields(names: _*))
 
     def beforeDecode(f: Json ⇒ Json): CodecJson[A] = compose(f)
     def afterDecode(f: A ⇒ A):        CodecJson[A] = derived(encoder ⇒ encoder)(_ map f)
@@ -171,6 +176,14 @@ object argonaut {
       self(name).fold(self + (name, value))(_ ⇒ self)
 
 
+    def removeIfPresent(assocs: Json.JsonAssoc*): JsonObject = assocs.foldLeft(self) {
+      case (acc, (name, value)) ⇒ acc.removeIfPresent(name, value)
+    }
+
+    def removeIfPresent(name: String, value: Json): JsonObject =
+      self(name).fold(self)(existing ⇒ if (existing == value) self - name else self)
+
+
     def filterR(p: Predicate[Json]): JsonObject =
       mapMap(_.collectValues { case j if p(j) ⇒ j.filterR(p) })
 
@@ -253,6 +266,9 @@ object Descendant {
     def addIfMissing(name: String, value: Json): From = self.modify(_.addIfMissing(name, value))
     def addIfMissing(assocs: Json.JsonAssoc*):   From = self.modify(_.addIfMissing(assocs: _*))
 
+    def removeIfPresent(name: String, value: Json): From = self.modify(_.removeIfPresent(name, value))
+    def removeIfPresent(assocs: Json.JsonAssoc*): From = self.modify(_.removeIfPresent(assocs: _*))
+
     def removeFields(names: String*): From = self.modify(_.removeFields(names: _*))
 
     def each: Descendant[From, Json, Json] = self composeTraversal objectValuesOrArrayElements
@@ -264,6 +280,9 @@ object Descendant {
 
     def addIfMissing(name: String, value: Json): From = self.modify(_.addIfMissing(name, value))
     def addIfMissing(assocs: Json.JsonAssoc*):   From = self.modify(_.addIfMissing(assocs: _*))
+
+    def removeIfPresent(name: String, value: Json): From = self.modify(_.removeIfPresent(name, value))
+    def removeIfPresent(assocs: Json.JsonAssoc*): From = self.modify(_.removeIfPresent(assocs: _*))
 
     def removeFields(names: String*): From = self.modify(_.removeFields(names: _*))
 

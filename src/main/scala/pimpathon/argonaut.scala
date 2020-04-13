@@ -62,6 +62,11 @@ object argonaut {
       PrettyParams.spaces2.copy(preserveOrder = true).pretty(self)
   }
 
+  implicit class CodecJsonCompanionFrills(val self: CodecJson.type) extends AnyVal {
+    def defer[A](deferred: => CodecJson[A]): CodecJson[A] =
+      CodecJson.derived(EncodeJson.defer(deferred.Encoder), DecodeJson.defer(deferred.Decoder))
+  }
+
   implicit class CodecJsonFrills[A](val self: CodecJson[A]) extends AnyVal {
     def renameField(from: String, to: String):      CodecJson[A] = afterEncode(_.renameField(from, to))
     def renameFields(fromTos: (String, String)*):   CodecJson[A] = afterEncode(_.renameFields(fromTos: _*))

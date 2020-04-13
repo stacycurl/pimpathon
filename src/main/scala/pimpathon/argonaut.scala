@@ -1,8 +1,11 @@
 package pimpathon
 
+import scala.language.{dynamics, higherKinds, implicitConversions}
+
 import _root_.argonaut.Json.{jFalse, jNull, jString, jTrue}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
-import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, Json, JsonMonocle, JsonNumber, JsonObject, PrettyParams}
+import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, HCursor, Json, JsonMonocle, JsonNumber, JsonObject, PrettyParams}
+import _root_.scalaz.{Applicative, \/}
 import io.gatling.jsonpath.AST._
 import io.gatling.jsonpath._
 import monocle.function.Each.each
@@ -11,13 +14,11 @@ import monocle.std.list.{listEach, listFilterIndex}
 import monocle.{Iso, Optional, Prism, Traversal}
 import pimpathon.boolean.BooleanPimps
 import pimpathon.function.{Predicate, PredicatePimps}
+import pimpathon.list.ListOfTuple2Pimps
 import pimpathon.map.MapPimps
 import pimpathon.string.StringPimps
-import pimpathon.list.ListOfTuple2Pimps
 
-import _root_.scalaz.{Applicative, \/}
 import scala.collection.immutable.{Map => ▶:}
-import scala.language.{dynamics, higherKinds, implicitConversions}
 
 
 object argonaut {
@@ -88,6 +89,14 @@ object argonaut {
 
     def xmapKeys[C](kc: K ⇒ C)(ck: C ⇒ K):   CodecJson[C ▶: V] = self.derived(_ contramapKeys ck)(_ mapKeys kc)
     def xmapValues[W](vw: V ⇒ W)(wv: W ⇒ V): CodecJson[K ▶: W] = self.derived(_ contramapValues wv)(_ mapValues vw)
+  }
+
+  implicit class DecodeJsonCompanionFrills(val self: DecodeJson.type) extends AnyVal {
+    def defer[A](deferred: => DecodeJson[A]): DecodeJson[A] = new DecodeJson[A] {
+      def decode(c: HCursor): DecodeResult[A] = _deferred.decode(c)
+
+      private lazy val _deferred: DecodeJson[A] = deferred
+    }
   }
 
   implicit class DecodeJsonFrills[A](val self: DecodeJson[A]) extends AnyVal {

@@ -124,6 +124,14 @@ object argonaut {
     def mapValues[W](f: V ⇒ W): DecodeJson[K ▶: W] = self.map(_.mapValuesEagerly(f))
   }
 
+  implicit class EncodeJsonCompanionFrills(val self: EncodeJson.type) extends AnyVal {
+    def defer[A](deferred: => EncodeJson[A]): EncodeJson[A] = new EncodeJson[A] {
+      def encode(a: A): Json = _deferred.encode(a)
+
+      private lazy val _deferred: EncodeJson[A] = deferred
+    }
+  }
+
   implicit class EncodeJsonFrills[A](val self: EncodeJson[A]) extends AnyVal {
     def renameField(from: String, to: String):      EncodeJson[A] = afterEncode(_.renameField(from, to))
     def renameFields(fromTos: (String, String)*):   EncodeJson[A] = afterEncode(_.renameFields(fromTos: _*))

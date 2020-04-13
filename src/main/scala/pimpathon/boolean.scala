@@ -10,6 +10,16 @@ object boolean {
     def nor(rhs: Boolean): Boolean = !(self || rhs)
     def nand(rhs: Boolean): Boolean = !(self && rhs)
     def cond[A](ifTrue: ⇒ A, ifFalse: ⇒ A): A = if (self) ifTrue else ifFalse
+
+    def tapFalse[Discarded](ifFalse: => Discarded): Boolean = {
+      if (!self) ifFalse
+      self
+    }
+
+    def tapTrue[Discarded](ifTrue: => Discarded): Boolean = {
+      if (self) ifTrue
+      self
+    }
   }
 
   class EitherCapturer[R](value: Boolean, right: R) {

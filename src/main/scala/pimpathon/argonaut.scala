@@ -4,7 +4,8 @@ import scala.language.{dynamics, higherKinds, implicitConversions}
 
 import _root_.argonaut.Json.{jFalse, jNull, jString, jTrue}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
-import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, HCursor, Json, JsonMonocle, JsonNumber, JsonObject, PrettyParams}
+import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, HCursor, Json, JsonMonocle, JsonNumber, JsonObject, Parse, PrettyParams}
+import _root_.java.io.File
 import _root_.scalaz.{Applicative, \/}
 import io.gatling.jsonpath.AST._
 import io.gatling.jsonpath._
@@ -13,6 +14,7 @@ import monocle.function.FilterIndex.filterIndex
 import monocle.std.list.{listEach, listFilterIndex}
 import monocle.{Iso, Optional, Prism, Traversal}
 import pimpathon.boolean.BooleanPimps
+import pimpathon.file.FilePimps
 import pimpathon.function.{Predicate, PredicatePimps}
 import pimpathon.list.ListOfTuple2Pimps
 import pimpathon.map.MapPimps
@@ -22,6 +24,13 @@ import scala.collection.immutable.{Map => ▶:}
 
 
 object argonaut {
+  implicit class JsonCompanionFrils(val self: Json.type) extends AnyVal {
+    def readFrom(file: File): Option[Json] = for {
+      content <- if (file.exists()) Some(file.readString) else None
+      json    <- Parse.parse(content).toOption
+    } yield json
+  }
+
   implicit class JsonFrills(val self: Json) extends AnyVal {
     def descendant: Descendant[Json, Json, Json] =
       Descendant(self, List(Traversal.id[Json]), () => List("" -> Traversal.id[Json]))

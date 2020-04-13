@@ -13,6 +13,7 @@ import monocle.function.Each.each
 import monocle.function.FilterIndex.filterIndex
 import monocle.std.list.{listEach, listFilterIndex}
 import monocle.{Iso, Optional, Prism, Traversal}
+import pimpathon.any.AnyPimps
 import pimpathon.boolean.BooleanPimps
 import pimpathon.file.FilePimps
 import pimpathon.function.{Predicate, PredicatePimps}
@@ -66,6 +67,9 @@ object argonaut {
 
     def filterR(p: Predicate[Json]): Json =
       p.cond(self.withObject(_.filterR(p)).withArray(_.filterR(p)), jNull)(self)
+
+    def writeTo(file: File): Json =
+      self.tap(_ => file.writeString(indent2))
 
     def indent2: String =
       PrettyParams.spaces2.copy(preserveOrder = true).pretty(self)

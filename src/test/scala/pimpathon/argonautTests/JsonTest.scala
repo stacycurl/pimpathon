@@ -4,15 +4,48 @@ import argonaut.Json._
 import argonaut._
 import argonaut.StringWrap.StringToStringWrap
 import org.junit.Test
-import pimpathon.Descendant
 import pimpathon.argonaut._
+import pimpathon.random._
 import pimpathon.util.on
+import pimpathon.util.AnyTestPimp
 import sjc.delta.argonaut.json.actualExpected.flat._
 import sjc.delta.argonaut.matchers._
 import sjc.delta.matchers.syntax.anyDeltaMatcherOps
 
+import scala.util.Random
+
 
 class JsonTest extends JsonUtil {
+  @Test def indent2(): Unit = Json.obj(
+    "abc" := 1,
+    "def" := 2,
+    "ghi" := 3,
+    "jkl" := 4,
+    "mno" := 5
+  ).indent2 ===
+    s"""{
+     |  "abc" : 1,
+     |  "def" : 2,
+     |  "ghi" : 3,
+     |  "jkl" : 4,
+     |  "mno" : 5
+     |}""".stripMargin
+
+  @Test def spaces2(): Unit = Json.obj( // spaces2 isn't part of pimpathon, just comparing against indent2
+    "abc" := 1,
+    "def" := 2,
+    "ghi" := 3,
+    "jkl" := 4,
+    "mno" := 5
+  ).spaces2 ===
+    s"""{
+     |  "abc" : 1,
+     |  "mno" : 5,
+     |  "jkl" : 4,
+     |  "def" : 2,
+     |  "ghi" : 3
+     |}""".stripMargin
+
   @Test def booleanFilter(): Unit = {
     val json = parse(
       """{

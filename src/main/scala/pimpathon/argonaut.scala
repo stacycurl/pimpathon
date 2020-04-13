@@ -2,7 +2,7 @@ package pimpathon
 
 import _root_.argonaut.Json.{jFalse, jNull, jString, jTrue}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
-import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, Json, JsonMonocle, JsonNumber, JsonObject}
+import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, Json, JsonMonocle, JsonNumber, JsonObject, PrettyParams}
 import io.gatling.jsonpath.AST._
 import io.gatling.jsonpath._
 import monocle.function.Each.each
@@ -56,6 +56,9 @@ object argonaut {
 
     def filterR(p: Predicate[Json]): Json =
       p.cond(self.withObject(_.filterR(p)).withArray(_.filterR(p)), jNull)(self)
+
+    def indent2: String =
+      PrettyParams.spaces2.copy(preserveOrder = true).pretty(self)
   }
 
   implicit class CodecJsonFrills[A](val self: CodecJson[A]) extends AnyVal {

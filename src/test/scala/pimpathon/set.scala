@@ -45,4 +45,6 @@ class SetTest {
   @Test def asMultiMap_withKeys(): Unit = on(Set(0, 1, 2, 3))
     .calling(_.asMultiMap[List].withKeys(_ % 2), _.asMultiMap[Set].withKeys(_ % 2))
     .produces(Map(0 → List(0, 2), 1 → List(1, 3)), Map(0 → Set(0, 2), 1 → Set(1, 3)))
+
+  @Test def amass(): Unit = Set(1, 2, 3, 4).amass { case i if i % 2 == 0 ⇒ Set(i, -i) } === Set(2, -2, 4, -4)
 }

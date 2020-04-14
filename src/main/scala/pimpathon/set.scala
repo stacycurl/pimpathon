@@ -1,7 +1,7 @@
 package pimpathon
 
 import pimpathon.genTraversableLike.{GenTraversableLikeOfTuple2Mixin, GenTraversableLikeOfEitherPimpsMixin, GTLGT}
-
+import scala.{PartialFunction => ~>}
 import scala.collection.immutable.TreeSet
 import scala.collection.{mutable ⇒ M, GenTraversable, GenTraversableLike}
 
@@ -24,6 +24,8 @@ object set  {
 
     def toMutable: M.Set[A] = mutable
     def mutable: M.Set[A] = M.Set.empty[A] ++ self
+
+    def amass[B](pf: A ~> Set[B]): Set[B] = self.flatMap(a ⇒ pf.lift(a).getOrElse(Set.empty[B]))
 
     protected def gtl: GenTraversableLike[A, GenTraversable[A]] = self
     protected def cc: Set[A] = self

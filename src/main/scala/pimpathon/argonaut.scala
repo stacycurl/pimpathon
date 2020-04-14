@@ -28,7 +28,10 @@ object argonaut {
   implicit class JsonCompanionFrils(val self: Json.type) extends AnyVal {
     def readFrom(file: File): Option[Json] = for {
       content <- if (file.exists()) Some(file.readString) else None
-      json    <- Parse.parse(content).toOption
+      json    <- Parse.parse(content) match {
+        case Left(_)     => None
+        case Right(json) => Some(json)
+      }
     } yield json
   }
 

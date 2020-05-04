@@ -21,7 +21,7 @@ import pimpathon.list.ListOfTuple2Pimps
 import pimpathon.map.MapPimps
 import pimpathon.string.StringPimps
 
-import scala.collection.immutable.{Map => ▶:}
+import scala.collection.immutable.{ListMap, Map => ▶:}
 
 
 object argonaut {
@@ -233,7 +233,7 @@ object argonaut {
       mapMap(_.collectValues { case j if p(j) ⇒ j.filterR(p) })
 
     private def mapMap(f: Map[String, Json] ⇒ Map[String, Json]): JsonObject =
-      JsonObject.fromTraversableOnce(f(self.toMap))
+      JsonObject.fromTraversableOnce(f(ListMap[String, Json](self.toList: _*)))
   }
 
   implicit class TraversalToJsonFrills[A](val self: Traversal[A, Json]) extends AnyVal {

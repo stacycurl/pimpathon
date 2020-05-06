@@ -21,6 +21,7 @@ import pimpathon.list.ListOfTuple2Pimps
 import pimpathon.map.MapPimps
 import pimpathon.string.StringPimps
 
+import scala.{PartialFunction ⇒ ~>}
 import scala.collection.immutable.{ListMap, Map => ▶:}
 
 
@@ -201,9 +202,14 @@ object argonaut {
   }
 
   implicit class JsonObjectFrills(val self: JsonObject) extends AnyVal {
-    def filterKeys(p: Predicate[String]): JsonObject = mapMap(_.filterKeys(p))
-    def filterValues(p: Predicate[Json]): JsonObject = mapMap(_.filterValues(p))
-    def removeFields(names: String*): JsonObject = mapMap(_.filterKeysNot(names.toSet))
+    def filterKeys(p: Predicate[String]): JsonObject = mapCollect { case entry@(k, _) if p(k) => entry }
+    def filterValues(p: Predicate[Json]): JsonObject = mapCollect { case entry@(_, j) if p(j) => entry }
+
+    def removeFields(names: String*): JsonObject = {
+      val namesSet: Set[String] = names.toSet
+
+      mapCollect { case entry@(k, _) if !namesSet.contains(k) => entry }
+    }
 
     def renameFields(fromTos: (String, String)*): JsonObject = fromTos.foldLeft(self) {
       case (acc, (from, to)) ⇒ acc.renameField(from, to)
@@ -230,10 +236,14 @@ object argonaut {
 
 
     def filterR(p: Predicate[Json]): JsonObject =
-      mapMap(_.collectValues { case j if p(j) ⇒ j.filterR(p) })
+      mapCollect { case (k, j) if p(j) ⇒ k -> j.filterR(p) }
 
-    private def mapMap(f: Map[String, Json] ⇒ Map[String, Json]): JsonObject =
-      JsonObject.fromTraversableOnce(f(ListMap[String, Json](self.toList: _*)))
+    private def mapCollect(pf: (String, Json) ~> (String, Json)): JsonObject = {
+      val from: ListMap[String, Json] = ListMap[String, Json](self.toList: _*)
+      val to: ListMap[String, Json] = from.collect(pf)
+
+      JsonObject.fromTraversableOnce(to)
+    }
   }
 
   implicit class TraversalToJsonFrills[A](val self: Traversal[A, Json]) extends AnyVal {

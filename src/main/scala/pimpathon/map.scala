@@ -26,6 +26,8 @@ object map {
     def getOrThrow(k: K, message: String): V        = getOrThrow(k, new IllegalArgumentException(message))
     def getOrThrow(k: K, exception: ⇒ Exception): V = self.getOrElse(k, throw exception)
 
+    def getOrLeft[L](k: K, l: => L): Either[L, V] = self.get(k).toRight(l)
+
     def findKey(p: Predicate[K]): Option[K]   = keyFor.matchingKey(p)
     def findValue(p: Predicate[V]): Option[V] = valueFor.matchingValue(p)
 

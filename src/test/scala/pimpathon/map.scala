@@ -58,6 +58,14 @@ class MapTest {
     assertThrows[RuntimeException]("missing")(nonEmpty.getOrThrow(0, new RuntimeException("missing")))
   }
 
+  @Test def getOrLeft(): Unit = {
+    Map(0 → "present").getOrLeft(0, "missing")                === Right("present")
+    Map(0 → "present").getOrLeft(0, new Exception("missing")) === Right("present")
+    Map(0 → "present").getOrLeft(0, util.goBoom: Exception)   === Right("present")
+
+    nonEmpty.getOrLeft(0, "missing") === Left("missing")
+  }
+
   @Test def uncons(): Unit =
     on(empty, nonEmpty).calling(_.uncons("empty", _ ⇒ "nonEmpty")).produces("empty", "nonEmpty")
 

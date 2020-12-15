@@ -4,6 +4,7 @@ import argonaut.Json._
 import argonaut._
 import argonaut.StringWrap.StringToStringWrap
 import org.junit.Test
+import pimpathon.frills.any._
 import pimpathon.argonaut._
 import pimpathon.random._
 import pimpathon.util.on
@@ -132,6 +133,12 @@ class JsonTest extends JsonUtil {
     jobj.descendant("$.address").as[Address].modify(_.reverse) <=> jobj.descendant("$.address").array.modify(_.reverse)
   }
 
+  @Test def banamanCodec(): Unit = {
+    BananaMan.bananaManCodec.encode(bananaMan) <=> jobj
+
+    BananaMan.bananaManCodec.decodeJson(jobj).toOption <=> Some(bananaMan)
+  }
+
   @Test def descendant_complex(): Unit = {
     jobj.descendant("preferences/*").bool.set(false)
         .descendant("address").array.string.modify("Flat B" :: _)
@@ -184,6 +191,46 @@ class JsonTest extends JsonUtil {
           |  "awkward" : { "1": "ONE" }
           |}""".stripMargin
         )
+  }
+
+  @Test def descendant_complex_case_class(): Unit = {
+    bananaMan
+      .descendant("preferences/*").bool.set(false)
+      .descendant("address").array.string.modify("Flat B" :: _)
+      .descendant("address/*").string.modify(_.toUpperCase)
+      .descendant("potatoes/*/variety").string.modify(_ ⇒ "Avalanche")
+      .descendant("knownUnknowns/*").int.modify(_ ⇒ 42)
+      .descendant("awkward/*").string.modify(_.toUpperCase) <=> BananaMan(
+        name = "Eric",
+        age = 3,
+        lying = true,
+        address = Address(List("FLAT B", "29 ACACIA ROAD", "NUTTYTOWN")),
+        preferences = Preferences(bananas = false),
+        width = 33.5,
+        potatoes = Nil,
+        knownUnknowns = KnownUnknowns(),
+        awkward = Awkward(`1` = "ONE")
+      )
+  }
+
+  @Test def descendant_dynamic_case_class(): Unit = {
+    bananaMan
+      .descendant.preferences.each.bool.set(false)
+      .descendant.address.array.string.modify("Flat B" :: _)
+      .descendant.address.each.string.modify(_.toUpperCase)
+      .descendant.potatoes.each.variety.string.modify(_ ⇒ "Avalanche")
+      .descendant.knownUnknowns.each.int.modify(_ ⇒ 42)
+      .descendant.awkward.each.string.modify(_.toUpperCase) <=> BananaMan(
+        name = "Eric",
+        age = 3,
+        lying = true,
+        address = Address(List("FLAT B", "29 ACACIA ROAD", "NUTTYTOWN")),
+        preferences = Preferences(bananas = false),
+        width = 33.5,
+        potatoes = Nil,
+        knownUnknowns = KnownUnknowns(),
+        awkward = Awkward(`1` = "ONE")
+      )
   }
 
   @Test def delete(): Unit = {

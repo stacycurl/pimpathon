@@ -103,6 +103,12 @@ object argonaut {
 
     def derived[B](f: EncodeJson[A] ⇒ EncodeJson[B])(g: DecodeJson[A] ⇒ DecodeJson[B]): CodecJson[B] =
       CodecJson.derived[B](f(self.Encoder), g(self.Decoder))
+
+    def traversalToJson: Traversal[A, Json] = new Traversal[A, Json] {
+      def modifyF[F[_]](f: Json => F[Json])(a: A)(implicit F: Applicative[F]): F[A] = {
+        F.map[Json, A](f(self.encode(a)))(json => self.decodeJson(json).getOr(a))
+      }
+    }
   }
 
   implicit class CodecJsonMapFrills[K, V](val self: CodecJson[K ▶: V]) extends AnyVal {
@@ -363,8 +369,11 @@ object Descendant {
   object Descender {
     def apply(path: String): Descender = if (path.startsWith("$")) JsonPath else Pimpathon
 
-    def traversal(path: String): Traversal[Json, Json] = apply(path).traversal(Traversal.id[Json], path)
-    def ancestors(path: String): List[(String, Traversal[Json, Json])] = apply(path).ancestors(Traversal.id[Json], path)
+    def traversal(path: String): Traversal[Json, Json] = traversal(Traversal.id[Json], path)
+    def traversal[A](start: Traversal[A, Json], path: String) = apply(path).traversal(start, path)
+
+    def ancestors(path: String): List[(String, Traversal[Json, Json])] = ancestors(Traversal.id[Json], path)
+    def ancestors[A](start: Traversal[A, Json], path: String) = apply(path).ancestors(start, path)
   }
 
   sealed trait Descender {

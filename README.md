@@ -1,7 +1,7 @@
 Pimpathon
 =========
 
-![Build Status](https://github.com/stacycurl/pimpathon/actions/workflows/release.yml/badge.svg)
+![Build Status](https://github.com/stacycurl/pimpathon/actions/workflows/build.yml/badge.svg)
 [![Release Artifacts][badge-release]][link-release]
 
 **Pimpathon** is a library that extends Scala & Java classes with 'extension methods' via the [Pimp my Library][pimp-my-library] pattern.

@@ -1,11 +1,8 @@
 Pimpathon
 =========
 
-[![Build Status](https://api.travis-ci.org/stacycurl/pimpathon.png?branch=master)](https://travis-ci.org/stacycurl/pimpathon)
-[![Stories in Ready](https://badge.waffle.io/stacycurl/pimpathon.png?label=ready&title=Ready)](http://waffle.io/stacycurl/pimpathon)
-[![Coverage Status](https://coveralls.io/repos/stacycurl/pimpathon/badge.svg)](https://coveralls.io/r/stacycurl/pimpathon)
-[![Gitter chat](https://badges.gitter.im/stacycurl/pimpathon.png)](https://gitter.im/stacycurl/pimpathon)
-[![Bintray](https://api.bintray.com/packages/stacycurl/repo/pimpathon/images/download.svg) ](https://bintray.com/stacycurl/repo/pimpathon/_latestVersion)
+![Build Status](https://github.com/stacycurl/pimpathon/actions/workflows/release.yml/badge.svg)
+[![Release Artifacts][badge-release]][link-release]
 
 **Pimpathon** is a library that extends Scala & Java classes with 'extension methods' via the [Pimp my Library][pimp-my-library] pattern.
 
@@ -15,21 +12,18 @@ XFrills (ListFrills, etc.)
 
 ### Using Pimpathon
 
-Release artefacts are published to Bintray and are built using [Travis CI][ci].
-The artefacts can be published to Sonatype upon request (if someone can tell me how to _fully_ automate that that would be great).
+Release artefacts are published to Sonatype and are built using Github Actions.
 
 To include the repositories in your SBT build you should add:
 
 ```scala
-resolvers += "jcenter" at "http://jcenter.bintray.com"
-// or
-resolvers += "Stacy Curl's repo" at "http://dl.bintray.com/stacycurl/repo/"
+resolvers += Resolver.sonatypeRepo("releases")
 ```
 
 To include pimpathon as a dependency you should add:
 
 ```scala
-libraryDependencies += "com.github.stacycurl" %% "pimpathon" % "1.8.16" intransitive()
+libraryDependencies += "com.github.stacycurl" %% "pimpathon" % "1.8.27" intransitive()
 ```
 
 'intransitive' means that even though pimpathon pimps a few third party libraries it won't force you to depend on them,
@@ -52,8 +46,9 @@ Builds are available for Scala 2.11.7 & 2.12.0
 + Stacy Curl <stacy.curl@gmail.com> [@stacycurl](https://twitter.com/stacycurl)
 + Xavier GUIHOT <x.guihot@gmail.com> (http://xavierguihot.com)
 
-[ci]: https://travis-ci.org/stacycurl/pimpathon
-[sonatype]: https://oss.sonatype.org/index.html#nexus-search;quick~pimpathon
 [pimp-my-library]:http://www.artima.com/weblogs/viewpost.jsp?thread=179766
 [doc]: https://rawgit.com/stacycurl/pimpathon/master/docs/index.html
 [olddoc]: https://github.com/stacycurl/pimpathon/blob/master/docs/Documentation.md
+[link-release]: https://oss.sonatype.org/content/repositories/releases/com/github/stacycurl/pimpathon_2.12/ "Sonatype Releases"
+[badge-release]: https://img.shields.io/nexus/r/https/oss.sonatype.org/com.github.stacycurl/pimpathon_2.12.svg "Sonatype Releases"
+

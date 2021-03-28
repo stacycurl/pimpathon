@@ -12,12 +12,10 @@ object string {
     def emptyTo(alternative: ⇒ String): String = if (self.isEmpty) alternative else self
 
     def quote: String = quoteWith('"')
-    def quoteWith(char: Char) = s"$char$self$char"
+    def quoteWith(char: Char): String = s"$char$self$char"
     def unquote: String = self.stripAffixes("\"", "\"")
 
     def hyphenate: String = splitByCase("-").toLowerCase
-
-    def indent: String = self.split("\n").map("  " + _).mkString("\n")
 
     def wrap(length: Int): String =
       self.split(" ").toList.batchWhile(_.mkString(" ").length <= length).map(_.mkString(" ")).mkString("\n")

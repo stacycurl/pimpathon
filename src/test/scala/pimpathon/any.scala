@@ -119,4 +119,22 @@ class AnyTest {
       assertEquals((10.0 max num) min 100.0, num.bounded(10.0, 100.0), 0.01)
     })
   }
+  
+  @Test def indent(): Unit = {
+    (new Spiel).indent ===
+    """|  Pimpathon contains pimps
+       |    for classes in core
+       |      scala & java libraries
+       |    and pimps for external
+       |  libraries""".stripMargin
+  }
+  
+  private class Spiel {
+    override def toString: String = 
+      """|Pimpathon contains pimps
+         |  for classes in core
+         |    scala & java libraries
+         |  and pimps for external
+         |libraries""".stripMargin
+  }
 }

@@ -64,17 +64,4 @@ class StringTest {
 
     wrapped.replaceAllLiterally("\n", " ").wrap(24) === wrapped
   }
-
-  @Test def indent(): Unit = {
-    """|Pimpathon contains pimps
-       |  for classes in core
-       |    scala & java libraries
-       |  and pimps for external
-       |libraries""".stripMargin.indent ===
-    """|  Pimpathon contains pimps
-       |    for classes in core
-       |      scala & java libraries
-       |    and pimps for external
-       |  libraries""".stripMargin
-  }
 }

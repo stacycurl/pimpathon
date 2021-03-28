@@ -62,6 +62,8 @@ object any {
     def tap[Discarded](actions: (A ⇒ Discarded)*): A = { actions.foreach(action ⇒ action(self)); self }
 
     def bounded(lower: A, upper: A)(implicit na: Numeric[A]): A = na.min(na.max(lower, self), upper)
+    
+    def indent: String = self.toString.split("\n").map("  " + _).mkString("\n") 
   }
 
   class AnyCapturer[A](a: A, andThen: Boolean ⇒ Option[A]) {

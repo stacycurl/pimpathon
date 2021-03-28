@@ -15,7 +15,7 @@ object option {
     def getOrThrow(exception: ⇒ Exception): A = self.getOrElse(throw exception)
 
     def toTry: Try[A] = self.fold(pimpTry.failure[A](new NoSuchElementException))(pimpTry.success[A])
-    def toEither[L,R](none: => L, some: A => R): Either[L,R] = self.map(a => Right(some(a))).getOrElse(Left(none))
+    def toEither[L,R](none: ⇒ L, some: A ⇒ R): Either[L,R] = self.map(a => Right(some(a))).getOrElse(Left(none))
 
     def invert(a: A): Option[A] = self.fold(Some(a): Option[A])(_ ⇒ None)
 

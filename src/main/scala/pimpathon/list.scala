@@ -20,15 +20,15 @@ import scala.collection.generic.CanBuildFrom
 
 
 object list {
-  implicit class ListPimps[A](self: List[A]) extends genTraversableLike.GenTraversableLikePimpsMixin[A, List] {
+  implicit class ListPimps[A](private val self: List[A]) extends genTraversableLike.GenTraversableLikePimpsMixin[A, List] {
     def updateIf(pred: A ⇒ Boolean, updateFn: A ⇒ A): List[A] = self.map {
       case x if pred(x) ⇒ updateFn(x)
       case x            ⇒ x
     }
 
     def update(pf: A ~> A): List[A] = self.map {
-      case x if pf.isDefinedAt(x) => pf(x)
-      case x                      => x
+      case x if pf.isDefinedAt(x) ⇒ pf(x)
+      case x                      ⇒ x
     }
 
     def tapEmpty[Discarded](empty: ⇒ Discarded): List[A] = tap(empty, _ ⇒ {})
@@ -93,16 +93,17 @@ object list {
     def amass[B](pf: A ~> List[B]): List[B] = self.flatMap(a ⇒ pf.lift(a).getOrElse(Nil))
 
     def interleave(rhs: List[A]): List[A] = {
+      @tailrec
       def recurse(acc: List[A], next: List[A], after: List[A]): List[A] = next match {
-        case Nil => acc.reverse ::: after
-        case head :: tail => recurse(head :: acc, after, tail)
+        case Nil ⇒ acc.reverse ::: after
+        case head :: tail ⇒ recurse(head :: acc, after, tail)
       }
 
       recurse(Nil, self, rhs)
     }
 
-    def interleaveWith[B, C](rhs: List[B])(f: Either[A, B] => C): List[C] =
-      self.map(a => f(Left(a))).interleave(rhs.map(b => f(Right(b))))
+    def interleaveWith[B, C](rhs: List[B])(f: Either[A, B] ⇒ C): List[C] =
+      self.map(a ⇒ f(Left(a))).interleave(rhs.map(b ⇒ f(Right(b))))
 
     def uncons[B](empty: ⇒ B, nonEmpty: List[A] ⇒ B): B = if (self.isEmpty) empty else nonEmpty(self)
 
@@ -137,10 +138,10 @@ object list {
     def zipExact[B](bs: List[B]): (List[(A, B)], Option[Either[List[A], List[B]]]) = zipExactWith(bs)((a, b) ⇒ (a, b))
 
     case class zipExactWith[B](other: List[B]) {
-      def apply[C](fromTuple: (A, B) ⇒ C, fromLhs: A => C, fromRhs: B => C): List[C] = apply(fromTuple).calc {
-        case (cs, None)            => cs
-        case (cs, Some(Left(as)))  => cs ++ as.map(fromLhs)
-        case (cs, Some(Right(bs))) => cs ++ bs.map(fromRhs)
+      def apply[C](fromTuple: (A, B) ⇒ C, fromLhs: A ⇒ C, fromRhs: B ⇒ C): List[C] = apply(fromTuple).calc {
+        case (cs, None)            ⇒ cs
+        case (cs, Some(Left(as)))  ⇒ cs ++ as.map(fromLhs)
+        case (cs, Some(Right(bs))) ⇒ cs ++ bs.map(fromRhs)
       }
 
       def apply[C](fromTuple: (A, B) ⇒ C): (List[C], Option[Either[List[A], List[B]]]) = {
@@ -168,18 +169,21 @@ object list {
     protected def cc: List[A] = self
   }
 
-  implicit class ListOfEithersPimps[L, R](self: List[_ <: Either[L, R]]) extends GenTraversableLikeOfEitherPimpsMixin[L, R, List] {
+  implicit class ListOfEithersPimps[L, R](
+    private val self: List[_ <: Either[L, R]]
+  ) extends GenTraversableLikeOfEitherPimpsMixin[L, R, List] {
+
     protected def gtl: GTLGT[Either[L, R]] = self
   }
 
-  implicit class ListOfTuple2Pimps[K, V](self: List[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
-    def mapFirst[C](f: K => C): List[(C, V)] = mapC(k => v => (f(k), v))
-    def mapSecond[W](f: V => W): List[(K, W)] = mapC(k => v => (k, f(v)))
-    def mapValues[W](f: V => W): List[(K, W)] = mapC(k => v => (k, f(v)))
+  implicit class ListOfTuple2Pimps[K, V](private val self: List[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
+    def mapFirst[C](f: K ⇒ C): List[(C, V)] = mapC(k ⇒ v ⇒ (f(k), v))
+    def mapSecond[W](f: V ⇒ W): List[(K, W)] = mapC(k ⇒ v ⇒ (k, f(v)))
+    def mapValues[W](f: V ⇒ W): List[(K, W)] = mapC(k ⇒ v ⇒ (k, f(v)))
     def mapC[W](f: K ⇒ V ⇒ W): List[W] = self.map(kv ⇒ f(kv._1)(kv._2))
 
-    def flatMapValues[W](f: V => TraversableOnce[W]): Seq[(K, W)] =
-      self.flatMap { case (k, v) => f(v).map(vb => (k, vb)) }
+    def flatMapValues[W](f: V ⇒ TraversableOnce[W]): Seq[(K, W)] =
+      self.flatMap { case (k, v) ⇒ f(v).map(vb ⇒ (k, vb)) }
 
     def keys: List[K] = self.map(_._1)
     def values: List[V] = self.map(_._2)

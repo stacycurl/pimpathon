@@ -28,7 +28,7 @@ object genTraversableLike {
 
     def asMap: GenTraversableLikeCapturer[A, ▶:, ▶:] = as[▶:]
 
-    object histogram extends aggregator[Lambda[(X, Y) => X ▶: Int]] {
+    object histogram extends aggregator[Lambda[(X, Y) ⇒ X ▶: Int]] {
       protected implicit def cbf[B]: CanBuildFrom[Nothing, (B, A), B ▶: Int] =
         multiMap.build[Lambda[X ⇒ Int], B, A](CanBuildNonEmpty.canBuildFromToCBNE(CountCBF))
     }
@@ -163,16 +163,19 @@ object genTraversableLike {
     protected def gtl: GTLGT[(K, V)]
   }
 
-  implicit class GenTraversableLikePimps[A](self: GTLGT[A]) extends GenTraversableLikePimpsMixin[A, GTLGT] {
+  implicit class GenTraversableLikePimps[A](private val self: GTLGT[A]) extends GenTraversableLikePimpsMixin[A, GTLGT] {
     protected def cc: GTLGT[A]  = self
     protected def gtl: GTLGT[A] = self
   }
 
-  implicit class GenTraversableLikeOfEitherPimps[L, R](self: GTLGT[Either[L, R]]) extends GenTraversableLikeOfEitherPimpsMixin[L, R, GTLGT] {
+  implicit class GenTraversableLikeOfEitherPimps[L, R](
+    private val self: GTLGT[Either[L, R]]
+  ) extends GenTraversableLikeOfEitherPimpsMixin[L, R, GTLGT] {
+
     protected def gtl: GTLGT[Either[L, R]] = self
   }
 
-  implicit class GenTraversableLikeOfTuple2[K, V](self: GTLGT[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
+  implicit class GenTraversableLikeOfTuple2[K, V](private val self: GTLGT[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
     protected def gtl: GTLGT[(K, V)] = self
   }
 }

@@ -4,7 +4,7 @@ import pimpathon.multiMap.IgnoreFromCBF
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.{breakOut, mutable => M}
-import scala.collection.immutable.{Iterable, Map => ▶:}
+import scala.collection.immutable.{Map => ▶:}
 import pimpathon.builder.BuilderPimps
 import pimpathon.map.MapPimps
 
@@ -24,11 +24,11 @@ object nestedMap {
     def nestedMap: NestedMapConflictingPimps[K1, K2, V] = new NestedMapConflictingPimps[K1, K2, V](self)
   }
 
-  class NestedMapConflictingPimps[K1, K2, V](self: K1 ▶: K2 ▶: V) {
+  class NestedMapConflictingPimps[K1, K2, V](private val self: K1 ▶: K2 ▶: V) {
     def mapValuesEagerly[W](f: V ⇒ W): K1 ▶: K2 ▶: W = self.mapValuesEagerly(_.mapValuesEagerly(f))
     def mapKeysEagerly[C](f: K2 ⇒ C):  K1 ▶: C ▶: V  = self.mapValuesEagerly(_.mapKeysEagerly(f))
 
-    def mapEntries[C1, C2, W](f: (K1, K2, V) => (C1, C2, W)): C1 ▶: C2 ▶: W =
+    def mapEntries[C1, C2, W](f: (K1, K2, V) ⇒ (C1, C2, W)): C1 ▶: C2 ▶: W =
       build[C1, C2, W]().run(_ ++= (for { (k1, k2v) <- self; (k2, v) <- k2v } yield f(k1, k2, v)))
   }
 

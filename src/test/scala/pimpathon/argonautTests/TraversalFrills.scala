@@ -9,7 +9,6 @@ import pimpathon.map._
 import pimpathon.util._
 import pimpathon.argonaut._
 import sjc.delta.matchers.syntax.anyDeltaMatcherOps
-import sjc.delta.argonaut.matchers._
 import sjc.delta.argonaut.json.actualExpected.flat._
 
 

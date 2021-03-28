@@ -21,8 +21,10 @@ import pimpathon.list.ListOfTuple2Pimps
 import pimpathon.map.MapPimps
 import pimpathon.string.StringPimps
 
-import scala.{PartialFunction ⇒ ~>}
+import scala.collection.immutable
+import scala.{PartialFunction => ~>}
 import scala.collection.immutable.{ListMap, Map => ▶:}
+import scala.util.matching.Regex
 
 
 object argonaut {
@@ -30,19 +32,19 @@ object argonaut {
     def readFrom(file: File): Option[Json] = for {
       content <- if (file.exists()) Some(file.readString) else None
       json    <- Parse.parse(content) match {
-        case Left(_)     => None
-        case Right(json) => Some(json)
+        case Left(_)     ⇒ None
+        case Right(json) ⇒ Some(json)
       }
     } yield json
   }
 
   implicit class JsonFrills(val self: Json) extends AnyVal {
     def descendant: Descendant[Json, Json, Json] =
-      Descendant(self, List(Traversal.id[Json]), () => List("" -> Traversal.id[Json]))
+      Descendant(self, List(Traversal.id[Json]), () ⇒ List("" -> Traversal.id[Json]))
 
     def descendant(paths: String*): Descendant[Json, Json, Json] = Descendant(self,
       paths.map(Descendant.Descender.traversal)(collection.breakOut),
-      () => paths.flatMap(Descendant.Descender.ancestors)(collection.breakOut)
+      () ⇒ paths.flatMap(Descendant.Descender.ancestors)(collection.breakOut)
     )
 
     def compact: Json = filterNulls
@@ -73,14 +75,14 @@ object argonaut {
       p.cond(self.withObject(_.filterR(p)).withArray(_.filterR(p)), jNull)(self)
 
     def writeTo(file: File): Json =
-      self.tap(_ => file.writeString(indent2))
+      self.tap(_ ⇒ file.writeString(indent2))
 
     def indent2: String =
       PrettyParams.spaces2.copy(preserveOrder = true).pretty(self)
   }
 
   implicit class CodecJsonCompanionFrills(val self: CodecJson.type) extends AnyVal {
-    def defer[A](deferred: => CodecJson[A]): CodecJson[A] =
+    def defer[A](deferred: ⇒ CodecJson[A]): CodecJson[A] =
       CodecJson.derived(EncodeJson.defer(deferred.Encoder), DecodeJson.defer(deferred.Decoder))
   }
 
@@ -105,8 +107,8 @@ object argonaut {
       CodecJson.derived[B](f(self.Encoder), g(self.Decoder))
 
     def traversalToJson: Traversal[A, Json] = new Traversal[A, Json] {
-      def modifyF[F[_]](f: Json => F[Json])(a: A)(implicit F: Applicative[F]): F[A] = {
-        F.map[Json, A](f(self.encode(a)))(json => self.decodeJson(json).getOr(a))
+      def modifyF[F[_]](f: Json ⇒ F[Json])(a: A)(implicit F: Applicative[F]): F[A] = {
+        F.map[Json, A](f(self.encode(a)))(json ⇒ self.decodeJson(json).getOr(a))
       }
     }
   }
@@ -120,7 +122,7 @@ object argonaut {
   }
 
   implicit class DecodeJsonCompanionFrills(val self: DecodeJson.type) extends AnyVal {
-    def defer[A](deferred: => DecodeJson[A]): DecodeJson[A] = new DecodeJson[A] {
+    def defer[A](deferred: ⇒ DecodeJson[A]): DecodeJson[A] = new DecodeJson[A] {
       def decode(c: HCursor): DecodeResult[A] = _deferred.decode(c)
 
       private lazy val _deferred: DecodeJson[A] = deferred
@@ -153,7 +155,7 @@ object argonaut {
   }
 
   implicit class EncodeJsonCompanionFrills(val self: EncodeJson.type) extends AnyVal {
-    def defer[A](deferred: => EncodeJson[A]): EncodeJson[A] = new EncodeJson[A] {
+    def defer[A](deferred: ⇒ EncodeJson[A]): EncodeJson[A] = new EncodeJson[A] {
       def encode(a: A): Json = _deferred.encode(a)
 
       private lazy val _deferred: EncodeJson[A] = deferred
@@ -208,13 +210,13 @@ object argonaut {
   }
 
   implicit class JsonObjectFrills(val self: JsonObject) extends AnyVal {
-    def filterKeys(p: Predicate[String]): JsonObject = mapCollect { case entry@(k, _) if p(k) => entry }
-    def filterValues(p: Predicate[Json]): JsonObject = mapCollect { case entry@(_, j) if p(j) => entry }
+    def filterKeys(p: Predicate[String]): JsonObject = mapCollect { case entry@(k, _) if p(k) ⇒ entry }
+    def filterValues(p: Predicate[Json]): JsonObject = mapCollect { case entry@(_, j) if p(j) ⇒ entry }
 
     def removeFields(names: String*): JsonObject = {
       val namesSet: Set[String] = names.toSet
 
-      mapCollect { case entry@(k, _) if !namesSet.contains(k) => entry }
+      mapCollect { case entry@(k, _) if !namesSet.contains(k) ⇒ entry }
     }
 
     def renameFields(fromTos: (String, String)*): JsonObject = fromTos.foldLeft(self) {
@@ -298,7 +300,7 @@ object CanPrismFrom {
   implicit def cpfJsonToCodec[A: CodecJson]: CanPrismFrom[Json, A, A] = {
     val A = CodecJson.derived[A]
 
-    apply(Prism[Json, A](json => A.decodeJson(json).toOption)(A.encode))
+    apply(Prism[Json, A](json ⇒ A.decodeJson(json).toOption)(A.encode))
   }
 
   implicit def cpfl[From, Elem, To](implicit cpf: CanPrismFrom[From, Elem, To])
@@ -320,7 +322,7 @@ object Descendant {
 //  implicit def descendantAsApplyTraversal[From, Via, To](descendant: Descendant[From, Via, To]):
 //    ApplyTraversal[From, From, To, To] = ApplyTraversal(descendant.from, descendant.traversal)
 
-  implicit class DescendantToJsonFrills[From](self: Descendant[From, Json, Json]) {
+  implicit class DescendantToJsonFrills[From](private val self: Descendant[From, Json, Json]) {
     def renameField(from: String, to: String):    From = self.modify(_.renameField(from, to))
     def renameFields(fromTos: (String, String)*): From = self.modify(_.renameFields(fromTos: _*))
 
@@ -335,7 +337,7 @@ object Descendant {
     def each: Descendant[From, Json, Json] = self composeTraversal objectValuesOrArrayElements
   }
 
-  implicit class DescendantToJsonObjectFrills[From](self: Descendant[From, Json, JsonObject]) {
+  implicit class DescendantToJsonObjectFrills[From](private val self: Descendant[From, Json, JsonObject]) {
     def renameField(from: String, to: String):    From = self.modify(_.renameField(from, to))
     def renameFields(fromTos: (String, String)*): From = self.modify(_.renameFields(fromTos: _*))
 
@@ -354,31 +356,31 @@ object Descendant {
 //    }
   }
 
-  implicit class DescendantViaJsonFrills[From, To](self: Descendant[From, Json, To]) {
+  implicit class DescendantViaJsonFrills[From, To](private val self: Descendant[From, Json, To]) {
     def firstEmptyAt: Option[String] = ancestorsList.collectFirst {
-      case (path, Nil) => path
+      case (path, Nil) ⇒ path
     }
 
     def ancestors: Json =
       Json.jObjectAssocList(ancestorsList.mapSecond(Json.jArray))
 
     private def ancestorsList: List[(String, List[Json])] =
-      self.ancestorsFn().mapSecond(ancestor => ancestor.getAll(self.from))
+      self.ancestorsFn().mapSecond(ancestor ⇒ ancestor.getAll(self.from))
   }
 
   object Descender {
     def apply(path: String): Descender = if (path.startsWith("$")) JsonPath else Pimpathon
 
     def traversal(path: String): Traversal[Json, Json] = traversal(Traversal.id[Json], path)
-    def traversal[A](start: Traversal[A, Json], path: String) = apply(path).traversal(start, path)
+    def traversal[A](start: Traversal[A, Json], path: String): Traversal[A, Json] = apply(path).traversal(start, path)
 
     def ancestors(path: String): List[(String, Traversal[Json, Json])] = ancestors(Traversal.id[Json], path)
-    def ancestors[A](start: Traversal[A, Json], path: String) = apply(path).ancestors(start, path)
+    def ancestors[A](start: Traversal[A, Json], path: String): List[(String, Traversal[A, Json])] = apply(path).ancestors(start, path)
   }
 
   sealed trait Descender {
     def descendant[A](from: A, start: Traversal[A, Json], path: String): Descendant[A, Json, Json] =
-      Descendant(from, List(traversal(start, path)), () => ancestors(start, path))
+      Descendant(from, List(traversal(start, path)), () ⇒ ancestors(start, path))
 
     def traversal[A](from: Traversal[A, Json], path: String): Traversal[A, Json]
     def ancestors[A](from: Traversal[A, Json], path: String): List[(String, Traversal[A, Json])]
@@ -416,7 +418,7 @@ object Descendant {
         case Field(name)                    ⇒ acc.obj composeTraversal filterIndex(Set(name))
         case RecursiveAnyField              ⇒ notSupported("RecursiveAnyField")
         case CurrentNode                    ⇒ acc
-        case filterToken: FilterToken       => filterArrayOrObject(filterObject(filterTokenStep(filterToken)))(acc)
+        case filterToken: FilterToken       ⇒ filterArrayOrObject(filterObject(filterTokenStep(filterToken)))(acc)
         case ArraySlice(None, None, 1)      ⇒ acc.array composeTraversal each
         case ArraySlice(begin, end, step)   ⇒ notSupported(s"ArraySlice($begin, $end, $step)")
         case ArrayRandomAccess(indecies)    ⇒ acc.array composeTraversal filterIndex(indecies.toSet: Set[Int])
@@ -435,18 +437,18 @@ object Descendant {
       }
 
       private def toString(token: PathToken): String = token match {
-        case RootNode                       ⇒ "$"
-        case AnyField                       ⇒ ".*"
-        case MultiField(names)              ⇒ names.map(_.quoteWith('\'')).mkString(", ")
-        case Field(name)                    ⇒ s".$name"
-        case CurrentNode                    ⇒ "@"
-        case ComparisonFilter(op, lhs, rhs) ⇒ s"?(${toString(lhs)} ${toString(op)} ${toString(rhs)})"
-        case HasFilter(SubQuery(subTokens)) ⇒ subTokens.map(toString).mkString("")
-        case ArraySlice(None, None, 1)      ⇒ "[*]"
-        case ArrayRandomAccess(indecies)    ⇒ indecies.mkString(", ")
-        case BooleanFilter(AndOperator, lhs, rhs) => s"${toString(lhs)} && ${toString(rhs)}"
-        case BooleanFilter(OrOperator, lhs, rhs) => s"${toString(lhs)} || ${toString(rhs)}"
-        case _ => ???
+        case RootNode                             ⇒ "$"
+        case AnyField                             ⇒ ".*"
+        case MultiField(names)                    ⇒ names.map(_.quoteWith('\'')).mkString(", ")
+        case Field(name)                          ⇒ s".$name"
+        case CurrentNode                          ⇒ "@"
+        case ComparisonFilter(op, lhs, rhs)       ⇒ s"?(${toString(lhs)} ${toString(op)} ${toString(rhs)})"
+        case HasFilter(SubQuery(subTokens))       ⇒ subTokens.map(toString).mkString("")
+        case ArraySlice(None, None, 1)            ⇒ "[*]"
+        case ArrayRandomAccess(indecies)          ⇒ indecies.mkString(", ")
+        case BooleanFilter(AndOperator, lhs, rhs) ⇒ s"${toString(lhs)} && ${toString(rhs)}"
+        case BooleanFilter(OrOperator, lhs, rhs)  ⇒ s"${toString(lhs)} || ${toString(rhs)}"
+        case other                                ⇒ throw new MatchError(s"not implemented for: $other")
       }
 
       private def toString(op: ComparisonOperator): String = op match {
@@ -507,14 +509,12 @@ object Descendant {
       }
 
       object ComparisonArgument {
-        def apply(pf: PartialFunction[FilterValue, FN]): ComparisonArgument = new ComparisonArgument {
-          def unapply(lhs: FilterValue): Option[FN] = pf.lift(lhs)
-        }
+        def apply(pf: PartialFunction[FilterValue, FN]): ComparisonArgument = (lhs: FilterValue) ⇒ pf.lift(lhs)
       }
 
       type FN = FilterValue ⇒ Predicate[Json]
 
-      private def toPredicate(f: FilterValue => Predicate[Json]): FN = f
+      private def toPredicate(f: FilterValue ⇒ Predicate[Json]): FN = f
 
       private def json(fdv: FilterValue): Json = fdv match {
         case JPTrue          ⇒ jTrue
@@ -550,7 +550,10 @@ object Descendant {
       case key                            ⇒ acc.obj composeTraversal filterIndex(Set(key))
     }
 
-    private implicit class RegexMatcher(val self: StringContext) extends AnyVal { def r = self.parts.mkString("(.+)").r }
+    private implicit class RegexMatcher(val self: StringContext) extends AnyVal {
+      def r: Regex = self.parts.mkString("(.+)").r
+    }
+    
     private object Split { def unapply(value: String): Option[Set[String]] = Some(value.split(",").map(_.trim).toSet) }
   }
 
@@ -576,7 +579,10 @@ object Descendant {
   }
 }
 
-case class Descendant[From, Via, To](from: From, traversals: List[Traversal[From, To]], ancestorsFn: () => List[(String, Traversal[From, Via])]) extends Dynamic {
+case class Descendant[From, Via, To](
+  from: From, traversals: List[Traversal[From, To]], ancestorsFn: () ⇒ List[(String, Traversal[From, Via])]
+) extends Dynamic {
+
   def bool[That](  implicit cpf: CanPrismFrom[To, Boolean,    That]): Descendant[From, Via, That] = apply(cpf)
   def number[That](implicit cpf: CanPrismFrom[To, JsonNumber, That]): Descendant[From, Via, That] = apply(cpf)
   def string[That](implicit cpf: CanPrismFrom[To, String,     That]): Descendant[From, Via, That] = apply(cpf)
@@ -607,11 +613,12 @@ case class Descendant[From, Via, To](from: From, traversals: List[Traversal[From
   def getAll: List[To] = traversals.flatMap(_.getAll(from))
 
   def set(to: To):         From = foldLeft(_.set(to))
-  def modify(f: To => To): From = foldLeft(_.modify(f))
+  def modify(f: To ⇒ To): From = foldLeft(_.modify(f))
 
-  private def foldLeft(f: Traversal[From, To] => From => From): From = traversals.foldLeft(from) {
-    case (acc, traversal) => f(traversal)(acc)
+  private def foldLeft(f: Traversal[From, To] ⇒ From ⇒ From): From = traversals.foldLeft(from) {
+    case (acc, traversal) ⇒ f(traversal)(acc)
   }
 
-  private def withTraversal[That](fn: Traversal[From, To] => Traversal[From, That]): Descendant[From, Via, That] = copy(traversals = traversals.map(fn))
+  private def withTraversal[That](fn: Traversal[From, To] ⇒ Traversal[From, That]): Descendant[From, Via, That] = 
+    copy(traversals = traversals.map(fn))
 }

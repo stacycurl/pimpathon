@@ -11,12 +11,12 @@ object boolean {
     def nand(rhs: Boolean): Boolean = !(self && rhs)
     def cond[A](ifTrue: ⇒ A, ifFalse: ⇒ A): A = if (self) ifTrue else ifFalse
 
-    def tapFalse[Discarded](ifFalse: => Discarded): Boolean = {
+    def tapFalse[Discarded](ifFalse: ⇒ Discarded): Boolean = {
       if (!self) ifFalse
       self
     }
 
-    def tapTrue[Discarded](ifTrue: => Discarded): Boolean = {
+    def tapTrue[Discarded](ifTrue: ⇒ Discarded): Boolean = {
       if (self) ifTrue
       self
     }

@@ -26,7 +26,10 @@ object genTraversableLike {
     protected def gtl: GenTraversableLike[L \/ R, GenTraversable[L \/ R]]
   }
 
-  implicit class GenTraversableLikeOfDisjunctionFrills[L, R](self: GenTraversableLike[L \/ R, GenTraversable[L \/ R]]) extends GenTraversableLikeOfDisjunctionFrillsMixin[L, R] {
+  implicit class GenTraversableLikeOfDisjunctionFrills[L, R](
+    self: GenTraversableLike[L \/ R, GenTraversable[L \/ R]]
+  ) extends GenTraversableLikeOfDisjunctionFrillsMixin[L, R] {
+
     protected def gtl: GenTraversableLike[L \/ R, GenTraversable[L \/ R]] = self
   }
 }

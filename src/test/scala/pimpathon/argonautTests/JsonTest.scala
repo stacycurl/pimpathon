@@ -10,7 +10,6 @@ import pimpathon.random._
 import pimpathon.util.on
 import pimpathon.util.AnyTestPimp
 import sjc.delta.argonaut.json.actualExpected.flat._
-import sjc.delta.argonaut.matchers._
 import sjc.delta.matchers.syntax.anyDeltaMatcherOps
 
 import scala.util.Random
@@ -124,7 +123,7 @@ class JsonTest extends JsonUtil {
     )
   }
 
-  @Test def descendant_firstEmptyAt(): Unit = on((path: String) => jobj.descendant(path).firstEmptyAt).maps(
+  @Test def descendant_firstEmptyAt(): Unit = on((path: String) ⇒ jobj.descendant(path).firstEmptyAt).maps(
     "$.preferences.bananas" → None, "$.preferences.apples" → Some("$.preferences.apples"), "$.prefs.apples" → Some("$.prefs")
   )
 

@@ -20,11 +20,9 @@ class AnyTest {
 
   @Test def transform(): Unit = on(1, 2, 3, 4).calling(_.transform(util.partial(2 → 4, 4 → 8))).produces(1, 4, 3, 8)
 
-  @Test def transformIf(): Unit = on(1, 2, 3, 4).calling(n => n.transformIf(n % 2 == 0)(_ * 2)).produces(1, 4, 3, 8)
+  @Test def transformIf(): Unit = on(1, 2, 3, 4).calling(n ⇒ n.transformIf(n % 2 == 0)(_ * 2)).produces(1, 4, 3, 8)
   
-  @Test def tap(): Unit            = ints().run(is ⇒ 1.tap(is += _, is += _)) === List(1, 1)
-  @Test def update(): Unit         = ints().run(is ⇒ 1.update(is += _, is += _)) === List(1, 1)
-  @Test def withSideEffect(): Unit = ints().run(is ⇒ 1.withSideEffect(is += _, is += _)) === List(1, 1)
+  @Test def tap(): Unit = ints().run(is ⇒ 1.tap(is += _, is += _)) === List(1, 1)
 
   @Test def tapIf(): Unit = ints().run(is ⇒ List(1, 2, 3).foreach(i ⇒ i.tapIf(_ % 2 == 0)(is += _))) === List(2)
 

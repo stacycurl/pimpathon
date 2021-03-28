@@ -25,8 +25,8 @@ object CiPublishPlugin extends AutoPlugin {
     val TaggedVersion = """(\d{1,14})([\.\d{1,14}]*)((?:-\w+)*)""".r
     
     val gpgVersion: Long = versionLine.split(" ").last match {
-      case TaggedVersion(m, _, _) => m.toLong
-      case _                         => 0L
+      case TaggedVersion(m, _, _) ⇒ m.toLong
+      case _                      ⇒ 0L
     }
     
     // https://dev.gnupg.org/T2313
@@ -46,8 +46,8 @@ object CiPublishPlugin extends AutoPlugin {
 
   override lazy val buildSettings: Seq[Def.Setting[_]] = List(
     scmInfo ~= {
-      case Some(info) => Some(info)
-      case None =>
+      case Some(info) ⇒ Some(info)
+      case None ⇒ {
         import scala.sys.process._
         val identifier = """([^\/]+?)"""
         val GitHubHttps = s"https://github.com/$identifier/$identifier(?:\\.git)?".r
@@ -56,21 +56,22 @@ object CiPublishPlugin extends AutoPlugin {
         try {
           val remote = List("git", "ls-remote", "--get-url", "origin").!!.trim()
           remote match {
-            case GitHubHttps(user, repo) => Some(gitHubScmInfo(user, repo))
-            case GitHubGit(user, repo)   => Some(gitHubScmInfo(user, repo))
-            case GitHubSsh(user, repo)   => Some(gitHubScmInfo(user, repo))
-            case _                       => None
+            case GitHubHttps(user, repo) ⇒ Some(gitHubScmInfo(user, repo))
+            case GitHubGit(user, repo)   ⇒ Some(gitHubScmInfo(user, repo))
+            case GitHubSsh(user, repo)   ⇒ Some(gitHubScmInfo(user, repo))
+            case _                       ⇒ None
           }
         } catch {
-          case NonFatal(_) => None
+          case NonFatal(_) ⇒ None
         }
+      }
     }
   )
 
   override lazy val globalSettings: Seq[Def.Setting[_]] = List(
     publishArtifact.in(Test) := false,
     publishMavenStyle := true,
-    commands += Command.command("ci-publish") { currentState =>
+    commands += Command.command("ci-publish")(currentState ⇒ {
       if (!isSecure) {
         println("No access to secret variables, skipping publish")
         currentState
@@ -85,7 +86,7 @@ object CiPublishPlugin extends AutoPlugin {
         "sonatypeBundleRelease" ::
         currentState
       }
-    }
+    })
   )
   
   override lazy val projectSettings: Seq[Def.Setting[_]] = List(

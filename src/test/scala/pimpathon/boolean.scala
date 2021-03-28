@@ -29,7 +29,7 @@ class BooleanTest {
 
   @Test def disjunction_or(): Unit = falseTrue(_.disjunction(123).or("456")).produces(-\/("456"), \/-(123))
 
-  private def truthTableFor(fn: (Boolean, Boolean) => Boolean, ff: Boolean, ft: Boolean, tf: Boolean, tt: Boolean): Unit =
+  private def truthTableFor(fn: (Boolean, Boolean) ⇒ Boolean, ff: Boolean, ft: Boolean, tf: Boolean, tt: Boolean): Unit =
     util.on((f,f), (f,t), (t,f), (t,t)).calling(fn.tupled).produces(ff, ft, tf, tt)
 
   private def falseTrue[A](f: Boolean ⇒ A): on[Boolean]#calling[A] = util.on(false, true).calling(f)

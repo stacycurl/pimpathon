@@ -56,7 +56,7 @@ object multiMap {
   }
 
 
-  class MultiMapConflictingPimps[F[_], K, V](self: K ▶: F[V]) {
+  class MultiMapConflictingPimps[F[_], K, V](private val self: K ▶: F[V]) {
     // These operations cannot be defined on MultiMapPimps because non-implicit methods of the same name exist on Map
     def head(implicit gtl: F[V] <:< GenTraversable[V]): K ▶: V =
       self.flatMap { case (k, fv) ⇒ fv.headOption.map(k → _) }

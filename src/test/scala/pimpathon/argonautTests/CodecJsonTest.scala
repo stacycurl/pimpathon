@@ -6,7 +6,6 @@ import pimpathon.any._
 import pimpathon.argonaut._
 import pimpathon.util._
 import sjc.delta.argonaut.json.actualExpected.flat._
-import sjc.delta.argonaut.matchers._
 import sjc.delta.matchers.syntax.anyDeltaMatcherOps
 
 import scalaz.{-\/, \/, \/-}
@@ -42,5 +41,5 @@ class CodecJsonTest extends JsonUtil {
   })
 
   // Searching for a better name before making this a pimp (and one producing Either[A, B])
-  private def attempt[A, B](f: A => B)(a: A): A \/ B = a.attempt(f).fold(_ => -\/(a), \/-(_))
+  private def attempt[A, B](f: A ⇒ B)(a: A): A \/ B = a.attempt(f).fold(_ => -\/(a), \/-(_))
 }

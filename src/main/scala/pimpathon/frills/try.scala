@@ -3,7 +3,6 @@ package pimpathon.frills
 import scala.util.Try
 import scalaz.{-\/, \/, \/-}
 
-import pimpathon.pimpTry._
 
 
 object pimpTry {

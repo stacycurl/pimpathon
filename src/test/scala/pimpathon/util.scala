@@ -62,7 +62,7 @@ object util {
     }
   }
 
-  implicit class onFnPimps[A, B](self: on[A => B]) {
+  implicit class onFnPimps[A, B](private val self: on[A ⇒ B]) {
     def maps[C](abs: (A, B)*): Unit = applying(abs.map(_._1): _*).produces(abs.map(_._2): _*)
 
     def applying(as: A*): on[Unit]#calling[B] = on(()).calling[B]((for {

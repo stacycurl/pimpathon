@@ -4,7 +4,6 @@ import argonaut.StringWrap.StringToStringWrap
 import org.junit.Test
 import pimpathon.argonaut._
 import sjc.delta.argonaut.json.actualExpected.flat._
-import sjc.delta.argonaut.matchers._
 import sjc.delta.matchers.syntax.anyDeltaMatcherOps
 
 

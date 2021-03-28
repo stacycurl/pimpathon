@@ -7,7 +7,7 @@ import pimpathon.any._
 
 
 object builder {
-  implicit class CanBuildFromPimps[Elem, To](self: CanBuildFrom[Nothing, Elem, To]) {
+  implicit class CanBuildFromPimps[Elem, To](private val self: CanBuildFrom[Nothing, Elem, To]) {
     def mapResult[X](f: To ⇒ X): CanBuildFrom[Nothing, Elem, X] = new CanBuildFrom[Nothing, Elem, X] {
       def apply(from: Nothing): M.Builder[Elem, X] = self.apply(from).mapResult(f)
       def apply():              M.Builder[Elem, X] = self.apply().mapResult(f)

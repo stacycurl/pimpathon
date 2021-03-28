@@ -37,7 +37,7 @@ object either {
 
     def getMessage(implicit ev: L <:< Throwable): Option[String] = self.fold(t ⇒ Some(t.getMessage), _ ⇒ None)
     def toTry(implicit ev: L <:< Throwable): Try[R] = self.fold(Failure(_), Success(_))
-    def toOption: Option[R] = self.fold(_ => None, Some(_))
+    def toOption: Option[R] = self.fold(_ ⇒ None, Some(_))
   }
 
   implicit class EitherPimpsNestedL[L, R](val self: Either[Either[L, R], R]) {

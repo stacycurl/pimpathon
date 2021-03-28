@@ -12,7 +12,7 @@ object tuple {
     def calcC[C](f: A ⇒ B ⇒ C): C = f(self._1)(self._2)
     def to[C](implicit ac: A ⇒ C, bc: B ⇒ C): (C, C) = (ac(self._1), bc(self._2))
     def tmap[C, D](f: A ⇒ C, g: B ⇒ D): (C, D) = (f(self._1), g(self._2))
-    def map1[C](f: A => C): (C, B) = calcC(a => b => (f(a), b))
-    def map2[C](f: B => C): (A, C) = calcC(a => b => (a, f(b)))
+    def map1[C](f: A ⇒ C): (C, B) = calcC(a ⇒ b ⇒ (f(a), b))
+    def map2[C](f: B ⇒ C): (A, C) = calcC(a ⇒ b ⇒ (a, f(b)))
   }
 }

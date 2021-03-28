@@ -22,17 +22,17 @@ object function {
   implicit class FunctionPimps[A, B](val self: A ⇒ B) extends AnyVal {
     def attempt: A ⇒ Try[B] = a ⇒ Try(self(a))
     def guardWith(p: Predicate[A]): A ~> B = p guard self
-    def tuple2: T2[A] => T2[B] = a => (self(a._1), self(a._2))
-    def tuple3: T3[A] => T3[B] = a => (self(a._1), self(a._2), self(a._3))
-    def tuple4: T4[A] => T4[B] = a => (self(a._1), self(a._2), self(a._3), self(a._4))
-    def tuple5: T5[A] => T5[B] = a => (self(a._1), self(a._2), self(a._3), self(a._4), self(a._5))
+    def tuple2: T2[A] ⇒ T2[B] = a ⇒ (self(a._1), self(a._2))
+    def tuple3: T3[A] ⇒ T3[B] = a ⇒ (self(a._1), self(a._2), self(a._3))
+    def tuple4: T4[A] ⇒ T4[B] = a ⇒ (self(a._1), self(a._2), self(a._3), self(a._4))
+    def tuple5: T5[A] ⇒ T5[B] = a ⇒ (self(a._1), self(a._2), self(a._3), self(a._4), self(a._5))
   }
 
-  implicit class Function2Pimps[A, B, C](val self: (A, B) => C) extends AnyVal {
-    def tuple2: (T2[A], T2[B]) => T2[C] = (a,b) => (self(a._1, b._1), self(a._2, b._2))
-    def tuple3: (T3[A], T3[B]) => T3[C] = (a,b) => (self(a._1, b._1), self(a._2, b._2), self(a._3, b._3))
-    def tuple4: (T4[A], T4[B]) => T4[C] = (a,b) => (self(a._1, b._1), self(a._2, b._2), self(a._3, b._3), self(a._4, b._4))
-    def tuple5: (T5[A], T5[B]) => T5[C] = (a,b) => (self(a._1, b._1), self(a._2, b._2), self(a._3, b._3), self(a._4, b._4), self(a._5, b._5))
+  implicit class Function2Pimps[A, B, C](val self: (A, B) ⇒ C) extends AnyVal {
+    def tuple2: (T2[A], T2[B]) ⇒ T2[C] = (a,b) ⇒ (self(a._1, b._1), self(a._2, b._2))
+    def tuple3: (T3[A], T3[B]) ⇒ T3[C] = (a,b) ⇒ (self(a._1, b._1), self(a._2, b._2), self(a._3, b._3))
+    def tuple4: (T4[A], T4[B]) ⇒ T4[C] = (a,b) ⇒ (self(a._1, b._1), self(a._2, b._2), self(a._3, b._3), self(a._4, b._4))
+    def tuple5: (T5[A], T5[B]) ⇒ T5[C] = (a,b) ⇒ (self(a._1, b._1), self(a._2, b._2), self(a._3, b._3), self(a._4, b._4), self(a._5, b._5))
   }
 
   implicit class FunctionOptionPimps[A, B](val self: A ⇒ Option[B]) extends AnyVal {
@@ -59,13 +59,13 @@ object function {
 
     def ifSome: Predicate[Option[A]] = _.exists(self)
 
-    def first[B]: Predicate[(A, B)] = (ab: (A, B)) => self(ab._1)
-    def second[B]: Predicate[(B, A)] = (ba: (B, A)) => self(ba._2)
+    def first[B]: Predicate[(A, B)] = (ab: (A, B)) ⇒ self(ab._1)
+    def second[B]: Predicate[(B, A)] = (ba: (B, A)) ⇒ self(ba._2)
 
     def guard[B](f: A ⇒ B): A ~> B = new GuardedPartialFunction[A, B](self, f)
   }
 
-  implicit class PartialFunctionPimps[In, Out](self: In ~> Out) {
+  implicit class PartialFunctionPimps[In, Out](private val self: In ~> Out) {
     def isUndefinedAt(in: In): Boolean = !self.isDefinedAt(in)
 
     def partition[CC[A]](ins: GenTraversableLike[In, GenTraversable[In]])
@@ -114,13 +114,13 @@ object function {
     def apply(a: A): B = f(a)
   }
 
-  def identityPF[A]: A ~> A = { case a => a }
+  def identityPF[A]: A ~> A = { case a ⇒ a }
   def equalC[A]: A ⇒ A ⇒ Boolean = (l: A) ⇒ (r: A) ⇒ l equals r
   def nand[A](ps: Predicate[A]*): Predicate[A] = and(ps: _*).not
   def nor[A](ps: Predicate[A]*): Predicate[A]  = or(ps: _*).not
   def or[A](ps: Predicate[A]*): Predicate[A]   = ps.foldLeft((a: A) ⇒ false)(_ or _)
   def and[A](ps: Predicate[A]*): Predicate[A]  = ps.foldLeft((a: A) ⇒ true)(_ and _)
 
-  def partialChain[A, B](first: A => B => B, rest: (A => B => B)*): A => B => B = a => Function.chain((first +: rest).map(fn => fn(a)))
-  def partialChain2[A, B, C](first: (A, B) => C => C, rest: ((A, B) => C => C)*): (A, B) => C => C = (a, b) => Function.chain((first +: rest).map(fn => fn(a, b)))
+  def partialChain[A, B](first: A ⇒ B ⇒ B, rest: (A ⇒ B ⇒ B)*): A ⇒ B ⇒ B = a ⇒ Function.chain((first +: rest).map(fn ⇒ fn(a)))
+  def partialChain2[A, B, C](first: (A, B) ⇒ C ⇒ C, rest: ((A, B) ⇒ C ⇒ C)*): (A, B) ⇒ C ⇒ C = (a, b) ⇒ Function.chain((first +: rest).map(fn ⇒ fn(a, b)))
 }

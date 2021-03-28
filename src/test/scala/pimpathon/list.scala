@@ -94,10 +94,10 @@ class ListTest {
 
   @Test def flatMapValues(): Unit = {
     on(nil[(String, Int)], List(("a", 1), ("b", 2)))
-      .calling(_.flatMapValues(v => (0 to 2).map(i => v * i)))
+      .calling(_.flatMapValues(v ⇒ (0 to 2).map(i ⇒ v * i)))
       .produces(nil[(String, Int)], List(("a", 0), ("a", 1), ("a", 2), ("b", 0), ("b", 2), ("b", 4)))
     on(nil[(String, Int)], List(("a", 1), ("b", 2)))
-      .calling(_.flatMapValues{ case 1 => Some(10); case _ => None })
+      .calling(_.flatMapValues { case 1 ⇒ Some(10); case _ ⇒ None })
       .produces(nil[(String, Int)], List(("a", 10)))
   }
 
@@ -213,12 +213,12 @@ class ListTest {
   @Test def shuffle(): Unit = List.range(1, 10).shuffle().sorted === List.range(1, 10)
 
   @Test def updateIf(): Unit = {
-    val isEven = (x: Int) => x % 2 == 0
-    val decrement = (x: Int) => x-1
+    val isEven = (x: Int) ⇒ x % 2 == 0
+    val decrement = (x: Int) ⇒ x-1
     List.range(1, 6).updateIf(isEven, decrement) === List(1, 1, 3, 3, 5)
   }
 
   @Test def update(): Unit = {
-    List.range(1, 6).update { case x if x % 2 == 0 => x - 1 } === List(1, 1, 3, 3, 5)
+    List.range(1, 6).update { case x if x % 2 == 0 ⇒ x - 1 } === List(1, 1, 3, 3, 5)
   }
 }

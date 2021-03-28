@@ -10,7 +10,7 @@ import pimpathon.list._
 
 
 object set  {
-  implicit class SetPimps[A](self: Set[A]) extends genTraversableLike.GenTraversableLikePimpsMixin[A, Set] {
+  implicit class SetPimps[A](private val self: Set[A]) extends genTraversableLike.GenTraversableLikePimpsMixin[A, Set] {
     def sorted(implicit ordering: Ordering[A]): TreeSet[A] = TreeSet() ++ self
 
     def notContains(elem: A): Boolean = !self.contains(elem)
@@ -31,11 +31,14 @@ object set  {
     protected def cc: Set[A] = self
   }
 
-  implicit class SetOfEitherPimps[L, R](self: Set[_ <: Either[L, R]]) extends GenTraversableLikeOfEitherPimpsMixin[L, R, Set] {
+  implicit class SetOfEitherPimps[L, R](
+    private val self: Set[_ <: Either[L, R]]
+  ) extends GenTraversableLikeOfEitherPimpsMixin[L, R, Set] {
+
     protected def gtl: GTLGT[Either[L, R]] = self
   }
 
-  implicit class SetOfTuple2Pimps[K, V](self: Set[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
+  implicit class SetOfTuple2Pimps[K, V](private val self: Set[(K, V)]) extends GenTraversableLikeOfTuple2Mixin[K, V] {
     protected def gtl: GTLGT[(K, V)] = self
   }
 }

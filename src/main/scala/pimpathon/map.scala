@@ -11,8 +11,9 @@ import pimpathon.tuple._
 
 
 object map {
-  implicit class MapPimps[K, V](self: K ▶: V)
-    extends GenTraversableLikePimpsMixin[(K, V), GenTraversable]
+  implicit class MapPimps[K, V](
+    private val self: K ▶: V
+  ) extends GenTraversableLikePimpsMixin[(K, V), GenTraversable]
     with GenTraversableLikeOfTuple2Mixin[K, V] {
 
     def containsAny(ok: Option[K]): Boolean = ok.exists(self.contains)
@@ -26,7 +27,7 @@ object map {
     def getOrThrow(k: K, message: String): V        = getOrThrow(k, new IllegalArgumentException(message))
     def getOrThrow(k: K, exception: ⇒ Exception): V = self.getOrElse(k, throw exception)
 
-    def getOrLeft[L](k: K, l: => L): Either[L, V] = self.get(k).toRight(l)
+    def getOrLeft[L](k: K, l: ⇒ L): Either[L, V] = self.get(k).toRight(l)
 
     def findKey(p: Predicate[K]): Option[K]   = keyFor.matchingKey(p)
     def findValue(p: Predicate[V]): Option[V] = valueFor.matchingValue(p)
@@ -46,7 +47,7 @@ object map {
     def reverse(f: Set[K] ⇒ K): V ▶: K = reverseToMultiMap.mapValuesEagerly(f)
     def reverseToMultiMap: V ▶: Set[K] = self.map(_.swap)(breakOut)
 
-    def sortBy[C: Ordering](f: K => C): SortedMap[K, V] = sorted(Ordering[C].on[K](f))
+    def sortBy[C: Ordering](f: K ⇒ C): SortedMap[K, V] = sorted(Ordering[C].on[K](f))
     def sorted(implicit ordering: Ordering[K]): SortedMap[K, V] = TreeMap.empty[K, V](ordering) ++ self
 
     def composeM[C](other: C ▶: K): C ▶: V = other.andThenM(self)
@@ -72,7 +73,7 @@ object map {
     def mapValuesEagerly[W](f: V ⇒ W):       K ▶: W = self.map { case (k, v) ⇒ (k, f(v)) }
     def mapEntries[C, W](f: K ⇒ V ⇒ (C, W)): C ▶: W = self.map { case (k, v) ⇒ f(k)(v)   }
 
-    def mapValuesWithKey[W](f: K => V => W): K ▶: W = self.map { case (k, v) => (k, f(k)(v)) }
+    def mapValuesWithKey[W](f: K ⇒ V ⇒ W): K ▶: W = self.map { case (k, v) ⇒ (k, f(k)(v)) }
 
     def seqMapKeys[C](f: K ⇒ Option[C]):                Option[C ▶: V] = seqMapEntries(k ⇒ v ⇒ f(k).map(_ → v))
     def seqMapValues[W](f: V ⇒ Option[W]):              Option[K ▶: W] = seqMapEntries(k ⇒ v ⇒ f(v).map(k → _))

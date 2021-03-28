@@ -17,7 +17,7 @@ case class FileUtils (
   private val currentTime: () ⇒ Long = () ⇒ System.currentTimeMillis()
 ) {
 
-  implicit class FilePimps(self: File) {
+  implicit class FilePimps(private val self: File) {
     require(Option(self).isDefined, "FileOps cannot be used with null files")
 
     def missing: Boolean = !self.exists

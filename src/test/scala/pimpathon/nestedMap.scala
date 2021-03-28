@@ -27,7 +27,7 @@ class NestedMapTest {
 
   @Test def nesteMap_mapEntries(): Unit =
     Map(1 → Map(2 → 3, 3 → 4), 2 → Map(3 → 4, 4 → 5)).nestedMap.mapEntries {
-      case (outer, inner, value) => (outer + 1, inner - 1, value * 10)
+      case (outer, inner, value) ⇒ (outer + 1, inner - 1, value * 10)
     } === Map(2 → Map(1 → 30, 2 → 40), 3 → Map(2 → 40, 3 → 50))
 
   @Test def flipNesting(): Unit = Map(10 → Map(2 → 3, 3 → 4), 20 → Map(3 → 4, 4 → 5)).flipNesting ===

@@ -41,7 +41,7 @@ class OptionTest {
   @Test def toEither(): Unit ={
     none[String].toEither(42, identity[String]) === Left(42)
     some("forty two").toEither(42, identity[String]) === Right("forty two")
-    some("change me").toEither(1, s => s.dropRight(2) + "you") === Right("change you")
+    some("change me").toEither(1, s ⇒ s.dropRight(2) + "you") === Right("change you")
   }
 
   @Test def containedIn(): Unit = {

@@ -86,8 +86,8 @@ trait JsonUtil {
 
   object KnownUnknowns {
     implicit val KnownUnknownsCodec: CodecJson[KnownUnknowns] = CodecJson.derived[KnownUnknowns](
-      EncodeJson[KnownUnknowns](_ => Json.jEmptyObject),
-      DecodeJson[KnownUnknowns](cursor => {
+      EncodeJson[KnownUnknowns](_ ⇒ Json.jEmptyObject),
+      DecodeJson[KnownUnknowns](cursor ⇒ {
         if (cursor.focus == Json.jEmptyObject) {
           DecodeResult.ok(KnownUnknowns())
         } else {

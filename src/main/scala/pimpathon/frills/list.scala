@@ -12,14 +12,17 @@ import pimpathon.list._
 
 
 object list {
-  implicit class ListFrills[A](self: List[A]) extends GenTraversableLikeFrillsMixin[A, List] {
+  implicit class ListFrills[A](private val self: List[A]) extends GenTraversableLikeFrillsMixin[A, List] {
     def toNel: Option[NonEmptyList[A]] = self.unconsC(None, head ⇒ tail ⇒ Some(NonEmptyList(head, tail: _*)))
 
     protected def gtl: GTLGT[A] = self
     protected def cc: List[A]   = self
   }
 
-  implicit class ListOfDisjunctionsFrills[L, R](self: List[L \/ R]) extends GenTraversableLikeOfDisjunctionFrillsMixin[L, R] {
+  implicit class ListOfDisjunctionsFrills[L, R](
+    private val self: List[L \/ R]
+  ) extends GenTraversableLikeOfDisjunctionFrillsMixin[L, R] {
+
     protected def gtl: GenTraversableLike[L \/ R, GenTraversable[L \/ R]] = self
   }
 }

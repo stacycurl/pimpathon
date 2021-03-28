@@ -1208,7 +1208,7 @@ object Documentation {
 //      val maxExpressionLength = examples0.flatMap(_._1.split("\n").toList).map(_.length).max
 
       examples0.flatMap {
-        case (expression, result) => {
+        case (expression, result) ⇒ {
           <div style="display: flex">
             <pre style="flex: 1"><code class="hljs javascript">{expression.stripMargin}</code></pre>
             <pre><code class="hljs-comment">{result.stripMargin}</code></pre>

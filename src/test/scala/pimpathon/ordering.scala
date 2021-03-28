@@ -18,6 +18,10 @@ class OrderingTest {
 
   @Test def or: Unit =
     List(4, 2, 1, 3).shuffle.sorted(bit(0) || bit(1)) === List(4, 2, 1, 3)
+    
+  @Test def sameAs: Unit = {
+    List(1, 2, 3, 4, 5).sorted(Ordering.sameAs(4, 2, 1, 3)) === List(4, 2, 1, 3, 5)
+  }
 
   private def bit(index: Int): Ordering[Int] = Ordering.Boolean.on[Int](i ⇒ (i & (1 << index)) != 0)
 }

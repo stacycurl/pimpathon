@@ -14,4 +14,12 @@ object ordering {
 
     private def index(as: A*)(a: A): (Option[Int], A) = (as.indexOf(a).filterSelf(_ >= 0), a)
   }
+  
+  implicit class OrderingCompanionPimps(private val self: Ordering.type) extends AnyVal {
+    def sameAs[A](values: A*): Ordering[A] = {
+      val indexes = values.zipWithIndex.toMap
+      
+      Ordering[Int].on[A](indexes.getOrElse(_, Integer.MAX_VALUE))
+    }
+  }
 }

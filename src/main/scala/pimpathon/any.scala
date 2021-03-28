@@ -1,6 +1,6 @@
 package pimpathon
 
-import scala.{PartialFunction ⇒ ~>}
+import scala.{PartialFunction => ~>}
 import scala.collection.generic.{Growable, Shrinkable}
 import scala.util.Try
 import pimpathon.boolean._
@@ -17,6 +17,7 @@ object any {
     def calcUnless[B](p: Predicate[A])(f: A ⇒ B): Option[B] = (!p(self)).option(f(self))
     def calcPF[B](pf: A ~> B): Option[B] = pf.lift(self)
     def transform(pf: A ~> A): A = pf.unify(self)
+    def transformIf(condition: Boolean)(f: A => A): A = if (condition) f(self) else self
 
     def tapIf[Discarded](p: Predicate[A])(actions: (A ⇒ Discarded)*): A     = if (p(self)) tap(actions: _*) else self
     def tapUnless[Discarded](p: Predicate[A])(actions: (A ⇒ Discarded)*): A = if (p(self)) self else tap(actions: _*)

@@ -38,8 +38,8 @@ object function {
   implicit class FunctionOptionPimps[A, B](val self: A ⇒ Option[B]) extends AnyVal {
     def unlift: A ~> B = new AbstractPartialFunction[A, B] { // Gee thanks for making PF.Lifted & Unlifted private
       def isDefinedAt(a: A): Boolean = self(a).isDefined
-      override def applyOrElse[A1 <: A, B1 >: B](a: A1, default: (A1) ⇒ B1): B1 = self(a).getOrElse(default(a))
-      override def lift: (A) ⇒ Option[B] = self
+      override def applyOrElse[A1 <: A, B1 >: B](a: A1, default: A1 ⇒ B1): B1 = self(a).getOrElse(default(a))
+      override def lift: A ⇒ Option[B] = self
     }
   }
 
@@ -114,7 +114,7 @@ object function {
     def apply(a: A): B = f(a)
   }
 
-  def identityPF[A]: A ~> A = PartialFunction(identity[A])
+  def identityPF[A]: A ~> A = { case a => a }
   def equalC[A]: A ⇒ A ⇒ Boolean = (l: A) ⇒ (r: A) ⇒ l equals r
   def nand[A](ps: Predicate[A]*): Predicate[A] = and(ps: _*).not
   def nor[A](ps: Predicate[A]*): Predicate[A]  = or(ps: _*).not

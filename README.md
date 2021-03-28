@@ -30,7 +30,7 @@ libraryDependencies += "com.github.stacycurl" %% "pimpathon" % "1.8.27" intransi
 you'll only get pimps for types in libraries you already depend on.
 
 
-Builds are available for Scala 2.11.7 & 2.12.0
+Builds are available for Scala 2.11.7 & 2.12.12
 
 
 [Documentation][doc]

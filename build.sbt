@@ -15,15 +15,14 @@ inThisBuild(List(
 lazy val pimpathon: Project = (project in file(".")
   settings(
     organization              := "com.github.stacycurl",
-    scalaVersion              := "2.12.0",
-    crossScalaVersions        := Seq("2.12.0", "2.11.7"),
+    scalaVersion              := "2.12.12",
     scalacOptions             := Seq("-feature", "-Xfatal-warnings", "-deprecation", "-unchecked", "-target:jvm-1.8"),
     javacOptions              := Seq("-source", "1.8", "-target", "1.8", "-Xlint"),
     maxErrors                 := 1,
     parallelExecution in Test := true,
-    resolvers += "Stacy Curl's repo" at "http://dl.bintray.com/stacycurl/repo/",
-    resolvers += "jcenter" at "http://jcenter.bintray.com",
-    libraryDependencies ++= scalaVersion(dependencies("2.12.0" → List(
+    resolvers += "Stacy Curl's repo" at "https://dl.bintray.com/stacycurl/repo/",
+    resolvers += "jcenter"           at "https://jcenter.bintray.com",
+    libraryDependencies ++= scalaVersion(dependencies("2.12.12" → List(
       "org.scala-lang"             % "scala-compiler"    % "2.12.0" exclude("org.scala-lang.modules", "scala-xml_2.12"),
       "org.scala-lang"             % "scala-library"     % "2.12.0"    % "test",
       "com.github.julien-truffaut" %% "monocle-core"     % "1.3.2"     % "provided",
@@ -33,14 +32,6 @@ lazy val pimpathon: Project = (project in file(".")
       "io.gatling"                 %% "jsonpath"         % "0.6.8"     % "provided",
       "com.novocode"               % "junit-interface"   % "0.11"      % "test",
       "com.github.stacycurl"       %% "delta-matchers"   % "1.1.0"     % "test"
-    ), "2.11.7" → List(
-      "com.github.julien-truffaut" %% "monocle-core"     % "1.2.2"  % "provided",
-      "io.argonaut"                %% "argonaut"         % "6.2-M2" % "provided",
-      "io.argonaut"                %% "argonaut-monocle" % "6.2-M2" % "provided",
-      "org.scalaz"                 %% "scalaz-core"      % "7.2.2"  % "provided",
-      "io.gatling"                 %% "jsonpath"         % "0.6.7"  % "provided",
-      "com.novocode"               %  "junit-interface"  % "0.11"   % "test",
-      "com.github.stacycurl"       %% "delta-matchers"   % "1.0.19" % "test"
     ))).value,
     doc := version.apply(Documentation.generate).value,
     initialize := {

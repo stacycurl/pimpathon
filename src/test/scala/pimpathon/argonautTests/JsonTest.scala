@@ -6,13 +6,11 @@ import argonaut.StringWrap.StringToStringWrap
 import org.junit.Test
 import pimpathon.frills.any._
 import pimpathon.argonaut._
-import pimpathon.random._
 import pimpathon.util.on
 import pimpathon.util.AnyTestPimp
 import sjc.delta.argonaut.json.actualExpected.flat._
 import sjc.delta.matchers.syntax.anyDeltaMatcherOps
 
-import scala.util.Random
 
 
 class JsonTest extends JsonUtil {
@@ -456,6 +454,15 @@ class JsonTest extends JsonUtil {
   ).calling(_.removeFields("b", "c")).produces(
     obj("a" := "value"), obj("a" := "value")
   )
+  
+  @Test def append(): Unit = {
+    val value = Json.jString("bar")
+    
+    Json.obj().append(Nil, value)                       <=> Json.obj()
+    Json.obj().append(List("key"), value)               <=> Json.obj("key" := "bar")
+    Json.obj("key" := "foo").append(List("key"), value) <=> Json.obj("key" := "bar")
+    Json.obj().append(List("outer", "inner"), value)    <=> Json.obj("outer" := Json.obj("inner" := "bar"))
+  }
 
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
     case (input, expected) ⇒ f(parse(input)) <=> parse(expected)

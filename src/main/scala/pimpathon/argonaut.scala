@@ -24,6 +24,8 @@ import pimpathon.string.StringPimps
 import scala.{PartialFunction => ~>}
 import scala.collection.immutable.{ListMap, Map => ▶:}
 import scala.util.matching.Regex
+import pimpathon.either._
+import pimpathon.list._
 
 
 object argonaut {
@@ -78,6 +80,18 @@ object argonaut {
 
     def indent2: String =
       PrettyParams.spaces2.copy(preserveOrder = true).pretty(self)
+
+    def append(keys: List[String], value: Json): Json = self.withObject(obj => {
+      keys match {
+        case Nil => obj
+        case head :: Nil => obj + (head, value)
+        case head :: tail => {
+          val subObject = obj(head).getOrElse(Json.jEmptyObject)
+
+          obj + (head, subObject.append(tail, value))
+        }
+      }
+    })
   }
 
   implicit class CodecJsonCompanionFrills(val self: CodecJson.type) extends AnyVal {

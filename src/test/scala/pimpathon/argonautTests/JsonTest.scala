@@ -490,6 +490,9 @@ class JsonTest extends JsonUtil {
   @Test def pivot(): Unit =
     Json.obj(unpivoted.pivot: _*) <=> pivoted
 
+  @Test def unpivot(): Unit =  
+    pivoted.unpivot <=> unpivoted
+
   private val unpivoted: Json = Json.obj(
     "outer1" := Json.obj(
       "key1" := "value1",

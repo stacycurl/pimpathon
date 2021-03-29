@@ -116,6 +116,12 @@ object argonaut {
 
       recurse("", self).mapFirst(_.stripPrefix("/"))
     }
+    
+    def unpivot: Json = self.obj.fold(Json.jNull)(_.toList.map {
+      case (path, value) => path.split("/").toList.filter(_.nonEmpty) -> value
+    }.sortBy(_._1)(Ordering.Implicits.seqDerivedOrdering[List, String]).foldLeft(Json.jEmptyObject) {
+      case (json, (fragments, value)) => json.append(fragments, value)
+    })
   }
 
   implicit class CodecJsonCompanionFrills(val self: CodecJson.type) extends AnyVal {

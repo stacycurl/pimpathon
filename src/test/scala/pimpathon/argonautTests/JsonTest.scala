@@ -487,6 +487,30 @@ class JsonTest extends JsonUtil {
     )) <=> Right(Json.obj("foo" := 123))
   }
 
+  @Test def pivot(): Unit =
+    Json.obj(unpivoted.pivot: _*) <=> pivoted
+
+  private val unpivoted: Json = Json.obj(
+    "outer1" := Json.obj(
+      "key1" := "value1",
+      "key2" := 123,
+      "inner" := Json.obj(
+        "key3" := List("value3")
+      )
+    ),
+    "outer2" := Json.obj(
+      "key4" := "value4"
+    )
+  )
+  
+  private val pivoted: Json = Json.obj(
+    "outer1/key1"       := "value1",
+    "outer1/key2"       := 123,
+    "outer1/inner/key3" := List("value3"),
+    "outer2/key4"       := "value4"
+  )
+  
+
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
     case (input, expected) ⇒ f(parse(input)) <=> parse(expected)
   }

@@ -4,7 +4,7 @@ import scala.language.{dynamics, higherKinds, implicitConversions}
 
 import _root_.argonaut.Json.{jFalse, jNull, jString, jTrue}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
-import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, HCursor, Json, JsonMonocle, JsonNumber, JsonObject, Parse, JsonParser, PrettyParams}
+import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, HCursor, Json, JsonMonocle, JsonNumber, JsonObject, JsonParser, Parse, PrettyParams}
 import _root_.java.io.File
 import _root_.scalaz.{Applicative, \/}
 import io.gatling.jsonpath.AST._
@@ -29,6 +29,10 @@ import pimpathon.list._
 
 
 object argonaut {
+  private[pimpathon] implicit class RegexMatcher(val self: StringContext) extends AnyVal {
+    def r: Regex = self.parts.mkString("(.+)").r
+  }
+  
   implicit class JsonCompanionFrils(val self: Json.type) extends AnyVal {
     def fromProperties(properties: Map[String, String]): Either[(String, String), Json] = {
       properties.apoFold[Json, (String, String)](Json.jEmptyObject) {
@@ -100,6 +104,18 @@ object argonaut {
         }
       }
     })
+    
+    def pivot: List[(String, Json)] = {
+      def recurse(path: String, current: Json): List[(String, Json)] = current match {
+        case JsonMonocle.jObjectPrism(obj) => obj.toList.flatMap {
+          case (r":$field", value) => recurse(s"$path:$field", value)
+          case (field, value)        => recurse(s"$path/$field", value)
+        }
+        case other => List(path -> other)
+      }
+
+      recurse("", self).mapFirst(_.stripPrefix("/"))
+    }
   }
 
   implicit class CodecJsonCompanionFrills(val self: CodecJson.type) extends AnyVal {
@@ -577,6 +593,8 @@ object Descendant {
 
       tokens.inits.map(_.mkString("/")).toList.reverse.zip(traversals)
     }
+    
+    import argonaut.RegexMatcher
 
     private def step[A](acc: Traversal[A, Json], token: String): Traversal[A, Json] = token match {
       case "*"                            ⇒ acc composeTraversal objectValuesOrArrayElements
@@ -586,10 +604,6 @@ object Descendant {
       case key                            ⇒ acc.obj composeTraversal filterIndex(Set(key))
     }
 
-    private implicit class RegexMatcher(val self: StringContext) extends AnyVal {
-      def r: Regex = self.parts.mkString("(.+)").r
-    }
-    
     private object Split { def unapply(value: String): Option[Set[String]] = Some(value.split(",").map(_.trim).toSet) }
   }
 

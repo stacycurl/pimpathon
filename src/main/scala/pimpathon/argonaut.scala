@@ -21,7 +21,6 @@ import pimpathon.list.ListOfTuple2Pimps
 import pimpathon.map.MapPimps
 import pimpathon.string.StringPimps
 
-import scala.collection.immutable
 import scala.{PartialFunction => ~>}
 import scala.collection.immutable.{ListMap, Map => ▶:}
 import scala.util.matching.Regex
@@ -110,6 +109,16 @@ object argonaut {
       def modifyF[F[_]](f: Json ⇒ F[Json])(a: A)(implicit F: Applicative[F]): F[A] = {
         F.map[Json, A](f(self.encode(a)))(json ⇒ self.decodeJson(json).getOr(a))
       }
+    }
+    
+    def wrapExceptions(name: String): CodecJson[A] = CodecJson.derived[A](
+      EncodeJson[A](a => wrapExceptions(s"Encode($name)", self.encode(a))),
+      DecodeJson[A](c => wrapExceptions(s"Decode($name)", self.decode(c)))
+    )
+
+    private def wrapExceptions[X](description: String, f: => X): X = try { f } catch {
+      case ce: CodecException => throw description :: ce
+      case e: Exception       => throw CodecException(List(description), e)
     }
   }
 
@@ -270,6 +279,11 @@ object argonaut {
   }
 }
 
+private case class CodecException(descriptions: List[String], cause: Exception) extends Exception("", cause) {
+  setStackTrace(descriptions.map(new StackTraceElement(_, "", "", 0)).toArray)
+  
+  def ::(description: String): CodecException = copy(description :: descriptions)
+}
 
 case class CanPrismFrom[From, Elem, To](prism: Prism[From, To]) {
   def toList: CanPrismFrom[List[From], Elem, List[To]] =

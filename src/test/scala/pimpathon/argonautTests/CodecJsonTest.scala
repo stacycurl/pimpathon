@@ -2,12 +2,13 @@ package pimpathon.argonautTests
 
 import _root_.argonaut._
 import org.junit.Test
+import pimpathon.CodecException
 import pimpathon.any._
 import pimpathon.argonaut._
 import pimpathon.util._
+import pimpathon.throwable._
 import sjc.delta.argonaut.json.actualExpected.flat._
 import sjc.delta.matchers.syntax.anyDeltaMatcherOps
-
 import scalaz.{-\/, \/, \/-}
 
 
@@ -39,7 +40,31 @@ class CodecJsonTest extends JsonUtil {
     intCodec.decodeJson(Json.jString("3")) === DecodeResult.ok(3)
     intCodec.decodeJson(Json.jString("a")) === DecodeResult.fail("a", CursorHistory(Nil))
   })
+  
+  @Test def wrapExceptions(): Unit = on(Thing(null) -> 4, (null, 3)).calling((interceptEncode _).tupled).produces(
+    List(
+      "pimpathon.CodecException: ",
+      "\tat Encode(thingCodec).(:0)",
+      "\tat Encode(hcursorCodec).(:0)",
+      "Caused by: java.lang.NullPointerException"
+    ),
+    List(
+      "pimpathon.CodecException: ",
+      "\tat Encode(thingCodec).(:0)",
+      "Caused by: java.lang.NullPointerException"
+    )
+  )
 
+  private def interceptEncode(thing: Thing, lines: Int): List[String] =
+    intercept[CodecException](CodecJson.derived[Thing].encode(thing)).stackTraceAsString().lines.toList.take(lines)
+  
+  private case class Thing(cursor: HCursor)
+
+  private object Thing {
+    implicit val thingCodec: CodecJson[Thing] = 
+      CodecJson.derived[HCursor].wrapExceptions("hcursorCodec").xmap[Thing](Thing(_))(_.cursor).wrapExceptions("thingCodec")  
+  }
+  
   // Searching for a better name before making this a pimp (and one producing Either[A, B])
   private def attempt[A, B](f: A ⇒ B)(a: A): A \/ B = a.attempt(f).fold(_ => -\/(a), \/-(_))
 }

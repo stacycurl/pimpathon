@@ -11,9 +11,9 @@ trait JsonUtil {
   def reverse(json: Json): Json = json.withArray(_.reverse)
   def reverse[A](decodeResult: DecodeResult[List[A]]): DecodeResult[List[A]] = decodeResult.map(_.reverse)
 
-  val codec: CodecJson[List[String]]           = CodecJson.derived[List[String]]
+  val codec: CodecJson[List[String]]        = CodecJson.derived[List[String]]
   val mapCodec: CodecJson[String ▶: String] = CodecJson.derived[String ▶: String]
-  val stringCodec: CodecJson[String]           = CodecJson.derived[String]
+  val stringCodec: CodecJson[String]        = CodecJson.derived[String]
   val (encoder, decoder)       = (codec.Encoder, codec.Decoder)
   val (mapEncoder, mapDecoder) = (mapCodec.Encoder, mapCodec.Decoder)
 

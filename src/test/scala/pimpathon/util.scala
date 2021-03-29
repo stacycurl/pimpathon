@@ -12,6 +12,7 @@ import scala.reflect.ClassTag
 import scala.util.{DynamicVariable, Try}
 
 import org.junit.Assert._
+import pimpathon.any._
 import pimpathon.list._
 import pimpathon.tuple._
 import pimpathon.pimpTry._
@@ -34,6 +35,9 @@ object util {
   def assertEqualsSet[A](expected: Set[A], actual: Set[A]): Unit = (expected -- actual, actual -- expected).calcC(
     missing ⇒ extra ⇒ assertTrue(s"Extra: $extra, Missing: $missing", extra.isEmpty && missing.isEmpty)
   )
+
+  def intercept[T <: Throwable: ClassTag](f: ⇒ Unit): T = 
+    getThrowable[T](f).getOrElse(sys.error("Expected exception: " + classTag.className[T]))
 
   case class calling[A, B](f: A ⇒ B) {
     def partitions(as: A*): partitions = partitions(as.toList)
@@ -92,10 +96,10 @@ object util {
   def createOutputStream(): ByteArrayOutputStream with Closeable =
     new ByteArrayOutputStream with Closeable
 
-  private def getMessage[T <: Throwable: ClassTag](f: ⇒ Unit): Option[String] = try { f; None } catch {
-    case t: Throwable ⇒ if (classTag.klassOf[T].isAssignableFrom(t.getClass)) Some(t.getMessage) else sys.error(
-      s"Invalid exception, expected ${classTag.className[T]}, got: $t"
-    )
+  private def getMessage[T <: Throwable: ClassTag](f: ⇒ Unit): Option[String] = getThrowable[T](f).map(_.getMessage)
+
+  private def getThrowable[T <: Throwable: ClassTag](f: ⇒ Unit): Option[T] = try { f; None } catch {
+    case t: Throwable ⇒ Some(t.castTo[T].getOrElse(sys.error(s"Invalid exception, expected ${classTag.className[T]}, got: $t")))
   }
 
   def goBoom: Nothing = throw boom

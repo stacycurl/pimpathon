@@ -4,6 +4,7 @@ import scala.language.{dynamics, higherKinds, implicitConversions}
 
 import _root_.argonaut.Json.{jFalse, jNull, jString, jTrue}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
+import _root_.argonaut.JsonMonocle.jObjectPrism
 import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, HCursor, Json, JsonMonocle, JsonNumber, JsonObject, JsonParser, Parse, PrettyParams}
 import _root_.java.io.File
 import _root_.scalaz.{Applicative, \/}
@@ -107,7 +108,7 @@ object argonaut {
     
     def pivot: List[(String, Json)] = {
       def recurse(path: String, current: Json): List[(String, Json)] = current match {
-        case JsonMonocle.jObjectPrism(obj) => obj.toList.flatMap {
+        case jObjectPrism(obj) => obj.toList.flatMap {
           case (r":$field", value) => recurse(s"$path:$field", value)
           case (field, value)        => recurse(s"$path/$field", value)
         }
@@ -122,6 +123,18 @@ object argonaut {
     }.sortBy(_._1)(Ordering.Implicits.seqDerivedOrdering[List, String]).foldLeft(Json.jEmptyObject) {
       case (json, (fragments, value)) => json.append(fragments, value)
     })
+    
+    def merge(other: Json): Json = {
+      def recurse(lhsJson: Json, rhsJson: Json): Option[Json] = (lhsJson, rhsJson) partialMatch {
+        case (jObjectPrism(lhs), jObjectPrism(rhs)) => Json.jObjectFields(lhs.toMap.zipWith[Json, Json](rhs.toMap) {
+          case (Some(l), Some(r)) if r != Json.jNull => recurse(l, r).getOrElse(r)
+          case (Some(l), None)                       => l
+          case (None, Some(r))                       => r
+        }.toList: _*)
+      }
+      
+      recurse(self, other).getOrElse(self)
+    }
   }
 
   implicit class CodecJsonCompanionFrills(val self: CodecJson.type) extends AnyVal {

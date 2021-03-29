@@ -493,6 +493,16 @@ class JsonTest extends JsonUtil {
   @Test def unpivot(): Unit =  
     pivoted.unpivot <=> unpivoted
 
+  @Test def merge(): Unit = {
+    Json.obj("a" := "a", "b" := 123).merge(Json.obj("b" := 456)) <=> Json.obj("a" := "a", "b" := 456)
+
+    Json.obj("a" := "a", "b" := 123).merge(Json.obj("b" := Json.jNull)) <=> Json.obj("a" := "a")
+    
+    Json.jString("non object").merge(Json.jString("anything")) <=> Json.jString("non object")
+    
+    Json.obj("a" := "a").merge(Json.jString("non object")) <=> Json.obj("a" := "a") 
+  }
+  
   private val unpivoted: Json = Json.obj(
     "outer1" := Json.obj(
       "key1" := "value1",

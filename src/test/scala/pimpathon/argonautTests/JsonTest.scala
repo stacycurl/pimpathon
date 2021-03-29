@@ -463,6 +463,29 @@ class JsonTest extends JsonUtil {
     Json.obj("key" := "foo").append(List("key"), value) <=> Json.obj("key" := "bar")
     Json.obj().append(List("outer", "inner"), value)    <=> Json.obj("outer" := Json.obj("inner" := "bar"))
   }
+  
+  @Test def fromProperties(): Unit = {
+    Json.fromProperties(Map()) <=> Right(Json.obj())
+    
+    Json.fromProperties(Map(
+      "value" -> "\"bar\"",
+      "invalid" -> "unquoted string"
+    )) <=> Left(("invalid", "Unexpected content found: unquoted string"))
+
+    Json.fromProperties(Map("foo" -> "\"bar\"")) <=> Right(Json.obj("foo" := "bar"))
+
+    Json.fromProperties(Map("foo.oof" -> "\"bar\"")) <=> Right(Json.obj("foo" := Json.obj("oof" := "bar")))
+
+    Json.fromProperties(Map(
+      "foo.oof" -> "123",
+      "foo.ffs" -> "false"
+    )) <=> Right(Json.obj("foo" := Json.obj("oof" := 123, "ffs" := false)))
+
+    Json.fromProperties(Map(
+      "foo"     -> "123",
+      "foo.oof" -> "false"
+    )) <=> Right(Json.obj("foo" := 123))
+  }
 
   private def test(f: Json ⇒ Json, data: (String, String)*): Unit = data.foreach {
     case (input, expected) ⇒ f(parse(input)) <=> parse(expected)

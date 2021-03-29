@@ -4,7 +4,7 @@ import scala.language.{dynamics, higherKinds, implicitConversions}
 
 import _root_.argonaut.Json.{jFalse, jNull, jString, jTrue}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
-import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, HCursor, Json, JsonMonocle, JsonNumber, JsonObject, Parse, PrettyParams}
+import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, HCursor, Json, JsonMonocle, JsonNumber, JsonObject, Parse, JsonParser, PrettyParams}
 import _root_.java.io.File
 import _root_.scalaz.{Applicative, \/}
 import io.gatling.jsonpath.AST._
@@ -30,6 +30,14 @@ import pimpathon.list._
 
 object argonaut {
   implicit class JsonCompanionFrils(val self: Json.type) extends AnyVal {
+    def fromProperties(properties: Map[String, String]): Either[(String, String), Json] = {
+      properties.apoFold[Json, (String, String)](Json.jEmptyObject) {
+        case (acc, (key, value)) => for {
+          json <- JsonParser.parse(value).leftMap(key -> _)
+        } yield acc.append(key.split("\\.").toList.emptyTo(List(key)), json)
+      }
+    }
+    
     def readFrom(file: File): Option[Json] = for {
       content <- if (file.exists()) Some(file.readString) else None
       json    <- Parse.parse(content) match {

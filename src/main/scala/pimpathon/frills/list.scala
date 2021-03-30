@@ -13,7 +13,7 @@ import pimpathon.list._
 
 object list {
   implicit class ListFrills[A](private val self: List[A]) extends GenTraversableLikeFrillsMixin[A, List] {
-    def toNel: Option[NonEmptyList[A]] = self.unconsC(None, head ⇒ tail ⇒ Some(NonEmptyList(head, tail: _*)))
+    def toNel: Option[NonEmptyList[A]] = self.unconsC(None, head ⇒ tail ⇒ Some(NonEmptyList.fromSeq(head, tail)))
 
     protected def gtl: GTLGT[A] = self
     protected def cc: List[A]   = self

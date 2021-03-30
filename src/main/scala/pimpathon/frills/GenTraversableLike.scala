@@ -16,7 +16,7 @@ import scalaz.syntax.std.option._
 object genTraversableLike {
   trait GenTraversableLikeFrillsMixin[A, CC[_]] extends GenTraversableLikePimpsMixin[A, CC] {
     def onlyOrDisjunction[B](f: CC[A] ⇒ B): B \/ A = onlyOption.toRightDisjunction(f(cc))
-    def onlyDisjunction: CC[A] \/ A  = onlyEither.disjunction
+    def onlyDisjunction: CC[A] \/ A  = onlyEither.toDisjunction
   }
 
   trait GenTraversableLikeOfDisjunctionFrillsMixin[L, R] {

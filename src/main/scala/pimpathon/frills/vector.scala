@@ -12,7 +12,7 @@ import pimpathon.boolean._
 
 object vector {
   implicit class VectorFrills[A](private val self: Vector[A]) extends GenTraversableLikeFrillsMixin[A, Vector] {
-    def toNel: Option[NonEmptyList[A]] = self.nonEmpty.option(NonEmptyList(self.head, self.tail: _*))
+    def toNel: Option[NonEmptyList[A]] = self.nonEmpty.option(NonEmptyList.fromSeq(self.head, self.tail))
 
     protected def gtl: GTLGT[A] = self
     protected def cc: Vector[A] = self

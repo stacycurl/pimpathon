@@ -43,11 +43,24 @@ class DisjunctionTest {
   }
 
   @Test def flatten(): Unit = {
-    on(-\/(1), \/-(-\/(2)), \/-(\/-("s"))).calling(_.flatten).produces(-\/(1), -\/(2), \/-("s"))
-    on(-\/(-\/(1)), -\/(\/-("s")), \/-("s")).calling(_.flatten).produces(-\/(1), \/-("s"), \/-("s"))
+    locally {
+      def l(i: Int): Int \/ (Int \/ String) = -\/(1)
+      def m(i: Int): Int \/ (Int \/ String) = \/-(-\/(i))
+      def r(s: String): Int \/ (Int \/ String) = \/-(\/-(s))
+      
+      on[Int \/ (Int \/ String)](l(1), m(2), r("s")).calling(_.flatten).produces(-\/(1), -\/(2), \/-("s"))
+    }
+    
+    locally {
+      def l(i: Int): (Int \/ String) \/ String = -\/(-\/(1))
+      def m(s: String): (Int \/ String) \/ String = -\/(\/-(s))
+      def r(s: String): (Int \/ String) \/ String = \/-(s)
+      
+      on[(Int \/ String) \/ String](l(1), m("s"), r("s")).calling(_.flatten).produces(-\/(1), \/-("s"), \/-("s"))
+    }
   }
 
-  @Test def leftFlatMap(): Unit = on(\/-(123), -\/("456"), -\/("123"))
+  @Test def leftFlatMap(): Unit = on[String \/ Int](\/-(123), -\/("456"), -\/("123"))
     .calling(_.leftFlatMap(partial("123" → 123).toRightDisjunction)).produces(\/-(123), -\/("456"), \/-(123))
 
   private def left(i: Int): Int \/ String = -\/(i)

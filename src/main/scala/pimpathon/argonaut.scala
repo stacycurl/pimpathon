@@ -10,9 +10,8 @@ import _root_.java.io.File
 import _root_.scalaz.{Applicative, \/}
 import io.gatling.jsonpath.AST._
 import io.gatling.jsonpath._
-import monocle.function.Each.each
-import monocle.function.FilterIndex.filterIndex
-import monocle.std.list.{listEach, listFilterIndex}
+import monocle.function.Each.{each, listEach}
+import monocle.function.FilterIndex.{filterIndex, listFilterIndex}
 import monocle.{Iso, Optional, Prism, Traversal}
 import pimpathon.any.AnyPimps
 import pimpathon.boolean.BooleanPimps
@@ -316,7 +315,7 @@ object argonaut {
       val from: ListMap[String, Json] = ListMap[String, Json](self.toList: _*)
       val to: ListMap[String, Json] = from.collect(pf)
 
-      JsonObject.fromTraversableOnce(to)
+      JsonObject.fromIterable(to)
     }
   }
 
@@ -384,14 +383,11 @@ object CanPrismFrom {
     : CanPrismFrom[JsonObject, V, String ▶: V] = apply(jsonObjectMapIso.composePrism(cpf.toMap[String].prism))
 
   private val jsonObjectMapIso: Iso[JsonObject, String ▶: Json] =
-    Iso[JsonObject, String ▶: Json](_.toMap)(map ⇒ JsonObject.fromTraversableOnce(map))
+    Iso[JsonObject, String ▶: Json](_.toMap)(map ⇒ JsonObject.fromIterable(map))
 }
 
 object Descendant {
   import pimpathon.argonaut.{JsonFrills, JsonObjectFrills, TraversalFrills}
-
-//  implicit def descendantAsApplyTraversal[From, Via, To](descendant: Descendant[From, Via, To]):
-//    ApplyTraversal[From, From, To, To] = ApplyTraversal(descendant.from, descendant.traversal)
 
   implicit class DescendantToJsonFrills[From](private val self: Descendant[From, Json, Json]) {
     def renameField(from: String, to: String):    From = self.modify(_.renameField(from, to))

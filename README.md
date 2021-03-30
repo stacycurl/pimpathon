@@ -1,8 +1,9 @@
 Pimpathon
 =========
 
-![Build Status](https://github.com/stacycurl/pimpathon/actions/workflows/build.yml/badge.svg)
+[![Build Status][badge-build]][link-build]
 [![Release Artifacts][badge-release]][link-release]
+[![Maven Central][badge-maven]][link-maven]
 
 **Pimpathon** is a library that extends Scala & Java classes with 'extension methods' via the [Pimp my Library][pimp-my-library] pattern.
 
@@ -49,6 +50,13 @@ Builds are available for Scala 2.11.7 & 2.12.12
 [pimp-my-library]:http://www.artima.com/weblogs/viewpost.jsp?thread=179766
 [doc]: https://rawgit.com/stacycurl/pimpathon/master/docs/index.html
 [olddoc]: https://github.com/stacycurl/pimpathon/blob/master/docs/Documentation.md
-[link-release]: https://oss.sonatype.org/content/repositories/releases/com/github/stacycurl/pimpathon_2.12/ "Sonatype Releases"
-[badge-release]: https://img.shields.io/nexus/r/https/oss.sonatype.org/com.github.stacycurl/pimpathon_2.12.svg "Sonatype Releases"
 
+
+[badge-build]: https://github.com/stacycurl/pimpathon/actions/workflows/build.yml/badge.svg
+[link-build]: https://github.com/stacycurl/pimpathon/actions/
+
+[badge-release]: https://img.shields.io/nexus/r/https/oss.sonatype.org/com.github.stacycurl/pimpathon_2.12.svg "Sonatype Releases"
+[link-release]: https://oss.sonatype.org/content/repositories/releases/com/github/stacycurl/pimpathon_2.12/ "Sonatype Releases"
+
+[badge-maven]: https://maven-badges.herokuapp.com/maven-central/com.github.stacycurl/pimpathon_2.12/badge.svg
+[link-maven]: https://maven-badges.herokuapp.com/maven-central/com.github.stacycurl/pimpathon_2.12

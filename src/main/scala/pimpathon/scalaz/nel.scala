@@ -14,7 +14,7 @@ import pimpathon.tuple._
 
 object nel {
   implicit def canBuildNonEmpty[A]: CanBuildNonEmpty[A, NonEmptyList[A]] = 
-    (head: A) ⇒ List.newBuilder[A].mapResult(tail ⇒ NonEmptyList.nels[A](head, tail: _*))
+    (head: A) ⇒ List.newBuilder[A].mapResult(tail ⇒ NonEmptyList.fromSeq[A](head, tail))
 
   implicit class NelFrills[A](private val self: NonEmptyList[A]) extends GenTraversableLikeFrillsMixin[A, NonEmptyList] {
     def unique: NonEmptyList[A] = lift(_.distinct)
@@ -30,7 +30,7 @@ object nel {
 
     protected def gtl: GTLGT[A] = toList
     protected def cc: NonEmptyList[A] = self
-    private def toNel(ht: (A, List[A])): NonEmptyList[A] = ht.calc(NonEmptyList.nels)
+    private def toNel(ht: (A, List[A])): NonEmptyList[A] = ht.calc(NonEmptyList.fromSeq)
   }
 
   implicit class NelOfEithersFrills[L, R](

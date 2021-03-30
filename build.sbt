@@ -12,7 +12,7 @@ inThisBuild(List(
   usePgpKeyHex("pimpathon ci")
 ))
 
-lazy val pimpathon: Project = (project in file(".")
+val pimpathon: Project = (project in file(".")
   settings(
     organization              := "com.github.stacycurl",
     scalaVersion              := "2.12.12",
@@ -23,14 +23,15 @@ lazy val pimpathon: Project = (project in file(".")
     resolvers += Resolver.sonatypeRepo("releases"),
     libraryDependencies ++= scalaVersion(dependencies("2.12.12" → List(
       "org.scala-lang"             % "scala-compiler"    % "2.12.0" exclude("org.scala-lang.modules", "scala-xml_2.12"),
-      "org.scala-lang"             % "scala-library"     % "2.12.0"    % "test",
-      "com.github.julien-truffaut" %% "monocle-core"     % "1.3.2"     % "provided",
-      "io.argonaut"                %% "argonaut"         % "6.2-RC1"   % "provided",
-      "io.argonaut"                %% "argonaut-monocle" % "6.2-RC1"   % "provided",
-      "org.scalaz"                 %% "scalaz-core"      % "7.3.0-M6"  % "provided",
-      "io.gatling"                 %% "jsonpath"         % "0.6.8"     % "provided",
-      "com.novocode"               % "junit-interface"   % "0.11"      % "test",
-      "com.github.stacycurl"       %% "delta-matchers"   % "1.1.1"     % "test"
+      "org.scala-lang"             % "scala-library"     % "2.12.0" % "test",
+      "com.github.julien-truffaut" %% "monocle-core"     % "1.3.2"  % "provided",
+      "io.argonaut"                %% "argonaut"         % "6.3.3"  % "provided",
+      "io.argonaut"                %% "argonaut-monocle" % "6.3.3"  % "provided",
+      "org.scalaz"                 %% "scalaz-core"      % "7.3.3"  % "provided",
+      "io.gatling"                 %% "jsonpath"         % "0.6.8"  % "provided",
+      "com.novocode"               % "junit-interface"   % "0.11"   % "test",
+      "com.github.stacycurl"       %% "delta-argonaut"   % "1.2.0"  % "test",
+      "com.github.stacycurl"       %% "delta-matchers"   % "1.2.0"  % "test"
     ))).value,
     doc := version.apply(Documentation.generate).value,
     initialize := {

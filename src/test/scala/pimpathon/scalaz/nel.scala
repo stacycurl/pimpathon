@@ -2,11 +2,11 @@ package pimpathon.scalaz
 
 import org.junit.Test
 import pimpathon.util.on
-import scalaz.NonEmptyList
-
+import scalaz.{NonEmptyList, \/}
 import pimpathon.multiMap._
 import pimpathon.scalaz.nel._
 import pimpathon.util._
+
 import scalaz.syntax.either._
 
 
@@ -25,9 +25,12 @@ class NelTest {
   @Test def max(): Unit = NonEmptyList(1, 3, 2).max(scalaz.std.anyVal.intInstance) === 3
   @Test def min(): Unit = NonEmptyList(3, 1, 2).min(scalaz.std.anyVal.intInstance) === 1
 
-  @Test def partitionDisjunctions(): Unit =
-    NonEmptyList(1.left, "abc".right, "def".right, 2.left).partitionDisjunctions[List] ===
-      (List(1, 2), List("abc", "def"))
+  @Test def partitionDisjunctions(): Unit = {
+    def nel(head: (Int \/ String), tail: (Int \/ String)*): NonEmptyList[Int \/ String] =
+      NonEmptyList.fromSeq(head, tail)
+    
+    nel(1.left, "abc".right, "def".right, 2.left).partitionDisjunctions[List] === (List(1, 2), List("abc", "def"))
+  }
 
   @Test def partitionEithers(): Unit = {
     NonEmptyList[Either[Int, String]](Left(1), Right("abc"), Right("def"), Left(2)).partitionEithers[List] ===

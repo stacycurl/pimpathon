@@ -1,60 +1,57 @@
 package pimpathon
 
 import _root_.java.nio.charset.Charset
-
-import org.junit.{Assert, Test}
-
+import org.junit.Assert
 import pimpathon.string._
-import pimpathon.util._
 
 
-class StringTest {
-  @Test def stripAffixes(): Unit =
+class StringSpec extends PSpec {
+  "stripAffixes" in
     on("(foo)", "(foo", "oof)", "ooo").calling(_.stripAffixes("(", ")")).produces("foo", "foo", "oof", "ooo")
 
-  @Test def affixWith(): Unit =
+  "affixWith" in
     on("(foo)", "(foo", "oof)", "ooo").calling(_.affixWith("(", ")")).produces("(foo)", "(foo)", "(oof)", "(ooo)")
 
-  @Test def quote(): Unit =
+  "quote" in
     on("foo", "\"foo", "foo\"", "\"foo\"").calling(_.quote).produces("\"foo\"", "\"\"foo\"", "\"foo\"\"", "\"\"foo\"\"")
 
-  @Test def quoteWith(): Unit =
+  "quoteWith" in
     on("foo", "'foo", "foo'", "'foo'").calling(_.quoteWith('\'')).produces("'foo'", "''foo'", "'foo''", "''foo''")
 
-  @Test def unquote(): Unit =
+  "unquote" in
     on("foo", "\"foo", "foo\"", "\"foo\"").calling(_.unquote).produces("foo", "foo", "foo", "foo")
 
-  @Test def hyphenate(): Unit =
+  "hyphenate" in
     on("foo", "fooFood").calling(_.hyphenate).produces("foo", "foo-food")
 
-  @Test def prefixWith(): Unit = {
-    "".prefixWith("") === ""
+  "prefixWith" in {
+    "".prefixWith("") ≡ ""
     on("", "-suffix", "prefix").calling(_.prefixWith("prefix")).produces("prefix", "prefix-suffix", "prefix")
   }
 
-  @Test def sharedPrefix(): Unit = {
-    "".sharedPrefix("")         === ("", "", "")
-    "1".sharedPrefix("1")       === ("1", "", "")
-    "1234".sharedPrefix("1243") === ("12", "34", "43")
+  "sharedPrefix" in {
+    "".sharedPrefix("")         ≡ ("", "", "")
+    "1".sharedPrefix("1")       ≡ ("1", "", "")
+    "1234".sharedPrefix("1243") ≡ ("12", "34", "43")
   }
 
-  @Test def suffixWith(): Unit = {
-    "".suffixWith("") === ""
+  "suffixWith" in {
+    "".suffixWith("") ≡ ""
     on("", "prefix-", "suffix").calling(_.suffixWith("suffix")).produces("suffix", "prefix-suffix", "suffix")
   }
 
-  @Test def prefixPadTo(): Unit = "-suffix".prefixPadTo(10, 'p') === "ppp-suffix"
+  "prefixPadTo" in "-suffix".prefixPadTo(10, 'p') ≡ "ppp-suffix"
 
-  @Test def md5(): Unit = "blah".md5 === "6f1ed002ab5595859014ebf0951522d9"
+  "md5" in "blah".md5 ≡ "6f1ed002ab5595859014ebf0951522d9"
 
-  @Test def emptyTo(): Unit = on("", "def").calling(_.emptyTo("abc")).produces("abc", "def")
+  "emptyTo" in on("", "def").calling(_.emptyTo("abc")).produces("abc", "def")
 
-  @Test def toByteArray(): Unit = {
+  "toByteArray" in {
     Assert.assertArrayEquals(Array('a'.toByte, 'b'.toByte, 'c'.toByte), "abc".toByteArray(Charset.forName("UTF-8")))
     Assert.assertArrayEquals(Array('d'.toByte, 'e'.toByte, 'f'.toByte), "def".toByteArray)
   }
 
-  @Test def wrap(): Unit = {
+  "wrap" in {
     val wrapped =
       """|Pimpathon contains pimps
          |for classes in core
@@ -62,6 +59,6 @@ class StringTest {
          |and pimps for external
          |libraries""".stripMargin
 
-    wrapped.replaceAllLiterally("\n", " ").wrap(24) === wrapped
+    wrapped.replaceAllLiterally("\n", " ").wrap(24) ≡ wrapped
   }
 }

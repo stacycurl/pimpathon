@@ -1,14 +1,13 @@
 package pimpathon.frills
 
-import org.junit.Test
+import pimpathon.PSpec
 import pimpathon.frills.pimpTry._
-import pimpathon.util._
-
-import scala.util.{Failure, Success}
 import scalaz.{-\/, \/-}
 
+import scala.util.{Failure, Success}
 
-class TryTest {
-  @Test def toDisjunction(): Unit =
+
+class TrySpec extends PSpec {
+  "toDisjunction" in
     on(Success("foo"), Failure(boom)).calling(_.toDisjunction).produces(\/-("foo"), -\/(boom))
 }

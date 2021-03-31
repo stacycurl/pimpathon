@@ -1,26 +1,24 @@
 package pimpathon
 
-import org.junit.Test
+import pimpathon.dynamicVariable._
 
 import scala.util.DynamicVariable
-import dynamicVariable._
-import pimpathon.util._
 
 
-class DynamicVariableTest {
-  @Test def modify(): Unit = {
+class DynamicVariableSpec extends PSpec {
+  "modify" in {
     dyn.modify(_ * 2)
-    dyn.value === (123 * 2)
+    dyn.value ≡ (123 * 2)
   }
 
-  @Test def withModification(): Unit = {
+  "withModification" in {
     dyn.withModification(_ * 2) {
-      dyn.value === (123 * 2)
+      dyn.value ≡ (123 * 2)
       "foo"
-    } === "foo"
+    } ≡ "foo"
 
-    dyn.value === 123
+    dyn.value ≡ 123
   }
 
-  private val dyn = new DynamicVariable[Int](123)
+  private lazy val dyn: DynamicVariable[Int] = perTest.dynamicVariable(123)
 }

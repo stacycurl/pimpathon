@@ -1,11 +1,8 @@
 package pimpathon
 
-import org.junit.Test
-import pimpathon.util._
 
-
-class ClassTagTest {
-  @Test def className(): Unit       = classTag.className[ClassTagTest]       === "pimpathon.ClassTagTest"
-  @Test def simplecCassName(): Unit = classTag.simpleClassName[ClassTagTest] === "ClassTagTest"
-  @Test def klassOf(): Unit         = classTag.klassOf[ClassTagTest]         === classOf[ClassTagTest]
+class ClassTagSpec extends PSpec {
+  "className"       in classTag.className[ClassTagSpec]       ≡ "pimpathon.ClassTagSpec"
+  "simplecCassName" in classTag.simpleClassName[ClassTagSpec] ≡ "ClassTagSpec"
+  "klassOf"         in classTag.klassOf[ClassTagSpec]         ≡ classOf[ClassTagSpec]
 }

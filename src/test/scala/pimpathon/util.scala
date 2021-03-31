@@ -5,32 +5,35 @@ import scala.language.implicitConversions
 import _root_.java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import _root_.java.util.concurrent.atomic.AtomicBoolean
 
-import scala.{PartialFunction ⇒ ~>}
+import scala.{PartialFunction => ~>}
 import scala.collection.mutable.ListBuffer
-import scala.collection.{mutable ⇒ M}
+import scala.collection.{mutable => M}
 import scala.reflect.ClassTag
 import scala.util.{DynamicVariable, Try}
-
 import org.junit.Assert._
 import pimpathon.any._
 import pimpathon.list._
 import pimpathon.tuple._
 import pimpathon.pimpTry._
 
-
-object util {
-  implicit class AnyTestPimp[A](val self: A) extends AnyVal {
-    def ===(expected: A): Unit = assertEquals(expected, self)
+object util extends util
+trait util {
+  implicit class AnyTestPimp[A](val self: A) {
+    def ≡(expected: A): Unit = assertEquals(expected, self)
   }
 
   def ignore(f: ⇒ Unit): Unit = {}
   def ignoreExceptions(f: ⇒ Unit): Unit = Try(f)
 
-  def assertThrows[T <: Throwable: ClassTag](expectedMessage: String)(f: ⇒ Any): Unit =
-    assertThrows(f) === expectedMessage
-
-  def assertThrows[T <: Throwable: ClassTag](f: ⇒ Any): String =
-    getMessage[T](f).getOrElse(sys.error("Expected exception: " + classTag.className[T]))
+  protected val messageDoesntMatter: String = "messageDoesntMatter" 
+  
+  def assertThrows[T <: Throwable: ClassTag](expectedMessage: String)(f: ⇒ Any): Unit = {
+    val message = getMessage[T](f).getOrElse(sys.error("Expected exception: " + classTag.className[T]))
+    
+    if (!(expectedMessage eq messageDoesntMatter)) {
+      message ≡ expectedMessage  
+    }
+  }
 
   def assertEqualsSet[A](expected: Set[A], actual: Set[A]): Unit = (expected -- actual, actual -- expected).calcC(
     missing ⇒ extra ⇒ assertTrue(s"Extra: $extra, Missing: $missing", extra.isEmpty && missing.isEmpty)
@@ -46,12 +49,12 @@ object util {
         val (expectedFailbackFns, abs) = expectations.map(_.value).toList.partitionEithers[List]
 
         expectedFailbackFns.onlyOption match {
-          case None ⇒ pairs(as.rpair(f)) === pairs(abs)
+          case None ⇒ pairs(as.rpair(f)) ≡ pairs(abs)
           case Some(expectedFallbackFn) ⇒ {
             as.partition(a ⇒ abs.exists(_._1 == a)).calcC(positive ⇒ remainder ⇒ {
               val fallbacks = remainder.rpair(expectedFallbackFn)
 
-              pairs((positive ::: remainder).rpair(f)) === pairs(abs ::: fallbacks)
+              pairs((positive ::: remainder).rpair(f)) ≡ pairs(abs ::: fallbacks)
             })
           }
         }
@@ -61,8 +64,8 @@ object util {
 
   case class on[A](as: A*) {
     case class calling[B](fs: (A ⇒ B)*) {
-      def produces(bs: B*): Unit    = (for {f ← fs; a ← as} yield f(a)).toList === bs.toList
-      def throws(es: String*): Unit = (for {f ← fs; a ← as; m ← Try(f(a)).getMessage} yield m).toList === es.toList
+      def produces(bs: B*): Unit    = (for {f ← fs; a ← as} yield f(a)).toList ≡ bs.toList
+      def throws(es: String*): Unit = (for {f ← fs; a ← as; m ← Try(f(a)).getMessage} yield m).toList ≡ es.toList
     }
   }
 

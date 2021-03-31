@@ -29,7 +29,7 @@ val pimpathon: Project = (project in file(".")
       "io.argonaut"                %% "argonaut-monocle" % "6.3.3"  % "provided",
       "org.scalaz"                 %% "scalaz-core"      % "7.3.3"  % "provided",
       "io.gatling"                 %% "jsonpath"         % "0.6.8"  % "provided",
-      "com.novocode"               % "junit-interface"   % "0.11"   % "test",
+      "junit"                      %  "junit"            % "4.11"   % "test",
       "com.github.stacycurl"       %% "delta-argonaut"   % "1.2.0"  % "test",
       "com.github.stacycurl"       %% "delta-matchers"   % "1.2.0"  % "test"
     ))).value,

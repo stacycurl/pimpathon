@@ -46,12 +46,12 @@ trait JsonUtil {
   val bananas = JsonObject.empty + ("bananas", jBool(bananaMan.preferences.bananas))
   val intObj = JsonObject.empty + ("1", jString(bananaMan.awkward.`1`))
 
-  val fields@List(lying, name, address, age, width, preferences, potatoes, knownUnknowns, awkward) = List(
+  lazy val fields@List(lying, name, address, age, width, preferences, potatoes, knownUnknowns, awkward) = List(
     jBool(bananaMan.lying), jString(bananaMan.name), jArray(acaciaRoad), jNumber(bananaMan.age), jNumberOrNull(bananaMan.width),
     jObject(bananas), jArrayElements(), jObjectFields(), jObject(intObj)
   )
 
-  val jobj: Json = jObjectFields(
+  lazy val jobj: Json = jObjectFields(
     "name" → name, "age" → age, "lying" → lying, "address" → address, "preferences" → preferences, "width" → width,
     "potatoes" → potatoes, "knownUnknowns" → knownUnknowns, "awkward" → awkward
   )

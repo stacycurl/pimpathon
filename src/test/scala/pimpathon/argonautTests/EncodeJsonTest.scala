@@ -1,24 +1,24 @@
 package pimpathon.argonautTests
 
 import argonaut.StringWrap.StringToStringWrap
-import org.junit.Test
+import pimpathon.PSpec
 import pimpathon.argonaut._
 import sjc.delta.argonaut.json.actualExpected.flat._
 import sjc.delta.matchers.syntax.anyDeltaMatcherOps
 
 
-class EncodeJsonTest extends JsonUtil {
-  @Test def afterEncode(): Unit = encoder.afterEncode(reverse).encode(list)      <=> reverse(encoder.encode(list))
-  @Test def andThen(): Unit     = encoder.andThen(reverse).encode(list)          <=> reverse(encoder.encode(list))
-  @Test def downcast(): Unit    = Base.encoder.downcast[Derived].encode(derived) <=> derivedEncoded
-  @Test def add(): Unit         = encoder.add("length" := _.length).encode(list) <=> encoder.encode(list).addIfMissing("length" := list.length)
+class EncodeJsonSpec extends PSpec with JsonUtil {
+  "afterEncode" in encoder.afterEncode(reverse).encode(list)      <=> reverse(encoder.encode(list))
+  "andThen"     in encoder.andThen(reverse).encode(list)          <=> reverse(encoder.encode(list))
+  "downcast"    in Base.encoder.downcast[Derived].encode(derived) <=> derivedEncoded
+  "add"         in encoder.add("length" := _.length).encode(list) <=> encoder.encode(list).addIfMissing("length" := list.length)
 
-  @Test def contramapEntries(): Unit =
+  "contramapEntries" in
     mapEncoder.contramapEntries[String, String](reverseEntry).encode(Map("foo" → "bar")) <=> mapEncoder.encode(Map("oof" → "rab"))
 
-  @Test def contramapKeys(): Unit =
+  "contramapKeys" in
     mapEncoder.contramapKeys[String](_.reverse).encode(Map("foo" → "bar")) <=> mapEncoder.encode(Map("oof" → "bar"))
 
-  @Test def contramapValues(): Unit =
+  "contramapValues" in
     mapEncoder.contramapValues[String](_.reverse).encode(Map("foo" → "bar")) <=> mapEncoder.encode(Map("foo" → "rab"))
 }

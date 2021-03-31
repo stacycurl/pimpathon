@@ -12,6 +12,11 @@ jobs:
       - uses: olafurpg/setup-scala@v10
       - uses: blended-zio/setup-gpg@v3
       - run: project/build.sh
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: target/test-reports/**/*.xml      
         env:
           PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
           PGP_SECRET: ${{ secrets.PGP_SECRET }}

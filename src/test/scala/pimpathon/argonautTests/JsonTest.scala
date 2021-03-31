@@ -64,32 +64,131 @@ class JsonSpec extends PSpec with JsonUtil {
     BananaMan.bananaManCodec.decodeJson(jobj).toOption <=> Some(bananaMan)
   }
 
+  "delete" in {
+//    println(parse(
+//      """{
+//        |   "a": {
+//        |     "nested": {
+//        |       "thing": "bye bye"
+//        |     }
+//        |   },
+//        |   "remainder": "still here"
+//        |}
+//      """.stripMargin).delete("a/nested/thing").spaces2)
+//
+//    println(parse("""{"candy": "lollipop", "noncandy": null,"other": "things"}""")
+//      .descendant("candy").string.set("big turks").filterNulls
+//      .delete("other").spaces2)
+//
+
+//    store.jsonPath("$.store.book[*].author").getAll.foreach(j ⇒ println(j.spaces2))
+
+
+
+    val conditions = parse("""{ "conditions":
+          			[
+          				{ "id": "i1", "condition": true },
+          				{ "id": "i2", "condition": false }
+          			]
+          		}""")
+
+    Json.jArray(conditions.descendant("$.conditions[?(@['condition'] == true)].id").getAll)  <=> parse("""["i1"]""")
+    Json.jArray(conditions.descendant("$.conditions[?(@['condition'] == false)].id").getAll) <=> parse("""["i2"]""")
+
+    conditions.descendant("$.conditions[?(@['condition'] == true)]").modify(_.addIfMissing("matched" := true)) <=> parse("""{
+      "conditions": [
+        { "id": "i1", "condition": true, "matched": true },
+        { "id": "i2", "condition": false }
+      ]
+    }""")
+
+
+
+    val objConditions = parse("""{ "conditions":
+        {
+          "first": { "id": "i1", "condition": true },
+          "second": { "id": "i2", "condition": false }
+        }
+      }""")
+
+    Json.jArray(objConditions.descendant("$.conditions[?(@['condition'] == true)].id").getAll)  <=> parse("""["i1"]""")
+    Json.jArray(objConditions.descendant("$.conditions[?(@['condition'] == false)].id").getAll) <=> parse("""["i2"]""")
+
+    objConditions.descendant("$.conditions[?(@['condition'] == true)]").modify(_.addIfMissing("matched" := true)) <=> parse("""{
+      "conditions": {
+        "first": { "id": "i1", "condition": true, "matched": true },
+        "second": { "id": "i2", "condition": false }
+      }
+    }""")
+  }
+
+  "renameField" in
+    jObjectFields("original" → jTrue).renameField("original", "renamed") <=> jObjectFields("renamed" → jTrue)
+
+  "renameFields" in
+    jObjectFields("a" → jTrue, "b" → jFalse).renameFields("a" → "A", "b" → "B") <=> jObjectFields("A" → jTrue, "B" → jFalse)
+
+  "removeIfPresent" in on(
+    jEmptyObject, obj("a" := added), obj("a" := existing)
+  ).calling(_.removeIfPresent("a", jString(added))).produces(
+    jEmptyObject, jEmptyObject, obj("a" := existing)
+  )
+
+  "removeFields" in on(
+    obj("a" := "value", "b" := 123, "c" := true), obj("a" := "value", "b" := 123)
+  ).calling(_.removeFields("b", "c")).produces(
+    obj("a" := "value"), obj("a" := "value")
+  )
+  
+  "append" in {
+    val value = Json.jString("bar")
+    
+    Json.obj().append(Nil, value)                       <=> Json.obj()
+    Json.obj().append(List("key"), value)               <=> Json.obj("key" := "bar")
+    Json.obj("key" := "foo").append(List("key"), value) <=> Json.obj("key" := "bar")
+    Json.obj().append(List("outer", "inner"), value)    <=> Json.obj("outer" := Json.obj("inner" := "bar"))
+  }
+  
+  "fromProperties" in {
+    Json.fromProperties(Map()) <=> Right(Json.obj())
+    
+    Json.fromProperties(Map(
+      "value" -> "\"bar\"",
+      "invalid" -> "unquoted string"
+    )) <=> Left(("invalid", "Unexpected content found: unquoted string"))
+
+    Json.fromProperties(Map("foo" -> "\"bar\"")) <=> Right(Json.obj("foo" := "bar"))
+
+    Json.fromProperties(Map("foo.oof" -> "\"bar\"")) <=> Right(Json.obj("foo" := Json.obj("oof" := "bar")))
+
+    Json.fromProperties(Map(
+      "foo.oof" -> "123",
+      "foo.ffs" -> "false"
+    )) <=> Right(Json.obj("foo" := Json.obj("oof" := 123, "ffs" := false)))
+
+    Json.fromProperties(Map(
+      "foo"     -> "123",
+      "foo.oof" -> "false"
+    )) <=> Right(Json.obj("foo" := 123))
+  }
+
+  "pivot" in
+    Json.obj(unpivoted.pivot: _*) <=> pivoted
+
+  "unpivot" in  
+    pivoted.unpivot <=> unpivoted
+
+  "merge" in {
+    Json.obj("a" := "a", "b" := 123).merge(Json.obj("b" := 456)) <=> Json.obj("a" := "a", "b" := 456)
+
+    Json.obj("a" := "a", "b" := 123).merge(Json.obj("b" := Json.jNull)) <=> Json.obj("a" := "a")
+    
+    Json.jString("non object").merge(Json.jString("anything")) <=> Json.jString("non object")
+    
+    Json.obj("a" := "a").merge(Json.jString("non object")) <=> Json.obj("a" := "a") 
+  }
+  
   "descendant" - {
-    "booleanFilter" - {
-      "1" in {
-        val json = parse(
-          """{
-            | "people": [
-            |  {"person": {"name": "Arnie", "age": 100}, "address": "California"},
-            |  {"person": {"name": "Raymond", "age": 21}, "address": "Brisvegas"},
-            |  {"person": {"name": "Raymond", "age": 35}, "address": "London"}
-            | ]
-            |}
-          """.stripMargin)
-    
-        json.descendant("$.people[?(@.person.name == 'Raymond' && @.person.age == 21)].address").getAll <=> List(jString("Brisvegas"))
-        json.descendant("$.people[?(@.person.name == 'Arnie' || @.person.age == 21)].address").getAll <=> List(jString("California"), jString("Brisvegas"))
-      }
-  
-      "2" in {
-        val json = parse("""{ "conditions": [true, false, true] }""")
-    
-        json.descendant("$.conditions[?(@ == true)]").getAll  <=> List(jTrue, jTrue)
-        json.descendant("$.conditions[?(@ == false)]").getAll <=> List(jFalse)
-        json.descendant("$.conditions[?(false == @)]").getAll <=> List(jFalse)
-      }
-    }
-  
     "values" in {
       jobj.descendant("age").getAll <=> List(age)
       jobj.descendant("age").modify(_ ⇒ redacted) <=> ("age" → redacted) ->: jobj
@@ -305,6 +404,12 @@ class JsonSpec extends PSpec with JsonUtil {
     }
   
     "obj" - {
+      "renameField" in
+        parse("""{ "thing": { "original": true } }""").descendant("thing").obj.renameField("original", "renamed") <=> parse("""{ "thing": { "renamed": true } }""")
+  
+      "renameFields" in
+        parse("""{ "thing": { "a": true, "b": false} }""").descendant("thing").obj.renameFields("a" → "A", "b" → "B") <=> parse("""{ "thing": { "A": true, "B": false} }""")
+
       "addIfMissing" - {  
         "1" in on(
           parse("""{ "thing": {} }"""),           parse("""{ "thing": {"a": true} }""")
@@ -320,78 +425,33 @@ class JsonSpec extends PSpec with JsonUtil {
           thing(obj("a" := added, "b" := existing)), thing(obj("a" := existing, "b" := existing))
         )
       }
-      
-      "renameField" in
-        parse("""{ "thing": { "original": true } }""").descendant("thing").obj.renameField("original", "renamed") <=> parse("""{ "thing": { "renamed": true } }""")
-  
-      "renameFields" in
-        parse("""{ "thing": { "a": true, "b": false} }""").descendant("thing").obj.renameFields("a" → "A", "b" → "B") <=> parse("""{ "thing": { "A": true, "B": false} }""")
-    }  
-  }
-  
-  "delete" in {
-//    println(parse(
-//      """{
-//        |   "a": {
-//        |     "nested": {
-//        |       "thing": "bye bye"
-//        |     }
-//        |   },
-//        |   "remainder": "still here"
-//        |}
-//      """.stripMargin).delete("a/nested/thing").spaces2)
-//
-//    println(parse("""{"candy": "lollipop", "noncandy": null,"other": "things"}""")
-//      .descendant("candy").string.set("big turks").filterNulls
-//      .delete("other").spaces2)
-//
-
-//    store.jsonPath("$.store.book[*].author").getAll.foreach(j ⇒ println(j.spaces2))
-
-
-
-    val conditions = parse("""{ "conditions":
-          			[
-          				{ "id": "i1", "condition": true },
-          				{ "id": "i2", "condition": false }
-          			]
-          		}""")
-
-    Json.jArray(conditions.descendant("$.conditions[?(@['condition'] == true)].id").getAll)  <=> parse("""["i1"]""")
-    Json.jArray(conditions.descendant("$.conditions[?(@['condition'] == false)].id").getAll) <=> parse("""["i2"]""")
-
-    conditions.descendant("$.conditions[?(@['condition'] == true)]").modify(_.addIfMissing("matched" := true)) <=> parse("""{
-      "conditions": [
-        { "id": "i1", "condition": true, "matched": true },
-        { "id": "i2", "condition": false }
-      ]
-    }""")
-
-
-
-    val objConditions = parse("""{ "conditions":
-        {
-          "first": { "id": "i1", "condition": true },
-          "second": { "id": "i2", "condition": false }
-        }
-      }""")
-
-    Json.jArray(objConditions.descendant("$.conditions[?(@['condition'] == true)].id").getAll)  <=> parse("""["i1"]""")
-    Json.jArray(objConditions.descendant("$.conditions[?(@['condition'] == false)].id").getAll) <=> parse("""["i2"]""")
-
-    objConditions.descendant("$.conditions[?(@['condition'] == true)]").modify(_.addIfMissing("matched" := true)) <=> parse("""{
-      "conditions": {
-        "first": { "id": "i1", "condition": true, "matched": true },
-        "second": { "id": "i2", "condition": false }
+    }
+    
+    "booleanFilter" - {
+      "1" in {
+        val json = parse(
+          """{
+            | "people": [
+            |  {"person": {"name": "Arnie", "age": 100}, "address": "California"},
+            |  {"person": {"name": "Raymond", "age": 21}, "address": "Brisvegas"},
+            |  {"person": {"name": "Raymond", "age": 35}, "address": "London"}
+            | ]
+            |}
+          """.stripMargin)
+    
+        json.descendant("$.people[?(@.person.name == 'Raymond' && @.person.age == 21)].address").getAll <=> List(jString("Brisvegas"))
+        json.descendant("$.people[?(@.person.name == 'Arnie' || @.person.age == 21)].address").getAll <=> List(jString("California"), jString("Brisvegas"))
       }
-    }""")
+  
+      "2" in {
+        val json = parse("""{ "conditions": [true, false, true] }""")
+    
+        json.descendant("$.conditions[?(@ == true)]").getAll  <=> List(jTrue, jTrue)
+        json.descendant("$.conditions[?(@ == false)]").getAll <=> List(jFalse)
+        json.descendant("$.conditions[?(false == @)]").getAll <=> List(jFalse)
+      }
+    }
   }
-
-  "renameField" in
-    jObjectFields("original" → jTrue).renameField("original", "renamed") <=> jObjectFields("renamed" → jTrue)
-
-  "renameFields" in
-    jObjectFields("a" → jTrue, "b" → jFalse).renameFields("a" → "A", "b" → "B") <=> jObjectFields("A" → jTrue, "B" → jFalse)
 
   "addIfMissing" - {
     "1" in on(
@@ -409,66 +469,6 @@ class JsonSpec extends PSpec with JsonUtil {
     )
   }
 
-  "removeIfPresent" in on(
-    jEmptyObject, obj("a" := added), obj("a" := existing)
-  ).calling(_.removeIfPresent("a", jString(added))).produces(
-    jEmptyObject, jEmptyObject, obj("a" := existing)
-  )
-
-  "removeFields" in on(
-    obj("a" := "value", "b" := 123, "c" := true), obj("a" := "value", "b" := 123)
-  ).calling(_.removeFields("b", "c")).produces(
-    obj("a" := "value"), obj("a" := "value")
-  )
-  
-  "append" in {
-    val value = Json.jString("bar")
-    
-    Json.obj().append(Nil, value)                       <=> Json.obj()
-    Json.obj().append(List("key"), value)               <=> Json.obj("key" := "bar")
-    Json.obj("key" := "foo").append(List("key"), value) <=> Json.obj("key" := "bar")
-    Json.obj().append(List("outer", "inner"), value)    <=> Json.obj("outer" := Json.obj("inner" := "bar"))
-  }
-  
-  "fromProperties" in {
-    Json.fromProperties(Map()) <=> Right(Json.obj())
-    
-    Json.fromProperties(Map(
-      "value" -> "\"bar\"",
-      "invalid" -> "unquoted string"
-    )) <=> Left(("invalid", "Unexpected content found: unquoted string"))
-
-    Json.fromProperties(Map("foo" -> "\"bar\"")) <=> Right(Json.obj("foo" := "bar"))
-
-    Json.fromProperties(Map("foo.oof" -> "\"bar\"")) <=> Right(Json.obj("foo" := Json.obj("oof" := "bar")))
-
-    Json.fromProperties(Map(
-      "foo.oof" -> "123",
-      "foo.ffs" -> "false"
-    )) <=> Right(Json.obj("foo" := Json.obj("oof" := 123, "ffs" := false)))
-
-    Json.fromProperties(Map(
-      "foo"     -> "123",
-      "foo.oof" -> "false"
-    )) <=> Right(Json.obj("foo" := 123))
-  }
-
-  "pivot" in
-    Json.obj(unpivoted.pivot: _*) <=> pivoted
-
-  "unpivot" in  
-    pivoted.unpivot <=> unpivoted
-
-  "merge" in {
-    Json.obj("a" := "a", "b" := 123).merge(Json.obj("b" := 456)) <=> Json.obj("a" := "a", "b" := 456)
-
-    Json.obj("a" := "a", "b" := 123).merge(Json.obj("b" := Json.jNull)) <=> Json.obj("a" := "a")
-    
-    Json.jString("non object").merge(Json.jString("anything")) <=> Json.jString("non object")
-    
-    Json.obj("a" := "a").merge(Json.jString("non object")) <=> Json.obj("a" := "a") 
-  }
-  
   private lazy val unpivoted: Json = Json.obj(
     "outer1" := Json.obj(
       "key1" := "value1",
@@ -549,19 +549,21 @@ class JsonObjectSpec extends PSpec with JsonUtil {
   "renameFields" in
     obj("a" := true, "b" := false).withObject(_.renameFields("a" → "A", "b" → "B")) <=> obj("A" := true, "B" := false)
 
-  "addIfMissing" in on(
-    jEmptyObject,     obj("a" := existing)
-  ).calling(_.withObject(_.addIfMissing("a", added))).produces(
-    obj("a" := added), obj("a" := existing)
-  )
-
-  "addIfMissing_many" in on(
-    jEmptyObject,        obj("a" := existing),
-    obj("b" := existing), obj("a" := existing, "b" := existing)
-  ).calling(_.withObject(_.addIfMissing("a" := added, "b" := added))).produces(
-    obj("a" := added, "b" := added),    obj("a" := existing, "b" := added),
-    obj("a" := added, "b" := existing), obj("a" := existing, "b" := existing)
-  )
+  "addIfMissing" - {
+    "1" in on(
+      jEmptyObject,     obj("a" := existing)
+    ).calling(_.withObject(_.addIfMissing("a", added))).produces(
+      obj("a" := added), obj("a" := existing)
+    )
+  
+    "many" in on(
+      jEmptyObject,        obj("a" := existing),
+      obj("b" := existing), obj("a" := existing, "b" := existing)
+    ).calling(_.withObject(_.addIfMissing("a" := added, "b" := added))).produces(
+      obj("a" := added, "b" := added),    obj("a" := existing, "b" := added),
+      obj("a" := added, "b" := existing), obj("a" := existing, "b" := existing)
+    )
+  }
 
   private lazy val added    = jString("added")
   private lazy val existing = jString("existing")

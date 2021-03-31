@@ -8,7 +8,6 @@ import _root_.scalaz.{-\/, \/-}
 
 class BooleanSpec extends PSpec {
   "asInt"     in truthTableFor(_.asInt).produces(0, 1)
-  "either_or" in truthTableFor(_.either(123).or("456")).produces(Left("456"), Right(123))
   "option"    in truthTableFor(_.option(123)).produces(None, Some(123))
   "cond"      in truthTableFor(_.cond(123, 456)).produces(456, 123)
   "implies"   in truthTableFor(_ implies _).produces(t, t, f, t)
@@ -25,7 +24,13 @@ class BooleanSpec extends PSpec {
     strings().run(ss ⇒ true.tapTrue(ss += "true")) ≡ List("true")
   }
 
-  "disjunction_or" in truthTableFor(_.disjunction(123).or("456")).produces(-\/("456"), \/-(123))
+  "either" - {
+    "or" in truthTableFor(_.either(123).or("456")).produces(Left("456"), Right(123))
+  }
+
+  "disjunction" - {
+    "or" in truthTableFor(_.disjunction(123).or("456")).produces(-\/("456"), \/-(123))
+  }
   
   private def truthTableFor[A](fn: Boolean => A): util.on[Boolean]#calling[A] =
     util.on(false, true).calling(fn)

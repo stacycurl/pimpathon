@@ -54,46 +54,6 @@ class AnySpec extends PSpec {
   "isOneOf" in on(1, 2, 3, 4).calling(_.isOneOf(1, 3)).produces(true, false, true, false)
   "isNotOneOf" in on(1, 2, 3, 4).calling(_.isNotOneOf(1, 3)).produces(false, true, false, true)
 
-  "passes_one" in {
-    on(1, 2, 3, 4).calling(_.passes.one(_ < 2, _ > 3)).produces(Some(1), None, None, Some(4))
-    on(1, 2, 3, 4).calling(_.passes.one()).produces(None, None, None, None)
-  }
-
-  "passes_all" in {
-    on(1, 2, 3, 4).calling(_.passes.all(_ >= 2, _ <= 3)).produces(None, Some(2), Some(3), None)
-    on(1, 2, 3, 4).calling(_.passes.all()).produces(Some(1), Some(2), Some(3), Some(4))
-  }
-
-  "passes_none" in {
-    on(1, 2, 3, 4).calling(_.passes.none(_ >= 2, _ <= 3)).produces(Some(1), None, None, Some(4))
-    on(1, 2, 3, 4).calling(_.passes.none()).produces(None, None, None, None)
-  }
-
-  "passes_some" in {
-    on(1, 2, 3, 4).calling(_.passes.some(_ < 2, _ > 3)).produces(None, Some(2), Some(3), None)
-    on(1, 2, 3, 4).calling(_.passes.some()).produces(Some(1), Some(2), Some(3), Some(4))
-  }
-
-  "fails_one" in {
-    on(1, 2, 3, 4).calling(_.fails.one(_ < 2, _ > 3)).produces(None, Some(2), Some(3), None)
-    on(1, 2, 3, 4).calling(_.fails.one()).produces(Some(1), Some(2), Some(3), Some(4))
-  }
-
-  "fails_all" in {
-    on(1, 2, 3, 4).calling(_.fails.all(_ >= 2, _ <= 3)).produces(Some(1), None, None, Some(4))
-    on(1, 2, 3, 4).calling(_.fails.all()).produces(None, None, None, None)
-  }
-
-  "fails_none" in {
-    on(1, 2, 3, 4).calling(_.fails.none(_ >= 2, _ <= 3)).produces(None, Some(2), Some(3), None)
-    on(1, 2, 3, 4).calling(_.fails.none()).produces(Some(1), Some(2), Some(3), Some(4))
-  }
-
-  "fails_some" in {
-    on(1, 2, 3, 4).calling(_.fails.some(_ < 2, _ > 3)).produces(Some(1), None, None, Some(4))
-    on(1, 2, 3, 4).calling(_.fails.some()).produces(None, None, None, None)
-  }
-
   "withFinally" in strings().run(ss ⇒ {
     ss += "input".withFinally(s ⇒ ss += "finally: " + s)(s ⇒ {ss += "body: " + s; "done"})
   }) ≡ List("body: input", "finally: input", "done")
@@ -124,6 +84,50 @@ class AnySpec extends PSpec {
        |      scala & java libraries
        |    and pimps for external
        |  libraries""".stripMargin
+  }
+  
+  "passes" - {
+    "one" in {
+      on(1, 2, 3, 4).calling(_.passes.one(_ < 2, _ > 3)).produces(Some(1), None, None, Some(4))
+      on(1, 2, 3, 4).calling(_.passes.one()).produces(None, None, None, None)
+    }
+  
+    "all" in {
+      on(1, 2, 3, 4).calling(_.passes.all(_ >= 2, _ <= 3)).produces(None, Some(2), Some(3), None)
+      on(1, 2, 3, 4).calling(_.passes.all()).produces(Some(1), Some(2), Some(3), Some(4))
+    }
+  
+    "none" in {
+      on(1, 2, 3, 4).calling(_.passes.none(_ >= 2, _ <= 3)).produces(Some(1), None, None, Some(4))
+      on(1, 2, 3, 4).calling(_.passes.none()).produces(None, None, None, None)
+    }
+  
+    "some" in {
+      on(1, 2, 3, 4).calling(_.passes.some(_ < 2, _ > 3)).produces(None, Some(2), Some(3), None)
+      on(1, 2, 3, 4).calling(_.passes.some()).produces(Some(1), Some(2), Some(3), Some(4))
+    }
+  }
+  
+  "fails" - {
+    "one" in {
+      on(1, 2, 3, 4).calling(_.fails.one(_ < 2, _ > 3)).produces(None, Some(2), Some(3), None)
+      on(1, 2, 3, 4).calling(_.fails.one()).produces(Some(1), Some(2), Some(3), Some(4))
+    }
+  
+    "all" in {
+      on(1, 2, 3, 4).calling(_.fails.all(_ >= 2, _ <= 3)).produces(Some(1), None, None, Some(4))
+      on(1, 2, 3, 4).calling(_.fails.all()).produces(None, None, None, None)
+    }
+  
+    "none" in {
+      on(1, 2, 3, 4).calling(_.fails.none(_ >= 2, _ <= 3)).produces(None, Some(2), Some(3), None)
+      on(1, 2, 3, 4).calling(_.fails.none()).produces(Some(1), Some(2), Some(3), Some(4))
+    }
+  
+    "some" in {
+      on(1, 2, 3, 4).calling(_.fails.some(_ < 2, _ > 3)).produces(Some(1), None, None, Some(4))
+      on(1, 2, 3, 4).calling(_.fails.some()).produces(None, None, None, None)
+    }
   }
   
   private class Spiel {

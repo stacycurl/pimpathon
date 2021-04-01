@@ -9,7 +9,7 @@ import scala.collection.immutable.{Map => ▶:}
 import pimpathon.genTraversableLike.{GTLGT, GenTraversableLikeOfEitherPimpsMixin, GenTraversableLikeOfTuple2Mixin}
 import pimpathon.any.AnyPimps
 import pimpathon.boolean.BooleanPimps
-import pimpathon.function.{Predicate, equalC}
+import pimpathon.function._
 import pimpathon.multiMap.{MultiMapPimps, build}
 import pimpathon.option._
 import pimpathon.ordering._
@@ -21,15 +21,8 @@ import scala.collection.generic.CanBuildFrom
 
 object list {
   implicit class ListPimps[A](private val self: List[A]) extends genTraversableLike.GenTraversableLikePimpsMixin[A, List] {
-    def updateIf(pred: A ⇒ Boolean, updateFn: A ⇒ A): List[A] = self.map {
-      case x if pred(x) ⇒ updateFn(x)
-      case x            ⇒ x
-    }
-
-    def update(pf: A ~> A): List[A] = self.map {
-      case x if pf.isDefinedAt(x) ⇒ pf(x)
-      case x                      ⇒ x
-    }
+    def updateIf(pred: A ⇒ Boolean, updateFn: A ⇒ A): List[A] = update(updateFn.guardWith(pred))
+    def update(pf: A ~> A): List[A] = self.map(pf.unify)
 
     def tapEmpty[Discarded](empty: ⇒ Discarded): List[A] = tap(empty, _ ⇒ {})
     def tapNonEmpty[Discarded](nonEmpty: List[A] ⇒ Discarded): List[A] = tap({}, nonEmpty)

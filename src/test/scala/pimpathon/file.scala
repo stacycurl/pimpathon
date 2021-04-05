@@ -284,6 +284,11 @@ class FileSpec extends PSpec {
     tmp.writeLines(List("5", "6")).readLines()                ≡ List("5", "6")
   })
   
+  "prependBytes" in file.withTempFile(tmp => {
+    tmp.prependBytes("12".getBytes).readLines() ≡ List("12")
+    tmp.prependBytes("34".getBytes).readLines() ≡ List("3412")
+  })
+  
   "prependLines" in file.withTempFile(tmp => {
     tmp.prependLines(List("1", "2")).readLines() ≡ List("1", "2")
     tmp.prependLines(List("3", "4")).readLines() ≡ List("3", "4", "1", "2")

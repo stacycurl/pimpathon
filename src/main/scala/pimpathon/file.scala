@@ -75,10 +75,13 @@ case class FileUtils (
       writeBytes(contents.getBytes, append)
 
     def prependLines(lines: List[String]): File = 
-      writeLines(lines ++ self.readLines(), append = false)
-    
+      prependBytes(linesToBytes(lines))
+
+    def prependBytes(bytes: Array[Byte]): File =
+      writeBytes(bytes ++ readBytes(), append = false)
+
     def writeLines(lines: List[String], append: Boolean = append): File =
-      writeBytes((lines.mkString("\n") + "\n").getBytes, append)
+      writeBytes(linesToBytes(lines), append)
 
     def writeBytes(bytes: Array[Byte], append: Boolean = append): File =
       self.tap(_.outputStream(append).closeAfter(_.write(bytes)))
@@ -90,6 +93,7 @@ case class FileUtils (
 
     private def separator: String = File.separator.replace("\\", "\\\\")
     private def sharedPaths(other: File) = self.path.sharedPrefix(other.path) |> (t ⇒ (t._2, t._3))
+    private def linesToBytes(lines: List[String]): Array[Byte] = (lines.mkString("\n") + "\n").getBytes
   }
 
   def cwd: File = file(Properties.userDir)

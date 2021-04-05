@@ -74,6 +74,9 @@ case class FileUtils (
     def writeString(contents: String, append: Boolean = append): File =
       writeBytes(contents.getBytes, append)
 
+    def prependLines(lines: List[String]): File = 
+      writeLines(lines ++ self.readLines(), append = false)
+    
     def writeLines(lines: List[String], append: Boolean = append): File =
       writeBytes((lines.mkString("\n") + "\n").getBytes, append)
 

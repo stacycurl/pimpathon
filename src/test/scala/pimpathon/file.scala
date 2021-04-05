@@ -283,6 +283,11 @@ class FileSpec extends PSpec {
     tmp.writeLines(List("3", "4"), append = true).readLines() ≡ List("1", "2", "3", "4")
     tmp.writeLines(List("5", "6")).readLines()                ≡ List("5", "6")
   })
+  
+  "prependLines" in file.withTempFile(tmp => {
+    tmp.prependLines(List("1", "2")).readLines() ≡ List("1", "2")
+    tmp.prependLines(List("3", "4")).readLines() ≡ List("3", "4", "1", "2")
+  })
 
   "md5" in file.withTempFile(tmp ⇒ {
     tmp.writeLines(List("blah")).md5() ≡ "6f1ed002ab5595859014ebf0951522d9"

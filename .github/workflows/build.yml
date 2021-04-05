@@ -3,19 +3,6 @@ on:
   push:
     branches: ["*"]
 jobs:
-  no_more_secrets:  
-  # well, maybe some, I just REALLY want to reuse my lost pgp_secret 'n' passphrase, which github refuses to provide
-  # so, I'll use another fuggin secret that I don't care about (that's as strong), and encrypt the 
-  # ENV variables and log, so I can recover them privately. FFS, just ask me my damn password, github, I've got 2fa and the works.
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2.3.4
-        with:
-          fetch-depth: 0
-      - uses: blended-zio/setup-gpg@v3
-      - run: project/foofy.sh
-        env:
-          MY_MESSAGE: ${{ secrets.PGP_PASSPHRASE }}    
   build:
     runs-on: ubuntu-20.04
     steps:

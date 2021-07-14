@@ -20,6 +20,9 @@ object string {
     def wrap(length: Int): String =
       self.split(" ").toList.batchWhile(_.mkString(" ").length <= length).map(_.mkString(" ")).mkString("\n")
 
+    def pascal: String =
+      splitByCase("=").split("=").map(_.toLowerCase.capitalize).mkString("")
+
     def stripAffixes(prefix: String, suffix: String): String = self.stripPrefix(prefix).stripSuffix(suffix)
     def affixWith(prefix: String, suffix: String): String = prefixWith(prefix).suffixWith(suffix)
 

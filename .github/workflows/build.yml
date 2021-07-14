@@ -13,11 +13,10 @@ jobs:
         uses: trilom/file-changes-action@v1.2.3
       - uses: olafurpg/setup-scala@v10
       - run: sbt clean test
-#       - name: Publish Unit Test Results
-#         uses: EnricoMi/publish-unit-test-result-action@v1
-#         if: always()
-#         with:
-#           files: target/test-reports/**/*.xml      
+      - if: always()
+        uses: mikepenz/action-junit-report@v2
+        with:
+          report_paths: 'target/test-reports/**/*.xml'
       - if: contains(steps.file_changes.outputs.files, 'version.sbt')
         uses: blended-zio/setup-gpg@v3
       - if: contains(steps.file_changes.outputs.files, 'version.sbt')

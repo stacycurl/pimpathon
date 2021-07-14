@@ -6,6 +6,10 @@ import pimpathon.string._
 
 
 class StringSpec extends PSpec {
+  "pascal" in {
+    "CreateImageBuilderStreamingURL".pascal ≡ "CreateImageBuilderStreamingUrl"
+  }
+
   "stripAffixes" in
     on("(foo)", "(foo", "oof)", "ooo").calling(_.stripAffixes("(", ")")).produces("foo", "foo", "oof", "ooo")
 

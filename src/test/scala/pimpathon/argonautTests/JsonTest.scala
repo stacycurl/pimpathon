@@ -139,19 +139,19 @@ class JsonSpec extends PSpec with JsonUtil {
   ).calling(_.removeFields("b", "c")).produces(
     obj("a" := "value"), obj("a" := "value")
   )
-  
+
   "append" in {
     val value = Json.jString("bar")
-    
+
     Json.obj().append(Nil, value)                       <=> Json.obj()
     Json.obj().append(List("key"), value)               <=> Json.obj("key" := "bar")
     Json.obj("key" := "foo").append(List("key"), value) <=> Json.obj("key" := "bar")
     Json.obj().append(List("outer", "inner"), value)    <=> Json.obj("outer" := Json.obj("inner" := "bar"))
   }
-  
+
   "fromProperties" in {
     Json.fromProperties(Map()) <=> Right(Json.obj())
-    
+
     Json.fromProperties(Map(
       "value" -> "\"bar\"",
       "invalid" -> "unquoted string"
@@ -182,20 +182,20 @@ class JsonSpec extends PSpec with JsonUtil {
     Json.obj("a" := "a", "b" := 123).merge(Json.obj("b" := 456)) <=> Json.obj("a" := "a", "b" := 456)
 
     Json.obj("a" := "a", "b" := 123).merge(Json.obj("b" := Json.jNull)) <=> Json.obj("a" := "a")
-    
+
     Json.jString("non object").merge(Json.jString("anything")) <=> Json.jString("non object")
-    
-    Json.obj("a" := "a").merge(Json.jString("non object")) <=> Json.obj("a" := "a") 
+
+    Json.obj("a" := "a").merge(Json.jString("non object")) <=> Json.obj("a" := "a")
   }
-  
+
   "descendant" - {
     "values" in {
       jobj.descendant("age").getAll <=> List(age)
       jobj.descendant("age").modify(_ ⇒ redacted) <=> ("age" → redacted) ->: jobj
-  
+
       jobj.descendant("{name, age}").getAll <=> List(name, age)
       jobj.descendant("{name, age}").modify(_ ⇒ redacted) <=> ("name" → redacted) ->: ("age" → redacted) ->: jobj
-  
+
       jobj.descendant("age").int.getAll <=> List(3)
       jobj.descendant("age").int.modify(_ * 2) <=> ("age" → jNumber(6)) ->: jobj
     }
@@ -203,42 +203,42 @@ class JsonSpec extends PSpec with JsonUtil {
     "multiple" in {
       jobj.descendant("name", "age").getAll <=> List(name, age)
     }
-  
+
     "elements" in {
       jArray(fields).descendant("[0, 2]").getAll <=> List(lying, address)
-  
+
       jArray(fields).descendant("[0, 2]").modify(_ ⇒ redacted) <=> jArrayElements(
         redacted, name, redacted, age, width, preferences, potatoes, knownUnknowns, awkward
       )
     }
-  
+
     "all" in {
       jobj.descendant("*").getAll <=> List(name, age, lying, address, preferences, width, potatoes, knownUnknowns, awkward)
-  
+
       jobj.descendant("*").modify(_ ⇒ jString("redacted")) <=> jObjectFields(
         "name" → redacted, "age" → redacted, "lying" → redacted, "address" → redacted, "preferences" → redacted,
         "width" → redacted, "potatoes" → redacted, "knownUnknowns" → redacted, "awkward" → redacted
       )
     }
-  
+
     "ancestors" in {
       jobj.descendant("$.preferences.bananas").string.ancestors <=> jObjectFields(
         "$"                     -> Json.jArray(jobj.descendant("$").getAll),
         "$.preferences"         -> Json.jArray(jobj.descendant("$.preferences").getAll),
         "$.preferences.bananas" -> Json.jArray(jobj.descendant("$.preferences.bananas").getAll)
       )
-  
+
       jobj.descendant("preferences/bananas").string.ancestors <=> jObjectFields(
         ""                    -> Json.jArray(jobj.descendant("").getAll),
         "preferences"         -> Json.jArray(jobj.descendant("preferences").getAll),
         "preferences/bananas" -> Json.jArray(jobj.descendant("preferences/bananas").getAll)
       )
     }
-  
+
     "firstEmptyAt" in on((path: String) ⇒ jobj.descendant(path).firstEmptyAt).maps(
       "$.preferences.bananas" → None, "$.preferences.apples" → Some("$.preferences.apples"), "$.prefs.apples" → Some("$.prefs")
     )
-  
+
     "as" in {
       jobj.descendant("$.address").as[Address].getAll            <=> List(Address(List("29 Acacia Road", "Nuttytown")))
       jobj.descendant("$.address").as[Address].modify(_.reverse) <=> jobj.descendant("$.address").array.modify(_.reverse)
@@ -337,7 +337,7 @@ class JsonSpec extends PSpec with JsonUtil {
           awkward = Awkward(`1` = "ONE")
         )
     }
-    
+
     "work with test set 3" in {
       val json = parse("""{ "points": [
             				             { "id":"i1", "x": 4, "y":-5 },
@@ -348,7 +348,7 @@ class JsonSpec extends PSpec with JsonUtil {
             				             { "id":"i6", "x": 1, "y": 4 }
             				           ]
             				         }""")
-  
+
       json.descendant("$.points[1]").getAll <=> List(parse("""{ "id":"i2", "x":-2, "y": 2, "z":1 }"""))
       json.descendant("$.points[4].x").getAll <=> List(jNumber(0))
       json.descendant("$.points[?(@['id']=='i4')].x").getAll <=> List(jNumber(-6))
@@ -359,7 +359,7 @@ class JsonSpec extends PSpec with JsonUtil {
       json.descendant("$.points[?(@.z)].id").getAll <=> List(jString("i2"), jString("i5"))
       // Non supported syntax "$.points[(count(@)-1)].id"
     }
-  
+
     "Multi-fields accessors should be interpreted correctly" in {
       val json = parse("""{"menu":{"year":2013,"file":"open","options":[{"bold":true},{"font":"helvetica"},{"size":3}]}}""")
       json.descendant("$.menu['file','year']").getAll <=> List(jNumber(2013), jString("open"))
@@ -368,7 +368,7 @@ class JsonSpec extends PSpec with JsonUtil {
   //    json.descendant("$..options['foo','bar']").getAll <=> Nil
   //    json.descendant("$..options[*]['bold','size']").getAll <=> List(jTrue, jNumber(3))
     }
-  
+
     "workWithDeepPredicates" in {
       val json = parse(
         """{
@@ -380,10 +380,10 @@ class JsonSpec extends PSpec with JsonUtil {
         """.stripMargin)
       json.descendant("$.people[?(@.person.name == 'Arnie')].address").getAll <=> List(jString("California"))
     }
-  
+
     "renameField" in
       parse("""{ "thing": { "original": true } }""").descendant("thing").renameField("original", "renamed") <=> parse("""{ "thing": { "renamed": true } }""")
-  
+
     "renameFields" in
       parse("""{ "thing": { "a": true, "b": false} }""").descendant("thing").renameFields("a" → "A", "b" → "B") <=> parse("""{ "thing": { "A": true, "B": false} }""")
 
@@ -393,7 +393,7 @@ class JsonSpec extends PSpec with JsonUtil {
       ).calling(_.descendant("thing").addIfMissing("a", jFalse)).produces(
         parse("""{ "thing": {"a": false} }"""), parse("""{ "thing": {"a": true} }""")
       )
-    
+
       "many" in on(
         thing(jEmptyObject),         thing(obj("a" := existing)),
         thing(obj("b" := existing)), thing(obj("a" := existing, "b" := existing))
@@ -402,21 +402,21 @@ class JsonSpec extends PSpec with JsonUtil {
         thing(obj("a" := added, "b" := existing)), thing(obj("a" := existing, "b" := existing))
       )
     }
-  
+
     "obj" - {
       "renameField" in
         parse("""{ "thing": { "original": true } }""").descendant("thing").obj.renameField("original", "renamed") <=> parse("""{ "thing": { "renamed": true } }""")
-  
+
       "renameFields" in
         parse("""{ "thing": { "a": true, "b": false} }""").descendant("thing").obj.renameFields("a" → "A", "b" → "B") <=> parse("""{ "thing": { "A": true, "B": false} }""")
 
-      "addIfMissing" - {  
+      "addIfMissing" - {
         "1" in on(
           parse("""{ "thing": {} }"""),           parse("""{ "thing": {"a": true} }""")
         ).calling(_.descendant("thing").obj.addIfMissing("a", jFalse)).produces(
           parse("""{ "thing": {"a": false} }"""), parse("""{ "thing": {"a": true} }""")
         )
-      
+
         "many" in on(
           thing(jEmptyObject),         thing(obj("a" := existing)),
           thing(obj("b" := existing)), thing(obj("a" := existing, "b" := existing))
@@ -426,7 +426,7 @@ class JsonSpec extends PSpec with JsonUtil {
         )
       }
     }
-    
+
     "booleanFilter" - {
       "1" in {
         val json = parse(
@@ -438,14 +438,14 @@ class JsonSpec extends PSpec with JsonUtil {
             | ]
             |}
           """.stripMargin)
-    
+
         json.descendant("$.people[?(@.person.name == 'Raymond' && @.person.age == 21)].address").getAll <=> List(jString("Brisvegas"))
         json.descendant("$.people[?(@.person.name == 'Arnie' || @.person.age == 21)].address").getAll <=> List(jString("California"), jString("Brisvegas"))
       }
-  
+
       "2" in {
         val json = parse("""{ "conditions": [true, false, true] }""")
-    
+
         json.descendant("$.conditions[?(@ == true)]").getAll  <=> List(jTrue, jTrue)
         json.descendant("$.conditions[?(@ == false)]").getAll <=> List(jFalse)
         json.descendant("$.conditions[?(false == @)]").getAll <=> List(jFalse)
@@ -481,7 +481,7 @@ class JsonSpec extends PSpec with JsonUtil {
       "key4" := "value4"
     )
   )
-  
+
   private lazy val pivoted: Json = Json.obj(
     "outer1/key1"       := "value1",
     "outer1/key2"       := 123,
@@ -555,7 +555,7 @@ class JsonObjectSpec extends PSpec with JsonUtil {
     ).calling(_.withObject(_.addIfMissing("a", added))).produces(
       obj("a" := added), obj("a" := existing)
     )
-  
+
     "many" in on(
       jEmptyObject,        obj("a" := existing),
       obj("b" := existing), obj("a" := existing, "b" := existing)

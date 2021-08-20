@@ -4,7 +4,7 @@ import scala.language.{dynamics, higherKinds, implicitConversions}
 
 import _root_.argonaut.Json.{jFalse, jNull, jString, jTrue}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
-import _root_.argonaut.JsonMonocle.jObjectPrism
+import _root_.argonaut.JsonMonocle.{jArrayPrism, jObjectPrism}
 import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, HCursor, Json, JsonMonocle, JsonNumber, JsonObject, JsonParser, Parse, PrettyParams}
 import _root_.java.io.File
 import _root_.scalaz.{Applicative, \/}
@@ -32,7 +32,7 @@ object argonaut {
   private[pimpathon] implicit class RegexMatcher(val self: StringContext) extends AnyVal {
     def r: Regex = self.parts.mkString("(.+)").r
   }
-  
+
   implicit class JsonCompanionFrils(val self: Json.type) extends AnyVal {
     def fromProperties(properties: Map[String, String]): Either[(String, String), Json] = {
       properties.apoFold[Json, (String, String)](Json.jEmptyObject) {
@@ -41,7 +41,7 @@ object argonaut {
         } yield acc.append(key.split("\\.").toList.emptyTo(List(key)), json)
       }
     }
-    
+
     def readFrom(file: File): Option[Json] = for {
       content <- if (file.exists()) Some(file.readString) else None
       json    <- Parse.parse(content) match {
@@ -104,25 +104,28 @@ object argonaut {
         }
       }
     })
-    
+
     def pivot: List[(String, Json)] = {
       def recurse(path: String, current: Json): List[(String, Json)] = current match {
         case jObjectPrism(obj) => obj.toList.flatMap {
           case (r":$field", value) => recurse(s"$path:$field", value)
           case (field, value)        => recurse(s"$path/$field", value)
         }
+        case jArrayPrism(arr) ⇒ arr.zipWithIndex.flatMap {
+          case (value, index) ⇒ recurse(s"$path[$index]", value)
+        }
         case other => List(path -> other)
       }
 
       recurse("", self).mapFirst(_.stripPrefix("/"))
     }
-    
+
     def unpivot: Json = self.obj.fold(Json.jNull)(_.toList.map {
       case (path, value) => path.split("/").toList.filter(_.nonEmpty) -> value
     }.sortBy(_._1)(Ordering.Implicits.seqDerivedOrdering[List, String]).foldLeft(Json.jEmptyObject) {
       case (json, (fragments, value)) => json.append(fragments, value)
     })
-    
+
     def merge(other: Json): Json = {
       def recurse(lhsJson: Json, rhsJson: Json): Option[Json] = (lhsJson, rhsJson) partialMatch {
         case (jObjectPrism(lhs), jObjectPrism(rhs)) => Json.jObjectFields(lhs.toMap.zipWith[Json, Json](rhs.toMap) {
@@ -131,7 +134,7 @@ object argonaut {
           case (None, Some(r))                       => r
         }.toList: _*)
       }
-      
+
       recurse(self, other).getOrElse(self)
     }
   }
@@ -166,7 +169,7 @@ object argonaut {
         F.map[Json, A](f(self.encode(a)))(json ⇒ self.decodeJson(json).getOr(a))
       }
     }
-    
+
     def wrapExceptions(name: String): CodecJson[A] = CodecJson.derived[A](
       EncodeJson[A](a => wrapExceptions(s"Encode($name)", self.encode(a))),
       DecodeJson[A](c => wrapExceptions(s"Decode($name)", self.decode(c)))
@@ -337,7 +340,7 @@ object argonaut {
 
 private case class CodecException(descriptions: List[String], cause: Exception) extends Exception("", cause) {
   setStackTrace(descriptions.map(new StackTraceElement(_, "", "", 0)).toArray)
-  
+
   def ::(description: String): CodecException = copy(description :: descriptions)
 }
 
@@ -608,7 +611,7 @@ object Descendant {
 
       tokens.inits.map(_.mkString("/")).toList.reverse.zip(traversals)
     }
-    
+
     import argonaut.RegexMatcher
 
     private def step[A](acc: Traversal[A, Json], token: String): Traversal[A, Json] = token match {
@@ -684,6 +687,6 @@ case class Descendant[From, Via, To](
     case (acc, traversal) ⇒ f(traversal)(acc)
   }
 
-  private def withTraversal[That](fn: Traversal[From, To] ⇒ Traversal[From, That]): Descendant[From, Via, That] = 
+  private def withTraversal[That](fn: Traversal[From, To] ⇒ Traversal[From, That]): Descendant[From, Via, That] =
     copy(traversals = traversals.map(fn))
 }

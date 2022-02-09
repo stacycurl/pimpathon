@@ -6,6 +6,7 @@ import _root_.argonaut.Json.{jFalse, jNull, jString, jTrue}
 import _root_.argonaut.JsonObjectMonocle.{jObjectEach, jObjectFilterIndex}
 import _root_.argonaut.JsonMonocle.{jArrayPrism, jObjectPrism}
 import _root_.argonaut.{CodecJson, DecodeJson, DecodeResult, EncodeJson, HCursor, Json, JsonMonocle, JsonNumber, JsonObject, JsonParser, Parse, PrettyParams}
+
 import _root_.java.io.File
 import _root_.scalaz.{Applicative, \/}
 import io.gatling.jsonpath.AST._
@@ -21,11 +22,13 @@ import pimpathon.list.ListOfTuple2Pimps
 import pimpathon.map.MapPimps
 import pimpathon.string.StringPimps
 
-import scala.{PartialFunction => ~>}
-import scala.collection.immutable.{ListMap, Map => ▶:}
+import scala.{PartialFunction ⇒ ~>}
+import scala.collection.immutable.{ListMap, Map ⇒ ▶:}
 import scala.util.matching.Regex
 import pimpathon.either._
 import pimpathon.list._
+
+import scala.util.Try
 
 
 object argonaut {
@@ -93,17 +96,21 @@ object argonaut {
     def indent2: String =
       PrettyParams.spaces2.copy(preserveOrder = true).pretty(self)
 
-    def append(keys: List[String], value: Json): Json = self.withObject(obj => {
-      keys match {
-        case Nil => obj
-        case head :: Nil => obj + (head, value)
-        case head :: tail => {
-          val subObject = obj(head).getOrElse(Json.jEmptyObject)
+    def append(keys: List[String], value: Json): Json = keys match {
+      case Nil => self
 
-          obj + (head, subObject.append(tail, value))
-        }
-      }
-    })
+      case ArrayIndex(head, _) :: Nil ⇒ self.withObject(obj ⇒ {
+        obj + (head, obj(head).fold(Json.jArrayElements(value))(_.withArray(arr ⇒ arr :+ value)))
+      })
+
+      case head :: Nil => self.withObject(obj ⇒ obj + (head, value))
+
+      case head :: tail   => self.withObject(obj ⇒ {
+        val subObject = obj(head).getOrElse(Json.jEmptyObject)
+
+        obj + (head, subObject.append(tail, value))
+      })
+    }
 
     def pivot: List[(String, Json)] = {
       def recurse(path: String, current: Json): List[(String, Json)] = current match {
@@ -122,9 +129,10 @@ object argonaut {
 
     def unpivot: Json = self.obj.fold(Json.jNull)(_.toList.map {
       case (path, value) => path.split("/").toList.filter(_.nonEmpty) -> value
-    }.sortBy(_._1)(Ordering.Implicits.seqDerivedOrdering[List, String]).foldLeft(Json.jEmptyObject) {
+    }.sortBy(_._1)(Ordering.Implicits.seqDerivedOrdering[List, String](keyOrdering)).foldLeft(Json.jEmptyObject) {
       case (json, (fragments, value)) => json.append(fragments, value)
     })
+
 
     def merge(other: Json): Json = {
       def recurse(lhsJson: Json, rhsJson: Json): Option[Json] = (lhsJson, rhsJson) partialMatch {
@@ -137,6 +145,11 @@ object argonaut {
 
       recurse(self, other).getOrElse(self)
     }
+  }
+
+  private val keyOrdering: Ordering[String] = Ordering.fromLessThan {
+    case (ArrayIndex(lprefix, l), ArrayIndex(rprefix, r)) if lprefix == rprefix ⇒ l < r
+    case (l, r)                                                                 ⇒ l < r
   }
 
   implicit class CodecJsonCompanionFrills(val self: CodecJson.type) extends AnyVal {
@@ -335,6 +348,16 @@ object argonaut {
 
   implicit class JsonArrayFrills(val self: List[Json]) extends AnyVal {
     def filterR(p: Predicate[Json]): List[Json] = self.collect { case j if p(j) ⇒ j.filterR(p) }
+  }
+
+  private object ArrayIndex {
+    def unapply(value: String): Option[(String, Int)] = value partialMatch {
+      case r"${head}\[${Int(index)}\]" ⇒ (head, index)
+    }
+  }
+
+  private object Int {
+    def unapply(value: String): Option[Int] = Try(value.toInt).toOption
   }
 }
 

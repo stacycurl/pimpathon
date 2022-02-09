@@ -175,8 +175,20 @@ class JsonSpec extends PSpec with JsonUtil {
   "pivot" in
     Json.obj(unpivoted.pivot: _*) <=> pivoted
 
-  "unpivot" in  
+  "unpivot" in
     pivoted.unpivot <=> unpivoted
+
+  "pivot.unpivot" in {
+    val original = Json.obj(
+      "big" := List.range(0, 20)
+    )
+
+    val pivoted = original.pivot
+
+    val unpivoted = Json.obj(pivoted: _*).unpivot
+
+    unpivoted <=> original
+  }
 
   "merge" in {
     Json.obj("a" := "a", "b" := 123).merge(Json.obj("b" := 456)) <=> Json.obj("a" := "a", "b" := 456)
@@ -474,7 +486,7 @@ class JsonSpec extends PSpec with JsonUtil {
       "key1" := "value1",
       "key2" := 123,
       "inner" := Json.obj(
-        "key3" := List("value3")
+        "key3" := List("value3a", "value3b")
       )
     ),
     "outer2" := Json.obj(
@@ -483,10 +495,11 @@ class JsonSpec extends PSpec with JsonUtil {
   )
 
   private lazy val pivoted: Json = Json.obj(
-    "outer1/key1"       := "value1",
-    "outer1/key2"       := 123,
-    "outer1/inner/key3" := List("value3"),
-    "outer2/key4"       := "value4"
+    "outer1/key1"          := "value1",
+    "outer1/key2"          := 123,
+    "outer1/inner/key3[0]" := "value3a",
+    "outer1/inner/key3[1]" := "value3b",
+    "outer2/key4"          := "value4"
   )
 
   private def print(values: List[Json]) = values.foreach(j ⇒ println(j.spaces2))
